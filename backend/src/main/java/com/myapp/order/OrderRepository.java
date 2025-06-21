@@ -36,14 +36,17 @@ public class OrderRepository {
 
     public Optional<Order> findById(Long id) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
-            return Optional.ofNullable(session.get(Order.class, id));
+            Query<Order> q = session.createQuery(
+                    "select o from Order o left join fetch o.orderItems oi left join fetch oi.foodItem where o.id = :id", Order.class);
+            q.setParameter("id", id);
+            return q.uniqueResultOptional();
         }
     }
 
     public List<Order> findByCustomer(Long customerId) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Query<Order> q = session.createQuery(
-                    "from Order where customer.id = :customerId order by orderDate desc", Order.class);
+                    "select distinct o from Order o left join fetch o.orderItems oi left join fetch oi.foodItem where o.customer.id = :customerId order by o.orderDate desc", Order.class);
             q.setParameter("customerId", customerId);
             return q.list();
         }
@@ -52,7 +55,7 @@ public class OrderRepository {
     public List<Order> findByRestaurant(Long restaurantId) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Query<Order> q = session.createQuery(
-                    "from Order where restaurant.id = :restaurantId order by orderDate desc", Order.class);
+                    "select distinct o from Order o left join fetch o.orderItems oi left join fetch oi.foodItem where o.restaurant.id = :restaurantId order by o.orderDate desc", Order.class);
             q.setParameter("restaurantId", restaurantId);
             return q.list();
         }
@@ -139,6 +142,18 @@ public class OrderRepository {
                 session.remove(order);
             }
             tx.commit();
+        }
+    }
+
+    public boolean existsById(Long id) {
+        if (id == null || id <= 0) {
+            return false;
+        }
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            Query<Long> query = session.createQuery("SELECT COUNT(o) FROM Order o WHERE o.id = :id", Long.class);
+            query.setParameter("id", id);
+            Long count = query.uniqueResult();
+            return count != null && count > 0;
         }
     }
 

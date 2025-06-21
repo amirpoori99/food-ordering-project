@@ -103,4 +103,11 @@ public class RestaurantRepository {
             tx.commit();
         }
     }
+    
+    public boolean existsById(Long id) {
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            Restaurant restaurant = session.get(Restaurant.class, id);
+            return restaurant != null;
+        }
+    }
 }

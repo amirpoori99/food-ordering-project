@@ -1,5 +1,472 @@
 package com.myapp.order;
 
+import com.myapp.common.exceptions.NotFoundException;
+import com.myapp.common.models.*;
+import com.myapp.item.ItemRepository;
+import com.myapp.restaurant.RestaurantRepository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Service class for order management and shopping cart operations.
+ * Handles order placement, validation, and lifecycle management.
+ */
 public class OrderService {
     
+    private final OrderRepository orderRepository;
+    private final ItemRepository itemRepository;
+    private final RestaurantRepository restaurantRepository;
+    
+    public OrderService(OrderRepository orderRepository, ItemRepository itemRepository, RestaurantRepository restaurantRepository) {
+        this.orderRepository = orderRepository;
+        this.itemRepository = itemRepository;
+        this.restaurantRepository = restaurantRepository;
+    }
+    
+    /**
+     * Creates a new order for the given customer and restaurant.
+     * This represents creating a shopping cart.
+     */
+    public Order createOrder(Long customerId, Long restaurantId, String deliveryAddress, String phone) {
+        if (customerId == null) {
+            throw new IllegalArgumentException("Customer ID cannot be null");
+        }
+        if (restaurantId == null) {
+            throw new IllegalArgumentException("Restaurant ID cannot be null");
+        }
+        if (deliveryAddress == null || deliveryAddress.trim().isEmpty()) {
+            throw new IllegalArgumentException("Delivery address cannot be empty");
+        }
+        if (phone == null || phone.trim().isEmpty()) {
+            throw new IllegalArgumentException("Phone number cannot be empty");
+        }
+        
+        // Validate restaurant exists and is approved
+        Optional<Restaurant> restaurantOpt = restaurantRepository.findById(restaurantId);
+        if (restaurantOpt.isEmpty()) {
+            throw new NotFoundException("Restaurant", restaurantId);
+        }
+        
+        Restaurant restaurant = restaurantOpt.get();
+        if (restaurant.getStatus() != RestaurantStatus.APPROVED) {
+            throw new IllegalArgumentException("Restaurant is not available for orders. Status: " + restaurant.getStatus());
+        }
+        
+        // Create user object (in real app, would fetch from UserRepository)
+        User customer = new User();
+        customer.setId(customerId);
+        
+        Order order = Order.createNew(customer, restaurant, deliveryAddress.trim(), phone.trim());
+        return orderRepository.saveNew(order);
+    }
+    
+    /**
+     * Adds an item to the shopping cart (order).
+     */
+    public Order addItemToCart(Long orderId, Long itemId, int quantity) {
+        if (orderId == null) {
+            throw new IllegalArgumentException("Order ID cannot be null");
+        }
+        if (itemId == null) {
+            throw new IllegalArgumentException("Item ID cannot be null");
+        }
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be positive, got: " + quantity);
+        }
+        
+        // Find the order
+        Optional<Order> orderOpt = orderRepository.findById(orderId);
+        if (orderOpt.isEmpty()) {
+            throw new NotFoundException("Order", orderId);
+        }
+        
+        Order order = orderOpt.get();
+        
+        // Validate order is still pending (can be modified)
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new IllegalArgumentException("Cannot modify order with status: " + order.getStatus());
+        }
+        
+        // Find the item
+        Optional<FoodItem> itemOpt = itemRepository.findById(itemId);
+        if (itemOpt.isEmpty()) {
+            throw new NotFoundException("Food item", itemId);
+        }
+        
+        FoodItem item = itemOpt.get();
+        
+        // Validate item belongs to the same restaurant
+        if (!item.getRestaurant().getId().equals(order.getRestaurant().getId())) {
+            throw new IllegalArgumentException("Item does not belong to the order's restaurant");
+        }
+        
+        // Validate item is available
+        if (!item.getAvailable()) {
+            throw new IllegalArgumentException("Item is not available: " + item.getName());
+        }
+        
+        // Validate sufficient stock
+        if (!item.isInStock() || item.getQuantity() < quantity) {
+            throw new IllegalArgumentException("Insufficient stock for item: " + item.getName() + 
+                                             ". Available: " + item.getQuantity() + ", Requested: " + quantity);
+        }
+        
+        // Add item to order
+        order.addItem(item, quantity);
+        
+        return orderRepository.save(order);
+    }
+    
+    /**
+     * Removes an item from the shopping cart.
+     */
+    public Order removeItemFromCart(Long orderId, Long itemId) {
+        if (orderId == null) {
+            throw new IllegalArgumentException("Order ID cannot be null");
+        }
+        if (itemId == null) {
+            throw new IllegalArgumentException("Item ID cannot be null");
+        }
+        
+        Optional<Order> orderOpt = orderRepository.findById(orderId);
+        if (orderOpt.isEmpty()) {
+            throw new NotFoundException("Order", orderId);
+        }
+        
+        Order order = orderOpt.get();
+        
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new IllegalArgumentException("Cannot modify order with status: " + order.getStatus());
+        }
+        
+        Optional<FoodItem> itemOpt = itemRepository.findById(itemId);
+        if (itemOpt.isEmpty()) {
+            throw new NotFoundException("Food item", itemId);
+        }
+        
+        FoodItem item = itemOpt.get();
+        order.removeItem(item);
+        
+        return orderRepository.save(order);
+    }
+    
+    /**
+     * Updates the quantity of an item in the shopping cart.
+     */
+    public Order updateItemQuantity(Long orderId, Long itemId, int newQuantity) {
+        if (orderId == null) {
+            throw new IllegalArgumentException("Order ID cannot be null");
+        }
+        if (itemId == null) {
+            throw new IllegalArgumentException("Item ID cannot be null");
+        }
+        if (newQuantity <= 0) {
+            return removeItemFromCart(orderId, itemId);
+        }
+        
+        // Find the order
+        Optional<Order> orderOpt = orderRepository.findById(orderId);
+        if (orderOpt.isEmpty()) {
+            throw new NotFoundException("Order", orderId);
+        }
+        
+        Order order = orderOpt.get();
+        
+        // Validate order is still pending (can be modified)
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new IllegalArgumentException("Cannot modify order with status: " + order.getStatus());
+        }
+        
+        // Find the item
+        Optional<FoodItem> itemOpt = itemRepository.findById(itemId);
+        if (itemOpt.isEmpty()) {
+            throw new NotFoundException("Food item", itemId);
+        }
+        
+        FoodItem item = itemOpt.get();
+        
+        // Validate item belongs to the same restaurant
+        if (!item.getRestaurant().getId().equals(order.getRestaurant().getId())) {
+            throw new IllegalArgumentException("Item does not belong to the order's restaurant");
+        }
+        
+        // Validate item is available
+        if (!item.getAvailable()) {
+            throw new IllegalArgumentException("Item is not available: " + item.getName());
+        }
+        
+        // Set the new quantity directly
+        order.setItemQuantity(item, newQuantity);
+        
+        return orderRepository.save(order);
+    }
+    
+    /**
+     * Places the order (confirms the shopping cart).
+     * This transitions the order from PENDING to CONFIRMED.
+     */
+    public Order placeOrder(Long orderId) {
+        if (orderId == null) {
+            throw new IllegalArgumentException("Order ID cannot be null");
+        }
+        
+        Optional<Order> orderOpt = orderRepository.findById(orderId);
+        if (orderOpt.isEmpty()) {
+            throw new NotFoundException("Order", orderId);
+        }
+        
+        Order order = orderOpt.get();
+        
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new IllegalArgumentException("Order cannot be placed. Current status: " + order.getStatus());
+        }
+        
+        if (order.getOrderItems().isEmpty()) {
+            throw new IllegalArgumentException("Cannot place empty order");
+        }
+        
+        // Validate all items are still available and in stock
+        for (OrderItem orderItem : order.getOrderItems()) {
+            FoodItem item = orderItem.getFoodItem();
+            
+            // Refresh item from database to get latest stock info
+            Optional<FoodItem> currentItemOpt = itemRepository.findById(item.getId());
+            if (currentItemOpt.isEmpty()) {
+                throw new IllegalArgumentException("Item no longer exists: " + item.getName());
+            }
+            
+            FoodItem currentItem = currentItemOpt.get();
+            if (!currentItem.getAvailable()) {
+                throw new IllegalArgumentException("Item is no longer available: " + item.getName());
+            }
+            
+            if (currentItem.getQuantity() < orderItem.getQuantity()) {
+                throw new IllegalArgumentException("Insufficient stock for item: " + item.getName() + 
+                                                 ". Available: " + currentItem.getQuantity() + 
+                                                 ", Ordered: " + orderItem.getQuantity());
+            }
+        }
+        
+        // Decrease inventory for all items
+        for (OrderItem orderItem : order.getOrderItems()) {
+            FoodItem item = orderItem.getFoodItem();
+            item.decreaseQuantity(orderItem.getQuantity());
+            itemRepository.save(item);
+        }
+        
+        // Confirm the order
+        order.confirm();
+        
+        // Set estimated delivery time (30-60 minutes from now)
+        LocalDateTime estimatedDelivery = LocalDateTime.now().plusMinutes(30 + (int)(Math.random() * 30));
+        order.setEstimatedDeliveryTime(estimatedDelivery);
+        
+        return orderRepository.save(order);
+    }
+    
+    /**
+     * Cancels an order if it's in a cancellable state.
+     */
+    public Order cancelOrder(Long orderId, String reason) {
+        if (orderId == null) {
+            throw new IllegalArgumentException("Order ID cannot be null");
+        }
+        
+        Optional<Order> orderOpt = orderRepository.findById(orderId);
+        if (orderOpt.isEmpty()) {
+            throw new NotFoundException("Order", orderId);
+        }
+        
+        Order order = orderOpt.get();
+        
+        if (!order.canBeCancelled()) {
+            throw new IllegalArgumentException("Order cannot be cancelled. Current status: " + order.getStatus());
+        }
+        
+        // If order was confirmed, restore inventory
+        if (order.getStatus() == OrderStatus.CONFIRMED || order.getStatus() == OrderStatus.PREPARING) {
+            for (OrderItem orderItem : order.getOrderItems()) {
+                FoodItem item = orderItem.getFoodItem();
+                item.increaseQuantity(orderItem.getQuantity());
+                itemRepository.save(item);
+            }
+        }
+        
+        order.cancel();
+        if (reason != null && !reason.trim().isEmpty()) {
+            order.setNotes(reason.trim());
+        }
+        
+        return orderRepository.save(order);
+    }
+    
+    /**
+     * Gets order details by ID.
+     */
+    public Order getOrder(Long orderId) {
+        if (orderId == null) {
+            throw new IllegalArgumentException("Order ID cannot be null");
+        }
+        
+        Optional<Order> orderOpt = orderRepository.findById(orderId);
+        if (orderOpt.isEmpty()) {
+            throw new NotFoundException("Order", orderId);
+        }
+        
+        return orderOpt.get();
+    }
+    
+    /**
+     * Gets all orders for a customer.
+     */
+    public List<Order> getCustomerOrders(Long customerId) {
+        if (customerId == null) {
+            throw new IllegalArgumentException("Customer ID cannot be null");
+        }
+        
+        return orderRepository.findByCustomer(customerId);
+    }
+    
+    /**
+     * Gets all orders for a restaurant.
+     */
+    public List<Order> getRestaurantOrders(Long restaurantId) {
+        if (restaurantId == null) {
+            throw new IllegalArgumentException("Restaurant ID cannot be null");
+        }
+        
+        return orderRepository.findByRestaurant(restaurantId);
+    }
+    
+    /**
+     * Gets orders by status.
+     */
+    public List<Order> getOrdersByStatus(OrderStatus status) {
+        if (status == null) {
+            throw new IllegalArgumentException("Status cannot be null");
+        }
+        
+        return orderRepository.findByStatus(status);
+    }
+    
+    /**
+     * Updates order status (for restaurant/admin use).
+     */
+    public Order updateOrderStatus(Long orderId, OrderStatus newStatus) {
+        if (orderId == null) {
+            throw new IllegalArgumentException("Order ID cannot be null");
+        }
+        if (newStatus == null) {
+            throw new IllegalArgumentException("Status cannot be null");
+        }
+        
+        Optional<Order> orderOpt = orderRepository.findById(orderId);
+        if (orderOpt.isEmpty()) {
+            throw new NotFoundException("Order", orderId);
+        }
+        
+        Order order = orderOpt.get();
+        
+        // Validate status transition
+        OrderStatus currentStatus = order.getStatus();
+        if (!isValidStatusTransition(currentStatus, newStatus)) {
+            throw new IllegalArgumentException("Invalid status transition from " + currentStatus + " to " + newStatus);
+        }
+        
+        // Handle special status changes
+        if (newStatus == OrderStatus.DELIVERED) {
+            order.markAsDelivered();
+        } else {
+            orderRepository.updateStatus(orderId, newStatus);
+            order.setStatus(newStatus);
+        }
+        
+        return orderRepository.save(order);
+    }
+    
+    /**
+     * Validates if a status transition is allowed.
+     */
+    private boolean isValidStatusTransition(OrderStatus from, OrderStatus to) {
+        switch (from) {
+            case PENDING:
+                return to == OrderStatus.CONFIRMED || to == OrderStatus.CANCELLED;
+            case CONFIRMED:
+                return to == OrderStatus.PREPARING || to == OrderStatus.CANCELLED;
+            case PREPARING:
+                return to == OrderStatus.READY || to == OrderStatus.CANCELLED;
+            case READY:
+                return to == OrderStatus.OUT_FOR_DELIVERY;
+            case OUT_FOR_DELIVERY:
+                return to == OrderStatus.DELIVERED;
+            case DELIVERED:
+            case CANCELLED:
+                return false; // Terminal states
+            default:
+                return false;
+        }
+    }
+    
+    /**
+     * Gets active orders (not delivered or cancelled).
+     */
+    public List<Order> getActiveOrders() {
+        return orderRepository.findActiveOrders();
+    }
+    
+    /**
+     * Gets pending orders waiting for confirmation.
+     */
+    public List<Order> getPendingOrders() {
+        return orderRepository.findPendingOrders();
+    }
+    
+    /**
+     * Calculates order statistics for a customer.
+     */
+    public OrderStatistics getCustomerOrderStatistics(Long customerId) {
+        if (customerId == null) {
+            throw new IllegalArgumentException("Customer ID cannot be null");
+        }
+        
+        List<Order> orders = getCustomerOrders(customerId);
+        
+        int totalOrders = orders.size();
+        int completedOrders = (int) orders.stream().filter(o -> o.getStatus() == OrderStatus.DELIVERED).count();
+        int cancelledOrders = (int) orders.stream().filter(o -> o.getStatus() == OrderStatus.CANCELLED).count();
+        double totalSpent = orders.stream()
+                .filter(o -> o.getStatus() == OrderStatus.DELIVERED)
+                .mapToDouble(Order::getTotalAmount)
+                .sum();
+        
+        return new OrderStatistics(totalOrders, completedOrders, cancelledOrders, totalSpent);
+    }
+    
+    /**
+     * Simple statistics class for order data.
+     */
+    public static class OrderStatistics {
+        private final int totalOrders;
+        private final int completedOrders;
+        private final int cancelledOrders;
+        private final double totalSpent;
+        
+        public OrderStatistics(int totalOrders, int completedOrders, int cancelledOrders, double totalSpent) {
+            this.totalOrders = totalOrders;
+            this.completedOrders = completedOrders;
+            this.cancelledOrders = cancelledOrders;
+            this.totalSpent = totalSpent;
+        }
+        
+        public int getTotalOrders() { return totalOrders; }
+        public int getCompletedOrders() { return completedOrders; }
+        public int getCancelledOrders() { return cancelledOrders; }
+        public double getTotalSpent() { return totalSpent; }
+        public int getActiveOrders() { return totalOrders - completedOrders - cancelledOrders; }
+        public double getAverageOrderValue() { 
+            return completedOrders > 0 ? totalSpent / completedOrders : 0.0; 
+        }
+    }
 }

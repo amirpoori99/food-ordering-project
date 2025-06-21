@@ -70,6 +70,18 @@ public class AuthRepository {
         }
     }
 
+    public boolean existsById(Long id) {
+        if (id == null || id <= 0) {
+            return false;
+        }
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            Query<Long> query = session.createQuery("SELECT COUNT(u) FROM User u WHERE u.id = :id", Long.class);
+            query.setParameter("id", id);
+            Long count = query.uniqueResult();
+            return count != null && count > 0;
+        }
+    }
+
     // Utility method for cleaning database during tests
     public void deleteAll() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {

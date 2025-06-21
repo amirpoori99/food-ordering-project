@@ -121,6 +121,27 @@ public class Order {
         }
     }
     
+    public void setItemQuantity(FoodItem foodItem, Integer quantity) {
+        if (foodItem == null || quantity <= 0) {
+            throw new IllegalArgumentException("Food item and quantity must be valid");
+        }
+        
+        if (!foodItem.isInStock() || foodItem.getQuantity() < quantity) {
+            throw new IllegalArgumentException("Not enough quantity available");
+        }
+        
+        OrderItem existingItem = findOrderItemByFoodItem(foodItem);
+        if (existingItem != null) {
+            // Set the quantity directly (not add to existing)
+            existingItem.setQuantity(quantity);
+        } else {
+            // Add new item
+            OrderItem orderItem = new OrderItem(this, foodItem, quantity, foodItem.getPrice());
+            orderItems.add(orderItem);
+        }
+        recalculateTotal();
+    }
+    
     private OrderItem findOrderItemByFoodItem(FoodItem foodItem) {
         return orderItems.stream()
                 .filter(item -> item.getFoodItem().equals(foodItem))

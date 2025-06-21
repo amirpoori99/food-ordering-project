@@ -39,22 +39,22 @@ public class MenuRepository {
     /**
      * Get full menu for a restaurant
      */
-    public List<FoodItem> getRestaurantMenu(Long restaurantId) {
+    public List<FoodItem> getMenuByRestaurant(Long restaurantId) {
         return itemRepository.findByRestaurant(restaurantId);
     }
     
     /**
      * Get available menu items for a restaurant (in stock and available)
      */
-    public List<FoodItem> getAvailableMenu(Long restaurantId) {
+    public List<FoodItem> getAvailableMenuByRestaurant(Long restaurantId) {
         return itemRepository.findAvailableByRestaurant(restaurantId);
     }
     
     /**
-     * Get menu items by category
+     * Get menu items by category for a restaurant
      */
-    public List<FoodItem> getMenuByCategory(String category) {
-        return itemRepository.findByCategory(category);
+    public List<FoodItem> getMenuByCategory(Long restaurantId, String category) {
+        return itemRepository.findByRestaurantAndCategory(restaurantId, category);
     }
     
     /**
@@ -96,13 +96,27 @@ public class MenuRepository {
      * Check if restaurant has any menu items
      */
     public boolean hasMenuItems(Long restaurantId) {
-        return !getRestaurantMenu(restaurantId).isEmpty();
+        return !getMenuByRestaurant(restaurantId).isEmpty();
     }
     
     /**
      * Get count of available items in restaurant
      */
     public long getAvailableItemCount(Long restaurantId) {
-        return getAvailableMenu(restaurantId).size();
+        return getAvailableMenuByRestaurant(restaurantId).size();
+    }
+    
+    /**
+     * Get all categories for a restaurant menu
+     */
+    public List<String> getCategories(Long restaurantId) {
+        return itemRepository.getCategoriesByRestaurant(restaurantId);
+    }
+    
+    /**
+     * Get low stock items for a restaurant
+     */
+    public List<FoodItem> getLowStockItems(Long restaurantId, int threshold) {
+        return itemRepository.findLowStockByRestaurant(restaurantId, threshold);
     }
 }

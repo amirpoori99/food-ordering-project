@@ -4,17 +4,17 @@
         "http://hibernate.org/dtd/hibernate-configuration-5.4.dtd">
 <hibernate-configuration>
     <session-factory>
-        <!-- Database connection settings -->
-        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
-        <property name="hibernate.connection.url">${JDBC_URL}</property>
-        <property name="hibernate.connection.username">${JDBC_USER}</property>
-        <property name="hibernate.connection.password">${JDBC_PASSWORD}</property>
+        <!-- Database connection settings (SQLite default) -->
+        <property name="hibernate.connection.driver_class">org.sqlite.JDBC</property>
+        <property name="hibernate.connection.url">jdbc:sqlite:food_ordering.db</property>
+        <property name="hibernate.connection.username"></property>
+        <property name="hibernate.connection.password"></property>
 
         <!-- JDBC connection pool (use built-in) -->
         <property name="connection.pool_size">5</property>
 
         <!-- SQL dialect -->
-        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+        <property name="hibernate.dialect">org.hibernate.community.dialect.SQLiteDialect</property>
 
         <!-- Echo SQL -->
         <property name="show_sql">true</property>
@@ -28,6 +28,6 @@
         <mapping class="com.myapp.common.models.FoodItem"/>
         <mapping class="com.myapp.common.models.Order"/>
         <mapping class="com.myapp.common.models.OrderItem"/>
-        <!-- more mappings to add later -->
+        <mapping class="com.myapp.common.models.Transaction"/>
     </session-factory>
 </hibernate-configuration> 

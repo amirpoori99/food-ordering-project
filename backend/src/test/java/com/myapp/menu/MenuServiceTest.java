@@ -17,8 +17,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Menu Controller Tests - Complete Coverage")
-class MenuControllerTest {
+@DisplayName("Menu Service Comprehensive Tests - Complete Coverage")
+class MenuServiceTest {
     
     private static SessionFactory sessionFactory;
     private Session session;
@@ -637,7 +637,7 @@ class MenuControllerTest {
             assertEquals(3, stats.getAvailableItems()); // pizza, burger, salad
             assertEquals(1, stats.getUnavailableItems()); // pasta
             assertEquals(1, stats.getOutOfStockItems()); // burger
-            assertEquals(2, stats.getLowStockItems()); // burger (0) and salad (3) both <= 5
+            assertEquals(2, stats.getLowStockItems()); // salad (quantity=3) and pasta (quantity=5)
             assertEquals(3, stats.getInStockItems()); // pizza, pasta, salad
             assertEquals(75.0, stats.getAvailabilityPercentage(), 0.01); // 3/4 * 100
         }
@@ -762,4 +762,4 @@ class MenuControllerTest {
         item.setAvailable(available);
         return itemRepository.save(item);
     }
-}
+} 

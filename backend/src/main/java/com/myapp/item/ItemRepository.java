@@ -130,4 +130,43 @@ public class ItemRepository {
             tx.commit();
         }
     }
+    
+    public boolean existsById(Long id) {
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            FoodItem foodItem = session.get(FoodItem.class, id);
+            return foodItem != null;
+        }
+    }
+    
+    public List<FoodItem> findByRestaurantAndCategory(Long restaurantId, String category) {
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            Query<FoodItem> q = session.createQuery(
+                    "from FoodItem where restaurant.id = :restaurantId and category = :category", 
+                    FoodItem.class);
+            q.setParameter("restaurantId", restaurantId);
+            q.setParameter("category", category);
+            return q.list();
+        }
+    }
+    
+    public List<String> getCategoriesByRestaurant(Long restaurantId) {
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            Query<String> q = session.createQuery(
+                    "select distinct category from FoodItem where restaurant.id = :restaurantId", 
+                    String.class);
+            q.setParameter("restaurantId", restaurantId);
+            return q.list();
+        }
+    }
+    
+    public List<FoodItem> findLowStockByRestaurant(Long restaurantId, int threshold) {
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            Query<FoodItem> q = session.createQuery(
+                    "from FoodItem where restaurant.id = :restaurantId and quantity <= :threshold", 
+                    FoodItem.class);
+            q.setParameter("restaurantId", restaurantId);
+            q.setParameter("threshold", threshold);
+            return q.list();
+        }
+    }
 }
