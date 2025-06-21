@@ -1,0 +1,209 @@
+ food-ordering-project/
+├── backend/                                         # Backend (Server) section
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/myapp/
+│   │   │   │   ├── ServerApp.java                   # Main HTTP Server for Backend testing
+│   │   │   │   ├── common/                          # Common classes and utilities
+│   │   │   │   │   ├── models/                      # Data models (JPA Entities)
+│   │   │   │   │   │   ├── User.java                # User class (ID, name, phone, role, etc.) - JPA Entity
+│   │   │   │   │   │   ├── Restaurant.java          # Restaurant model - JPA Entity  
+│   │   │   │   │   │   ├── FoodItem.java            # Food item model
+│   │   │   │   │   │   ├── Order.java               # Order model
+│   │   │   │   │   │   ├── Transaction.java         # Financial transaction model
+│   │   │   │   │   │   ├── Rating.java              # User rating model
+│   │   │   │   │   │   ├── Coupon.java              # Coupon model
+│   │   │   │   │   │   ├── Menu.java                # Menu model
+│   │   │   │   │   │   ├── Favorite.java            # Favorite model
+│   │   │   │   │   │   └── RestaurantStatus.java    # Restaurant status enum (PENDING/APPROVED/REJECTED)
+│   │   │   │   │   ├── exceptions/                  # Custom exceptions
+│   │   │   │   │   │   ├── DuplicatePhoneException.java
+│   │   │   │   │   │   ├── InvalidCredentialsException.java
+│   │   │   │   │   │   └── NotFoundException.java
+│   │   │   │   │   └── utils/                       # Helper classes
+│   │   │   │   │       ├── JWTUtil.java             # JWT token generation and validation
+│   │   │   │   │       ├── DatabaseUtil.java        # Database connection and Hibernate SessionFactory
+│   │   │   │   │       └── JsonUtil.java            # JSON serialization/deserialization
+│   │   │   │   ├── auth/                            # Authentication package
+│   │   │   │   │   ├── AuthController.java          # register(), login(), getProfile(), updateProfile(), logout()
+│   │   │   │   │   ├── AuthService.java             # Core authentication and user management logic
+│   │   │   │   │   ├── AuthRepository.java          # Database access (save/retrieve users) - Hibernate
+│   │   │   │   │   └── dto/                         # Data Transfer Objects
+│   │   │   │   │       ├── RegisterRequest.java
+│   │   │   │   │       ├── UpdateProfileRequest.java
+│   │   │   │   │       └── ProfileResponse.java
+│   │   │   │   ├── restaurant/                      # Restaurant management package
+│   │   │   │   │   ├── RestaurantController.java    # createRestaurant(), listMine(), updateRestaurant()
+│   │   │   │   │   ├── RestaurantService.java       # Restaurant business logic
+│   │   │   │   │   └── RestaurantRepository.java    # Database CRUD operations - Hibernate
+│   │   │   │   ├── menu/                            # Menu package
+│   │   │   │   │   ├── MenuController.java          # addMenu(), addItemToMenu(), removeMenu(), removeItemFromMenu()
+│   │   │   │   │   ├── MenuService.java             # Menu business logic
+│   │   │   │   │   └── MenuRepository.java          # Menu database operations
+│   │   │   │   ├── item/                            # Food item package
+│   │   │   │   │   ├── ItemController.java          # addItem(), updateItem(), deleteItem()
+│   │   │   │   │   ├── ItemService.java             # Item business logic
+│   │   │   │   │   └── ItemRepository.java          # Item database operations
+│   │   │   │   ├── vendor/                          # Vendors package (customer-facing)
+│   │   │   │   │   ├── VendorController.java        # listVendors(), getVendorMenu()
+│   │   │   │   │   ├── VendorService.java           # Vendor business logic
+│   │   │   │   │   └── VendorRepository.java        # Vendor database operations
+│   │   │   │   ├── order/                           # Order package
+│   │   │   │   │   ├── OrderController.java         # submitOrder(), getOrder(), getOrderHistory()
+│   │   │   │   │   ├── OrderService.java            # Order business logic
+│   │   │   │   │   └── OrderRepository.java         # Order database operations
+│   │   │   │   ├── favorites/                       # Favorites package
+│   │   │   │   │   ├── FavoritesController.java     # listFavorites(), addFavorite(), removeFavorite()
+│   │   │   │   │   └── FavoritesRepository.java     # Favorites database operations
+│   │   │   │   ├── courier/                         # Courier package
+│   │   │   │   │   ├── DeliveryController.java      # listAvailable(), updateStatus(), history()
+│   │   │   │   │   ├── DeliveryService.java         # Order assignment and status update logic
+│   │   │   │   │   └── DeliveryRepository.java      # Courier database operations
+│   │   │   │   ├── notification/                    # Notifications package (Controller only implemented)
+│   │   │   │   │   └── NotificationController.java  # push(), list()
+│   │   │   │   ├── payment/                         # Payment package
+│   │   │   │   │   ├── PaymentController.java       # onPay()
+│   │   │   │   │   ├── PaymentService.java          # Payment logic
+│   │   │   │   │   ├── PaymentRepository.java       # Payment database operations
+│   │   │   │   │   ├── WalletController.java        # topUp()
+│   │   │   │   │   ├── WalletService.java           # Wallet logic
+│   │   │   │   │   ├── TransactionController.java   # Transaction management
+│   │   │   │   │   └── TransactionRepository.java   # Transaction database operations
+│   │   │   │   ├── coupon/                          # Coupon package
+│   │   │   │   │   ├── CouponController.java        # Coupon management
+│   │   │   │   │   ├── CouponService.java           # Coupon business logic
+│   │   │   │   │   └── CouponRepository.java        # Coupon database operations
+│   │   │   │   ├── review/                          # Review package
+│   │   │   │   │   └── RatingController.java        # Rating and review management
+│   │   │   │   ├── admin/                           # Admin package
+│   │   │   │   │   └── AdminController.java         # listUsers(), updateUserStatus(), listOrders(), listTransactions()
+│   │   │   │   └── dto/                             # Legacy DTO (some classes moved to specific packages)
+│   │   │   │       └── RegisterRequest.java         # Legacy location
+│   │   │   ├── resources/
+│   │   │   │   ├── application.yml                  # Database connection and server settings
+│   │   │   │   ├── hibernate.cfg.xml                # Hibernate configuration with entity mappings
+│   │   │   │   └── openapi.yaml                     # API documentation (OpenAPI)
+│   │   │   └── docker/
+│   │   │       └── docker-compose.yml               # Database configuration in Docker
+│   │   └── test/java/com/myapp/
+│   │       ├── api/                                 # API integration tests
+│   │       │   └── RegistrationApiTest.java         # Comprehensive registration testing
+│   │       ├── auth/                                # Authentication tests
+│   │       │   ├── AuthControllerTest.java          # Test auth endpoints
+│   │       │   ├── AuthRepositoryTest.java          # Repository layer tests
+│   │       │   ├── AuthServiceTest.java             # Service layer tests
+│   │       │   └── AuthServiceProfileTest.java      # Profile-specific tests
+│   │       ├── restaurant/                          # Restaurant tests
+│   │       │   ├── RestaurantRepositoryTest.java    # Repository tests
+│   │       │   └── RestaurantServiceTest.java       # Service tests
+│   │       ├── menu/
+│   │       │   └── MenuControllerTest.java
+│   │       ├── itam/                                # Note: typo in directory name
+│   │       │   └── ItemServiceTest.java
+│   │       ├── vendor/
+│   │       │   └── VendorControllerTest.java
+│   │       ├── order/
+│   │       │   └── OrderControllerTest.java
+│   │       ├── favorites/
+│   │       │   └── FavoritesControllerTest.java
+│   │       ├── payment/
+│   │       │   └── PaymentControllerTest.java
+│   │       ├── courier/
+│   │       │   └── DeliveryControllerTest.java
+│   │       ├── review/
+│   │       │   └── RatingControllerTest.java
+│   │       └── coupon/
+│   │           └── CouponControllerTest.java
+│   ├── pom.xml                                      # Maven configuration with Hibernate, JPA, PostgreSQL, H2 dependencies
+│   ├── food_ordering.db                             # SQLite database file (for testing)
+│   └── target/                                      # Maven build output
+├── frontend-javafx/                                 # JavaFX Client section
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/myapp/ui/
+│   │   │   │   ├── MainApp.java                    # JavaFX startup class
+│   │   │   │   ├── common/                         # Common UI classes
+│   │   │   │   │   ├── NavigationController.java   # Navigation between pages
+│   │   │   │   │   ├── NotificationService.java    # User message display
+│   │   │   │   │   └── HttpClientUtil.java         # REST API calls
+│   │   │   │   ├── auth/                           # Authentication UI controllers
+│   │   │   │   │   ├── LoginController.java        # onLogin(), initialize()
+│   │   │   │   │   ├── RegisterController.java     # onRegister()
+│   │   │   │   │   └── ProfileController.java      # loadProfile(), onSave()
+│   │   │   │   ├── restaurant/                     # Restaurant management UI controllers
+│   │   │   │   │   ├── RestaurantListController.java   # loadMyRestaurants()
+│   │   │   │   │   ├── CreateRestaurantController.java # onCreate()
+│   │   │   │   │   └── EditRestaurantController.java   # onUpdate()
+│   │   │   │   ├── menu/                           # Menu management UI controllers
+│   │   │   │   │   ├── MenuManagementController.java   # loadMenus(), onAddMenu(), onRemoveMenu()
+│   │   │   │   │   └── ItemManagementController.java   # onAddItem(), onEditItem(), onDeleteItem()
+│   │   │   │   ├── vendor/                         # Restaurant search UI controllers
+│   │   │   │   │   └── VendorSearchController.java     # onSearch()
+│   │   │   │   ├── order/                          # Shopping cart and history UI controllers
+│   │   │   │   │   ├── CartController.java             # addToCart(), onCheckout()
+│   │   │   │   │   ├── OrderHistoryController.java     # loadHistory()
+│   │   │   │   │   └── OrderDetailController.java      # loadOrderDetail()
+│   │   │   │   ├── payment/                        # Payment UI controllers
+│   │   │   │   │   ├── WalletController.java       # onTopUp()
+│   │   │   │   │   └── PaymentController.java      # onPay()
+│   │   │   │   ├── courier/                        # Courier UI controllers
+│   │   │   │   │   ├── CourierAvailableController.java # loadAvailable()
+│   │   │   │   │   └── CourierHistoryController.java   # loadDeliveryHistory()
+│   │   │   │   ├── review/                         # Review UI controllers
+│   │   │   │   │   └── ReviewController.java       # onSubmitReview(), loadReviews()
+│   │   │   │   ├── coupon/                         # Coupon UI controllers
+│   │   │   │   │   └── CouponController.java       # onValidateCoupon()
+│   │   │   │   └── admin/                          # Admin UI controllers
+│   │   │   │       ├── AdminUserController.java        # loadUsers(), onChangeStatus()
+│   │   │   │       ├── AdminOrderController.java       # loadOrders()
+│   │   │   │       ├── AdminTransactionController.java # loadTransactions()
+│   │   │   │       └── CouponManagementController.java # onCreate(), onUpdate(), onDelete()
+│   │   │   └── resources/
+│   │   │       └── fxml/                           # FXML files for each page
+│   │   │           ├── Login.fxml
+│   │   │           ├── Register.fxml
+│   │   │           ├── Profile.fxml
+│   │   │           ├── RestaurantList.fxml
+│   │   │           ├── CreateRestaurant.fxml
+│   │   │           ├── EditRestaurant.fxml
+│   │   │           ├── MenuManagement.fxml
+│   │   │           ├── ItemManagement.fxml
+│   │   │           ├── VendorSearch.fxml
+│   │   │           ├── Cart.fxml
+│   │   │           ├── OrderHistory.fxml
+│   │   │           ├── OrderDetail.fxml
+│   │   │           ├── Wallet.fxml
+│   │   │           ├── Payment.fxml
+│   │   │           ├── CourierAvailable.fxml
+│   │   │           ├── CourierHistory.fxml
+│   │   │           ├── Review.fxml
+│   │   │           ├── CouponValidation.fxml
+│   │   │           └── AdminDashboard.fxml
+│   └── pom.xml                                    # Maven settings and JavaFX plugin
+├── docker-compose.yml                             # PostgreSQL database service definition
+├── init-db.sql                                    # Database initialization script
+└── aut_food.yaml                                  # Project automation configuration
+
+## Current Implementation Status
+
+### ✅ Completed (Phase 1 - JPA Migration)
+- **User.java**: Fully migrated to JPA entity with proper annotations
+- **Restaurant.java**: Fully migrated to JPA entity with RestaurantStatus enum
+- **AuthRepository.java**: Migrated to Hibernate with exception handling
+- **RestaurantRepository.java**: Migrated to Hibernate CRUD operations
+- **DatabaseUtil.java**: Enhanced to support PostgreSQL and H2 databases
+- **hibernate.cfg.xml**: Configured with entity mappings
+- **Tests**: All 27 tests passing (AuthRepositoryTest, AuthServiceTest, etc.)
+- **ServerApp.java**: Basic HTTP server for API testing
+- **Docker**: PostgreSQL container setup
+
+### 🚧 In Progress
+- **Database Connection**: PostgreSQL authentication issues
+- **API Endpoints**: Basic structure in place, needs refinement
+
+### 📋 TODO (Phase 2)
+- **Remaining Models**: FoodItem, Order, Menu, Transaction, Coupon, Rating, Favorite
+- **Service Layer**: Complete migration to JPA for all services
+- **Repository Layer**: Migrate all repositories to Hibernate
+- **API Integration**: Complete REST API implementation
+- **Frontend Integration**: Connect JavaFX client to backend APIs
