@@ -25,6 +25,47 @@ public class AuthController {
     public User login(String phone, String passwordHash) {
         return service.login(phone, passwordHash);
     }
+    
+    /**
+     * Login with JWT tokens
+     * 
+     * @param phone User phone
+     * @param passwordHash Password hash
+     * @return AuthResult with JWT tokens
+     */
+    public AuthResult loginWithTokens(String phone, String passwordHash) {
+        return service.loginWithTokens(phone, passwordHash);
+    }
+    
+    /**
+     * Refresh access token
+     * 
+     * @param refreshToken Refresh token
+     * @return AuthResult with new tokens
+     */
+    public AuthResult refreshToken(String refreshToken) {
+        return service.refreshToken(refreshToken);
+    }
+    
+    /**
+     * Validate access token
+     * 
+     * @param accessToken Access token
+     * @return AuthResult with user information
+     */
+    public AuthResult validateToken(String accessToken) {
+        return service.validateToken(accessToken);
+    }
+    
+    /**
+     * Logout user
+     * 
+     * @param userId User ID
+     * @return Success message
+     */
+    public String logout(Long userId) {
+        return service.logout(userId);
+    }
 
     public ProfileResponse getProfile(long id) {
         return ProfileResponse.from(service.getProfile(id));

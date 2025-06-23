@@ -34,5 +34,6 @@
         <mapping class="com.myapp.common.models.Coupon"/>
         <mapping class="com.myapp.common.models.CouponUsage"/>
         <mapping class="com.myapp.common.models.Favorite"/>
+        <mapping class="com.myapp.common.models.Notification"/>
     </session-factory>
 </hibernate-configuration> 

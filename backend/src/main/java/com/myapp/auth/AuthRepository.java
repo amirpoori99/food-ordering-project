@@ -7,6 +7,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public class AuthRepository {
@@ -79,6 +80,13 @@ public class AuthRepository {
             query.setParameter("id", id);
             Long count = query.uniqueResult();
             return count != null && count > 0;
+        }
+    }
+
+    public List<Long> findAllActiveUserIds() {
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            Query<Long> query = session.createQuery("SELECT u.id FROM User u", Long.class);
+            return query.getResultList();
         }
     }
 

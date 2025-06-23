@@ -6,6 +6,7 @@ import com.myapp.common.exceptions.InvalidCredentialsException;
 import com.myapp.common.models.User;
 import com.myapp.common.exceptions.NotFoundException;
 import com.myapp.common.exceptions.DuplicatePhoneException;
+import com.myapp.common.utils.JWTUtil;
 
 import java.util.Objects;
 
@@ -35,6 +36,60 @@ public class AuthService {
         return repository.findByPhone(phone)
                 .filter(u -> u.getPasswordHash().equals(passwordHash))
                 .orElseThrow(InvalidCredentialsException::new);
+    }
+    
+    /**
+     * Login user and generate JWT tokens
+     * 
+     * @param phone User phone
+     * @param passwordHash Password hash
+     * @return AuthResult with JWT tokens
+     */
+    public AuthResult loginWithTokens(String phone, String passwordHash) {
+        try {
+            User user = login(phone, passwordHash);
+            String[] tokens = JWTUtil.generateTokenPair(user.getId(), user.getPhone(), user.getRole().toString());
+            
+            // Return AuthResult with both tokens
+            return AuthResult.refreshed(user.getId(), user.getPhone(), user.getRole().toString(), tokens[0], tokens[1]);
+        } catch (InvalidCredentialsException e) {
+            return AuthResult.unauthenticated("Invalid phone or password");
+        } catch (Exception e) {
+            return AuthResult.unauthenticated("Login failed: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Refresh access token using refresh token
+     * 
+     * @param refreshToken Refresh token
+     * @return AuthResult with new tokens
+     */
+    public AuthResult refreshToken(String refreshToken) {
+        return AuthMiddleware.refreshAccessToken(refreshToken, repository);
+    }
+    
+    /**
+     * Validate access token
+     * 
+     * @param accessToken Access token
+     * @return AuthResult with user information
+     */
+    public AuthResult validateToken(String accessToken) {
+        return AuthMiddleware.authenticateToken(accessToken);
+    }
+    
+    /**
+     * Logout user (invalidate token on client side)
+     * Note: In a production system, you might want to maintain a blacklist of tokens
+     * 
+     * @param userId User ID
+     * @return Success message
+     */
+    public String logout(Long userId) {
+        // In a stateless JWT system, logout is typically handled client-side
+        // by removing the token from storage
+        return "Logged out successfully";
     }
 
     /**

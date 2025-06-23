@@ -2,6 +2,8 @@ package com.myapp;
 
 import com.myapp.auth.AuthRepository;
 import com.myapp.auth.AuthService;
+import com.myapp.auth.AuthResult;
+import com.myapp.auth.AuthMiddleware;
 import com.myapp.restaurant.RestaurantRepository;
 import com.myapp.restaurant.RestaurantController;
 import com.myapp.admin.AdminRepository;
@@ -20,6 +22,9 @@ import com.myapp.vendor.VendorController;
 import com.myapp.favorites.FavoritesRepository;
 import com.myapp.favorites.FavoritesService;
 import com.myapp.favorites.FavoritesController;
+import com.myapp.notification.NotificationRepository;
+import com.myapp.notification.NotificationService;
+import com.myapp.notification.NotificationController;
 import com.myapp.common.utils.DatabaseUtil;
 import com.myapp.common.models.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,6 +51,7 @@ public class ServerApp {
     private static MenuController menuController;
     private static VendorController vendorController;
     private static FavoritesController favoritesController;
+    private static NotificationController notificationController;
     
     public static void main(String[] args) throws IOException {
         System.out.println("🚀 Starting Food Ordering Backend Server...");
@@ -59,6 +65,7 @@ public class ServerApp {
         PaymentRepository paymentRepo = new PaymentRepository();
         DeliveryRepository deliveryRepo = new DeliveryRepository();
         FavoritesRepository favoritesRepo = new FavoritesRepository();
+        NotificationRepository notificationRepo = new NotificationRepository();
         
         // Initialize Admin services
         AdminRepository adminRepo = new AdminRepository();
@@ -67,6 +74,9 @@ public class ServerApp {
         
         // Initialize Favorites service
         FavoritesService favoritesService = new FavoritesService(favoritesRepo, authRepo, restaurantRepo);
+        
+        // Initialize Notification service
+        NotificationService notificationService = new NotificationService(notificationRepo, authRepo);
         
         // Initialize other controllers
         restaurantController = new RestaurantController();
@@ -78,6 +88,7 @@ public class ServerApp {
         menuController = new MenuController();
         vendorController = new VendorController();
         favoritesController = new FavoritesController(favoritesService);
+        notificationController = new NotificationController(notificationService);
         
         // Test database connection
         System.out.println("Testing Hibernate connection...");
@@ -97,6 +108,9 @@ public class ServerApp {
         server.createContext("/api/test", new TestHandler());
         server.createContext("/api/auth/register", new RegisterHandler());
         server.createContext("/api/auth/login", new LoginHandler());
+        server.createContext("/api/auth/refresh", new RefreshTokenHandler());
+        server.createContext("/api/auth/validate", new ValidateTokenHandler());
+        server.createContext("/api/auth/logout", new LogoutHandler());
         server.createContext("/health", new HealthHandler());
         
         // Controller endpoints
@@ -110,6 +124,8 @@ public class ServerApp {
         server.createContext("/api/menu/", menuController);
         server.createContext("/api/vendors/", vendorController);
         server.createContext("/api/favorites/", favoritesController);
+        server.createContext("/api/notifications/", notificationController);
+        server.createContext("/api/notification/", notificationController);
         
         // Configure thread pool
         server.setExecutor(Executors.newFixedThreadPool(10));
@@ -121,7 +137,10 @@ public class ServerApp {
         System.out.println("   GET  /health - Health check");
         System.out.println("   GET  /api/test - Simple test");
         System.out.println("   POST /api/auth/register - User registration");
-        System.out.println("   POST /api/auth/login - User login");
+        System.out.println("   POST /api/auth/login - User login (with JWT tokens)");
+        System.out.println("   POST /api/auth/refresh - Refresh access token");
+        System.out.println("   GET  /api/auth/validate - Validate access token");
+        System.out.println("   POST /api/auth/logout - User logout");
         System.out.println("   🔧 Admin Dashboard (18+ endpoints):");
         System.out.println("   GET  /api/admin/dashboard - Admin statistics");
         System.out.println("   GET  /api/admin/users - User management");
@@ -157,6 +176,11 @@ public class ServerApp {
         System.out.println("   GET  /api/favorites/ - User favorites");
         System.out.println("   POST /api/favorites/add - Add to favorites");
         System.out.println("   DELETE /api/favorites/remove - Remove favorite");
+        System.out.println("   🔔 Notification System (6+ endpoints):");
+        System.out.println("   GET  /api/notifications/{userId} - User notifications");
+        System.out.println("   POST /api/notifications/ - Create notification");
+        System.out.println("   PUT  /api/notification/{id}/read - Mark as read");
+        System.out.println("   DELETE /api/notification/{id} - Delete notification");
         
         // Graceful shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -278,16 +302,31 @@ public class ServerApp {
                     // Simple password hash (should match registration logic)
                     String passwordHash = "hashed_" + password;
                     
-                    // Authenticate user
-                    User user = authService.login(phone, passwordHash);
+                    // Authenticate user with JWT tokens
+                    AuthResult authResult = authService.loginWithTokens(phone, passwordHash);
                     
-                    // Create response
-                    String response = "{\"message\":\"Login successful!\",\"status\":\"success\",\"userId\":" + 
-                                    user.getId() + ",\"fullName\":\"" + user.getFullName() + "\",\"phone\":\"" + 
-                                    user.getPhone() + "\",\"role\":\"" + user.getRole() + "\"}";
-                sendResponse(exchange, 200, response);
+                    if (!authResult.isAuthenticated()) {
+                        sendResponse(exchange, 401, "{\"error\":\"" + authResult.getErrorMessage() + "\"}");
+                        return;
+                    }
                     
-                    System.out.println("✅ User logged in: " + user.getFullName() + " (ID: " + user.getId() + ")");
+                    // Create response with JWT tokens
+                    String response = String.format(
+                        "{\"message\":\"Login successful!\",\"status\":\"success\",\"userId\":%d," +
+                        "\"fullName\":\"%s\",\"phone\":\"%s\",\"role\":\"%s\"," +
+                        "\"accessToken\":\"%s\",\"refreshToken\":\"%s\"," +
+                        "\"tokenType\":\"Bearer\",\"expiresIn\":%d}",
+                        authResult.getUserId(),
+                        authResult.getPhone().replace("\"", "\\\""),
+                        authResult.getPhone(),
+                        authResult.getRole(),
+                        authResult.getAccessToken(),
+                        authResult.getRefreshToken(),
+                        com.myapp.common.utils.JWTUtil.getAccessTokenValidity() / 1000 // in seconds
+                    );
+                    sendResponse(exchange, 200, response);
+                    
+                    System.out.println("✅ User logged in with JWT tokens: " + authResult.getPhone() + " (ID: " + authResult.getUserId() + ")");
                     
                 } catch (com.myapp.common.exceptions.InvalidCredentialsException e) {
                     sendResponse(exchange, 401, "{\"error\":\"Invalid phone or password\"}");
@@ -295,6 +334,110 @@ public class ServerApp {
                     System.err.println("❌ Login error: " + e.getMessage());
                     e.printStackTrace();
                     String errorResponse = "{\"error\":\"Login failed\",\"message\":\"" + e.getMessage().replace("\"", "'") + "\"}";
+                    sendResponse(exchange, 500, errorResponse);
+                }
+            } else {
+                sendResponse(exchange, 405, "{\"error\":\"Method not allowed\"}");
+            }
+        }
+    }
+    
+    static class RefreshTokenHandler implements HttpHandler {
+        private final ObjectMapper objectMapper = new ObjectMapper();
+        
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            if ("POST".equals(exchange.getRequestMethod())) {
+                try {
+                    String requestBody = new String(exchange.getRequestBody().readAllBytes());
+                    JsonNode json = objectMapper.readTree(requestBody);
+                    
+                    if (!json.has("refreshToken")) {
+                        sendResponse(exchange, 400, "{\"error\":\"Missing refreshToken field\"}");
+                        return;
+                    }
+                    
+                    String refreshToken = json.get("refreshToken").asText();
+                    AuthResult authResult = authService.refreshToken(refreshToken);
+                    
+                    if (!authResult.isAuthenticated()) {
+                        sendResponse(exchange, 401, "{\"error\":\"" + authResult.getErrorMessage() + "\"}");
+                        return;
+                    }
+                    
+                    String response = String.format(
+                        "{\"message\":\"Token refreshed successfully\",\"status\":\"success\"," +
+                        "\"accessToken\":\"%s\",\"refreshToken\":\"%s\"," +
+                        "\"tokenType\":\"Bearer\",\"expiresIn\":%d}",
+                        authResult.getAccessToken(),
+                        authResult.getRefreshToken(),
+                        com.myapp.common.utils.JWTUtil.getAccessTokenValidity() / 1000
+                    );
+                    sendResponse(exchange, 200, response);
+                    
+                } catch (Exception e) {
+                    System.err.println("❌ Token refresh error: " + e.getMessage());
+                    String errorResponse = "{\"error\":\"Token refresh failed\",\"message\":\"" + e.getMessage().replace("\"", "'") + "\"}";
+                    sendResponse(exchange, 500, errorResponse);
+                }
+            } else {
+                sendResponse(exchange, 405, "{\"error\":\"Method not allowed\"}");
+            }
+        }
+    }
+    
+    static class ValidateTokenHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            if ("GET".equals(exchange.getRequestMethod())) {
+                try {
+                    AuthResult authResult = AuthMiddleware.authenticate(exchange);
+                    
+                    if (!authResult.isAuthenticated()) {
+                        sendResponse(exchange, 401, "{\"error\":\"" + authResult.getErrorMessage() + "\"}");
+                        return;
+                    }
+                    
+                    String response = String.format(
+                        "{\"valid\":true,\"userId\":%d,\"phone\":\"%s\",\"role\":\"%s\"}",
+                        authResult.getUserId(),
+                        authResult.getPhone(),
+                        authResult.getRole()
+                    );
+                    sendResponse(exchange, 200, response);
+                    
+                } catch (Exception e) {
+                    System.err.println("❌ Token validation error: " + e.getMessage());
+                    String errorResponse = "{\"valid\":false,\"error\":\"Token validation failed\"}";
+                    sendResponse(exchange, 401, errorResponse);
+                }
+            } else {
+                sendResponse(exchange, 405, "{\"error\":\"Method not allowed\"}");
+            }
+        }
+    }
+    
+    static class LogoutHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            if ("POST".equals(exchange.getRequestMethod())) {
+                try {
+                    AuthResult authResult = AuthMiddleware.authenticate(exchange);
+                    
+                    if (!authResult.isAuthenticated()) {
+                        sendResponse(exchange, 401, "{\"error\":\"" + authResult.getErrorMessage() + "\"}");
+                        return;
+                    }
+                    
+                    String message = authService.logout(authResult.getUserId());
+                    String response = "{\"message\":\"" + message + "\",\"status\":\"success\"}";
+                    sendResponse(exchange, 200, response);
+                    
+                    System.out.println("✅ User logged out: " + authResult.getPhone() + " (ID: " + authResult.getUserId() + ")");
+                    
+                } catch (Exception e) {
+                    System.err.println("❌ Logout error: " + e.getMessage());
+                    String errorResponse = "{\"error\":\"Logout failed\",\"message\":\"" + e.getMessage().replace("\"", "'") + "\"}";
                     sendResponse(exchange, 500, errorResponse);
                 }
             } else {

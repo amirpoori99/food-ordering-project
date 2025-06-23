@@ -195,15 +195,24 @@ public class Notification {
     }
     
     private static String getOrderStatusMessage(OrderStatus status) {
-        return switch (status) {
-            case CONFIRMED -> "سفارش شما تایید شد و در حال آماده‌سازی است.";
-            case PREPARING -> "رستوران در حال آماده‌سازی سفارش شما است.";
-            case READY -> "سفارش شما آماده است و منتظر پیک می‌باشد.";
-            case PICKED_UP -> "سفارش شما توسط پیک دریافت شد.";
-            case DELIVERED -> "سفارش شما با موفقیت تحویل داده شد.";
-            case CANCELLED -> "متأسفانه سفارش شما لغو شد.";
-            default -> "وضعیت سفارش شما تغییر کرد.";
-        };
+        switch (status) {
+            case PENDING:
+                return "سفارش شما در انتظار تایید است.";
+            case CONFIRMED:
+                return "سفارش شما تایید شد و در حال آماده‌سازی است.";
+            case PREPARING:
+                return "رستوران در حال آماده‌سازی سفارش شما است.";
+            case READY:
+                return "سفارش شما آماده است و منتظر پیک می‌باشد.";
+            case OUT_FOR_DELIVERY:
+                return "سفارش شما توسط پیک دریافت شد و در راه است.";
+            case DELIVERED:
+                return "سفارش شما با موفقیت تحویل داده شد.";
+            case CANCELLED:
+                return "متأسفانه سفارش شما لغو شد.";
+            default:
+                return "وضعیت سفارش شما تغییر کرد.";
+        }
     }
 
     // Getters and Setters
