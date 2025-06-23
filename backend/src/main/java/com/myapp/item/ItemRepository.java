@@ -44,7 +44,7 @@ public class ItemRepository {
             Query<FoodItem> q = session.createQuery(
                     "from FoodItem where restaurant.id = :restaurantId", FoodItem.class);
             q.setParameter("restaurantId", restaurantId);
-            return q.list();
+            return q.getResultList();
         }
     }
 
@@ -54,7 +54,7 @@ public class ItemRepository {
                     "from FoodItem where restaurant.id = :restaurantId and available = true and quantity > 0", 
                     FoodItem.class);
             q.setParameter("restaurantId", restaurantId);
-            return q.list();
+            return q.getResultList();
         }
     }
 
@@ -63,7 +63,7 @@ public class ItemRepository {
             Query<FoodItem> q = session.createQuery(
                     "from FoodItem where category = :category and available = true", FoodItem.class);
             q.setParameter("category", category);
-            return q.list();
+            return q.getResultList();
         }
     }
 
@@ -78,14 +78,14 @@ public class ItemRepository {
                     "from FoodItem where (lower(name) like :keyword or lower(keywords) like :keyword) and available = true", 
                     FoodItem.class);
             q.setParameter("keyword", "%" + keyword.toLowerCase().trim() + "%");
-            return q.list();
+            return q.getResultList();
         }
     }
 
     public List<FoodItem> findAll() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Query<FoodItem> q = session.createQuery("from FoodItem", FoodItem.class);
-            return q.list();
+            return q.getResultList();
         }
     }
 
@@ -145,7 +145,7 @@ public class ItemRepository {
                     FoodItem.class);
             q.setParameter("restaurantId", restaurantId);
             q.setParameter("category", category);
-            return q.list();
+            return q.getResultList();
         }
     }
     
@@ -155,7 +155,7 @@ public class ItemRepository {
                     "select distinct category from FoodItem where restaurant.id = :restaurantId", 
                     String.class);
             q.setParameter("restaurantId", restaurantId);
-            return q.list();
+            return q.getResultList();
         }
     }
     
@@ -166,7 +166,33 @@ public class ItemRepository {
                     FoodItem.class);
             q.setParameter("restaurantId", restaurantId);
             q.setParameter("threshold", threshold);
-            return q.list();
+            return q.getResultList();
+        }
+    }
+    
+    /**
+     * Count total number of food items for a restaurant
+     */
+    public int countByRestaurant(Long restaurantId) {
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            Query<Long> q = session.createQuery(
+                    "select count(*) from FoodItem where restaurant.id = :restaurantId", 
+                    Long.class);
+            q.setParameter("restaurantId", restaurantId);
+            return q.getSingleResult().intValue();
+        }
+    }
+    
+    /**
+     * Count available food items for a restaurant
+     */
+    public int countAvailableByRestaurant(Long restaurantId) {
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            Query<Long> q = session.createQuery(
+                    "select count(*) from FoodItem where restaurant.id = :restaurantId and available = true and quantity > 0", 
+                    Long.class);
+            q.setParameter("restaurantId", restaurantId);
+            return q.getSingleResult().intValue();
         }
     }
 }

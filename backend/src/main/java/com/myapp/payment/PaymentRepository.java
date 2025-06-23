@@ -88,7 +88,7 @@ public class PaymentRepository {
             Query<Transaction> query = session.createQuery(
                 "FROM Transaction t WHERE t.userId = :userId ORDER BY t.createdAt DESC", Transaction.class);
             query.setParameter("userId", userId);
-            List<Transaction> transactions = query.list();
+            List<Transaction> transactions = query.getResultList();
             session.getTransaction().commit();
             return transactions;
         }
@@ -103,7 +103,7 @@ public class PaymentRepository {
             Query<Transaction> query = session.createQuery(
                 "FROM Transaction t WHERE t.orderId = :orderId ORDER BY t.createdAt DESC", Transaction.class);
             query.setParameter("orderId", orderId);
-            List<Transaction> transactions = query.list();
+            List<Transaction> transactions = query.getResultList();
             session.getTransaction().commit();
             return transactions;
         }
@@ -118,7 +118,7 @@ public class PaymentRepository {
             Query<Transaction> query = session.createQuery(
                 "FROM Transaction t WHERE t.status = :status ORDER BY t.createdAt DESC", Transaction.class);
             query.setParameter("status", status);
-            List<Transaction> transactions = query.list();
+            List<Transaction> transactions = query.getResultList();
             session.getTransaction().commit();
             return transactions;
         }
@@ -133,7 +133,7 @@ public class PaymentRepository {
             Query<Transaction> query = session.createQuery(
                 "FROM Transaction t WHERE t.type = :type ORDER BY t.createdAt DESC", Transaction.class);
             query.setParameter("type", type);
-            List<Transaction> transactions = query.list();
+            List<Transaction> transactions = query.getResultList();
             session.getTransaction().commit();
             return transactions;
         }
@@ -150,7 +150,7 @@ public class PaymentRepository {
                 Transaction.class);
             query.setParameter("userId", userId);
             query.setParameter("status", status);
-            List<Transaction> transactions = query.list();
+            List<Transaction> transactions = query.getResultList();
             session.getTransaction().commit();
             return transactions;
         }
@@ -167,7 +167,7 @@ public class PaymentRepository {
                 Transaction.class);
             query.setParameter("userId", userId);
             query.setParameter("type", type);
-            List<Transaction> transactions = query.list();
+            List<Transaction> transactions = query.getResultList();
             session.getTransaction().commit();
             return transactions;
         }
@@ -184,7 +184,7 @@ public class PaymentRepository {
                 Transaction.class);
             query.setParameter("userId", userId);
             query.setParameter("walletTypes", List.of(TransactionType.WALLET_CHARGE, TransactionType.WALLET_WITHDRAWAL));
-            List<Transaction> transactions = query.list();
+            List<Transaction> transactions = query.getResultList();
             session.getTransaction().commit();
             return transactions;
         }
@@ -201,7 +201,7 @@ public class PaymentRepository {
                 Transaction.class);
             query.setParameter("userId", userId);
             query.setParameter("paymentTypes", List.of(TransactionType.PAYMENT, TransactionType.REFUND));
-            List<Transaction> transactions = query.list();
+            List<Transaction> transactions = query.getResultList();
             session.getTransaction().commit();
             return transactions;
         }
@@ -218,7 +218,7 @@ public class PaymentRepository {
                 Transaction.class);
             query.setParameter("startDate", startDate);
             query.setParameter("endDate", endDate);
-            List<Transaction> transactions = query.list();
+            List<Transaction> transactions = query.getResultList();
             session.getTransaction().commit();
             return transactions;
         }
@@ -236,7 +236,7 @@ public class PaymentRepository {
             query.setParameter("userId", userId);
             query.setParameter("startDate", startDate);
             query.setParameter("endDate", endDate);
-            List<Transaction> transactions = query.list();
+            List<Transaction> transactions = query.getResultList();
             session.getTransaction().commit();
             return transactions;
         }

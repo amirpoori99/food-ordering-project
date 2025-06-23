@@ -27,6 +27,9 @@ public class User {
 
     private String address;
 
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true; // Default to active
+
     public enum Role { BUYER, SELLER, COURIER, ADMIN }
 
     /* ---------- CONSTRUCTORS ---------- */
@@ -43,6 +46,7 @@ public class User {
         this.passwordHash = passwordHash;
         this.role         = role;
         this.address      = address;
+        this.isActive     = true; // New users are active by default
     }
 
     /** با Long id - برای تست‌هایی که id را صراحتاً می‌دهند */
@@ -68,7 +72,9 @@ public class User {
         this((long) id, fullName, phone, email, passwordHash, role, address);
     }
 
-    public User() { }
+    public User() { 
+        this.isActive = true; // Default constructor sets active to true
+    }
 
     /* ---------- GETTERS / SETTERS ---------- */
     public Long getId() { return id; }
@@ -91,6 +97,9 @@ public class User {
 
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
+    
+    public Boolean getIsActive() { return isActive; }
+    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
     
     /* ---------- FACTORY METHODS ---------- */
     /**

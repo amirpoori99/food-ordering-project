@@ -306,4 +306,30 @@ public class ItemService {
                 totalItems, availableItems, inStockItems, lowStockItems, averagePrice);
         }
     }
+    
+    /**
+     * Get distinct categories for a restaurant
+     */
+    public List<String> getRestaurantCategories(Long restaurantId) {
+        // Validate restaurant exists
+        restaurantRepository.findById(restaurantId)
+            .orElseThrow(() -> new NotFoundException("Restaurant", restaurantId));
+        
+        return itemRepository.getCategoriesByRestaurant(restaurantId);
+    }
+
+    /**
+     * Get low stock items for a restaurant
+     */
+    public List<FoodItem> getLowStockItems(Long restaurantId, int threshold) {
+        // Validate restaurant exists
+        restaurantRepository.findById(restaurantId)
+            .orElseThrow(() -> new NotFoundException("Restaurant", restaurantId));
+        
+        return itemRepository.findLowStockByRestaurant(restaurantId, threshold);
+    }
+
+    /**
+     * Get low stock items with default threshold
+     */
 }

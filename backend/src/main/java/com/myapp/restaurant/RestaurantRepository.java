@@ -32,7 +32,7 @@ public class RestaurantRepository {
             Query<Restaurant> q = session.createQuery(
                     "from Restaurant where ownerId = :o", Restaurant.class);
             q.setParameter("o", ownerId);
-            return q.list();
+            return q.getResultList();
         }
     }
 
@@ -41,7 +41,7 @@ public class RestaurantRepository {
             Query<Restaurant> q = session.createQuery(
                     "from Restaurant where status = :s", Restaurant.class);
             q.setParameter("s", RestaurantStatus.APPROVED);
-            return q.list();
+            return q.getResultList();
         }
     }
 
@@ -80,7 +80,7 @@ public class RestaurantRepository {
     public List<Restaurant> findAll() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Query<Restaurant> q = session.createQuery("from Restaurant", Restaurant.class);
-            return q.list();
+            return q.getResultList();
         }
     }
 
@@ -89,7 +89,7 @@ public class RestaurantRepository {
             Query<Restaurant> q = session.createQuery(
                     "from Restaurant where status = :s", Restaurant.class);
             q.setParameter("s", status);
-            return q.list();
+            return q.getResultList();
         }
     }
 
@@ -108,6 +108,15 @@ public class RestaurantRepository {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Restaurant restaurant = session.get(Restaurant.class, id);
             return restaurant != null;
+        }
+    }
+    
+    public Restaurant update(Restaurant restaurant) {
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+            Restaurant updated = (Restaurant) session.merge(restaurant);
+            tx.commit();
+            return updated;
         }
     }
 }

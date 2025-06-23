@@ -29,5 +29,7 @@
         <mapping class="com.myapp.common.models.Order"/>
         <mapping class="com.myapp.common.models.OrderItem"/>
         <mapping class="com.myapp.common.models.Transaction"/>
+        <mapping class="com.myapp.common.models.Delivery"/>
+        <mapping class="com.myapp.common.models.Rating"/>
     </session-factory>
 </hibernate-configuration> 

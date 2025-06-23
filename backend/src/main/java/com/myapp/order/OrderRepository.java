@@ -48,7 +48,7 @@ public class OrderRepository {
             Query<Order> q = session.createQuery(
                     "select distinct o from Order o left join fetch o.orderItems oi left join fetch oi.foodItem where o.customer.id = :customerId order by o.orderDate desc", Order.class);
             q.setParameter("customerId", customerId);
-            return q.list();
+            return q.getResultList();
         }
     }
 
@@ -57,7 +57,7 @@ public class OrderRepository {
             Query<Order> q = session.createQuery(
                     "select distinct o from Order o left join fetch o.orderItems oi left join fetch oi.foodItem where o.restaurant.id = :restaurantId order by o.orderDate desc", Order.class);
             q.setParameter("restaurantId", restaurantId);
-            return q.list();
+            return q.getResultList();
         }
     }
 
@@ -66,7 +66,7 @@ public class OrderRepository {
             Query<Order> q = session.createQuery(
                     "from Order where status = :status order by orderDate desc", Order.class);
             q.setParameter("status", status);
-            return q.list();
+            return q.getResultList();
         }
     }
 
@@ -77,7 +77,7 @@ public class OrderRepository {
                     Order.class);
             q.setParameter("customerId", customerId);
             q.setParameter("status", status);
-            return q.list();
+            return q.getResultList();
         }
     }
 
@@ -88,7 +88,7 @@ public class OrderRepository {
                     Order.class);
             q.setParameter("restaurantId", restaurantId);
             q.setParameter("status", status);
-            return q.list();
+            return q.getResultList();
         }
     }
 
@@ -97,7 +97,7 @@ public class OrderRepository {
             Query<Order> q = session.createQuery(
                     "from Order where status = :pending order by orderDate asc", Order.class);
             q.setParameter("pending", OrderStatus.PENDING);
-            return q.list();
+            return q.getResultList();
         }
     }
 
@@ -112,14 +112,14 @@ public class OrderRepository {
                 OrderStatus.READY, 
                 OrderStatus.OUT_FOR_DELIVERY
             ));
-            return q.list();
+            return q.getResultList();
         }
     }
 
     public List<Order> findAll() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Query<Order> q = session.createQuery("from Order order by orderDate desc", Order.class);
-            return q.list();
+            return q.getResultList();
         }
     }
 
@@ -154,6 +154,15 @@ public class OrderRepository {
             query.setParameter("id", id);
             Long count = query.uniqueResult();
             return count != null && count > 0;
+        }
+    }
+
+    public Order update(Order order) {
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+            Order updated = (Order) session.merge(order);
+            tx.commit();
+            return updated;
         }
     }
 

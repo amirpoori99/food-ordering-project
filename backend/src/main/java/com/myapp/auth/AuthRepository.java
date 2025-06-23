@@ -16,7 +16,7 @@ public class AuthRepository {
             // Check duplicate phone
             Query<User> q = session.createQuery("from User where phone = :p", User.class);
             q.setParameter("p", user.getPhone());
-            if (!q.list().isEmpty()) {
+            if (!q.getResultList().isEmpty()) {
                 throw new DuplicatePhoneException(user.getPhone());
             }
             Transaction tx = session.beginTransaction();
