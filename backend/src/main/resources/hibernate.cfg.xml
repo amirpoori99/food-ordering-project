@@ -31,5 +31,8 @@
         <mapping class="com.myapp.common.models.Transaction"/>
         <mapping class="com.myapp.common.models.Delivery"/>
         <mapping class="com.myapp.common.models.Rating"/>
+        <mapping class="com.myapp.common.models.Coupon"/>
+        <mapping class="com.myapp.common.models.CouponUsage"/>
+        <mapping class="com.myapp.common.models.Favorite"/>
     </session-factory>
 </hibernate-configuration> 

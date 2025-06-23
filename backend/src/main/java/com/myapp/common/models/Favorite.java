@@ -130,7 +130,7 @@ public class Favorite {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-    
+
     public String getNotes() {
         return notes;
     }
@@ -143,11 +143,11 @@ public class Favorite {
     public long getUserId() {
         return user != null ? user.getId() : 0L;
     }
-    
+
     public long getRestaurantId() {
         return restaurant != null ? restaurant.getId() : 0L;
     }
-    
+
     // equals, hashCode, toString
     @Override
     public boolean equals(Object o) {
@@ -158,7 +158,7 @@ public class Favorite {
                Objects.equals(user, favorite.user) &&
                Objects.equals(restaurant, favorite.restaurant);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(id, user != null ? user.getId() : null, 

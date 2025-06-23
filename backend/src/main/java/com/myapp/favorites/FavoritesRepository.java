@@ -103,7 +103,7 @@ public class FavoritesRepository {
             logger.error("Error finding favorite by user {} and restaurant {}: {}", 
                         user.getId(), restaurant.getId(), e.getMessage(), e);
             return Optional.empty();
-        }
+    }
     }
 
     /**
@@ -140,7 +140,7 @@ public class FavoritesRepository {
         } catch (Exception e) {
             logger.error("Error finding favorites for user {}: {}", user.getId(), e.getMessage(), e);
             return List.of();
-        }
+    }
     }
 
     /**
@@ -271,7 +271,7 @@ public class FavoritesRepository {
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
-            }
+    }
             logger.error("Error deleting favorite {}: {}", id, e.getMessage(), e);
             return false;
         }
@@ -285,7 +285,7 @@ public class FavoritesRepository {
             Optional<Favorite> favorite = find(userId, restaurantId);
             if (favorite.isPresent()) {
                 delete(favorite.get().getId());
-            }
+    }
         } catch (Exception e) {
             logger.error("Error deleting favorite for user {} and restaurant {}: {}", 
                         userId, restaurantId, e.getMessage(), e);

@@ -285,7 +285,7 @@ public class ServerApp {
                     String response = "{\"message\":\"Login successful!\",\"status\":\"success\",\"userId\":" + 
                                     user.getId() + ",\"fullName\":\"" + user.getFullName() + "\",\"phone\":\"" + 
                                     user.getPhone() + "\",\"role\":\"" + user.getRole() + "\"}";
-                    sendResponse(exchange, 200, response);
+                sendResponse(exchange, 200, response);
                     
                     System.out.println("✅ User logged in: " + user.getFullName() + " (ID: " + user.getId() + ")");
                     
