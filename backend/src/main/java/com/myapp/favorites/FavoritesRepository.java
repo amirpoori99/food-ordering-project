@@ -110,7 +110,7 @@ public class FavoritesRepository {
                         restaurant != null ? restaurant.getId() : "null", 
                         e.getMessage(), e);
             return Optional.empty();
-        }
+    }
     }
 
     /**

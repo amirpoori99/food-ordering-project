@@ -557,10 +557,10 @@ public class RatingRepositoryTest {
             // The business logic might have different thresholds, so we just check it's not null
             // and if it has results, verify the structure
             if (!topRestaurants.isEmpty()) {
-                Object[] first = topRestaurants.get(0);
-                assertEquals(4, first.length); // id, name, avg, count
-                assertEquals(testRestaurant.getId(), first[0]);
-                assertEquals(testRestaurant.getName(), first[1]);
+            Object[] first = topRestaurants.get(0);
+            assertEquals(4, first.length); // id, name, avg, count
+            assertEquals(testRestaurant.getId(), first[0]);
+            assertEquals(testRestaurant.getName(), first[1]);
             }
             // Test passes whether list is empty or not - depends on business logic
         }

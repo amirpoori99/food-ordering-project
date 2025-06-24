@@ -673,19 +673,19 @@ public class FavoritesRepositoryTest {
             // should throw an exception
             
             // Act & Assert
-            try {
-                favoritesRepository.save(1L, 2L);
-                favoritesRepository.save(1L, 2L); // Potential duplicate
+                try {
+                    favoritesRepository.save(1L, 2L);
+                    favoritesRepository.save(1L, 2L); // Potential duplicate
                 // If we reach here, either no constraint exists or first save failed
                 assertTrue(true, "Either no constraint violation or operation succeeded");
-            } catch (RuntimeException e) {
+                } catch (RuntimeException e) {
                 // Expected for duplicate constraint violation or other database issues
-                assertTrue(e.getMessage().contains("constraint") || 
-                          e.getMessage().contains("duplicate") ||
+                    assertTrue(e.getMessage().contains("constraint") || 
+                              e.getMessage().contains("duplicate") ||
                           e.getMessage().contains("unique") ||
                           e.getMessage().contains("not found") ||
                           e.getMessage().contains("Failed"));
-            }
+                }
         }
         
         @Test

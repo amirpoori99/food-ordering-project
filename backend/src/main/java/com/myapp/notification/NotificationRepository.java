@@ -48,16 +48,16 @@ public class NotificationRepository {
         Exception lastException = null;
         
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
-            try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
-                transaction = session.beginTransaction();
-                session.merge(notification);
-                transaction.commit();
-                return notification;
-            } catch (Exception e) {
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.merge(notification);
+            transaction.commit();
+            return notification;
+        } catch (Exception e) {
                 lastException = e;
-                if (transaction != null) {
-                    transaction.rollback();
-                }
+            if (transaction != null) {
+                transaction.rollback();
+            }
                 
                 // Check if it's a lock exception and we can retry
                 if (isRetryableException(e) && attempt < maxRetries) {
@@ -75,7 +75,7 @@ public class NotificationRepository {
         }
         
         throw new RuntimeException("Error updating notification after " + maxRetries + " attempts: " + lastException.getMessage(), lastException);
-    }
+        }
 
     private boolean isRetryableException(Exception e) {
         String message = e.getMessage().toLowerCase();
