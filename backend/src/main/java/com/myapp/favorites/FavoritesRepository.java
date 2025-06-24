@@ -90,6 +90,11 @@ public class FavoritesRepository {
      * Finds favorite by user and restaurant
      */
     public Optional<Favorite> findByUserAndRestaurant(User user, Restaurant restaurant) {
+        if (user == null || restaurant == null) {
+            logger.warn("Cannot find favorite with null user or restaurant");
+            return Optional.empty();
+        }
+        
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             String hql = "FROM Favorite f WHERE f.user.id = :userId AND f.restaurant.id = :restaurantId";
             Query<Favorite> query = session.createQuery(hql, Favorite.class);
@@ -101,9 +106,11 @@ public class FavoritesRepository {
             
         } catch (Exception e) {
             logger.error("Error finding favorite by user {} and restaurant {}: {}", 
-                        user.getId(), restaurant.getId(), e.getMessage(), e);
+                        user != null ? user.getId() : "null", 
+                        restaurant != null ? restaurant.getId() : "null", 
+                        e.getMessage(), e);
             return Optional.empty();
-    }
+        }
     }
 
     /**

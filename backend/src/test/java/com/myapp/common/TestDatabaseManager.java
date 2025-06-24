@@ -14,6 +14,48 @@ public class TestDatabaseManager {
     private static final Logger logger = LoggerFactory.getLogger(TestDatabaseManager.class);
     
     /**
+     * Sets up the test database
+     */
+    public void setupTestDatabase() {
+        // Database is automatically set up via hibernate configuration
+        logger.debug("Test database setup completed");
+    }
+    
+    /**
+     * Cleanup method for test teardown
+     */
+    public void cleanup() {
+        cleanAllTestData();
+        logger.debug("Test database cleanup completed");
+    }
+    
+    /**
+     * Cleans all notification data from the database
+     */
+    public void clearNotifications() {
+        Transaction transaction = null;
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            
+            // Delete all notifications
+            session.createQuery("DELETE FROM Notification").executeUpdate();
+            
+            transaction.commit();
+            logger.debug("Cleaned all notification data from test database");
+            
+        } catch (Exception e) {
+            if (transaction != null) {
+                try {
+                    transaction.rollback();
+                } catch (Exception rollbackEx) {
+                    logger.error("Error during rollback: {}", rollbackEx.getMessage(), rollbackEx);
+                }
+            }
+            logger.error("Error cleaning notification data: {}", e.getMessage(), e);
+        }
+    }
+    
+    /**
      * Cleans all rating data from the database
      */
     public static void cleanRatingData() {
@@ -48,6 +90,7 @@ public class TestDatabaseManager {
             transaction = session.beginTransaction();
             
             // Delete in order to respect foreign key constraints
+            session.createQuery("DELETE FROM Notification").executeUpdate();
             session.createQuery("DELETE FROM Rating").executeUpdate();
             session.createQuery("DELETE FROM OrderItem").executeUpdate();
             session.createQuery("DELETE FROM Order").executeUpdate();

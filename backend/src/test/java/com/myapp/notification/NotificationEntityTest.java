@@ -18,14 +18,14 @@ class NotificationEntityTest {
     void testCreateNotificationBasic() {
         // When
         Notification notification = new Notification(
-            1L, "Test Title", "Test Message", NotificationType.ORDER_UPDATE);
+            1L, "Test Title", "Test Message", NotificationType.ORDER_CREATED);
 
         // Then
         assertNotNull(notification);
         assertEquals(1L, notification.getUserId());
         assertEquals("Test Title", notification.getTitle());
         assertEquals("Test Message", notification.getMessage());
-        assertEquals(NotificationType.ORDER_UPDATE, notification.getType());
+        assertEquals(NotificationType.ORDER_CREATED, notification.getType());
         assertEquals(NotificationPriority.NORMAL, notification.getPriority());
         assertFalse(notification.getIsRead());
         assertFalse(notification.getIsDeleted());
@@ -38,7 +38,7 @@ class NotificationEntityTest {
         // When
         Notification notification = new Notification(
             1L, "High Priority", "Important message", 
-            NotificationType.SYSTEM_UPDATE, NotificationPriority.HIGH);
+            NotificationType.SYSTEM_MAINTENANCE, NotificationPriority.HIGH);
 
         // Then
         assertEquals(NotificationPriority.HIGH, notification.getPriority());
@@ -49,7 +49,7 @@ class NotificationEntityTest {
     void testMarkAsRead() {
         // Given
         Notification notification = new Notification(
-            1L, "Test", "Message", NotificationType.ORDER_UPDATE);
+            1L, "Test", "Message", NotificationType.ORDER_CREATED);
         assertFalse(notification.getIsRead());
         assertNull(notification.getReadAt());
 
@@ -66,7 +66,7 @@ class NotificationEntityTest {
     void testMarkAsUnread() {
         // Given
         Notification notification = new Notification(
-            1L, "Test", "Message", NotificationType.ORDER_UPDATE);
+            1L, "Test", "Message", NotificationType.ORDER_CREATED);
         notification.markAsRead();
         assertTrue(notification.getIsRead());
 
@@ -83,7 +83,7 @@ class NotificationEntityTest {
     void testSoftDelete() {
         // Given
         Notification notification = new Notification(
-            1L, "Test", "Message", NotificationType.ORDER_UPDATE);
+            1L, "Test", "Message", NotificationType.ORDER_CREATED);
         assertFalse(notification.getIsDeleted());
 
         // When
@@ -98,7 +98,7 @@ class NotificationEntityTest {
     void testRestore() {
         // Given
         Notification notification = new Notification(
-            1L, "Test", "Message", NotificationType.ORDER_UPDATE);
+            1L, "Test", "Message", NotificationType.ORDER_CREATED);
         notification.softDelete();
         assertTrue(notification.getIsDeleted());
 
@@ -114,11 +114,11 @@ class NotificationEntityTest {
     void testIsHighPriority() {
         // Given
         Notification normalNotification = new Notification(
-            1L, "Normal", "Message", NotificationType.ORDER_UPDATE, NotificationPriority.NORMAL);
+            1L, "Normal", "Message", NotificationType.ORDER_CREATED, NotificationPriority.NORMAL);
         Notification highNotification = new Notification(
-            1L, "High", "Message", NotificationType.ORDER_UPDATE, NotificationPriority.HIGH);
+            1L, "High", "Message", NotificationType.ORDER_CREATED, NotificationPriority.HIGH);
         Notification urgentNotification = new Notification(
-            1L, "Urgent", "Message", NotificationType.ORDER_UPDATE, NotificationPriority.URGENT);
+            1L, "Urgent", "Message", NotificationType.ORDER_CREATED, NotificationPriority.URGENT);
 
         // When & Then
         assertFalse(normalNotification.isHighPriority());
@@ -131,11 +131,11 @@ class NotificationEntityTest {
     void testIsExpired() {
         // Given
         Notification oldNotification = new Notification(
-            1L, "Old", "Message", NotificationType.ORDER_UPDATE);
+            1L, "Old", "Message", NotificationType.ORDER_CREATED);
         oldNotification.setCreatedAt(LocalDateTime.now().minusDays(10));
 
         Notification newNotification = new Notification(
-            1L, "New", "Message", NotificationType.ORDER_UPDATE);
+            1L, "New", "Message", NotificationType.ORDER_CREATED);
 
         // When & Then
         assertTrue(oldNotification.isExpired(5));
@@ -147,15 +147,15 @@ class NotificationEntityTest {
     void testRelationshipFlags() {
         // Given
         Notification orderNotification = new Notification(
-            1L, "Order", "Message", NotificationType.ORDER_UPDATE);
+            1L, "Order", "Message", NotificationType.ORDER_CREATED);
         orderNotification.setOrderId(123L);
 
         Notification restaurantNotification = new Notification(
-            1L, "Restaurant", "Message", NotificationType.RESTAURANT_UPDATE);
+            1L, "Restaurant", "Message", NotificationType.RESTAURANT_APPROVED);
         restaurantNotification.setRestaurantId(456L);
 
         Notification deliveryNotification = new Notification(
-            1L, "Delivery", "Message", NotificationType.DELIVERY_UPDATE);
+            1L, "Delivery", "Message", NotificationType.DELIVERY_ASSIGNED);
         deliveryNotification.setDeliveryId(789L);
 
         // When & Then
@@ -180,7 +180,7 @@ class NotificationEntityTest {
 
         // Then
         assertEquals(1L, notification.getUserId());
-        assertEquals(NotificationType.ORDER_UPDATE, notification.getType());
+        assertEquals(NotificationType.ORDER_CREATED, notification.getType());
         assertEquals(NotificationPriority.NORMAL, notification.getPriority());
         assertEquals(Long.valueOf(123L), notification.getOrderId());
         assertTrue(notification.getTitle().contains("سفارش"));
@@ -194,7 +194,7 @@ class NotificationEntityTest {
         Notification notification = Notification.orderStatusChanged(1L, 123L, OrderStatus.CONFIRMED);
 
         // Then
-        assertEquals(NotificationType.ORDER_UPDATE, notification.getType());
+        assertEquals(NotificationType.ORDER_STATUS_CHANGED, notification.getType());
         assertEquals(NotificationPriority.HIGH, notification.getPriority());
         assertEquals(Long.valueOf(123L), notification.getOrderId());
         assertTrue(notification.getTitle().contains("تغییر وضعیت"));
@@ -208,7 +208,7 @@ class NotificationEntityTest {
         Notification notification = Notification.deliveryAssigned(1L, 123L, 456L, "John Doe");
 
         // Then
-        assertEquals(NotificationType.DELIVERY_UPDATE, notification.getType());
+        assertEquals(NotificationType.DELIVERY_ASSIGNED, notification.getType());
         assertEquals(NotificationPriority.HIGH, notification.getPriority());
         assertEquals(Long.valueOf(123L), notification.getOrderId());
         assertEquals(Long.valueOf(456L), notification.getDeliveryId());
@@ -247,7 +247,7 @@ class NotificationEntityTest {
         Notification notification = Notification.restaurantApproved(1L, 789L, "My Restaurant");
 
         // Then
-        assertEquals(NotificationType.RESTAURANT_UPDATE, notification.getType());
+        assertEquals(NotificationType.RESTAURANT_APPROVED, notification.getType());
         assertEquals(NotificationPriority.HIGH, notification.getPriority());
         assertEquals(Long.valueOf(789L), notification.getRestaurantId());
         assertTrue(notification.getMessage().contains("My Restaurant"));
@@ -264,8 +264,8 @@ class NotificationEntityTest {
         Notification notification = Notification.systemMaintenance(1L, maintenanceTime);
 
         // Then
-        assertEquals(NotificationType.SYSTEM_UPDATE, notification.getType());
-        assertEquals(NotificationPriority.URGENT, notification.getPriority());
+        assertEquals(NotificationType.SYSTEM_MAINTENANCE, notification.getType());
+        assertEquals(NotificationPriority.HIGH, notification.getPriority());
         assertTrue(notification.getTitle().contains("نگهداری"));
         assertTrue(notification.getMessage().contains("نگهداری"));
     }
@@ -293,7 +293,7 @@ class NotificationEntityTest {
     @DisplayName("ToString - Success")
     void testToString() {
         // Given
-        Notification notification = new Notification(1L, "Test Title", "Test Message", NotificationType.ORDER_UPDATE);
+        Notification notification = new Notification(1L, "Test Title", "Test Message", NotificationType.ORDER_CREATED);
         notification.setId(1L);
 
         // When
@@ -303,7 +303,7 @@ class NotificationEntityTest {
         assertTrue(toString.contains("id=1"));
         assertTrue(toString.contains("userId=1"));
         assertTrue(toString.contains("title='Test Title'"));
-        assertTrue(toString.contains("type=ORDER_UPDATE"));
+        assertTrue(toString.contains("type=ORDER_CREATED"));
         assertTrue(toString.contains("priority=NORMAL"));
         assertTrue(toString.contains("isRead=false"));
     }

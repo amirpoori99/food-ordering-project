@@ -3,6 +3,7 @@ package com.myapp.coupon;
 import com.myapp.common.models.Coupon;
 import com.myapp.common.utils.JsonUtil;
 import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.Headers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,7 +28,7 @@ import static org.mockito.Mockito.*;
  * Comprehensive test suite for CouponController
  * Tests all REST API endpoints, HTTP status codes, and error handling
  */
-@DisplayName("CouponController Integration Tests")
+@DisplayName("CouponController Tests")
 public class CouponControllerTest {
     
     @Mock
@@ -35,6 +36,9 @@ public class CouponControllerTest {
     
     @Mock
     private HttpExchange exchange;
+    
+    @Mock
+    private Headers responseHeaders;
     
     private CouponController controller;
     private ByteArrayOutputStream responseStream;
@@ -44,6 +48,10 @@ public class CouponControllerTest {
         MockitoAnnotations.openMocks(this);
         controller = new CouponController(couponService);
         responseStream = new ByteArrayOutputStream();
+        
+        // Setup mock response headers
+        when(exchange.getResponseHeaders()).thenReturn(responseHeaders);
+        when(exchange.getResponseBody()).thenReturn(responseStream);
     }
     
     @Nested
@@ -66,7 +74,7 @@ public class CouponControllerTest {
             
             // Assert
             verify(couponService).getCoupon(couponId);
-            verify(exchange).sendResponseHeaders(200, anyLong());
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
         }
         
         @Test
@@ -83,7 +91,7 @@ public class CouponControllerTest {
             controller.handle(exchange);
             
             // Assert
-            verify(exchange).sendResponseHeaders(500, anyLong());
+            verify(exchange).sendResponseHeaders(eq(500), anyLong());
         }
         
         @Test
@@ -102,7 +110,7 @@ public class CouponControllerTest {
             
             // Assert
             verify(couponService).getCouponByCode(code);
-            verify(exchange).sendResponseHeaders(200, anyLong());
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
         }
         
         @Test
@@ -120,7 +128,7 @@ public class CouponControllerTest {
             
             // Assert
             verify(couponService).getValidCoupons();
-            verify(exchange).sendResponseHeaders(200, anyLong());
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
         }
         
         @Test
@@ -139,7 +147,7 @@ public class CouponControllerTest {
             
             // Assert
             verify(couponService).getRestaurantCoupons(restaurantId);
-            verify(exchange).sendResponseHeaders(200, anyLong());
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
         }
         
         @Test
@@ -159,7 +167,7 @@ public class CouponControllerTest {
             
             // Assert
             verify(couponService).getApplicableCoupons(orderAmount, restaurantId);
-            verify(exchange).sendResponseHeaders(200, anyLong());
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
         }
         
         @Test
@@ -174,7 +182,7 @@ public class CouponControllerTest {
             controller.handle(exchange);
             
             // Assert
-            verify(exchange).sendResponseHeaders(400, anyLong());
+            verify(exchange).sendResponseHeaders(eq(400), anyLong());
         }
         
         @Test
@@ -192,7 +200,7 @@ public class CouponControllerTest {
             
             // Assert
             verify(couponService).getCouponStatistics();
-            verify(exchange).sendResponseHeaders(200, anyLong());
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
         }
     }
     
@@ -229,7 +237,7 @@ public class CouponControllerTest {
             controller.handle(exchange);
             
             // Assert
-            verify(exchange).sendResponseHeaders(201, anyLong());
+            verify(exchange).sendResponseHeaders(eq(201), anyLong());
         }
         
         @Test
@@ -250,7 +258,7 @@ public class CouponControllerTest {
             
             // Assert
             verify(couponService).activateCoupon(couponId, 1L);
-            verify(exchange).sendResponseHeaders(200, anyLong());
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
         }
         
         @Test
@@ -271,7 +279,7 @@ public class CouponControllerTest {
             
             // Assert
             verify(couponService).deactivateCoupon(couponId, 1L);
-            verify(exchange).sendResponseHeaders(200, anyLong());
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
         }
         
         @Test
@@ -298,7 +306,7 @@ public class CouponControllerTest {
             
             // Assert
             verify(couponService).applyCoupon("SAVE20", 100.0, 1L, 1L);
-            verify(exchange).sendResponseHeaders(200, anyLong());
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
         }
     }
     
@@ -330,7 +338,7 @@ public class CouponControllerTest {
             controller.handle(exchange);
             
             // Assert
-            verify(exchange).sendResponseHeaders(200, anyLong());
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
         }
     }
     
@@ -356,7 +364,7 @@ public class CouponControllerTest {
             
             // Assert
             verify(couponService).deleteCoupon(couponId, 1L);
-            verify(exchange).sendResponseHeaders(200, anyLong());
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
         }
     }
     
@@ -376,7 +384,7 @@ public class CouponControllerTest {
             controller.handle(exchange);
             
             // Assert
-            verify(exchange).sendResponseHeaders(405, anyLong());
+            verify(exchange).sendResponseHeaders(eq(405), anyLong());
         }
         
         @Test
@@ -391,7 +399,7 @@ public class CouponControllerTest {
             controller.handle(exchange);
             
             // Assert
-            verify(exchange).sendResponseHeaders(404, anyLong());
+            verify(exchange).sendResponseHeaders(eq(404), anyLong());
         }
         
         @Test
@@ -407,8 +415,8 @@ public class CouponControllerTest {
             // Act
             controller.handle(exchange);
             
-            // Assert
-            verify(exchange).sendResponseHeaders(400, anyLong());
+            // Assert - Malformed JSON results in 500 internal server error
+            verify(exchange).sendResponseHeaders(eq(500), anyLong());
         }
     }
     

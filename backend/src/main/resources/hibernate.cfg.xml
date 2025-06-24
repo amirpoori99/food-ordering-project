@@ -6,12 +6,18 @@
     <session-factory>
         <!-- Database connection settings (SQLite default) -->
         <property name="hibernate.connection.driver_class">org.sqlite.JDBC</property>
-        <property name="hibernate.connection.url">jdbc:sqlite:food_ordering.db</property>
+        <property name="hibernate.connection.url">jdbc:sqlite:food_ordering.db?journal_mode=WAL&amp;synchronous=NORMAL&amp;busy_timeout=30000</property>
         <property name="hibernate.connection.username"></property>
         <property name="hibernate.connection.password"></property>
 
         <!-- JDBC connection pool (use built-in) -->
         <property name="connection.pool_size">5</property>
+        
+        <!-- Additional SQLite optimizations -->
+        <property name="hibernate.connection.isolation">2</property>
+        <property name="hibernate.jdbc.batch_size">20</property>
+        <property name="hibernate.order_inserts">true</property>
+        <property name="hibernate.order_updates">true</property>
 
         <!-- SQL dialect -->
         <property name="hibernate.dialect">org.hibernate.community.dialect.SQLiteDialect</property>

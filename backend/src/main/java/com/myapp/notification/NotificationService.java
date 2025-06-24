@@ -240,16 +240,23 @@ public class NotificationService {
             throw new IllegalArgumentException("Maintenance time cannot be null");
         }
 
-        // Get all active users
-        List<Long> activeUserIds = authRepository.findAllActiveUserIds();
+        // Get all active users and create notifications in batch
+        List<Long> activeUserIds = notificationRepository.getAllActiveUserIds();
+        List<Notification> notifications = new java.util.ArrayList<>();
         
         for (Long userId : activeUserIds) {
             try {
-                notifySystemMaintenance(userId, maintenanceTime);
+                Notification notification = Notification.systemMaintenance(userId, maintenanceTime);
+                notifications.add(notification);
             } catch (Exception e) {
                 // Log error but continue with other users
-                System.err.println("Failed to send maintenance notification to user " + userId + ": " + e.getMessage());
+                System.err.println("Failed to create maintenance notification for user " + userId + ": " + e.getMessage());
             }
+        }
+        
+        // Save all notifications in batch
+        if (!notifications.isEmpty()) {
+            notificationRepository.saveBatch(notifications);
         }
     }
 
@@ -264,45 +271,51 @@ public class NotificationService {
             priority = NotificationPriority.LOW;
         }
 
-        // Get all active users
-        List<Long> activeUserIds = authRepository.findAllActiveUserIds();
+        // Get all active users and create notifications in batch
+        List<Long> activeUserIds = notificationRepository.getAllActiveUserIds();
+        List<Notification> notifications = new java.util.ArrayList<>();
         
         for (Long userId : activeUserIds) {
             try {
-                Notification notification = new Notification(userId, title, message, NotificationType.PROMOTION, priority);
-                notificationRepository.save(notification);
+                Notification notification = new Notification(userId, title, message, NotificationType.PROMOTIONAL, priority);
+                notifications.add(notification);
             } catch (Exception e) {
                 // Log error but continue with other users
-                System.err.println("Failed to send promotional notification to user " + userId + ": " + e.getMessage());
+                System.err.println("Failed to create promotional notification for user " + userId + ": " + e.getMessage());
             }
+        }
+        
+        // Save all notifications in batch
+        if (!notifications.isEmpty()) {
+            notificationRepository.saveBatch(notifications);
         }
     }
 
     // Analytics and statistics
     public long getUnreadCount(Long userId) {
         validateUserId(userId);
-        return notificationRepository.countUnreadByUserId(userId);
+        return notificationRepository.getUnreadCount(userId);
     }
 
     public long getNotificationCountByType(Long userId, NotificationType type) {
         validateUserId(userId);
         validateNotificationType(type);
-        return notificationRepository.countByUserIdAndType(userId, type);
+        return notificationRepository.getNotificationCountByType(userId, type);
     }
 
     public long getHighPriorityUnreadCount(Long userId) {
         validateUserId(userId);
-        return notificationRepository.countHighPriorityUnread(userId);
+        return notificationRepository.getHighPriorityUnreadCount(userId);
     }
 
     public boolean hasUnreadHighPriorityNotifications(Long userId) {
         validateUserId(userId);
-        return notificationRepository.existsUnreadHighPriority(userId);
+        return notificationRepository.getHighPriorityUnreadCount(userId) > 0;
     }
 
     public Optional<Notification> getLatestNotification(Long userId) {
         validateUserId(userId);
-        return notificationRepository.findLatestByUserId(userId);
+        return notificationRepository.getLatestNotification(userId);
     }
 
     public List<Object[]> getNotificationStatsByType(Long userId) {
@@ -323,7 +336,7 @@ public class NotificationService {
         if (orderId == null || orderId <= 0) {
             throw new IllegalArgumentException("Order ID cannot be null or negative");
         }
-        return notificationRepository.findByOrderId(orderId);
+        return notificationRepository.findOrderNotifications(orderId);
     }
 
     public List<Notification> getUserOrderNotifications(Long userId, Long orderId) {
@@ -331,7 +344,7 @@ public class NotificationService {
         if (orderId == null || orderId <= 0) {
             throw new IllegalArgumentException("Order ID cannot be null or negative");
         }
-        return notificationRepository.findByUserIdAndOrderId(userId, orderId);
+        return notificationRepository.findUserOrderNotifications(userId, orderId);
     }
 
     // Restaurant-related queries
@@ -339,7 +352,7 @@ public class NotificationService {
         if (restaurantId == null || restaurantId <= 0) {
             throw new IllegalArgumentException("Restaurant ID cannot be null or negative");
         }
-        return notificationRepository.findByRestaurantId(restaurantId);
+        return notificationRepository.findRestaurantNotifications(restaurantId);
     }
 
     // Delivery-related queries
@@ -347,7 +360,7 @@ public class NotificationService {
         if (deliveryId == null || deliveryId <= 0) {
             throw new IllegalArgumentException("Delivery ID cannot be null or negative");
         }
-        return notificationRepository.findByDeliveryId(deliveryId);
+        return notificationRepository.findDeliveryNotifications(deliveryId);
     }
 
     // Scheduled maintenance operations
@@ -374,7 +387,7 @@ public class NotificationService {
         }
         
         // Check if user exists
-        if (!authRepository.existsById(userId)) {
+        if (authRepository.findById(userId).isEmpty()) {
             throw new RuntimeException("User not found with id: " + userId);
         }
     }

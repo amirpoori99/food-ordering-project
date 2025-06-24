@@ -50,6 +50,13 @@ public class Notification {
     @Column(name = "delivery_id")
     private Long deliveryId;
     
+    // Generic entity ID for linking to any entity
+    @Column(name = "related_entity_id")
+    private Long relatedEntityId;
+    
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+    
     // JSON data for extra information
     @Column(length = 1000)
     private String metadata;
@@ -88,10 +95,12 @@ public class Notification {
     
     public void softDelete() {
         this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
     }
     
     public void restore() {
         this.isDeleted = false;
+        this.deletedAt = null;
     }
     
     public boolean isExpired(int expirationDays) {
@@ -120,10 +129,11 @@ public class Notification {
             userId,
             "سفارش جدید ثبت شد",
             "سفارش شما از رستوران " + restaurantName + " با موفقیت ثبت شد.",
-            NotificationType.ORDER_UPDATE,
+            NotificationType.ORDER_CREATED,
             NotificationPriority.NORMAL
         );
         notification.setOrderId(orderId);
+        notification.setRelatedEntityId(orderId);
         return notification;
     }
     
@@ -133,10 +143,11 @@ public class Notification {
             userId,
             "تغییر وضعیت سفارش",
             message,
-            NotificationType.ORDER_UPDATE,
+            NotificationType.ORDER_STATUS_CHANGED,
             NotificationPriority.HIGH
         );
         notification.setOrderId(orderId);
+        notification.setRelatedEntityId(orderId);
         return notification;
     }
     
@@ -145,11 +156,12 @@ public class Notification {
             userId,
             "پیک انتخاب شد",
             "پیک " + courierName + " برای تحویل سفارش شما انتخاب شد.",
-            NotificationType.DELIVERY_UPDATE,
+            NotificationType.DELIVERY_ASSIGNED,
             NotificationPriority.HIGH
         );
         notification.setOrderId(orderId);
         notification.setDeliveryId(deliveryId);
+        notification.setRelatedEntityId(orderId);
         return notification;
     }
     
@@ -176,10 +188,11 @@ public class Notification {
             userId,
             "رستوران تایید شد",
             "رستوران " + restaurantName + " شما توسط ادمین تایید شد.",
-            NotificationType.RESTAURANT_UPDATE,
+            NotificationType.RESTAURANT_APPROVED,
             NotificationPriority.HIGH
         );
         notification.setRestaurantId(restaurantId);
+        notification.setRelatedEntityId(restaurantId);
         return notification;
     }
     
@@ -187,9 +200,9 @@ public class Notification {
         Notification notification = new Notification(
             userId,
             "نگهداری سیستم",
-            "سیستم در تاریخ " + maintenanceTime.toLocalDate() + " به دلیل نگهداری موقتاً در دسترس نخواهد بود.",
-            NotificationType.SYSTEM_UPDATE,
-            NotificationPriority.URGENT
+            "سیستم در زمان " + maintenanceTime.toString() + " به دلیل نگهداری موقتاً در دسترس نخواهد بود.",
+            NotificationType.SYSTEM_MAINTENANCE,
+            NotificationPriority.HIGH
         );
         return notification;
     }
@@ -239,6 +252,10 @@ public class Notification {
 
     public Boolean getIsDeleted() { return isDeleted; }
     public void setIsDeleted(Boolean isDeleted) { this.isDeleted = isDeleted; }
+    
+    // Convenience methods
+    public boolean isRead() { return Boolean.TRUE.equals(isRead); }
+    public boolean isDeleted() { return Boolean.TRUE.equals(isDeleted); }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
@@ -257,14 +274,26 @@ public class Notification {
 
     public String getMetadata() { return metadata; }
     public void setMetadata(String metadata) { this.metadata = metadata; }
+    
+    public Long getRelatedEntityId() { return relatedEntityId; }
+    public void setRelatedEntityId(Long relatedEntityId) { this.relatedEntityId = relatedEntityId; }
+    
+    public LocalDateTime getDeletedAt() { return deletedAt; }
+    public void setDeletedAt(LocalDateTime deletedAt) { this.deletedAt = deletedAt; }
 
     // Enums
     public enum NotificationType {
+        ORDER_CREATED,
+        ORDER_STATUS_CHANGED,
         ORDER_UPDATE,
+        DELIVERY_ASSIGNED,
         DELIVERY_UPDATE, 
         PAYMENT_UPDATE,
+        RESTAURANT_APPROVED,
         RESTAURANT_UPDATE,
+        SYSTEM_MAINTENANCE,
         SYSTEM_UPDATE,
+        PROMOTIONAL,
         PROMOTION,
         REMINDER
     }
@@ -272,6 +301,7 @@ public class Notification {
     public enum NotificationPriority {
         LOW,
         NORMAL,
+        MEDIUM,
         HIGH,
         URGENT
     }

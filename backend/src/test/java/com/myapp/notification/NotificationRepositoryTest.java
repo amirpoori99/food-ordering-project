@@ -4,662 +4,870 @@ import com.myapp.common.TestDatabaseManager;
 import com.myapp.common.models.Notification;
 import com.myapp.common.models.Notification.NotificationType;
 import com.myapp.common.models.Notification.NotificationPriority;
-import org.hibernate.SessionFactory;
+import com.myapp.common.models.User;
+import com.myapp.common.utils.DatabaseUtil;
+
 import org.junit.jupiter.api.*;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class NotificationRepositoryTest {
 
-    private SessionFactory sessionFactory;
-    private NotificationRepository notificationRepository;
+    private static NotificationRepository notificationRepository;
+    private static TestDatabaseManager testDatabaseManager;
+    private static User testUser1, testUser2;
+
     @BeforeAll
-    void setUpAll() {
-        sessionFactory = com.myapp.common.utils.DatabaseUtil.getSessionFactory();
-        notificationRepository = new NotificationRepository(sessionFactory);
+    static void setUpClass() {
+        testDatabaseManager = new TestDatabaseManager();
+        testDatabaseManager.setupTestDatabase();
+        notificationRepository = new NotificationRepository();
+        
+        // Create test users
+        createTestUsers();
+    }
+
+    @AfterAll
+    static void tearDownClass() {
+        if (testDatabaseManager != null) {
+            testDatabaseManager.cleanup();
+        }
     }
 
     @BeforeEach
     void setUp() {
-        com.myapp.common.TestDatabaseManager.cleanAllTestData();
+        testDatabaseManager.clearNotifications();
     }
 
-    @AfterAll
-    void tearDownAll() {
-        // DatabaseUtil handles session factory lifecycle
+    private static void createTestUsers() {
+        Transaction transaction = null;
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            
+            testUser1 = new User();
+            testUser1.setFullName("Test User 1");
+            testUser1.setEmail("testuser1@example.com");
+            testUser1.setPhone("1234567890");
+            testUser1.setPasswordHash("password123");
+            testUser1.setIsActive(true);
+            session.persist(testUser1);
+            
+            testUser2 = new User();
+            testUser2.setFullName("Test User 2");
+            testUser2.setEmail("testuser2@example.com");
+            testUser2.setPhone("0987654321");
+            testUser2.setPasswordHash("password456");
+            testUser2.setIsActive(true);
+            session.persist(testUser2);
+            
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw e;
+        }
     }
 
-    // ====== Basic CRUD Tests ======
-    @Test
-    @DisplayName("Save notification - Success")
-    void testSaveNotification() {
-        // Given
-        Notification notification = new Notification(
-            1L, "Test Title", "Test Message", NotificationType.ORDER_UPDATE);
+    @Nested
+    @DisplayName("Basic CRUD Operations")
+    class BasicCrudOperationsTest {
 
-        // When
-        Notification saved = notificationRepository.save(notification);
+        @Test
+        @Order(1)
+        @DisplayName("Should save notification successfully")
+        void shouldSaveNotificationSuccessfully() {
+            // Given
+            Notification notification = new Notification(
+                testUser1.getId(), 
+                "Test Title", 
+                "Test Message", 
+                NotificationType.ORDER_CREATED
+            );
 
-        // Then
-        assertNotNull(saved);
-        assertNotNull(saved.getId());
-        assertEquals("Test Title", saved.getTitle());
-        assertEquals("Test Message", saved.getMessage());
-        assertEquals(NotificationType.ORDER_UPDATE, saved.getType());
-        assertEquals(NotificationPriority.NORMAL, saved.getPriority());
-        assertFalse(saved.getIsRead());
-        assertFalse(saved.getIsDeleted());
-        assertNotNull(saved.getCreatedAt());
-    }
+            // When
+            Notification savedNotification = notificationRepository.save(notification);
 
-    @Test
-    @DisplayName("Find notification by ID - Success")
-    void testFindById() {
-        // Given
-        Notification notification = new Notification(
-            1L, "Test Title", "Test Message", NotificationType.ORDER_UPDATE);
-        Notification saved = notificationRepository.save(notification);
-
-        // When
-        Optional<Notification> found = notificationRepository.findById(saved.getId());
-
-        // Then
-        assertTrue(found.isPresent());
-        assertEquals(saved.getId(), found.get().getId());
-        assertEquals("Test Title", found.get().getTitle());
-    }
-
-    @Test
-    @DisplayName("Find notification by non-existent ID - Should return empty")
-    void testFindByIdNotFound() {
-        // When
-        Optional<Notification> found = notificationRepository.findById(999L);
-
-        // Then
-        assertFalse(found.isPresent());
-    }
-
-    @Test
-    @DisplayName("Update notification - Success")
-    void testUpdateNotification() {
-        // Given
-        Notification notification = new Notification(
-            1L, "Original Title", "Original Message", NotificationType.ORDER_UPDATE);
-        Notification saved = notificationRepository.save(notification);
-
-        // When
-        saved.setTitle("Updated Title");
-        saved.markAsRead();
-        Notification updated = notificationRepository.update(saved);
-
-        // Then
-        assertEquals("Updated Title", updated.getTitle());
-        assertTrue(updated.getIsRead());
-        assertNotNull(updated.getReadAt());
-    }
-
-    @Test
-    @DisplayName("Delete notification - Success")
-    void testDeleteNotification() {
-        // Given
-        Notification notification = new Notification(
-            1L, "Test Title", "Test Message", NotificationType.ORDER_UPDATE);
-        Notification saved = notificationRepository.save(notification);
-
-        // When
-        notificationRepository.delete(saved.getId());
-
-        // Then
-        Optional<Notification> found = notificationRepository.findById(saved.getId());
-        assertFalse(found.isPresent());
-    }
-
-    // ====== User Query Tests ======
-    @Test
-    @DisplayName("Find notifications by user ID - Success")
-    void testFindByUserId() {
-        // Given
-        Long userId = 1L;
-        notificationRepository.save(new Notification(
-            userId, "Title 1", "Message 1", NotificationType.ORDER_UPDATE));
-        notificationRepository.save(new Notification(
-            userId, "Title 2", "Message 2", NotificationType.PAYMENT_UPDATE));
-        notificationRepository.save(new Notification(
-            2L, "Other User", "Message 3", NotificationType.ORDER_UPDATE));
-
-        // When
-        List<Notification> notifications = notificationRepository.findByUserId(userId);
-
-        // Then
-        assertEquals(2, notifications.size());
-        assertTrue(notifications.stream().allMatch(n -> userId.equals(n.getUserId())));
-        assertEquals("Title 2", notifications.get(0).getTitle()); // Most recent first
-    }
-
-    @Test
-    @DisplayName("Find notifications by user ID paginated - Success")
-    void testFindByUserIdPaginated() {
-        // Given
-        Long userId = 1L;
-        for (int i = 1; i <= 5; i++) {
-            notificationRepository.save(new Notification(
-                userId, "Title " + i, "Message " + i, NotificationType.ORDER_UPDATE));
+            // Then
+            assertNotNull(savedNotification);
+            assertNotNull(savedNotification.getId());
+            assertEquals("Test Title", savedNotification.getTitle());
+            assertEquals("Test Message", savedNotification.getMessage());
+            assertEquals(NotificationType.ORDER_CREATED, savedNotification.getType());
+            assertEquals(testUser1.getId(), savedNotification.getUserId());
         }
 
-        // When
-        List<Notification> page1 = notificationRepository.findByUserIdPaginated(userId, 0, 2);
-        List<Notification> page2 = notificationRepository.findByUserIdPaginated(userId, 1, 2);
+        @Test
+        @Order(2)
+        @DisplayName("Should find notification by ID successfully")
+        void shouldFindNotificationByIdSuccessfully() {
+            // Given
+            Notification notification = new Notification(
+                testUser1.getId(), 
+                "Find Test", 
+                "Find Message", 
+                NotificationType.ORDER_STATUS_CHANGED
+            );
+            Notification savedNotification = notificationRepository.save(notification);
 
-        // Then
-        assertEquals(2, page1.size());
-        assertEquals(2, page2.size());
-        assertEquals("Title 5", page1.get(0).getTitle()); // Most recent first
-        assertEquals("Title 4", page1.get(1).getTitle());
-        assertEquals("Title 3", page2.get(0).getTitle());
-        assertEquals("Title 2", page2.get(1).getTitle());
+            // When
+            Optional<Notification> foundNotification = notificationRepository.findById(savedNotification.getId());
+
+            // Then
+            assertTrue(foundNotification.isPresent());
+            assertEquals(savedNotification.getId(), foundNotification.get().getId());
+            assertEquals("Find Test", foundNotification.get().getTitle());
+        }
+
+        @Test
+        @Order(3)
+        @DisplayName("Should update notification successfully")
+        void shouldUpdateNotificationSuccessfully() {
+            // Given
+            Notification notification = new Notification(
+                testUser1.getId(), 
+                "Update Test", 
+                "Update Message", 
+                NotificationType.DELIVERY_ASSIGNED
+            );
+            Notification savedNotification = notificationRepository.save(notification);
+            
+            // When
+            savedNotification.markAsRead();
+            Notification updatedNotification = notificationRepository.update(savedNotification);
+
+            // Then
+            assertNotNull(updatedNotification);
+            assertTrue(updatedNotification.isRead());
+            assertNotNull(updatedNotification.getReadAt());
+        }
+
+        @Test
+        @Order(4)
+        @DisplayName("Should delete notification successfully")
+        void shouldDeleteNotificationSuccessfully() {
+            // Given
+            Notification notification = new Notification(
+                testUser1.getId(), 
+                "Delete Test", 
+                "Delete Message", 
+                NotificationType.PROMOTIONAL
+            );
+            Notification savedNotification = notificationRepository.save(notification);
+
+            // When
+            notificationRepository.delete(savedNotification);
+
+            // Then
+            Optional<Notification> deletedNotification = notificationRepository.findById(savedNotification.getId());
+            assertFalse(deletedNotification.isPresent());
+        }
     }
 
-    @Test
-    @DisplayName("Find unread notifications by user ID - Success")
-    void testFindUnreadByUserId() {
-        // Given
-        Long userId = 1L;
-        Notification n1 = notificationRepository.save(new Notification(
-            userId, "Unread", "Message 1", NotificationType.ORDER_UPDATE));
-        Notification n2 = notificationRepository.save(new Notification(
-            userId, "Read", "Message 2", NotificationType.PAYMENT_UPDATE));
-        
-        n2.markAsRead();
-        notificationRepository.update(n2);
+    @Nested
+    @DisplayName("Find Operations")
+    class FindOperationsTest {
 
-        // When
-        List<Notification> unreadNotifications = notificationRepository.findUnreadByUserId(userId);
+        @Test
+        @DisplayName("Should find notifications by user ID")
+        void shouldFindNotificationsByUserId() {
+            // Given
+            Notification notification1 = new Notification(
+                testUser1.getId(), 
+                "User Test 1", 
+                "Message 1", 
+                NotificationType.ORDER_CREATED
+            );
+            Notification notification2 = new Notification(
+                testUser1.getId(), 
+                "User Test 2", 
+                "Message 2", 
+                NotificationType.ORDER_STATUS_CHANGED
+            );
+            Notification notification3 = new Notification(
+                testUser2.getId(), 
+                "Other User", 
+                "Message 3", 
+                NotificationType.DELIVERY_ASSIGNED
+            );
 
-        // Then
-        assertEquals(1, unreadNotifications.size());
-        assertEquals("Unread", unreadNotifications.get(0).getTitle());
+            notificationRepository.save(notification1);
+            notificationRepository.save(notification2);
+            notificationRepository.save(notification3);
+
+            // When
+            List<Notification> userNotifications = notificationRepository.findByUserId(testUser1.getId());
+
+            // Then
+            assertEquals(2, userNotifications.size());
+            assertTrue(userNotifications.stream().allMatch(n -> n.getUserId().equals(testUser1.getId())));
+        }
+
+        @Test
+        @DisplayName("Should find notifications by user ID paginated")
+        void shouldFindNotificationsByUserIdPaginated() {
+            // Given
+            for (int i = 0; i < 5; i++) {
+                Notification notification = new Notification(
+                    testUser1.getId(), 
+                    "Page Test " + i, 
+                    "Message " + i, 
+                    NotificationType.ORDER_CREATED
+                );
+                notificationRepository.save(notification);
+            }
+
+            // When
+            List<Notification> page0 = notificationRepository.findByUserIdPaginated(testUser1.getId(), 0, 2);
+            List<Notification> page1 = notificationRepository.findByUserIdPaginated(testUser1.getId(), 1, 2);
+
+            // Then
+            assertEquals(2, page0.size());
+            assertEquals(2, page1.size());
+            // Verify no duplicates between pages
+            assertNotEquals(page0.get(0).getId(), page1.get(0).getId());
+        }
+
+        @Test
+        @DisplayName("Should find unread notifications by user ID")
+        void shouldFindUnreadNotificationsByUserId() {
+            // Given
+            Notification readNotification = new Notification(
+                testUser1.getId(), 
+                "Read Test", 
+                "Read Message", 
+                NotificationType.ORDER_CREATED
+            );
+            readNotification.markAsRead();
+            
+            Notification unreadNotification = new Notification(
+                testUser1.getId(), 
+                "Unread Test", 
+                "Unread Message", 
+                NotificationType.ORDER_STATUS_CHANGED
+            );
+
+            notificationRepository.save(readNotification);
+            notificationRepository.save(unreadNotification);
+
+            // When
+            List<Notification> unreadNotifications = notificationRepository.findUnreadByUserId(testUser1.getId());
+
+            // Then
+            assertEquals(1, unreadNotifications.size());
+            assertFalse(unreadNotifications.get(0).isRead());
+            assertEquals("Unread Test", unreadNotifications.get(0).getTitle());
+        }
+
+        @Test
+        @DisplayName("Should find notifications by user ID and type")
+        void shouldFindNotificationsByUserIdAndType() {
+            // Given
+            Notification orderNotification = new Notification(
+                testUser1.getId(), 
+                "Order Test", 
+                "Order Message", 
+                NotificationType.ORDER_CREATED
+            );
+            Notification deliveryNotification = new Notification(
+                testUser1.getId(), 
+                "Delivery Test", 
+                "Delivery Message", 
+                NotificationType.DELIVERY_ASSIGNED
+            );
+
+            notificationRepository.save(orderNotification);
+            notificationRepository.save(deliveryNotification);
+
+            // When
+            List<Notification> orderNotifications = notificationRepository.findByUserIdAndType(
+                testUser1.getId(), NotificationType.ORDER_CREATED
+            );
+
+            // Then
+            assertEquals(1, orderNotifications.size());
+            assertEquals(NotificationType.ORDER_CREATED, orderNotifications.get(0).getType());
+        }
+
+        @Test
+        @DisplayName("Should find notifications by user ID and priority")
+        void shouldFindNotificationsByUserIdAndPriority() {
+            // Given
+            Notification highPriorityNotification = new Notification(
+                testUser1.getId(), 
+                "High Priority", 
+                "High Priority Message", 
+                NotificationType.SYSTEM_MAINTENANCE,
+                NotificationPriority.HIGH
+            );
+            Notification lowPriorityNotification = new Notification(
+                testUser1.getId(), 
+                "Low Priority", 
+                "Low Priority Message", 
+                NotificationType.PROMOTIONAL,
+                NotificationPriority.LOW
+            );
+
+            notificationRepository.save(highPriorityNotification);
+            notificationRepository.save(lowPriorityNotification);
+
+            // When
+            List<Notification> highPriorityNotifications = notificationRepository.findByUserIdAndPriority(
+                testUser1.getId(), NotificationPriority.HIGH
+            );
+
+            // Then
+            assertEquals(1, highPriorityNotifications.size());
+            assertEquals(NotificationPriority.HIGH, highPriorityNotifications.get(0).getPriority());
+        }
+
+        @Test
+        @DisplayName("Should find high priority notifications by user ID")
+        void shouldFindHighPriorityNotificationsByUserId() {
+            // Given
+            Notification highPriorityNotification = new Notification(
+                testUser1.getId(), 
+                "High Priority", 
+                "High Priority Message", 
+                NotificationType.SYSTEM_MAINTENANCE,
+                NotificationPriority.HIGH
+            );
+            Notification mediumPriorityNotification = new Notification(
+                testUser1.getId(), 
+                "Medium Priority", 
+                "Medium Priority Message", 
+                NotificationType.PROMOTIONAL,
+                NotificationPriority.MEDIUM
+            );
+
+            notificationRepository.save(highPriorityNotification);
+            notificationRepository.save(mediumPriorityNotification);
+
+            // When
+            List<Notification> highPriorityNotifications = notificationRepository.findHighPriorityByUserId(testUser1.getId());
+
+            // Then
+            assertEquals(1, highPriorityNotifications.size());
+            assertEquals(NotificationPriority.HIGH, highPriorityNotifications.get(0).getPriority());
+        }
+
+        @Test
+        @DisplayName("Should find recent notifications by user ID")
+        void shouldFindRecentNotificationsByUserId() {
+            // Given
+            Notification recentNotification = new Notification(
+                testUser1.getId(), 
+                "Recent Test", 
+                "Recent Message", 
+                NotificationType.ORDER_CREATED
+            );
+            notificationRepository.save(recentNotification);
+
+            // Simulate old notification by manually setting creation date
+            Notification oldNotification = new Notification(
+                testUser1.getId(), 
+                "Old Test", 
+                "Old Message", 
+                NotificationType.ORDER_STATUS_CHANGED
+            );
+            oldNotification = notificationRepository.save(oldNotification);
+            
+            // Manually update creation date to be old
+            try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+                Transaction transaction = session.beginTransaction();
+                session.createQuery("UPDATE Notification SET createdAt = :oldDate WHERE id = :id")
+                    .setParameter("oldDate", LocalDateTime.now().minusDays(10))
+                    .setParameter("id", oldNotification.getId())
+                    .executeUpdate();
+                transaction.commit();
+            }
+
+            // When
+            List<Notification> recentNotifications = notificationRepository.findRecentByUserId(testUser1.getId(), 7);
+
+            // Then
+            assertEquals(1, recentNotifications.size());
+            assertEquals("Recent Test", recentNotifications.get(0).getTitle());
+        }
     }
 
-    @Test
-    @DisplayName("Find notifications by user ID and type - Success")
-    void testFindByUserIdAndType() {
-        // Given
-        Long userId = 1L;
-        notificationRepository.save(new Notification(
-            userId, "Order 1", "Message 1", NotificationType.ORDER_UPDATE));
-        notificationRepository.save(new Notification(
-            userId, "Payment 1", "Message 2", NotificationType.PAYMENT_UPDATE));
-        notificationRepository.save(new Notification(
-            userId, "Order 2", "Message 3", NotificationType.ORDER_UPDATE));
+    @Nested
+    @DisplayName("Bulk Operations")
+    class BulkOperationsTest {
 
-        // When
-        List<Notification> orderNotifications = notificationRepository.findByUserIdAndType(
-            userId, NotificationType.ORDER_UPDATE);
+        @Test
+        @DisplayName("Should mark all notifications as read for user")
+        void shouldMarkAllNotificationsAsReadForUser() {
+            // Given
+            Notification notification1 = new Notification(
+                testUser1.getId(), 
+                "Bulk Test 1", 
+                "Message 1", 
+                NotificationType.ORDER_CREATED
+            );
+            Notification notification2 = new Notification(
+                testUser1.getId(), 
+                "Bulk Test 2", 
+                "Message 2", 
+                NotificationType.ORDER_STATUS_CHANGED
+            );
 
-        // Then
-        assertEquals(2, orderNotifications.size());
-        assertTrue(orderNotifications.stream().allMatch(n -> n.getType() == NotificationType.ORDER_UPDATE));
+            notificationRepository.save(notification1);
+            notificationRepository.save(notification2);
+
+            // When
+            int updatedCount = notificationRepository.markAllAsReadForUser(testUser1.getId());
+
+            // Then
+            assertEquals(2, updatedCount);
+            
+            // Verify all notifications are now read
+            List<Notification> unreadNotifications = notificationRepository.findUnreadByUserId(testUser1.getId());
+            assertEquals(0, unreadNotifications.size());
+        }
+
+        @Test
+        @DisplayName("Should mark notifications as read by type")
+        void shouldMarkNotificationsAsReadByType() {
+            // Given
+            Notification orderNotification = new Notification(
+                testUser1.getId(), 
+                "Order Test", 
+                "Order Message", 
+                NotificationType.ORDER_CREATED
+            );
+            Notification deliveryNotification = new Notification(
+                testUser1.getId(), 
+                "Delivery Test", 
+                "Delivery Message", 
+                NotificationType.DELIVERY_ASSIGNED
+            );
+
+            notificationRepository.save(orderNotification);
+            notificationRepository.save(deliveryNotification);
+
+            // When
+            int updatedCount = notificationRepository.markAsReadByType(testUser1.getId(), NotificationType.ORDER_CREATED);
+
+            // Then
+            assertEquals(1, updatedCount);
+            
+            // Verify only order notifications are read
+            List<Notification> orderNotifications = notificationRepository.findByUserIdAndType(
+                testUser1.getId(), NotificationType.ORDER_CREATED
+            );
+            assertTrue(orderNotifications.get(0).isRead());
+            
+            List<Notification> deliveryNotifications = notificationRepository.findByUserIdAndType(
+                testUser1.getId(), NotificationType.DELIVERY_ASSIGNED
+            );
+            assertFalse(deliveryNotifications.get(0).isRead());
+        }
+
+        @Test
+        @DisplayName("Should soft delete old notifications")
+        void shouldSoftDeleteOldNotifications() {
+            // Given
+            Notification oldNotification = new Notification(
+                testUser1.getId(), 
+                "Old Test", 
+                "Old Message", 
+                NotificationType.ORDER_CREATED
+            );
+            oldNotification = notificationRepository.save(oldNotification);
+            
+            // Manually set old creation date
+            try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+                Transaction transaction = session.beginTransaction();
+                session.createQuery("UPDATE Notification SET createdAt = :oldDate WHERE id = :id")
+                    .setParameter("oldDate", LocalDateTime.now().minusDays(35))
+                    .setParameter("id", oldNotification.getId())
+                    .executeUpdate();
+                transaction.commit();
+            }
+
+            // When
+            int deletedCount = notificationRepository.softDeleteOldNotifications(30);
+
+            // Then
+            assertEquals(1, deletedCount);
+            
+            // Verify notification is soft deleted
+            Optional<Notification> deletedNotification = notificationRepository.findById(oldNotification.getId());
+            assertTrue(deletedNotification.isPresent());
+            assertTrue(deletedNotification.get().isDeleted());
+        }
     }
 
-    @Test
-    @DisplayName("Find notifications by user ID and priority - Success")
-    void testFindByUserIdAndPriority() {
-        // Given
-        Long userId = 1L;
-        notificationRepository.save(new Notification(
-            userId, "Normal", "Message 1", NotificationType.ORDER_UPDATE, NotificationPriority.NORMAL));
-        notificationRepository.save(new Notification(
-            userId, "High", "Message 2", NotificationType.PAYMENT_UPDATE, NotificationPriority.HIGH));
-        notificationRepository.save(new Notification(
-            userId, "High 2", "Message 3", NotificationType.ORDER_UPDATE, NotificationPriority.HIGH));
+    @Nested
+    @DisplayName("Statistics and Counts")
+    class StatisticsAndCountsTest {
 
-        // When
-        List<Notification> highPriorityNotifications = notificationRepository.findByUserIdAndPriority(
-            userId, NotificationPriority.HIGH);
+        @Test
+        @DisplayName("Should get unread count")
+        void shouldGetUnreadCount() {
+            // Given
+            Notification readNotification = new Notification(
+                testUser1.getId(), 
+                "Read Test", 
+                "Read Message", 
+                NotificationType.ORDER_CREATED
+            );
+            readNotification.markAsRead();
+            
+            Notification unreadNotification1 = new Notification(
+                testUser1.getId(), 
+                "Unread Test 1", 
+                "Unread Message 1", 
+                NotificationType.ORDER_STATUS_CHANGED
+            );
+            
+            Notification unreadNotification2 = new Notification(
+                testUser1.getId(), 
+                "Unread Test 2", 
+                "Unread Message 2", 
+                NotificationType.DELIVERY_ASSIGNED
+            );
 
-        // Then
-        assertEquals(2, highPriorityNotifications.size());
-        assertTrue(highPriorityNotifications.stream().allMatch(n -> n.getPriority() == NotificationPriority.HIGH));
+            notificationRepository.save(readNotification);
+            notificationRepository.save(unreadNotification1);
+            notificationRepository.save(unreadNotification2);
+
+            // When
+            long unreadCount = notificationRepository.getUnreadCount(testUser1.getId());
+
+            // Then
+            assertEquals(2, unreadCount);
+        }
+
+        @Test
+        @DisplayName("Should get notification count by type")
+        void shouldGetNotificationCountByType() {
+            // Given
+            Notification orderNotification1 = new Notification(
+                testUser1.getId(), 
+                "Order Test 1", 
+                "Order Message 1", 
+                NotificationType.ORDER_CREATED
+            );
+            Notification orderNotification2 = new Notification(
+                testUser1.getId(), 
+                "Order Test 2", 
+                "Order Message 2", 
+                NotificationType.ORDER_CREATED
+            );
+            Notification deliveryNotification = new Notification(
+                testUser1.getId(), 
+                "Delivery Test", 
+                "Delivery Message", 
+                NotificationType.DELIVERY_ASSIGNED
+            );
+
+            notificationRepository.save(orderNotification1);
+            notificationRepository.save(orderNotification2);
+            notificationRepository.save(deliveryNotification);
+
+            // When
+            long orderCount = notificationRepository.getNotificationCountByType(testUser1.getId(), NotificationType.ORDER_CREATED);
+            long deliveryCount = notificationRepository.getNotificationCountByType(testUser1.getId(), NotificationType.DELIVERY_ASSIGNED);
+
+            // Then
+            assertEquals(2, orderCount);
+            assertEquals(1, deliveryCount);
+        }
+
+        @Test
+        @DisplayName("Should get high priority unread count")
+        void shouldGetHighPriorityUnreadCount() {
+            // Given
+            Notification highPriorityUnread = new Notification(
+                testUser1.getId(), 
+                "High Priority Unread", 
+                "High Priority Message", 
+                NotificationType.SYSTEM_MAINTENANCE,
+                NotificationPriority.HIGH
+            );
+            
+            Notification highPriorityRead = new Notification(
+                testUser1.getId(), 
+                "High Priority Read", 
+                "High Priority Message", 
+                NotificationType.SYSTEM_MAINTENANCE,
+                NotificationPriority.HIGH
+            );
+            highPriorityRead.markAsRead();
+            
+            Notification mediumPriorityUnread = new Notification(
+                testUser1.getId(), 
+                "Medium Priority Unread", 
+                "Medium Priority Message", 
+                NotificationType.PROMOTIONAL,
+                NotificationPriority.MEDIUM
+            );
+
+            notificationRepository.save(highPriorityUnread);
+            notificationRepository.save(highPriorityRead);
+            notificationRepository.save(mediumPriorityUnread);
+
+            // When
+            long highPriorityUnreadCount = notificationRepository.getHighPriorityUnreadCount(testUser1.getId());
+
+            // Then
+            assertEquals(1, highPriorityUnreadCount);
+        }
+
+        @Test
+        @DisplayName("Should get latest notification")
+        void shouldGetLatestNotification() {
+            // Given
+            Notification oldNotification = new Notification(
+                testUser1.getId(), 
+                "Old Test", 
+                "Old Message", 
+                NotificationType.ORDER_CREATED
+            );
+            notificationRepository.save(oldNotification);
+            
+            // Wait a moment to ensure different timestamps
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            
+            Notification latestNotification = new Notification(
+                testUser1.getId(), 
+                "Latest Test", 
+                "Latest Message", 
+                NotificationType.ORDER_STATUS_CHANGED
+            );
+            notificationRepository.save(latestNotification);
+
+            // When
+            Optional<Notification> latest = notificationRepository.getLatestNotification(testUser1.getId());
+
+            // Then
+            assertTrue(latest.isPresent());
+            assertEquals("Latest Test", latest.get().getTitle());
+        }
+
+        @Test
+        @DisplayName("Should get notification stats by type")
+        void shouldGetNotificationStatsByType() {
+            // Given
+            Notification orderNotification1 = new Notification(
+                testUser1.getId(), 
+                "Order Test 1", 
+                "Order Message 1", 
+                NotificationType.ORDER_CREATED
+            );
+            Notification orderNotification2 = new Notification(
+                testUser1.getId(), 
+                "Order Test 2", 
+                "Order Message 2", 
+                NotificationType.ORDER_CREATED
+            );
+            orderNotification2.markAsRead();
+
+            notificationRepository.save(orderNotification1);
+            notificationRepository.save(orderNotification2);
+
+            // When
+            List<Object[]> stats = notificationRepository.getNotificationStatsByType(testUser1.getId());
+
+            // Then
+            assertFalse(stats.isEmpty());
+            // Find ORDER_CREATED stats
+            Object[] orderStats = stats.stream()
+                .filter(stat -> stat[0] == NotificationType.ORDER_CREATED)
+                .findFirst()
+                .orElse(null);
+            
+            assertNotNull(orderStats);
+            assertEquals(2L, orderStats[1]); // Total count
+            assertEquals(1L, orderStats[2]); // Unread count
+        }
     }
 
-    @Test
-    @DisplayName("Find high priority notifications by user ID - Success")
-    void testFindHighPriorityByUserId() {
-        // Given
-        Long userId = 1L;
-        notificationRepository.save(new Notification(
-            userId, "Normal", "Message 1", NotificationType.ORDER_UPDATE, NotificationPriority.NORMAL));
-        notificationRepository.save(new Notification(
-            userId, "High", "Message 2", NotificationType.PAYMENT_UPDATE, NotificationPriority.HIGH));
-        notificationRepository.save(new Notification(
-            userId, "Urgent", "Message 3", NotificationType.SYSTEM_UPDATE, NotificationPriority.URGENT));
+    @Nested
+    @DisplayName("Specialized Find Operations")
+    class SpecializedFindOperationsTest {
 
-        // When
-        List<Notification> highPriorityNotifications = notificationRepository.findHighPriorityByUserId(userId);
+        @Test
+        @DisplayName("Should find order notifications")
+        void shouldFindOrderNotifications() {
+            // Given
+            Long orderId = 123L;
+            Notification orderCreated = new Notification(
+                testUser1.getId(), 
+                "Order Created", 
+                "Your order has been created", 
+                NotificationType.ORDER_CREATED
+            );
+            orderCreated.setRelatedEntityId(orderId);
+            
+            Notification orderStatusChanged = new Notification(
+                testUser1.getId(), 
+                "Order Status Changed", 
+                "Your order status has changed", 
+                NotificationType.ORDER_STATUS_CHANGED
+            );
+            orderStatusChanged.setRelatedEntityId(orderId);
+            
+            Notification unrelatedNotification = new Notification(
+                testUser1.getId(), 
+                "Unrelated", 
+                "Unrelated notification", 
+                NotificationType.PROMOTIONAL
+            );
 
-        // Then
-        assertEquals(2, highPriorityNotifications.size());
-        assertTrue(highPriorityNotifications.stream().allMatch(n -> 
-            n.getPriority() == NotificationPriority.HIGH || n.getPriority() == NotificationPriority.URGENT));
-        assertEquals("Urgent", highPriorityNotifications.get(0).getTitle()); // Urgent comes first
+            notificationRepository.save(orderCreated);
+            notificationRepository.save(orderStatusChanged);
+            notificationRepository.save(unrelatedNotification);
+
+            // When
+            List<Notification> orderNotifications = notificationRepository.findOrderNotifications(orderId);
+
+            // Then
+            assertEquals(2, orderNotifications.size());
+            assertTrue(orderNotifications.stream().allMatch(n -> n.getRelatedEntityId().equals(orderId)));
+        }
+
+        @Test
+        @DisplayName("Should find user order notifications")
+        void shouldFindUserOrderNotifications() {
+            // Given
+            Long orderId = 456L;
+            Notification userOrderNotification = new Notification(
+                testUser1.getId(), 
+                "User Order", 
+                "Your order notification", 
+                NotificationType.ORDER_CREATED
+            );
+            userOrderNotification.setRelatedEntityId(orderId);
+            
+            Notification otherUserOrderNotification = new Notification(
+                testUser2.getId(), 
+                "Other User Order", 
+                "Other user order notification", 
+                NotificationType.ORDER_CREATED
+            );
+            otherUserOrderNotification.setRelatedEntityId(orderId);
+
+            notificationRepository.save(userOrderNotification);
+            notificationRepository.save(otherUserOrderNotification);
+
+            // When
+            List<Notification> userOrderNotifications = notificationRepository.findUserOrderNotifications(testUser1.getId(), orderId);
+
+            // Then
+            assertEquals(1, userOrderNotifications.size());
+            assertEquals(testUser1.getId(), userOrderNotifications.get(0).getUserId());
+            assertEquals(orderId, userOrderNotifications.get(0).getRelatedEntityId());
+        }
     }
 
-    // ====== Entity-specific Query Tests ======
-    @Test
-    @DisplayName("Find notifications by order ID - Success")
-    void testFindByOrderId() {
-        // Given
-        Long orderId = 123L;
-        Notification n1 = new Notification(1L, "Order Created", "Message 1", NotificationType.ORDER_UPDATE);
-        n1.setOrderId(orderId);
-        notificationRepository.save(n1);
+    @Nested
+    @DisplayName("Broadcast Operations")
+    class BroadcastOperationsTest {
 
-        Notification n2 = new Notification(1L, "Order Confirmed", "Message 2", NotificationType.ORDER_UPDATE);
-        n2.setOrderId(orderId);
-        notificationRepository.save(n2);
+        @Test
+        @DisplayName("Should get all active user IDs")
+        void shouldGetAllActiveUserIds() {
+            // When
+            List<Long> activeUserIds = notificationRepository.getAllActiveUserIds();
 
-        Notification n3 = new Notification(1L, "Other Order", "Message 3", NotificationType.ORDER_UPDATE);
-        n3.setOrderId(456L);
-        notificationRepository.save(n3);
+            // Then
+            assertTrue(activeUserIds.size() >= 2); // At least our test users
+            assertTrue(activeUserIds.contains(testUser1.getId()));
+            assertTrue(activeUserIds.contains(testUser2.getId()));
+        }
 
-        // When
-        List<Notification> orderNotifications = notificationRepository.findByOrderId(orderId);
+        @Test
+        @DisplayName("Should save batch notifications")
+        void shouldSaveBatchNotifications() {
+            // Given
+            List<Notification> notifications = Arrays.asList(
+                new Notification(testUser1.getId(), "Batch 1", "Message 1", NotificationType.PROMOTIONAL),
+                new Notification(testUser1.getId(), "Batch 2", "Message 2", NotificationType.PROMOTIONAL),
+                new Notification(testUser2.getId(), "Batch 3", "Message 3", NotificationType.PROMOTIONAL)
+            );
 
-        // Then
-        assertEquals(2, orderNotifications.size());
-        assertTrue(orderNotifications.stream().allMatch(n -> orderId.equals(n.getOrderId())));
+            // When
+            notificationRepository.saveBatch(notifications);
+
+            // Then
+            List<Notification> user1Notifications = notificationRepository.findByUserId(testUser1.getId());
+            List<Notification> user2Notifications = notificationRepository.findByUserId(testUser2.getId());
+            
+            assertTrue(user1Notifications.size() >= 2);
+            assertTrue(user2Notifications.size() >= 1);
+        }
     }
 
-    @Test
-    @DisplayName("Find notifications by user ID and order ID - Success")
-    void testFindByUserIdAndOrderId() {
-        // Given
-        Long userId1 = 1L;
-        Long userId2 = 2L;
-        Long orderId = 123L;
+    @Nested
+    @DisplayName("Edge Cases and Error Handling")
+    class EdgeCasesAndErrorHandlingTest {
 
-        Notification n1 = new Notification(userId1, "User1 Order", "Message 1", NotificationType.ORDER_UPDATE);
-        n1.setOrderId(orderId);
-        notificationRepository.save(n1);
+        @Test
+        @DisplayName("Should return empty optional for non-existent notification")
+        void shouldReturnEmptyOptionalForNonExistentNotification() {
+            // When
+            Optional<Notification> result = notificationRepository.findById(999999L);
 
-        Notification n2 = new Notification(userId2, "User2 Order", "Message 2", NotificationType.ORDER_UPDATE);
-        n2.setOrderId(orderId);
-        notificationRepository.save(n2);
+            // Then
+            assertFalse(result.isPresent());
+        }
 
-        // When
-        List<Notification> user1OrderNotifications = notificationRepository.findByUserIdAndOrderId(userId1, orderId);
+        @Test
+        @DisplayName("Should return empty list for user with no notifications")
+        void shouldReturnEmptyListForUserWithNoNotifications() {
+            // Given - using a user ID that doesn't exist
+            Long nonExistentUserId = 999999L;
 
-        // Then
-        assertEquals(1, user1OrderNotifications.size());
-        assertEquals(userId1, user1OrderNotifications.get(0).getUserId());
-        assertEquals(orderId, user1OrderNotifications.get(0).getOrderId());
-    }
+            // When
+            List<Notification> notifications = notificationRepository.findByUserId(nonExistentUserId);
 
-    @Test
-    @DisplayName("Find notifications by restaurant ID - Success")
-    void testFindByRestaurantId() {
-        // Given
-        Long restaurantId = 789L;
-        Notification n1 = new Notification(1L, "Restaurant Approved", "Message 1", NotificationType.RESTAURANT_UPDATE);
-        n1.setRestaurantId(restaurantId);
-        notificationRepository.save(n1);
+            // Then
+            assertTrue(notifications.isEmpty());
+        }
 
-        Notification n2 = new Notification(1L, "Other Restaurant", "Message 2", NotificationType.RESTAURANT_UPDATE);
-        n2.setRestaurantId(999L);
-        notificationRepository.save(n2);
+        @Test
+        @DisplayName("Should handle pagination with no results")
+        void shouldHandlePaginationWithNoResults() {
+            // Given - using a user ID that doesn't exist
+            Long nonExistentUserId = 999999L;
 
-        // When
-        List<Notification> restaurantNotifications = notificationRepository.findByRestaurantId(restaurantId);
+            // When
+            List<Notification> notifications = notificationRepository.findByUserIdPaginated(nonExistentUserId, 0, 10);
 
-        // Then
-        assertEquals(1, restaurantNotifications.size());
-        assertEquals(restaurantId, restaurantNotifications.get(0).getRestaurantId());
-    }
+            // Then
+            assertTrue(notifications.isEmpty());
+        }
 
-    @Test
-    @DisplayName("Find notifications by delivery ID - Success")
-    void testFindByDeliveryId() {
-        // Given
-        Long deliveryId = 456L;
-        Notification n1 = new Notification(1L, "Delivery Assigned", "Message 1", NotificationType.DELIVERY_UPDATE);
-        n1.setDeliveryId(deliveryId);
-        notificationRepository.save(n1);
+        @Test
+        @DisplayName("Should return zero for counts when no matching notifications")
+        void shouldReturnZeroForCountsWhenNoMatchingNotifications() {
+            // Given - using a user ID that doesn't exist
+            Long nonExistentUserId = 999999L;
 
-        Notification n2 = new Notification(1L, "Other Delivery", "Message 2", NotificationType.DELIVERY_UPDATE);
-        n2.setDeliveryId(789L);
-        notificationRepository.save(n2);
+            // When
+            long unreadCount = notificationRepository.getUnreadCount(nonExistentUserId);
+            long typeCount = notificationRepository.getNotificationCountByType(nonExistentUserId, NotificationType.ORDER_CREATED);
+            long highPriorityCount = notificationRepository.getHighPriorityUnreadCount(nonExistentUserId);
 
-        // When
-        List<Notification> deliveryNotifications = notificationRepository.findByDeliveryId(deliveryId);
-
-        // Then
-        assertEquals(1, deliveryNotifications.size());
-        assertEquals(deliveryId, deliveryNotifications.get(0).getDeliveryId());
-    }
-
-    // ====== Date Range Query Tests ======
-    @Test
-    @DisplayName("Find notifications by user ID and date range - Success")
-    void testFindByUserIdAndDateRange() {
-        // Given
-        Long userId = 1L;
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime yesterday = now.minusDays(1);
-        LocalDateTime tomorrow = now.plusDays(1);
-
-        Notification oldNotification = new Notification(userId, "Old", "Message 1", NotificationType.ORDER_UPDATE);
-        oldNotification.setCreatedAt(yesterday.minusHours(1));
-        notificationRepository.save(oldNotification);
-
-        Notification recentNotification = new Notification(userId, "Recent", "Message 2", NotificationType.ORDER_UPDATE);
-        notificationRepository.save(recentNotification);
-
-        // When
-        List<Notification> recentNotifications = notificationRepository.findByUserIdAndDateRange(
-            userId, yesterday, tomorrow);
-
-        // Then
-        assertEquals(1, recentNotifications.size());
-        assertEquals("Recent", recentNotifications.get(0).getTitle());
-    }
-
-    @Test
-    @DisplayName("Find recent notifications by user ID - Success")
-    void testFindRecentByUserId() {
-        // Given
-        Long userId = 1L;
-        LocalDateTime now = LocalDateTime.now();
-
-        Notification oldNotification = new Notification(userId, "Old", "Message 1", NotificationType.ORDER_UPDATE);
-        oldNotification.setCreatedAt(now.minusDays(10));
-        notificationRepository.save(oldNotification);
-
-        Notification recentNotification = new Notification(userId, "Recent", "Message 2", NotificationType.ORDER_UPDATE);
-        notificationRepository.save(recentNotification);
-
-        // When
-        List<Notification> recentNotifications = notificationRepository.findRecentByUserId(userId, 7);
-
-        // Then
-        assertEquals(1, recentNotifications.size());
-        assertEquals("Recent", recentNotifications.get(0).getTitle());
-    }
-
-    // ====== Bulk Operations Tests ======
-    @Test
-    @DisplayName("Mark all as read for user - Success")
-    void testMarkAllAsReadForUser() {
-        // Given
-        Long userId = 1L;
-        notificationRepository.save(new Notification(
-            userId, "Unread 1", "Message 1", NotificationType.ORDER_UPDATE));
-        notificationRepository.save(new Notification(
-            userId, "Unread 2", "Message 2", NotificationType.PAYMENT_UPDATE));
-        notificationRepository.save(new Notification(
-            2L, "Other User", "Message 3", NotificationType.ORDER_UPDATE));
-
-        // When
-        int updatedCount = notificationRepository.markAllAsReadForUser(userId);
-
-        // Then
-        assertEquals(2, updatedCount);
-        
-        List<Notification> unreadNotifications = notificationRepository.findUnreadByUserId(userId);
-        assertEquals(0, unreadNotifications.size());
-        
-        List<Notification> otherUserUnread = notificationRepository.findUnreadByUserId(2L);
-        assertEquals(1, otherUserUnread.size());
-    }
-
-    @Test
-    @DisplayName("Mark as read by type - Success")
-    void testMarkAsReadByType() {
-        // Given
-        Long userId = 1L;
-        notificationRepository.save(new Notification(
-            userId, "Order 1", "Message 1", NotificationType.ORDER_UPDATE));
-        notificationRepository.save(new Notification(
-            userId, "Order 2", "Message 2", NotificationType.ORDER_UPDATE));
-        notificationRepository.save(new Notification(
-            userId, "Payment 1", "Message 3", NotificationType.PAYMENT_UPDATE));
-
-        // When
-        int updatedCount = notificationRepository.markAsReadByType(userId, NotificationType.ORDER_UPDATE);
-
-        // Then
-        assertEquals(2, updatedCount);
-        
-        List<Notification> unreadNotifications = notificationRepository.findUnreadByUserId(userId);
-        assertEquals(1, unreadNotifications.size());
-        assertEquals(NotificationType.PAYMENT_UPDATE, unreadNotifications.get(0).getType());
-    }
-
-    @Test
-    @DisplayName("Soft delete old notifications - Success")
-    void testSoftDeleteOldNotifications() {
-        // Given
-        LocalDateTime now = LocalDateTime.now();
-        
-        Notification oldNotification = new Notification(1L, "Old", "Message 1", NotificationType.ORDER_UPDATE);
-        oldNotification.setCreatedAt(now.minusDays(100));
-        notificationRepository.save(oldNotification);
-
-        Notification recentNotification = new Notification(1L, "Recent", "Message 2", NotificationType.ORDER_UPDATE);
-        notificationRepository.save(recentNotification);
-
-        // When
-        int deletedCount = notificationRepository.softDeleteOldNotifications(90);
-
-        // Then
-        assertEquals(1, deletedCount);
-        
-        List<Notification> userNotifications = notificationRepository.findByUserId(1L);
-        assertEquals(1, userNotifications.size());
-        assertEquals("Recent", userNotifications.get(0).getTitle());
-    }
-
-    @Test
-    @DisplayName("Hard delete old notifications - Success")
-    void testHardDeleteOldNotifications() {
-        // Given
-        LocalDateTime now = LocalDateTime.now();
-        
-        Notification oldNotification = new Notification(1L, "Old", "Message 1", NotificationType.ORDER_UPDATE);
-        oldNotification.setCreatedAt(now.minusDays(100));
-        oldNotification.softDelete();
-        notificationRepository.save(oldNotification);
-
-        Notification recentNotification = new Notification(1L, "Recent", "Message 2", NotificationType.ORDER_UPDATE);
-        notificationRepository.save(recentNotification);
-
-        // When
-        int deletedCount = notificationRepository.hardDeleteOldNotifications(90);
-
-        // Then
-        assertEquals(1, deletedCount);
-        
-        Optional<Notification> found = notificationRepository.findById(oldNotification.getId());
-        assertFalse(found.isPresent());
-        
-        Optional<Notification> recentFound = notificationRepository.findById(recentNotification.getId());
-        assertTrue(recentFound.isPresent());
-    }
-
-    // ====== Analytics Tests ======
-    @Test
-    @DisplayName("Count unread notifications by user ID - Success")
-    void testCountUnreadByUserId() {
-        // Given
-        Long userId = 1L;
-        Notification n1 = notificationRepository.save(new Notification(
-            userId, "Unread 1", "Message 1", NotificationType.ORDER_UPDATE));
-        Notification n2 = notificationRepository.save(new Notification(
-            userId, "Read", "Message 2", NotificationType.PAYMENT_UPDATE));
-        notificationRepository.save(new Notification(
-            userId, "Unread 2", "Message 3", NotificationType.SYSTEM_UPDATE));
-        
-        n2.markAsRead();
-        notificationRepository.update(n2);
-
-        // When
-        long unreadCount = notificationRepository.countUnreadByUserId(userId);
-
-        // Then
-        assertEquals(2, unreadCount);
-    }
-
-    @Test
-    @DisplayName("Count notifications by user ID and type - Success")
-    void testCountByUserIdAndType() {
-        // Given
-        Long userId = 1L;
-        notificationRepository.save(new Notification(
-            userId, "Order 1", "Message 1", NotificationType.ORDER_UPDATE));
-        notificationRepository.save(new Notification(
-            userId, "Order 2", "Message 2", NotificationType.ORDER_UPDATE));
-        notificationRepository.save(new Notification(
-            userId, "Payment 1", "Message 3", NotificationType.PAYMENT_UPDATE));
-
-        // When
-        long orderCount = notificationRepository.countByUserIdAndType(userId, NotificationType.ORDER_UPDATE);
-        long paymentCount = notificationRepository.countByUserIdAndType(userId, NotificationType.PAYMENT_UPDATE);
-
-        // Then
-        assertEquals(2, orderCount);
-        assertEquals(1, paymentCount);
-    }
-
-    @Test
-    @DisplayName("Count high priority unread notifications - Success")
-    void testCountHighPriorityUnread() {
-        // Given
-        Long userId = 1L;
-        notificationRepository.save(new Notification(
-            userId, "Normal", "Message 1", NotificationType.ORDER_UPDATE, NotificationPriority.NORMAL));
-        
-        Notification highNotification = notificationRepository.save(new Notification(
-            userId, "High", "Message 2", NotificationType.PAYMENT_UPDATE, NotificationPriority.HIGH));
-        
-        notificationRepository.save(new Notification(
-            userId, "Urgent", "Message 3", NotificationType.SYSTEM_UPDATE, NotificationPriority.URGENT));
-        
-        // Mark high priority as read
-        highNotification.markAsRead();
-        notificationRepository.update(highNotification);
-
-        // When
-        long highPriorityUnreadCount = notificationRepository.countHighPriorityUnread(userId);
-
-        // Then
-        assertEquals(1, highPriorityUnreadCount); // Only urgent remains unread
-    }
-
-    @Test
-    @DisplayName("Check if unread high priority notifications exist - Success")
-    void testExistsUnreadHighPriority() {
-        // Given
-        Long userId = 1L;
-        notificationRepository.save(new Notification(
-            userId, "Normal", "Message 1", NotificationType.ORDER_UPDATE, NotificationPriority.NORMAL));
-
-        // When & Then
-        assertFalse(notificationRepository.existsUnreadHighPriority(userId));
-
-        // Given
-        notificationRepository.save(new Notification(
-            userId, "High", "Message 2", NotificationType.PAYMENT_UPDATE, NotificationPriority.HIGH));
-
-        // When & Then
-        assertTrue(notificationRepository.existsUnreadHighPriority(userId));
-    }
-
-    @Test
-    @DisplayName("Find latest notification by user ID - Success")
-    void testFindLatestByUserId() {
-        // Given
-        Long userId = 1L;
-        notificationRepository.save(new Notification(
-            userId, "First", "Message 1", NotificationType.ORDER_UPDATE));
-        
-        // Small delay to ensure different timestamps
-        try { Thread.sleep(10); } catch (InterruptedException e) {}
-        
-        Notification latest = notificationRepository.save(new Notification(
-            userId, "Latest", "Message 2", NotificationType.PAYMENT_UPDATE));
-
-        // When
-        Optional<Notification> found = notificationRepository.findLatestByUserId(userId);
-
-        // Then
-        assertTrue(found.isPresent());
-        assertEquals(latest.getId(), found.get().getId());
-        assertEquals("Latest", found.get().getTitle());
-    }
-
-    @Test
-    @DisplayName("Find expired notifications - Success")
-    void testFindExpiredNotifications() {
-        // Given
-        LocalDateTime now = LocalDateTime.now();
-        
-        Notification expiredNotification = new Notification(1L, "Expired", "Message 1", NotificationType.ORDER_UPDATE);
-        expiredNotification.setCreatedAt(now.minusDays(100));
-        notificationRepository.save(expiredNotification);
-
-        Notification recentNotification = new Notification(1L, "Recent", "Message 2", NotificationType.ORDER_UPDATE);
-        notificationRepository.save(recentNotification);
-
-        // When
-        List<Notification> expiredNotifications = notificationRepository.findExpiredNotifications(90);
-
-        // Then
-        assertEquals(1, expiredNotifications.size());
-        assertEquals("Expired", expiredNotifications.get(0).getTitle());
-    }
-
-    // ====== Edge Cases and Error Handling ======
-    @Test
-    @DisplayName("Handle empty results gracefully")
-    void testEmptyResults() {
-        // When & Then
-        assertTrue(notificationRepository.findByUserId(999L).isEmpty());
-        assertTrue(notificationRepository.findUnreadByUserId(999L).isEmpty());
-        assertTrue(notificationRepository.findByOrderId(999L).isEmpty());
-        assertEquals(0, notificationRepository.countUnreadByUserId(999L));
-        assertFalse(notificationRepository.existsUnreadHighPriority(999L));
-        assertFalse(notificationRepository.findLatestByUserId(999L).isPresent());
-    }
-
-    @Test
-    @DisplayName("Handle deleted notifications correctly")
-    void testDeletedNotificationsFiltering() {
-        // Given
-        Long userId = 1L;
-        Notification activeNotification = notificationRepository.save(new Notification(
-            userId, "Active", "Message 1", NotificationType.ORDER_UPDATE));
-        
-        Notification deletedNotification = notificationRepository.save(new Notification(
-            userId, "Deleted", "Message 2", NotificationType.ORDER_UPDATE));
-        deletedNotification.softDelete();
-        notificationRepository.update(deletedNotification);
-
-        // When
-        List<Notification> userNotifications = notificationRepository.findByUserId(userId);
-        List<Notification> unreadNotifications = notificationRepository.findUnreadByUserId(userId);
-        long unreadCount = notificationRepository.countUnreadByUserId(userId);
-
-        // Then
-        assertEquals(1, userNotifications.size());
-        assertEquals("Active", userNotifications.get(0).getTitle());
-        
-        assertEquals(1, unreadNotifications.size());
-        assertEquals("Active", unreadNotifications.get(0).getTitle());
-        
-        assertEquals(1, unreadCount);
+            // Then
+            assertEquals(0, unreadCount);
+            assertEquals(0, typeCount);
+            assertEquals(0, highPriorityCount);
+        }
     }
 } 

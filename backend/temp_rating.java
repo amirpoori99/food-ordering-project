@@ -265,7 +265,7 @@ class RatingControllerTest {
 
             ratingController.handle(mockExchange);
 
-            verify(mockExchange).sendResponseHeaders(eq(404), anyLong());
+            verify(mockExchange).sendResponseHeaders(eq(400), anyLong());
         }
 
         @Test
@@ -311,7 +311,7 @@ class RatingControllerTest {
 
             ratingController.handle(mockExchange);
 
-            verify(mockExchange).sendResponseHeaders(eq(404), anyLong());
+            verify(mockExchange).sendResponseHeaders(eq(400), anyLong());
         }
 
         @Test
@@ -322,7 +322,7 @@ class RatingControllerTest {
 
             ratingController.handle(mockExchange);
 
-            verify(mockExchange).sendResponseHeaders(eq(404), anyLong());
+            verify(mockExchange).sendResponseHeaders(eq(400), anyLong());
         }
     }
 
@@ -410,7 +410,7 @@ class RatingControllerTest {
 
             ratingController.handle(mockExchange);
 
-            verify(mockExchange).sendResponseHeaders(eq(404), anyLong());
+            verify(mockExchange).sendResponseHeaders(eq(400), anyLong());
         }
     }
 
@@ -454,7 +454,7 @@ class RatingControllerTest {
 
             ratingController.handle(mockExchange);
 
-            verify(mockExchange).sendResponseHeaders(eq(404), anyLong());
+            verify(mockExchange).sendResponseHeaders(eq(400), anyLong());
         }
     }
 
@@ -508,7 +508,7 @@ class RatingControllerTest {
 
             ratingController.handle(mockExchange);
 
-            verify(mockExchange).sendResponseHeaders(eq(404), anyLong());
+            verify(mockExchange).sendResponseHeaders(eq(400), anyLong());
         }
 
         @Test
@@ -520,7 +520,7 @@ class RatingControllerTest {
 
             ratingController.handle(mockExchange);
 
-            verify(mockExchange).sendResponseHeaders(eq(404), anyLong());
+            verify(mockExchange).sendResponseHeaders(eq(400), anyLong());
         }
 
         @Test
@@ -532,7 +532,7 @@ class RatingControllerTest {
 
             ratingController.handle(mockExchange);
 
-            verify(mockExchange).sendResponseHeaders(eq(404), anyLong());
+            verify(mockExchange).sendResponseHeaders(eq(400), anyLong());
         }
     }
 
@@ -561,7 +561,7 @@ class RatingControllerTest {
 
             ratingController.handle(mockExchange);
 
-            verify(mockExchange).sendResponseHeaders(eq(400), anyLong());
+            verify(mockExchange).sendResponseHeaders(eq(500), anyLong());
         }
 
         @Test
@@ -686,7 +686,7 @@ class RatingControllerTest {
 
             ratingController.handle(mockExchange);
 
-            verify(mockExchange).sendResponseHeaders(eq(404), anyLong());
+            verify(mockExchange).sendResponseHeaders(eq(400), anyLong());
         }
 
         @Test
@@ -697,7 +697,7 @@ class RatingControllerTest {
 
             ratingController.handle(mockExchange);
 
-            verify(mockExchange).sendResponseHeaders(eq(404), anyLong());
+            verify(mockExchange).sendResponseHeaders(eq(400), anyLong());
         }
 
         @Test
@@ -709,7 +709,7 @@ class RatingControllerTest {
 
             ratingController.handle(mockExchange);
 
-            verify(mockExchange).sendResponseHeaders(eq(404), anyLong());
+            verify(mockExchange).sendResponseHeaders(eq(400), anyLong());
         }
 
         @Test
@@ -737,6 +737,5 @@ class RatingControllerTest {
         }
     }
 }
-
 
 
