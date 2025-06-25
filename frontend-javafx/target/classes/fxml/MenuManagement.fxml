@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.ui.menu.MenuManagementController">
+   <top>
+      <VBox spacing="15.0">
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+         
+         <!-- Header Section -->
+         <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="← بازگشت" />
+            <Label text="مدیریت منوی رستوران" textFill="#2c3e50">
+               <font>
+                  <Font name="Arial Bold" size="24.0" />
+               </font>
+            </Label>
+         </HBox>
+         
+         <!-- Action Bar -->
+         <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <Button fx:id="addCategoryButton" mnemonicParsing="false" onAction="#handleAddCategory" 
+                    text="+ دسته جدید" styleClass="primary-button" />
+            
+            <Button fx:id="reorderMenuButton" mnemonicParsing="false" onAction="#handleReorderMenu" 
+                    text="↕ مرتب‌سازی منو" styleClass="secondary-button" />
+            
+            <TextField fx:id="searchMenuField" promptText="جستجو در منو..." prefWidth="200.0" />
+            
+            <ComboBox fx:id="menuViewComboBox" value="نمایش درختی" prefWidth="120.0">
+               <items>
+                  <FXCollections fx:factory="observableArrayList">
+                     <String fx:value="نمایش درختی" />
+                     <String fx:value="نمایش فشرده" />
+                     <String fx:value="نمایش جدولی" />
+                  </FXCollections>
+               </items>
+            </ComboBox>
+            
+            <Button fx:id="refreshMenuButton" mnemonicParsing="false" onAction="#handleRefreshMenu" 
+                    text="🔄" styleClass="icon-button" />
+         </HBox>
+      </VBox>
+   </top>
+   
+   <center>
+      <SplitPane dividerPositions="0.6" orientation="HORIZONTAL">
+         <!-- Menu Tree Section -->
+         <VBox spacing="10.0">
+            <padding>
+               <Insets bottom="10.0" left="20.0" right="10.0" top="10.0" />
+            </padding>
+            
+            <Label text="ساختار منو" textFill="#2c3e50">
+               <font>
+                  <Font name="Arial Bold" size="16.0" />
+               </font>
+            </Label>
+            
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
+               <VBox fx:id="menuTreeContainer" spacing="10.0">
+                  <!-- Category 1: Main Dishes -->
+                  <VBox styleClass="category-card" spacing="8.0">
+                     <padding>
+                        <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
+                     </padding>
+                     
+                     <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Button fx:id="expandCategory1" mnemonicParsing="false" onAction="#handleExpandCategory" 
+                                text="▼" styleClass="expand-button" userData="1" />
+                        
+                        <Label text="🍖 غذاهای اصلی" textFill="#2c3e50">
+                           <font>
+                              <Font name="Arial Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        
+                        <Label text="(۵ آیتم)" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        
+                        <Region HBox.hgrow="ALWAYS" />
+                        
+                        <Button fx:id="editCategory1" mnemonicParsing="false" onAction="#handleEditCategory" 
+                                text="✏️" styleClass="small-icon-button" userData="1" />
+                        
+                        <Button fx:id="deleteCategory1" mnemonicParsing="false" onAction="#handleDeleteCategory" 
+                                text="🗑️" styleClass="small-danger-button" userData="1" />
+                     </HBox>
+                     
+                     <!-- Items in Category -->
+                     <VBox fx:id="category1Items" spacing="5.0" visible="true" managed="true">
+                        <padding>
+                           <Insets left="25.0" />
+                        </padding>
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="menu-item-row">
+                           <Label text="•" textFill="#3498db">
+                              <font>
+                                 <Font size="12.0" />
+                              </font>
+                           </Label>
+                           <Label text="کباب کوبیده" HBox.hgrow="ALWAYS" textFill="#2c3e50">
+                              <font>
+                                 <Font size="12.0" />
+                              </font>
+                           </Label>
+                           <Label text="۶۰,۰۰۰ تومان" textFill="#27ae60">
+                              <font>
+                                 <Font name="Arial Bold" size="11.0" />
+                              </font>
+                           </Label>
+                           <Label text="✓" textFill="#27ae60" />
+                        </HBox>
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="menu-item-row">
+                           <Label text="•" textFill="#3498db">
+                              <font>
+                                 <Font size="12.0" />
+                              </font>
+                           </Label>
+                           <Label text="خورشت قیمه" HBox.hgrow="ALWAYS" textFill="#2c3e50">
+                              <font>
+                                 <Font size="12.0" />
+                              </font>
+                           </Label>
+                           <Label text="۴۵,۰۰۰ تومان" textFill="#27ae60">
+                              <font>
+                                 <Font name="Arial Bold" size="11.0" />
+                              </font>
+                           </Label>
+                           <Label text="✓" textFill="#27ae60" />
+                        </HBox>
+                     </VBox>
+                  </VBox>
+                  
+                  <!-- Category 2: Drinks -->
+                  <VBox styleClass="category-card" spacing="8.0">
+                     <padding>
+                        <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
+                     </padding>
+                     
+                     <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Button fx:id="expandCategory2" mnemonicParsing="false" onAction="#handleExpandCategory" 
+                                text="▶" styleClass="expand-button" userData="2" />
+                        
+                        <Label text="🥤 نوشیدنی" textFill="#2c3e50">
+                           <font>
+                              <Font name="Arial Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        
+                        <Label text="(۳ آیتم)" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        
+                        <Region HBox.hgrow="ALWAYS" />
+                        
+                        <Button fx:id="editCategory2" mnemonicParsing="false" onAction="#handleEditCategory" 
+                                text="✏️" styleClass="small-icon-button" userData="2" />
+                        
+                        <Button fx:id="deleteCategory2" mnemonicParsing="false" onAction="#handleDeleteCategory" 
+                                text="🗑️" styleClass="small-danger-button" userData="2" />
+                     </HBox>
+                     
+                     <!-- Items hidden when collapsed -->
+                     <VBox fx:id="category2Items" spacing="5.0" visible="false" managed="false">
+                        <padding>
+                           <Insets left="25.0" />
+                        </padding>
+                     </VBox>
+                  </VBox>
+                  
+                  <!-- Add New Category Button -->
+                  <VBox alignment="CENTER" spacing="10.0" styleClass="add-category-area">
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                     
+                     <Button fx:id="addNewCategoryButton" mnemonicParsing="false" onAction="#handleAddNewCategory" 
+                             text="+ افزودن دسته جدید" styleClass="dashed-button" />
+                  </VBox>
+               </VBox>
+            </ScrollPane>
+         </VBox>
+         
+         <!-- Category/Item Details Section -->
+         <VBox spacing="15.0">
+            <padding>
+               <Insets bottom="10.0" left="10.0" right="20.0" top="10.0" />
+            </padding>
+            
+            <Label fx:id="detailsTitleLabel" text="جزئیات دسته" textFill="#2c3e50">
+               <font>
+                  <Font name="Arial Bold" size="16.0" />
+               </font>
+            </Label>
+            
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
+               <!-- Category Form -->
+               <VBox fx:id="categoryFormContainer" spacing="15.0" visible="true" managed="true">
+                  <!-- Category Basic Info -->
+                  <VBox styleClass="form-section" spacing="10.0">
+                     <Label text="اطلاعات دسته" textFill="#2c3e50">
+                        <font>
+                           <Font name="Arial Bold" size="14.0" />
+                        </font>
+                     </Label>
+                     
+                     <VBox spacing="8.0">
+                        <VBox spacing="3.0">
+                           <Label text="نام دسته *" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Label>
+                           <TextField fx:id="categoryNameField" promptText="نام دسته منو" />
+                        </VBox>
+                        
+                        <VBox spacing="3.0">
+                           <Label text="آیکون دسته" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Label>
+                           <ComboBox fx:id="categoryIconComboBox" promptText="آیکون را انتخاب کنید" prefWidth="200.0">
+                              <items>
+                                 <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="🍖 غذاهای اصلی" />
+                                    <String fx:value="🥗 سالاد" />
+                                    <String fx:value="🥤 نوشیدنی" />
+                                    <String fx:value="🍰 دسر" />
+                                    <String fx:value="🍞 نان و پیش غذا" />
+                                    <String fx:value="☕ کافی شاپ" />
+                                 </FXCollections>
+                              </items>
+                           </ComboBox>
+                        </VBox>
+                        
+                        <VBox spacing="3.0">
+                           <Label text="توضیحات دسته" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Label>
+                           <TextArea fx:id="categoryDescriptionArea" promptText="توضیح کوتاه درباره این دسته..." 
+                                     wrapText="true" prefRowCount="2" />
+                        </VBox>
+                        
+                        <VBox spacing="3.0">
+                           <Label text="ترتیب نمایش" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Label>
+                           <HBox spacing="10.0" alignment="CENTER_LEFT">
+                              <TextField fx:id="categoryOrderField" promptText="1" prefWidth="60.0" />
+                              <Label text="(عدد کوچک‌تر = نمایش زودتر)" textFill="#bdc3c7">
+                                 <font>
+                                    <Font size="10.0" />
+                                 </font>
+                              </Label>
+                           </HBox>
+                        </VBox>
+                        
+                        <CheckBox fx:id="categoryActiveCheckBox" text="دسته فعال است" selected="true" />
+                     </VBox>
+                  </VBox>
+                  
+                  <!-- Category Items Management -->
+                  <VBox styleClass="form-section" spacing="10.0">
+                     <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Label text="آیتم‌های دسته" textFill="#2c3e50">
+                           <font>
+                              <Font name="Arial Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        
+                        <Button fx:id="addItemToCategoryButton" mnemonicParsing="false" onAction="#handleAddItemToCategory" 
+                                text="+ افزودن آیتم" styleClass="small-primary-button" />
+                     </HBox>
+                     
+                     <VBox fx:id="categoryItemsList" spacing="8.0">
+                        <!-- Sample Item -->
+                        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="category-item-row">
+                           <Button fx:id="moveUpItem1" mnemonicParsing="false" onAction="#handleMoveItemUp" 
+                                   text="↑" styleClass="tiny-button" userData="1" />
+                           <Button fx:id="moveDownItem1" mnemonicParsing="false" onAction="#handleMoveItemDown" 
+                                   text="↓" styleClass="tiny-button" userData="1" />
+                           
+                           <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                              <Label text="کباب کوبیده" textFill="#2c3e50">
+                                 <font>
+                                    <Font name="Arial Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label text="۶۰,۰۰۰ تومان - موجود" textFill="#7f8c8d">
+                                 <font>
+                                    <Font size="10.0" />
+                                 </font>
+                              </Label>
+                           </VBox>
+                           
+                           <Button fx:id="removeFromCategoryButton1" mnemonicParsing="false" onAction="#handleRemoveFromCategory" 
+                                   text="×" styleClass="tiny-danger-button" userData="1" />
+                        </HBox>
+                        
+                        <!-- Empty State -->
+                        <VBox fx:id="emptyCategoryMessage" alignment="CENTER" spacing="10.0" visible="false" managed="false">
+                           <Label text="هیچ آیتمی در این دسته نیست" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="12.0" />
+                              </font>
+                           </Label>
+                           <Label text="برای شروع آیتم اضافه کنید" textFill="#bdc3c7">
+                              <font>
+                                 <Font size="10.0" />
+                              </font>
+                           </Label>
+                        </VBox>
+                     </VBox>
+                  </VBox>
+                  
+                  <!-- Category Actions -->
+                  <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                     <Button fx:id="deleteCategoryButton" mnemonicParsing="false" onAction="#handleDeleteCategoryForm" 
+                             text="حذف دسته" styleClass="danger-button" />
+                     <Button fx:id="clearCategoryFormButton" mnemonicParsing="false" onAction="#handleClearCategoryForm" 
+                             text="پاک کردن فرم" styleClass="secondary-button" />
+                     <Button fx:id="saveCategoryButton" mnemonicParsing="false" onAction="#handleSaveCategory" 
+                             text="ذخیره دسته" styleClass="primary-button" />
+                  </HBox>
+               </VBox>
+            </ScrollPane>
+         </VBox>
+      </SplitPane>
+   </center>
+   
+   <bottom>
+      <VBox spacing="10.0">
+         <padding>
+            <Insets bottom="15.0" left="20.0" right="20.0" top="10.0" />
+         </padding>
+         
+         <!-- Menu Statistics -->
+         <HBox alignment="CENTER_LEFT" spacing="20.0">
+            <Label fx:id="totalCategoriesLabel" text="مجموع دسته‌ها: ۲" textFill="#7f8c8d">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Label>
+            
+            <Label fx:id="totalItemsLabel" text="مجموع آیتم‌ها: ۸" textFill="#7f8c8d">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Label>
+            
+            <Label fx:id="activeItemsInMenuLabel" text="آیتم‌های فعال: ۷" textFill="#27ae60">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Label>
+            
+            <Label fx:id="lastMenuUpdateLabel" text="آخرین بروزرسانی: امروز ۱۴:۳۰" textFill="#bdc3c7">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </Label>
+         </HBox>
+         
+         <!-- Menu Actions -->
+         <HBox alignment="CENTER_RIGHT" spacing="15.0">
+            <Button fx:id="previewMenuButton" mnemonicParsing="false" onAction="#handlePreviewMenu" 
+                    text="👁️ پیش‌نمایش منو" styleClass="secondary-button" />
+            
+            <Button fx:id="exportMenuButton" mnemonicParsing="false" onAction="#handleExportMenu" 
+                    text="📄 خروجی PDF" styleClass="secondary-button" />
+            
+            <Button fx:id="publishMenuButton" mnemonicParsing="false" onAction="#handlePublishMenu" 
+                    text="🚀 انتشار منو" styleClass="success-button" />
+         </HBox>
+      </VBox>
+   </bottom>
+   
+   <stylesheets>
+      <URL value="@../styles.css" />
+   </stylesheets>
+</BorderPane>

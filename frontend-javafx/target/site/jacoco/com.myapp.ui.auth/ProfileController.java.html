@@ -202,8 +202,8 @@ import java.util.ResourceBundle;
 <span class="nc bnc" id="L202" title="All 2 branches missed.">        boolean hasNewPassword = !newPassword.trim().isEmpty();</span>
 <span class="nc bnc" id="L203" title="All 2 branches missed.">        boolean passwordLengthValid = newPassword.length() &gt;= 4;</span>
         
-<span class="nc bnc" id="L205" title="All 4 branches missed.">        boolean canChangePassword = hasCurrentPassword &amp;&amp; hasNewPassword &amp;&amp; </span>
-<span class="nc bnc" id="L206" title="All 4 branches missed.">                                  passwordsMatch &amp;&amp; passwordLengthValid;</span>
+<span class="nc bnc" id="L205" title="All 8 branches missed.">        boolean canChangePassword = hasCurrentPassword &amp;&amp; hasNewPassword &amp;&amp; </span>
+                                  passwordsMatch &amp;&amp; passwordLengthValid;
         
 <span class="nc bnc" id="L208" title="All 2 branches missed.">        changePasswordButton.setDisable(!canChangePassword);</span>
 <span class="nc" id="L209">    }</span>

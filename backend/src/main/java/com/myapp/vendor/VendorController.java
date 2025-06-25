@@ -288,6 +288,7 @@ public class VendorController implements HttpHandler {
         return "";
     }
     
+    @SuppressWarnings("unchecked")
     private Map<String, Object> parseJsonRequest(HttpExchange exchange) throws IOException {
         String requestBody = new String(exchange.getRequestBody().readAllBytes());
         return JsonUtil.fromJson(requestBody, Map.class);

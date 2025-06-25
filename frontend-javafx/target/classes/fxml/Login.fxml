@@ -5,12 +5,12 @@
 
 <VBox xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.ui.auth.LoginController">
    <children>
-      <Label text="ورود به سیستم" />
-      <TextField fx:id="phoneField" promptText="شماره تلفن" />
-      <PasswordField fx:id="passwordField" promptText="رمز عبور" />
-      <CheckBox fx:id="rememberMeCheckbox" text="مرا به خاطر بسپار" />
-      <Button fx:id="loginButton" onAction="#handleLogin" text="ورود" />
-      <Hyperlink fx:id="registerLink" onAction="#handleRegisterLink" text="ثبت‌نام" />
+      <Label text="Login to Food Ordering System" />
+      <TextField fx:id="phoneField" promptText="Phone Number" />
+      <PasswordField fx:id="passwordField" promptText="Password" />
+      <CheckBox fx:id="rememberMeCheckbox" text="Remember Me" />
+      <Button fx:id="loginButton" onAction="#handleLogin" text="Login" />
+      <Hyperlink fx:id="registerLink" onAction="#handleRegisterLink" text="Create Account" />
       <Label fx:id="statusLabel" text="" />
       <ProgressIndicator fx:id="loadingIndicator" visible="false" />
    </children>

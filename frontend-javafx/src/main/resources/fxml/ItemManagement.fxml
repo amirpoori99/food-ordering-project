@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.ui.item.ItemManagementController">
+   <top>
+      <VBox spacing="15.0">
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+         
+         <!-- Header Section -->
+         <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="← بازگشت" />
+            <Label text="مدیریت آیتم‌های غذایی" textFill="#2c3e50">
+               <font>
+                  <Font name="Arial Bold" size="24.0" />
+               </font>
+            </Label>
+         </HBox>
+         
+         <!-- Action Bar -->
+         <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <Button fx:id="addItemButton" mnemonicParsing="false" onAction="#handleAddItem" 
+                    text="+ افزودن آیتم جدید" styleClass="primary-button" />
+            
+            <TextField fx:id="searchField" promptText="جستجو در آیتم‌ها..." prefWidth="200.0" />
+            
+            <ComboBox fx:id="categoryFilterComboBox" promptText="همه دسته‌ها" prefWidth="150.0">
+               <items>
+                  <FXCollections fx:factory="observableArrayList">
+                     <String fx:value="همه دسته‌ها" />
+                     <String fx:value="غذاهای اصلی" />
+                     <String fx:value="پیش غذا" />
+                     <String fx:value="نوشیدنی" />
+                     <String fx:value="دسر" />
+                     <String fx:value="سالاد" />
+                  </FXCollections>
+               </items>
+            </ComboBox>
+            
+            <ComboBox fx:id="statusFilterComboBox" promptText="همه وضعیت‌ها" prefWidth="120.0">
+               <items>
+                  <FXCollections fx:factory="observableArrayList">
+                     <String fx:value="همه وضعیت‌ها" />
+                     <String fx:value="فعال" />
+                     <String fx:value="غیرفعال" />
+                     <String fx:value="موجود" />
+                     <String fx:value="ناموجود" />
+                  </FXCollections>
+               </items>
+            </ComboBox>
+            
+            <Button fx:id="refreshButton" mnemonicParsing="false" onAction="#handleRefresh" 
+                    text="🔄" styleClass="icon-button" />
+         </HBox>
+      </VBox>
+   </top>
+   
+   <center>
+      <SplitPane dividerPositions="0.7" orientation="HORIZONTAL">
+         <!-- Items List Section -->
+         <VBox spacing="10.0">
+            <padding>
+               <Insets bottom="10.0" left="20.0" right="10.0" top="10.0" />
+            </padding>
+            
+            <Label text="لیست آیتم‌ها" textFill="#2c3e50">
+               <font>
+                  <Font name="Arial Bold" size="16.0" />
+               </font>
+            </Label>
+            
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
+               <VBox fx:id="itemsContainer" spacing="10.0">
+                  <!-- Sample Item Card -->
+                  <VBox styleClass="card" spacing="10.0">
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                     
+                     <HBox alignment="CENTER_LEFT" spacing="15.0">
+                        <!-- Item Image Placeholder -->
+                        <VBox alignment="CENTER" prefWidth="80.0" prefHeight="60.0" styleClass="image-placeholder">
+                           <Label text="🍽️" textFill="#bdc3c7">
+                              <font>
+                                 <Font size="24.0" />
+                              </font>
+                           </Label>
+                        </VBox>
+                        
+                        <!-- Item Info -->
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                           <HBox alignment="CENTER_LEFT" spacing="10.0">
+                              <Label text="کباب کوبیده" textFill="#2c3e50">
+                                 <font>
+                                    <Font name="Arial Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              
+                              <Label text="فعال" textFill="#27ae60" styleClass="status-badge">
+                                 <font>
+                                    <Font size="10.0" />
+                                 </font>
+                              </Label>
+                              
+                              <Label text="موجود" textFill="#3498db" styleClass="availability-badge">
+                                 <font>
+                                    <Font size="10.0" />
+                                 </font>
+                              </Label>
+                           </HBox>
+                           
+                           <Label text="دسته: غذاهای اصلی" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Label>
+                           
+                           <Label text="کباب کوبیده با برنج و سالاد" textFill="#7f8c8d" wrapText="true">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Label>
+                           
+                           <HBox alignment="CENTER_LEFT" spacing="10.0">
+                              <Label text="قیمت: ۶۰,۰۰۰ تومان" textFill="#2c3e50">
+                                 <font>
+                                    <Font name="Arial Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              
+                              <Label text="تعداد فروش: ۲۳" textFill="#7f8c8d">
+                                 <font>
+                                    <Font size="10.0" />
+                                 </font>
+                              </Label>
+                           </HBox>
+                        </VBox>
+                        
+                        <!-- Action Buttons -->
+                        <VBox spacing="5.0" alignment="TOP_RIGHT">
+                           <Button fx:id="editItemButton1" mnemonicParsing="false" onAction="#handleEditItem" 
+                                   text="ویرایش" styleClass="small-button" userData="1" />
+                           <Button fx:id="toggleStatusButton1" mnemonicParsing="false" onAction="#handleToggleStatus" 
+                                   text="غیرفعال" styleClass="small-warning-button" userData="1" />
+                           <Button fx:id="deleteItemButton1" mnemonicParsing="false" onAction="#handleDeleteItem" 
+                                   text="حذف" styleClass="small-danger-button" userData="1" />
+                        </VBox>
+                     </HBox>
+                  </VBox>
+                  
+                  <!-- No Items Message -->
+                  <VBox fx:id="noItemsContainer" alignment="CENTER" spacing="15.0" visible="false" managed="false">
+                     <Label text="هیچ آیتمی یافت نشد" textFill="#7f8c8d">
+                        <font>
+                           <Font size="16.0" />
+                        </font>
+                     </Label>
+                     <Label text="برای شروع، آیتم جدیدی اضافه کنید" textFill="#bdc3c7">
+                        <font>
+                           <Font size="12.0" />
+                        </font>
+                     </Label>
+                  </VBox>
+               </VBox>
+            </ScrollPane>
+         </VBox>
+         
+         <!-- Item Form Section -->
+         <VBox spacing="15.0">
+            <padding>
+               <Insets bottom="10.0" left="10.0" right="20.0" top="10.0" />
+            </padding>
+            
+            <Label fx:id="formTitleLabel" text="افزودن آیتم جدید" textFill="#2c3e50">
+               <font>
+                  <Font name="Arial Bold" size="16.0" />
+               </font>
+            </Label>
+            
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
+               <VBox fx:id="itemFormContainer" spacing="15.0">
+                  <!-- Basic Information -->
+                  <VBox styleClass="form-section" spacing="10.0">
+                     <Label text="اطلاعات پایه" textFill="#2c3e50">
+                        <font>
+                           <Font name="Arial Bold" size="14.0" />
+                        </font>
+                     </Label>
+                     
+                     <VBox spacing="8.0">
+                        <VBox spacing="3.0">
+                           <Label text="نام آیتم *" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Label>
+                           <TextField fx:id="itemNameField" promptText="نام آیتم غذایی" />
+                        </VBox>
+                        
+                        <VBox spacing="3.0">
+                           <Label text="دسته‌بندی *" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Label>
+                           <ComboBox fx:id="itemCategoryComboBox" promptText="دسته را انتخاب کنید" prefWidth="200.0">
+                              <items>
+                                 <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="غذاهای اصلی" />
+                                    <String fx:value="پیش غذا" />
+                                    <String fx:value="نوشیدنی" />
+                                    <String fx:value="دسر" />
+                                    <String fx:value="سالاد" />
+                                    <String fx:value="نان" />
+                                 </FXCollections>
+                              </items>
+                           </ComboBox>
+                        </VBox>
+                        
+                        <VBox spacing="3.0">
+                           <Label text="توضیحات" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Label>
+                           <TextArea fx:id="itemDescriptionArea" promptText="توضیحات آیتم..." 
+                                     wrapText="true" prefRowCount="3" />
+                        </VBox>
+                     </VBox>
+                  </VBox>
+                  
+                  <!-- Pricing and Availability -->
+                  <VBox styleClass="form-section" spacing="10.0">
+                     <Label text="قیمت و موجودی" textFill="#2c3e50">
+                        <font>
+                           <Font name="Arial Bold" size="14.0" />
+                        </font>
+                     </Label>
+                     
+                     <VBox spacing="8.0">
+                        <HBox spacing="10.0">
+                           <VBox spacing="3.0" HBox.hgrow="ALWAYS">
+                              <Label text="قیمت (تومان) *" textFill="#7f8c8d">
+                                 <font>
+                                    <Font size="11.0" />
+                                 </font>
+                              </Label>
+                              <TextField fx:id="itemPriceField" promptText="قیمت به تومان" />
+                           </VBox>
+                           
+                           <VBox spacing="3.0" HBox.hgrow="ALWAYS">
+                              <Label text="قیمت تخفیفی" textFill="#7f8c8d">
+                                 <font>
+                                    <Font size="11.0" />
+                                 </font>
+                              </Label>
+                              <TextField fx:id="discountPriceField" promptText="قیمت با تخفیف" />
+                           </VBox>
+                        </HBox>
+                        
+                        <HBox spacing="10.0">
+                           <VBox spacing="3.0" HBox.hgrow="ALWAYS">
+                              <Label text="زمان آماده‌سازی (دقیقه)" textFill="#7f8c8d">
+                                 <font>
+                                    <Font size="11.0" />
+                                 </font>
+                              </Label>
+                              <TextField fx:id="preparationTimeField" promptText="مثال: 15" />
+                           </VBox>
+                           
+                           <VBox spacing="3.0" HBox.hgrow="ALWAYS">
+                              <Label text="موجودی روزانه" textFill="#7f8c8d">
+                                 <font>
+                                    <Font size="11.0" />
+                                 </font>
+                              </Label>
+                              <TextField fx:id="dailyStockField" promptText="تعداد موجود" />
+                           </VBox>
+                        </HBox>
+                        
+                        <VBox spacing="5.0">
+                           <CheckBox fx:id="isAvailableCheckBox" text="آیتم در دسترس است" selected="true" />
+                           <CheckBox fx:id="isPopularCheckBox" text="آیتم محبوب است" />
+                           <CheckBox fx:id="hasDiscountCheckBox" text="دارای تخفیف ویژه" />
+                        </VBox>
+                     </VBox>
+                  </VBox>
+                  
+                  <!-- Ingredients and Allergens -->
+                  <VBox styleClass="form-section" spacing="10.0">
+                     <Label text="مواد تشکیل‌دهنده و آلرژن‌ها" textFill="#2c3e50">
+                        <font>
+                           <Font name="Arial Bold" size="14.0" />
+                        </font>
+                     </Label>
+                     
+                     <VBox spacing="8.0">
+                        <VBox spacing="3.0">
+                           <Label text="مواد اصلی" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Label>
+                           <TextField fx:id="ingredientsField" promptText="مثال: گوشت گوسفند، برنج، سبزیجات" />
+                        </VBox>
+                        
+                        <VBox spacing="3.0">
+                           <Label text="آلرژن‌ها" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Label>
+                           <FlowPane hgap="8.0" vgap="5.0">
+                              <CheckBox fx:id="glutenCheckBox" text="گلوتن" />
+                              <CheckBox fx:id="dairyCheckBox" text="لبنیات" />
+                              <CheckBox fx:id="nutsCheckBox" text="آجیل" />
+                              <CheckBox fx:id="eggCheckBox" text="تخم‌مرغ" />
+                              <CheckBox fx:id="seafoodCheckBox" text="غذای دریایی" />
+                           </FlowPane>
+                        </VBox>
+                        
+                        <VBox spacing="3.0">
+                           <Label text="ویژگی‌های خاص" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Label>
+                           <FlowPane hgap="8.0" vgap="5.0">
+                              <CheckBox fx:id="vegetarianCheckBox" text="گیاهی" />
+                              <CheckBox fx:id="veganCheckBox" text="وگان" />
+                              <CheckBox fx:id="halalCheckBox" text="حلال" selected="true" />
+                              <CheckBox fx:id="spicyCheckBox" text="تند" />
+                              <CheckBox fx:id="organicCheckBox" text="ارگانیک" />
+                           </FlowPane>
+                        </VBox>
+                     </VBox>
+                  </VBox>
+                  
+                  <!-- Form Actions -->
+                  <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                     <Button fx:id="clearFormButton" mnemonicParsing="false" onAction="#handleClearForm" 
+                             text="پاک کردن فرم" styleClass="secondary-button" />
+                     <Button fx:id="saveItemButton" mnemonicParsing="false" onAction="#handleSaveItem" 
+                             text="ذخیره آیتم" styleClass="primary-button" />
+                  </HBox>
+               </VBox>
+            </ScrollPane>
+         </VBox>
+      </SplitPane>
+   </center>
+   
+   <bottom>
+      <HBox alignment="CENTER_LEFT" spacing="15.0">
+         <padding>
+            <Insets bottom="15.0" left="20.0" right="20.0" top="10.0" />
+         </padding>
+         
+         <Label fx:id="itemCountLabel" text="مجموع آیتم‌ها: ۰" textFill="#7f8c8d">
+            <font>
+               <Font size="12.0" />
+            </font>
+         </Label>
+         
+         <Label fx:id="activeItemsLabel" text="آیتم‌های فعال: ۰" textFill="#27ae60">
+            <font>
+               <Font size="12.0" />
+            </font>
+         </Label>
+         
+         <Label fx:id="lastUpdatedLabel" text="آخرین بروزرسانی: --" textFill="#bdc3c7">
+            <font>
+               <Font size="10.0" />
+            </font>
+         </Label>
+      </HBox>
+   </bottom>
+   
+   <stylesheets>
+      <URL value="@../styles.css" />
+   </stylesheets>
+</BorderPane>

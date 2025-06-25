@@ -12,7 +12,7 @@ public final class FrontendConstants {
     
     // ==================== API Configuration ====================
     public static final class API {
-        public static final String BASE_URL = "http://localhost:8000/api";
+        public static final String BASE_URL = "http://localhost:8081/api";
         public static final String AUTH_LOGIN = "/auth/login";
         public static final String AUTH_REGISTER = "/auth/register";
         public static final String AUTH_LOGOUT = "/auth/logout";

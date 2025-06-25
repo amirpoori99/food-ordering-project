@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.ui.restaurant.CreateRestaurantController">
+   <top>
+      <VBox spacing="15.0">
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+         
+         <!-- Header Section -->
+         <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="← بازگشت" />
+            <Label text="ثبت رستوران جدید" textFill="#2c3e50">
+               <font>
+                  <Font name="Arial Bold" size="24.0" />
+               </font>
+            </Label>
+         </HBox>
+         
+         <!-- Progress Indicator -->
+         <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <Label fx:id="step1Label" text="1. اطلاعات پایه" styleClass="step-active">
+               <font>
+                  <Font name="Arial Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label text="→" textFill="#bdc3c7">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="step2Label" text="2. آدرس و تماس" styleClass="step-inactive">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Label>
+            <Label text="→" textFill="#bdc3c7">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="step3Label" text="3. تأیید نهایی" styleClass="step-inactive">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Label>
+         </HBox>
+      </VBox>
+   </top>
+   
+   <center>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+         <StackPane>
+            <!-- Step 1: Basic Information -->
+            <VBox fx:id="step1Container" spacing="20.0" visible="true" managed="true">
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
+               </padding>
+               
+               <!-- Restaurant Basic Info -->
+               <VBox styleClass="card" spacing="15.0">
+                  <padding>
+                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                  </padding>
+                  
+                  <Label text="اطلاعات پایه رستوران" textFill="#2c3e50">
+                     <font>
+                        <Font name="Arial Bold" size="18.0" />
+                     </font>
+                  </Label>
+                  
+                  <VBox spacing="15.0">
+                     <VBox spacing="5.0">
+                        <Label text="نام رستوران *" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="restaurantNameField" promptText="نام رستوران خود را وارد کنید" />
+                        <Label fx:id="nameErrorLabel" text="" textFill="#e74c3c" visible="false" managed="false">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
+                     </VBox>
+                     
+                     <VBox spacing="5.0">
+                        <Label text="نوع رستوران *" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        <ComboBox fx:id="restaurantTypeComboBox" promptText="نوع رستوران را انتخاب کنید" prefWidth="300.0">
+                           <items>
+                              <FXCollections fx:factory="observableArrayList">
+                                 <String fx:value="سنتی ایرانی" />
+                                 <String fx:value="فست فود" />
+                                 <String fx:value="ایتالیایی" />
+                                 <String fx:value="چینی" />
+                                 <String fx:value="عربی" />
+                                 <String fx:value="کافه" />
+                                 <String fx:value="شیرینی و کیک" />
+                                 <String fx:value="سایر" />
+                              </FXCollections>
+                           </items>
+                        </ComboBox>
+                     </VBox>
+                     
+                     <VBox spacing="5.0">
+                        <Label text="توضیحات رستوران" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        <TextArea fx:id="descriptionTextArea" promptText="توضیح کوتاهی درباره رستوران خود بنویسید..." 
+                                  wrapText="true" prefRowCount="3" />
+                        <Label fx:id="descCharCountLabel" text="0/300 کاراکتر" textFill="#bdc3c7" alignment="CENTER_RIGHT">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
+                     </VBox>
+                  </VBox>
+               </VBox>
+               
+               <!-- Operating Hours -->
+               <VBox styleClass="card" spacing="15.0">
+                  <padding>
+                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                  </padding>
+                  
+                  <Label text="ساعات کاری" textFill="#2c3e50">
+                     <font>
+                        <Font name="Arial Bold" size="16.0" />
+                     </font>
+                  </Label>
+                  
+                  <VBox spacing="10.0">
+                     <HBox alignment="CENTER_LEFT" spacing="15.0">
+                        <Label text="ساعت شروع:" prefWidth="80.0" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        <ComboBox fx:id="openHourComboBox" prefWidth="100.0">
+                           <items>
+                              <FXCollections fx:factory="observableArrayList">
+                                 <String fx:value="06:00" />
+                                 <String fx:value="07:00" />
+                                 <String fx:value="08:00" />
+                                 <String fx:value="09:00" />
+                                 <String fx:value="10:00" />
+                                 <String fx:value="11:00" />
+                                 <String fx:value="12:00" />
+                              </FXCollections>
+                           </items>
+                        </ComboBox>
+                        
+                        <Label text="ساعت پایان:" prefWidth="80.0" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        <ComboBox fx:id="closeHourComboBox" prefWidth="100.0">
+                           <items>
+                              <FXCollections fx:factory="observableArrayList">
+                                 <String fx:value="18:00" />
+                                 <String fx:value="19:00" />
+                                 <String fx:value="20:00" />
+                                 <String fx:value="21:00" />
+                                 <String fx:value="22:00" />
+                                 <String fx:value="23:00" />
+                                 <String fx:value="24:00" />
+                              </FXCollections>
+                           </items>
+                        </ComboBox>
+                     </HBox>
+                     
+                     <CheckBox fx:id="is24HoursCheckBox" text="رستوران ۲۴ ساعته است" />
+                  </VBox>
+               </VBox>
+               
+               <!-- Delivery Options -->
+               <VBox styleClass="card" spacing="15.0">
+                  <padding>
+                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                  </padding>
+                  
+                  <Label text="گزینه‌های تحویل" textFill="#2c3e50">
+                     <font>
+                        <Font name="Arial Bold" size="16.0" />
+                     </font>
+                  </Label>
+                  
+                  <VBox spacing="10.0">
+                     <CheckBox fx:id="deliveryAvailableCheckBox" text="ارسال رایگان دارد" selected="true" />
+                     <CheckBox fx:id="takeawayAvailableCheckBox" text="تحویل حضوری دارد" selected="true" />
+                     
+                     <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Label text="هزینه ارسال:" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="deliveryFeeField" promptText="مثال: 15000" prefWidth="100.0" />
+                        <Label text="تومان" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                     </HBox>
+                     
+                     <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Label text="حداقل مبلغ سفارش:" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="minOrderField" promptText="مثال: 50000" prefWidth="100.0" />
+                        <Label text="تومان" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                     </HBox>
+                  </VBox>
+               </VBox>
+            </VBox>
+            
+            <!-- Step 2: Address and Contact -->
+            <VBox fx:id="step2Container" spacing="20.0" visible="false" managed="false">
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
+               </padding>
+               
+               <!-- Address Information -->
+               <VBox styleClass="card" spacing="15.0">
+                  <padding>
+                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                  </padding>
+                  
+                  <Label text="آدرس رستوران" textFill="#2c3e50">
+                     <font>
+                        <Font name="Arial Bold" size="18.0" />
+                     </font>
+                  </Label>
+                  
+                  <VBox spacing="15.0">
+                     <HBox spacing="15.0">
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                           <Label text="استان *" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="12.0" />
+                              </font>
+                           </Label>
+                           <ComboBox fx:id="provinceComboBox" promptText="استان را انتخاب کنید" prefWidth="200.0">
+                              <items>
+                                 <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="تهران" />
+                                    <String fx:value="اصفهان" />
+                                    <String fx:value="فارس" />
+                                    <String fx:value="خراسان رضوی" />
+                                    <String fx:value="خوزستان" />
+                                    <String fx:value="مازندران" />
+                                 </FXCollections>
+                              </items>
+                           </ComboBox>
+                        </VBox>
+                        
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                           <Label text="شهر *" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="12.0" />
+                              </font>
+                           </Label>
+                           <ComboBox fx:id="cityComboBox" promptText="شهر را انتخاب کنید" prefWidth="200.0">
+                              <items>
+                                 <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="تهران" />
+                                    <String fx:value="کرج" />
+                                    <String fx:value="اصفهان" />
+                                    <String fx:value="شیراز" />
+                                    <String fx:value="مشهد" />
+                                 </FXCollections>
+                              </items>
+                           </ComboBox>
+                        </VBox>
+                     </HBox>
+                     
+                     <VBox spacing="5.0">
+                        <Label text="آدرس کامل *" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        <TextArea fx:id="fullAddressTextArea" promptText="آدرس کامل رستوران را وارد کنید..." 
+                                  wrapText="true" prefRowCount="3" />
+                     </VBox>
+                     
+                     <HBox spacing="15.0">
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                           <Label text="کد پستی" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="12.0" />
+                              </font>
+                           </Label>
+                           <TextField fx:id="postalCodeField" promptText="کد پستی ۱۰ رقمی" />
+                        </VBox>
+                        
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                           <Label text="تلفن رستوران *" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="12.0" />
+                              </font>
+                           </Label>
+                           <TextField fx:id="restaurantPhoneField" promptText="مثال: 021-88776655" />
+                        </VBox>
+                     </HBox>
+                  </VBox>
+               </VBox>
+               
+               <!-- Owner Information -->
+               <VBox styleClass="card" spacing="15.0">
+                  <padding>
+                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                  </padding>
+                  
+                  <Label text="اطلاعات مالک" textFill="#2c3e50">
+                     <font>
+                        <Font name="Arial Bold" size="16.0" />
+                     </font>
+                  </Label>
+                  
+                  <VBox spacing="15.0">
+                     <HBox spacing="15.0">
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                           <Label text="نام مالک *" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="12.0" />
+                              </font>
+                           </Label>
+                           <TextField fx:id="ownerNameField" promptText="نام و نام خانوادگی مالک" />
+                        </VBox>
+                        
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                           <Label text="تلفن همراه مالک *" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="12.0" />
+                              </font>
+                           </Label>
+                           <TextField fx:id="ownerPhoneField" promptText="09123456789" />
+                        </VBox>
+                     </HBox>
+                     
+                     <VBox spacing="5.0">
+                        <Label text="ایمیل مالک" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="ownerEmailField" promptText="example@email.com" />
+                     </VBox>
+                  </VBox>
+               </VBox>
+            </VBox>
+            
+            <!-- Step 3: Final Confirmation -->
+            <VBox fx:id="step3Container" spacing="20.0" visible="false" managed="false">
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
+               </padding>
+               
+               <!-- Summary Card -->
+               <VBox styleClass="card" spacing="15.0">
+                  <padding>
+                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                  </padding>
+                  
+                  <Label text="خلاصه اطلاعات رستوران" textFill="#2c3e50">
+                     <font>
+                        <Font name="Arial Bold" size="18.0" />
+                     </font>
+                  </Label>
+                  
+                  <VBox fx:id="summaryContainer" spacing="10.0">
+                     <!-- Summary will be populated dynamically -->
+                  </VBox>
+               </VBox>
+               
+               <!-- Terms and Conditions -->
+               <VBox styleClass="card" spacing="15.0">
+                  <padding>
+                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                  </padding>
+                  
+                  <Label text="قوانین و مقررات" textFill="#2c3e50">
+                     <font>
+                        <Font name="Arial Bold" size="16.0" />
+                     </font>
+                  </Label>
+                  
+                  <VBox spacing="10.0">
+                     <CheckBox fx:id="termsCheckBox" text="قوانین و مقررات سایت را مطالعه کرده و می‌پذیرم" />
+                     <CheckBox fx:id="dataAccuracyCheckBox" text="صحت اطلاعات وارد شده را تأیید می‌کنم" />
+                     <CheckBox fx:id="responsibilityCheckBox" text="مسئولیت کیفیت غذا و تحویل به موقع را می‌پذیرم" />
+                  </VBox>
+               </VBox>
+            </VBox>
+         </StackPane>
+      </ScrollPane>
+   </center>
+   
+   <bottom>
+      <HBox alignment="CENTER_RIGHT" spacing="15.0">
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="15.0" />
+         </padding>
+         
+         <Button fx:id="previousButton" mnemonicParsing="false" onAction="#handlePrevious" 
+                 text="مرحله قبل" styleClass="secondary-button" visible="false" managed="false" />
+         
+         <Button fx:id="nextButton" mnemonicParsing="false" onAction="#handleNext" 
+                 text="مرحله بعد" styleClass="primary-button" />
+         
+         <Button fx:id="submitButton" mnemonicParsing="false" onAction="#handleSubmit" 
+                 text="ثبت رستوران" styleClass="success-button" visible="false" managed="false" />
+         
+         <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#handleCancel" 
+                 text="انصراف" styleClass="danger-button" />
+      </HBox>
+   </bottom>
+   
+   <stylesheets>
+      <URL value="@../styles.css" />
+   </stylesheets>
+</BorderPane>

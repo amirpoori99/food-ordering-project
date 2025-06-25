@@ -14,6 +14,8 @@ import com.myapp.order.OrderController;
 import com.myapp.payment.PaymentRepository;
 import com.myapp.payment.PaymentController;
 import com.myapp.payment.WalletController;
+import com.myapp.payment.WalletService;
+import com.myapp.payment.TransactionController;
 import com.myapp.courier.DeliveryRepository;
 import com.myapp.courier.DeliveryController;
 import com.myapp.item.ItemController;
@@ -46,6 +48,7 @@ public class ServerApp {
     private static OrderController orderController;
     private static PaymentController paymentController;
     private static WalletController walletController;
+    private static TransactionController transactionController;
     private static DeliveryController deliveryController;
     private static ItemController itemController;
     private static MenuController menuController;
@@ -78,11 +81,15 @@ public class ServerApp {
         // Initialize Notification service
         NotificationService notificationService = new NotificationService(notificationRepo, authRepo);
         
+        // Initialize Wallet service for Transaction controller
+        WalletService walletService = new WalletService(paymentRepo, authRepo);
+        
         // Initialize other controllers
         restaurantController = new RestaurantController();
         orderController = new OrderController();
         paymentController = new PaymentController();
         walletController = new WalletController();
+        transactionController = new TransactionController(walletService, paymentRepo);
         deliveryController = new DeliveryController();
         itemController = new ItemController();
         menuController = new MenuController();
@@ -119,6 +126,7 @@ public class ServerApp {
         server.createContext("/api/orders/", orderController);
         server.createContext("/api/payments/", paymentController);
         server.createContext("/api/wallet/", walletController);
+        server.createContext("/api/transactions/", transactionController);
         server.createContext("/api/deliveries/", deliveryController);
         server.createContext("/api/items/", itemController);
         server.createContext("/api/menu/", menuController);
@@ -160,6 +168,9 @@ public class ServerApp {
         System.out.println("   💰 Wallet System (6+ endpoints):");
         System.out.println("   GET  /api/wallet/ - Wallet balance");
         System.out.println("   POST /api/wallet/ - Add funds");
+        System.out.println("   💸 Transaction System (5+ endpoints):");
+        System.out.println("   GET  /api/transactions/wallet/history - Transaction history");
+        System.out.println("   GET  /api/transactions/wallet/statistics - Wallet statistics");
         System.out.println("   🚚 Delivery System (16+ endpoints):");
         System.out.println("   GET  /api/deliveries/ - All deliveries");
         System.out.println("   POST /api/deliveries/ - Create delivery");

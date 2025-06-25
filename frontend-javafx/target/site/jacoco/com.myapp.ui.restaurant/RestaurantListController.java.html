@@ -85,7 +85,7 @@ import java.util.ResourceBundle;
 <span class="nc bnc" id="L85" title="All 2 branches missed.">                        for (JsonNode restaurantNode : dataArray) {</span>
 <span class="nc" id="L86">                            Restaurant restaurant = parseRestaurant(restaurantNode);</span>
 <span class="nc" id="L87">                            restaurants.add(restaurant);</span>
-                        }
+<span class="nc" id="L88">                        }</span>
                     }
                     
 <span class="nc" id="L91">                    return restaurants;</span>
@@ -153,7 +153,7 @@ import java.util.ResourceBundle;
 <span class="nc bnc" id="L153" title="All 2 branches missed.">        if (searchText.isEmpty()) {</span>
 <span class="nc" id="L154">            displayRestaurants(allRestaurants);</span>
 <span class="nc" id="L155">            setStatus(allRestaurants.size() + &quot; رستوران یافت شد&quot;);</span>
-<span class="nc" id="L156">        } else {</span>
+        } else {
 <span class="nc" id="L157">            filteredRestaurants = allRestaurants.stream()</span>
 <span class="nc" id="L158">                .filter(restaurant -&gt; </span>
 <span class="nc bnc" id="L159" title="All 2 branches missed.">                    restaurant.getName().toLowerCase().contains(searchText) ||</span>
@@ -268,7 +268,7 @@ import java.util.ResourceBundle;
 <span class="pc bpc" id="L268" title="1 of 4 branches missed.">            if (empty || restaurant == null) {</span>
 <span class="fc" id="L269">                setGraphic(null);</span>
 <span class="fc" id="L270">                setText(null);</span>
-<span class="fc" id="L271">            } else {</span>
+            } else {
 <span class="fc" id="L272">                VBox content = createRestaurantCell(restaurant);</span>
 <span class="fc" id="L273">                setGraphic(content);</span>
 <span class="fc" id="L274">                setText(null);</span>

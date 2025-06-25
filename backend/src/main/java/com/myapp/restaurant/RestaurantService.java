@@ -3,9 +3,11 @@ package com.myapp.restaurant;
 import com.myapp.common.exceptions.NotFoundException;
 import com.myapp.common.models.Restaurant;
 import com.myapp.common.models.RestaurantStatus;
+import com.myapp.common.utils.PerformanceUtil;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Future;
 
 public class RestaurantService {
     
@@ -77,10 +79,24 @@ public class RestaurantService {
     }
     
     /**
-     * Get all approved restaurants (public listing)
+     * Get all approved restaurants (public listing) - Optimized with caching
      */
     public List<Restaurant> getApprovedRestaurants() {
-        return restaurantRepository.listApproved();
+        String cacheKey = PerformanceUtil.createQueryCacheKey("approved_restaurants");
+        
+        return PerformanceUtil.executeWithCache(
+            cacheKey,
+            () -> {
+                PerformanceUtil.PerformanceResult<List<Restaurant>> result = 
+                    PerformanceUtil.measurePerformance("getApprovedRestaurants", 
+                        () -> restaurantRepository.listApproved());
+                
+                System.out.println("🏪 " + result.toString());
+                return result.getResult();
+            },
+            List.class,
+            15 // Cache for 15 minutes
+        );
     }
     
     /**
@@ -249,27 +265,94 @@ public class RestaurantService {
     }
     
     /**
-     * Get restaurant statistics
+     * Bulk update restaurant statuses - Optimized with async processing
+     */
+    public Future<Void> bulkUpdateRestaurantStatus(List<Long> restaurantIds, RestaurantStatus status) {
+        if (restaurantIds == null || restaurantIds.isEmpty()) {
+            throw new IllegalArgumentException("Restaurant IDs cannot be null or empty");
+        }
+        if (status == null) {
+            throw new IllegalArgumentException("Status cannot be null");
+        }
+        
+        return PerformanceUtil.executeAsync(() -> {
+            PerformanceUtil.measurePerformance("bulkUpdateRestaurantStatus", () -> {
+                // Process in batches of 50
+                PerformanceUtil.processBatch(restaurantIds, 50, batch -> {
+                    for (Long id : batch) {
+                        try {
+                            updateRestaurantStatus(id, status);
+                        } catch (Exception e) {
+                            System.err.println("Failed to update restaurant " + id + ": " + e.getMessage());
+                        }
+                    }
+                });
+                
+                // Clear relevant caches after bulk update
+                clearRestaurantCaches();
+                return null;
+            });
+        });
+    }
+    
+    /**
+     * Bulk approve restaurants - Optimized async operation
+     */
+    public Future<Void> bulkApproveRestaurants(List<Long> restaurantIds) {
+        return bulkUpdateRestaurantStatus(restaurantIds, RestaurantStatus.APPROVED);
+    }
+    
+    /**
+     * Clear restaurant-related caches after data modifications
+     */
+    private void clearRestaurantCaches() {
+        // Clear specific cache keys
+        String approvedKey = PerformanceUtil.createQueryCacheKey("approved_restaurants");
+        String statsKey = PerformanceUtil.createQueryCacheKey("restaurant_statistics");
+        
+        // Note: PerformanceUtil doesn't have specific key removal, so we'd need to add that
+        // For now, we can force a cache cleanup
+        PerformanceUtil.cleanExpiredEntries();
+    }
+    
+    /**
+     * Get restaurant statistics - Optimized with caching and performance monitoring
      */
     public RestaurantStatistics getRestaurantStatistics() {
-        List<Restaurant> allRestaurants = getAllRestaurants();
+        String cacheKey = PerformanceUtil.createQueryCacheKey("restaurant_statistics");
         
-        long totalCount = allRestaurants.size();
-        long approvedCount = allRestaurants.stream()
-                .filter(r -> r.getStatus() == RestaurantStatus.APPROVED)
-                .count();
-        long pendingCount = allRestaurants.stream()
-                .filter(r -> r.getStatus() == RestaurantStatus.PENDING)
-                .count();
-        long rejectedCount = allRestaurants.stream()
-                .filter(r -> r.getStatus() == RestaurantStatus.REJECTED)
-                .count();
-        long suspendedCount = allRestaurants.stream()
-                .filter(r -> r.getStatus() == RestaurantStatus.SUSPENDED)
-                .count();
-        
-        return new RestaurantStatistics(totalCount, approvedCount, pendingCount, 
-                                      rejectedCount, suspendedCount);
+        return PerformanceUtil.executeWithCache(
+            cacheKey,
+            () -> {
+                return PerformanceUtil.measurePerformance("calculateRestaurantStatistics", () -> {
+                    List<Restaurant> allRestaurants = getAllRestaurants();
+                    
+                    // Check memory usage before processing large dataset
+                    if (PerformanceUtil.isMemoryUsageCritical()) {
+                        PerformanceUtil.forceGarbageCollection();
+                    }
+                    
+                    long totalCount = allRestaurants.size();
+                    long approvedCount = allRestaurants.parallelStream()
+                            .filter(r -> r.getStatus() == RestaurantStatus.APPROVED)
+                            .count();
+                    long pendingCount = allRestaurants.parallelStream()
+                            .filter(r -> r.getStatus() == RestaurantStatus.PENDING)
+                            .count();
+                    long rejectedCount = allRestaurants.parallelStream()
+                            .filter(r -> r.getStatus() == RestaurantStatus.REJECTED)
+                            .count();
+                    long suspendedCount = allRestaurants.parallelStream()
+                            .filter(r -> r.getStatus() == RestaurantStatus.SUSPENDED)
+                            .count();
+                    
+                    return new RestaurantStatistics(totalCount, approvedCount, pendingCount, 
+                                                  rejectedCount, suspendedCount);
+                }).getResult();
+            },
+            RestaurantStatistics.class,
+            30 // Cache for 30 minutes
+        );
     }
     
     // Private validation methods

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.myapp.ui.payment.PaymentControllerTest" time="12.191" tests="30" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.myapp.ui.payment.PaymentControllerTest" time="11.912" tests="30" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="javafx.runtime.version" value="12.0.1+2"/>
     <property name="sun.cpu.isalist" value="amd64"/>
     <property name="sun.jnu.encoding" value="Cp1252"/>
-    <property name="java.class.path" value="D:\food-ordering-project\food-ordering-project\frontend-javafx\target\test-classes;D:\food-ordering-project\food-ordering-project\frontend-javafx\target\classes;C:\Users\USER\.m2\repository\org\openjfx\javafx-controls\17.0.2\javafx-controls-17.0.2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-controls\17.0.2\javafx-controls-17.0.2-win.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-graphics\17.0.2\javafx-graphics-17.0.2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-graphics\17.0.2\javafx-graphics-17.0.2-win.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-fxml\17.0.2\javafx-fxml-17.0.2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-fxml\17.0.2\javafx-fxml-17.0.2-win.jar;C:\Users\USER\.m2\repository\com\squareup\okhttp3\okhttp\4.11.0\okhttp-4.11.0.jar;C:\Users\USER\.m2\repository\com\squareup\okio\okio\3.2.0\okio-3.2.0.jar;C:\Users\USER\.m2\repository\com\squareup\okio\okio-jvm\3.2.0\okio-jvm-3.2.0.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib\1.6.20\kotlin-stdlib-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-common\1.6.20\kotlin-stdlib-common-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\annotations\13.0\annotations-13.0.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk8\1.6.20\kotlin-stdlib-jdk8-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk7\1.6.20\kotlin-stdlib-jdk7-1.6.20.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.15.2\jackson-databind-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.15.2\jackson-annotations-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.15.2\jackson-core-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.15.2\jackson-datatype-jsr310-2.15.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.9.2\junit-jupiter-api-5.9.2.jar;C:\Users\USER\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-commons\1.9.2\junit-platform-commons-1.9.2.jar;C:\Users\USER\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.9.2\junit-jupiter-engine-5.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-engine\1.9.2\junit-platform-engine-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.9.2\junit-jupiter-params-5.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-suite-api\1.9.2\junit-platform-suite-api-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-suite-engine\1.9.2\junit-platform-suite-engine-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-suite-commons\1.9.2\junit-platform-suite-commons-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-launcher\1.9.2\junit-platform-launcher-1.9.2.jar;C:\Users\USER\.m2\repository\org\testfx\testfx-core\4.0.16-alpha\testfx-core-4.0.16-alpha.jar;C:\Users\USER\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\USER\.m2\repository\org\testfx\testfx-junit5\4.0.16-alpha\testfx-junit5-4.0.16-alpha.jar;C:\Users\USER\.m2\repository\org\assertj\assertj-core\3.24.2\assertj-core-3.24.2.jar;C:\Users\USER\.m2\repository\net\bytebuddy\byte-buddy\1.12.21\byte-buddy-1.12.21.jar;C:\Users\USER\.m2\repository\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\USER\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.12\byte-buddy-agent-1.14.12.jar;C:\Users\USER\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\USER\.m2\repository\org\testfx\openjfx-monocle\jdk-12.0.1+2\openjfx-monocle-jdk-12.0.1+2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-base\12.0.1\javafx-base-12.0.1.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-base\12.0.1\javafx-base-12.0.1-win.jar;"/>
+    <property name="java.class.path" value="C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\target\test-classes;C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\target\classes;C:\Users\USER\.m2\repository\org\openjfx\javafx-controls\17.0.2\javafx-controls-17.0.2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-controls\17.0.2\javafx-controls-17.0.2-win.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-graphics\17.0.2\javafx-graphics-17.0.2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-graphics\17.0.2\javafx-graphics-17.0.2-win.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-fxml\17.0.2\javafx-fxml-17.0.2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-fxml\17.0.2\javafx-fxml-17.0.2-win.jar;C:\Users\USER\.m2\repository\com\squareup\okhttp3\okhttp\4.11.0\okhttp-4.11.0.jar;C:\Users\USER\.m2\repository\com\squareup\okio\okio\3.2.0\okio-3.2.0.jar;C:\Users\USER\.m2\repository\com\squareup\okio\okio-jvm\3.2.0\okio-jvm-3.2.0.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib\1.6.20\kotlin-stdlib-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-common\1.6.20\kotlin-stdlib-common-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\annotations\13.0\annotations-13.0.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk8\1.6.20\kotlin-stdlib-jdk8-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk7\1.6.20\kotlin-stdlib-jdk7-1.6.20.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.15.2\jackson-databind-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.15.2\jackson-annotations-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.15.2\jackson-core-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.15.2\jackson-datatype-jsr310-2.15.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.9.2\junit-jupiter-api-5.9.2.jar;C:\Users\USER\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-commons\1.9.2\junit-platform-commons-1.9.2.jar;C:\Users\USER\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.9.2\junit-jupiter-engine-5.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-engine\1.9.2\junit-platform-engine-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.9.2\junit-jupiter-params-5.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-suite-api\1.9.2\junit-platform-suite-api-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-suite-engine\1.9.2\junit-platform-suite-engine-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-suite-commons\1.9.2\junit-platform-suite-commons-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-launcher\1.9.2\junit-platform-launcher-1.9.2.jar;C:\Users\USER\.m2\repository\org\testfx\testfx-core\4.0.16-alpha\testfx-core-4.0.16-alpha.jar;C:\Users\USER\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\USER\.m2\repository\org\testfx\testfx-junit5\4.0.16-alpha\testfx-junit5-4.0.16-alpha.jar;C:\Users\USER\.m2\repository\org\assertj\assertj-core\3.24.2\assertj-core-3.24.2.jar;C:\Users\USER\.m2\repository\net\bytebuddy\byte-buddy\1.12.21\byte-buddy-1.12.21.jar;C:\Users\USER\.m2\repository\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\USER\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.12\byte-buddy-agent-1.14.12.jar;C:\Users\USER\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\USER\.m2\repository\org\testfx\openjfx-monocle\jdk-12.0.1+2\openjfx-monocle-jdk-12.0.1+2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-base\12.0.1\javafx-base-12.0.1.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-base\12.0.1\javafx-base-12.0.1-win.jar;"/>
     <property name="java.vm.vendor" value="Eclipse Adoptium"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="user.variant" value=""/>
@@ -18,9 +18,9 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Eclipse Adoptium\jdk-17.0.14.7-hotspot\bin"/>
-    <property name="sun.java.command" value="C:\Users\USER\AppData\Local\Temp\surefire18056133645159677809\surefirebooter-20250625032216172_3.jar C:\Users\USER\AppData\Local\Temp\surefire18056133645159677809 2025-06-25T03-22-15_112-jvmRun1 surefire-20250625032216172_1tmp surefire_0-20250625032216172_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\USER\AppData\Local\Temp\surefire3586855048764385558\surefirebooter-20250625202042496_3.jar C:\Users\USER\AppData\Local\Temp\surefire3586855048764385558 2025-06-25T20-20-41_393-jvmRun1 surefire-20250625202042496_1tmp surefire_0-20250625202042496_2tmp"/>
     <property name="jdk.debug" value="release"/>
-    <property name="surefire.test.class.path" value="D:\food-ordering-project\food-ordering-project\frontend-javafx\target\test-classes;D:\food-ordering-project\food-ordering-project\frontend-javafx\target\classes;C:\Users\USER\.m2\repository\org\openjfx\javafx-controls\17.0.2\javafx-controls-17.0.2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-controls\17.0.2\javafx-controls-17.0.2-win.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-graphics\17.0.2\javafx-graphics-17.0.2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-graphics\17.0.2\javafx-graphics-17.0.2-win.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-fxml\17.0.2\javafx-fxml-17.0.2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-fxml\17.0.2\javafx-fxml-17.0.2-win.jar;C:\Users\USER\.m2\repository\com\squareup\okhttp3\okhttp\4.11.0\okhttp-4.11.0.jar;C:\Users\USER\.m2\repository\com\squareup\okio\okio\3.2.0\okio-3.2.0.jar;C:\Users\USER\.m2\repository\com\squareup\okio\okio-jvm\3.2.0\okio-jvm-3.2.0.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib\1.6.20\kotlin-stdlib-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-common\1.6.20\kotlin-stdlib-common-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\annotations\13.0\annotations-13.0.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk8\1.6.20\kotlin-stdlib-jdk8-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk7\1.6.20\kotlin-stdlib-jdk7-1.6.20.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.15.2\jackson-databind-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.15.2\jackson-annotations-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.15.2\jackson-core-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.15.2\jackson-datatype-jsr310-2.15.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.9.2\junit-jupiter-api-5.9.2.jar;C:\Users\USER\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-commons\1.9.2\junit-platform-commons-1.9.2.jar;C:\Users\USER\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.9.2\junit-jupiter-engine-5.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-engine\1.9.2\junit-platform-engine-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.9.2\junit-jupiter-params-5.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-suite-api\1.9.2\junit-platform-suite-api-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-suite-engine\1.9.2\junit-platform-suite-engine-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-suite-commons\1.9.2\junit-platform-suite-commons-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-launcher\1.9.2\junit-platform-launcher-1.9.2.jar;C:\Users\USER\.m2\repository\org\testfx\testfx-core\4.0.16-alpha\testfx-core-4.0.16-alpha.jar;C:\Users\USER\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\USER\.m2\repository\org\testfx\testfx-junit5\4.0.16-alpha\testfx-junit5-4.0.16-alpha.jar;C:\Users\USER\.m2\repository\org\assertj\assertj-core\3.24.2\assertj-core-3.24.2.jar;C:\Users\USER\.m2\repository\net\bytebuddy\byte-buddy\1.12.21\byte-buddy-1.12.21.jar;C:\Users\USER\.m2\repository\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\USER\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.12\byte-buddy-agent-1.14.12.jar;C:\Users\USER\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\USER\.m2\repository\org\testfx\openjfx-monocle\jdk-12.0.1+2\openjfx-monocle-jdk-12.0.1+2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-base\12.0.1\javafx-base-12.0.1.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-base\12.0.1\javafx-base-12.0.1-win.jar;"/>
+    <property name="surefire.test.class.path" value="C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\target\test-classes;C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\target\classes;C:\Users\USER\.m2\repository\org\openjfx\javafx-controls\17.0.2\javafx-controls-17.0.2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-controls\17.0.2\javafx-controls-17.0.2-win.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-graphics\17.0.2\javafx-graphics-17.0.2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-graphics\17.0.2\javafx-graphics-17.0.2-win.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-fxml\17.0.2\javafx-fxml-17.0.2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-fxml\17.0.2\javafx-fxml-17.0.2-win.jar;C:\Users\USER\.m2\repository\com\squareup\okhttp3\okhttp\4.11.0\okhttp-4.11.0.jar;C:\Users\USER\.m2\repository\com\squareup\okio\okio\3.2.0\okio-3.2.0.jar;C:\Users\USER\.m2\repository\com\squareup\okio\okio-jvm\3.2.0\okio-jvm-3.2.0.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib\1.6.20\kotlin-stdlib-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-common\1.6.20\kotlin-stdlib-common-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\annotations\13.0\annotations-13.0.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk8\1.6.20\kotlin-stdlib-jdk8-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk7\1.6.20\kotlin-stdlib-jdk7-1.6.20.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.15.2\jackson-databind-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.15.2\jackson-annotations-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.15.2\jackson-core-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.15.2\jackson-datatype-jsr310-2.15.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.9.2\junit-jupiter-api-5.9.2.jar;C:\Users\USER\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-commons\1.9.2\junit-platform-commons-1.9.2.jar;C:\Users\USER\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.9.2\junit-jupiter-engine-5.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-engine\1.9.2\junit-platform-engine-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.9.2\junit-jupiter-params-5.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-suite-api\1.9.2\junit-platform-suite-api-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-suite-engine\1.9.2\junit-platform-suite-engine-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-suite-commons\1.9.2\junit-platform-suite-commons-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-launcher\1.9.2\junit-platform-launcher-1.9.2.jar;C:\Users\USER\.m2\repository\org\testfx\testfx-core\4.0.16-alpha\testfx-core-4.0.16-alpha.jar;C:\Users\USER\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\USER\.m2\repository\org\testfx\testfx-junit5\4.0.16-alpha\testfx-junit5-4.0.16-alpha.jar;C:\Users\USER\.m2\repository\org\assertj\assertj-core\3.24.2\assertj-core-3.24.2.jar;C:\Users\USER\.m2\repository\net\bytebuddy\byte-buddy\1.12.21\byte-buddy-1.12.21.jar;C:\Users\USER\.m2\repository\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\USER\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.12\byte-buddy-agent-1.14.12.jar;C:\Users\USER\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\USER\.m2\repository\org\testfx\openjfx-monocle\jdk-12.0.1+2\openjfx-monocle-jdk-12.0.1+2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-base\12.0.1\javafx-base-12.0.1.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-base\12.0.1\javafx-base-12.0.1-win.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
     <property name="user.home" value="C:\Users\USER"/>
     <property name="user.language" value="en"/>
@@ -28,7 +28,7 @@
     <property name="java.version.date" value="2025-01-21"/>
     <property name="java.home" value="C:\Program Files\Eclipse Adoptium\jdk-17.0.14.7-hotspot"/>
     <property name="file.separator" value="\"/>
-    <property name="basedir" value="D:\food-ordering-project\food-ordering-project\frontend-javafx"/>
+    <property name="basedir" value="C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx"/>
     <property name="java.vm.compressedOopsMode" value="Zero based"/>
     <property name="line.separator" value="&#10;"/>
     <property name="prism.order" value="sw"/>
@@ -36,7 +36,7 @@
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="testfx.robot" value="glass"/>
     <property name="java.awt.headless" value="true"/>
-    <property name="surefire.real.class.path" value="C:\Users\USER\AppData\Local\Temp\surefire18056133645159677809\surefirebooter-20250625032216172_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\USER\AppData\Local\Temp\surefire3586855048764385558\surefirebooter-20250625202042496_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="17.0.14+7"/>
@@ -51,7 +51,7 @@
     <property name="java.vendor.url.bug" value="https://github.com/adoptium/adoptium-support/issues"/>
     <property name="java.io.tmpdir" value="C:\Users\USER\AppData\Local\Temp\"/>
     <property name="java.version" value="17.0.14"/>
-    <property name="user.dir" value="D:\food-ordering-project\food-ordering-project\frontend-javafx"/>
+    <property name="user.dir" value="C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx"/>
     <property name="os.arch" value="amd64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
     <property name="testfx.headless" value="true"/>
@@ -66,7 +66,7 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="testPaymentMethodRadioButtons" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.556">
+  <testcase name="testPaymentMethodRadioButtons" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.55">
     <system-out><![CDATA[FXML loading failed, skipping testPaymentMethodRadioButtons
 ]]></system-out>
     <system-err><![CDATA[java.nio.BufferOverflowException
@@ -81,7 +81,7 @@
 	at java.base/java.lang.Thread.run(Thread.java:840)
 ]]></system-err>
   </testcase>
-  <testcase name="testPaymentMethodRadioButtons" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.433">
+  <testcase name="testPaymentMethodRadioButtons" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.43">
     <system-out><![CDATA[FXML loading failed, skipping testPaymentMethodRadioButtons
 ]]></system-out>
     <system-err><![CDATA[java.nio.BufferOverflowException
@@ -96,39 +96,39 @@
 	at java.base/java.lang.Thread.run(Thread.java:840)
 ]]></system-err>
   </testcase>
-  <testcase name="testOrderItemDataModel" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.418"/>
-  <testcase name="testOrderItemDataModel" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.4"/>
-  <testcase name="testMultipleOrderItems" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.429"/>
-  <testcase name="testMultipleOrderItems" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.398"/>
-  <testcase name="testWalletPaymentRadioSelection" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.406">
+  <testcase name="testOrderItemDataModel" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.437"/>
+  <testcase name="testOrderItemDataModel" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.391"/>
+  <testcase name="testMultipleOrderItems" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.408"/>
+  <testcase name="testMultipleOrderItems" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.395"/>
+  <testcase name="testWalletPaymentRadioSelection" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.403">
     <system-out><![CDATA[FXML loading failed, skipping testWalletPaymentRadioSelection
 ]]></system-out>
   </testcase>
-  <testcase name="testWalletPaymentRadioSelection" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.42">
+  <testcase name="testWalletPaymentRadioSelection" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.383">
     <system-out><![CDATA[FXML loading failed, skipping testWalletPaymentRadioSelection
 ]]></system-out>
   </testcase>
-  <testcase name="testCardHolderNameValidation" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.397"/>
-  <testcase name="testCardHolderNameValidation" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.421"/>
-  <testcase name="testPriceCalculations" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.404"/>
-  <testcase name="testPriceCalculations" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.399"/>
-  <testcase name="testCardPaymentFields" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.409">
+  <testcase name="testCardHolderNameValidation" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.405"/>
+  <testcase name="testCardHolderNameValidation" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.392"/>
+  <testcase name="testPriceCalculations" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.415"/>
+  <testcase name="testPriceCalculations" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.391"/>
+  <testcase name="testCardPaymentFields" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.421">
     <system-out><![CDATA[FXML loading failed, skipping testCardPaymentFields
 ]]></system-out>
   </testcase>
-  <testcase name="testCardPaymentFields" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.397">
+  <testcase name="testCardPaymentFields" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.395">
     <system-out><![CDATA[FXML loading failed, skipping testCardPaymentFields
 ]]></system-out>
   </testcase>
-  <testcase name="testPriceLabelsInitialization" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.392">
+  <testcase name="testPriceLabelsInitialization" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.41">
     <system-out><![CDATA[FXML loading failed, skipping testPriceLabelsInitialization
 ]]></system-out>
   </testcase>
-  <testcase name="testPriceLabelsInitialization" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.399">
+  <testcase name="testPriceLabelsInitialization" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.391">
     <system-out><![CDATA[FXML loading failed, skipping testPriceLabelsInitialization
 ]]></system-out>
   </testcase>
-  <testcase name="testCardPaymentRadioSelection" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.538">
+  <testcase name="testCardPaymentRadioSelection" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.413">
     <system-out><![CDATA[FXML loading failed, skipping testCardPaymentRadioSelection
 ]]></system-out>
   </testcase>
@@ -136,65 +136,65 @@
     <system-out><![CDATA[FXML loading failed, skipping testCardPaymentRadioSelection
 ]]></system-out>
   </testcase>
-  <testcase name="testRefreshWalletButtonAction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.559">
-    <system-out><![CDATA[FXML loading failed, skipping testRefreshWalletButtonAction
-]]></system-out>
-  </testcase>
   <testcase name="testRefreshWalletButtonAction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.411">
     <system-out><![CDATA[FXML loading failed, skipping testRefreshWalletButtonAction
 ]]></system-out>
   </testcase>
-  <testcase name="testDefaultPaymentMethodSelection" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.589">
+  <testcase name="testRefreshWalletButtonAction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.399">
+    <system-out><![CDATA[FXML loading failed, skipping testRefreshWalletButtonAction
+]]></system-out>
+  </testcase>
+  <testcase name="testDefaultPaymentMethodSelection" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.41">
     <system-out><![CDATA[FXML loading failed, skipping testDefaultPaymentMethodSelection
 ]]></system-out>
   </testcase>
-  <testcase name="testDefaultPaymentMethodSelection" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.407">
+  <testcase name="testDefaultPaymentMethodSelection" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.401">
     <system-out><![CDATA[FXML loading failed, skipping testDefaultPaymentMethodSelection
 ]]></system-out>
   </testcase>
-  <testcase name="testPaymentButtonStates" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.566">
+  <testcase name="testPaymentButtonStates" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.406">
     <system-out><![CDATA[FXML loading failed, skipping testPaymentButtonStates
 ]]></system-out>
   </testcase>
-  <testcase name="testPaymentButtonStates" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.403">
+  <testcase name="testPaymentButtonStates" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.391">
     <system-out><![CDATA[FXML loading failed, skipping testPaymentButtonStates
 ]]></system-out>
   </testcase>
-  <testcase name="testConfirmPaymentButton" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.556">
+  <testcase name="testConfirmPaymentButton" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.397">
     <system-out><![CDATA[FXML loading failed, skipping testConfirmPaymentButton
 ]]></system-out>
   </testcase>
-  <testcase name="testConfirmPaymentButton" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.406">
+  <testcase name="testConfirmPaymentButton" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.401">
     <system-out><![CDATA[FXML loading failed, skipping testConfirmPaymentButton
 ]]></system-out>
   </testcase>
-  <testcase name="testPaymentSectionsExist" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.563">
+  <testcase name="testPaymentSectionsExist" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.399">
     <system-out><![CDATA[FXML loading failed, skipping testPaymentSectionsExist
 ]]></system-out>
   </testcase>
-  <testcase name="testPaymentSectionsExist" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.406">
+  <testcase name="testPaymentSectionsExist" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.394">
     <system-out><![CDATA[FXML loading failed, skipping testPaymentSectionsExist
 ]]></system-out>
   </testcase>
-  <testcase name="testCardExpiryMonthRestriction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.545">
+  <testcase name="testCardExpiryMonthRestriction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.443">
     <system-out><![CDATA[FXML loading failed, skipping testCardExpiryMonthRestriction
 ]]></system-out>
   </testcase>
-  <testcase name="testCardExpiryMonthRestriction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.398">
+  <testcase name="testCardExpiryMonthRestriction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.392">
     <system-out><![CDATA[FXML loading failed, skipping testCardExpiryMonthRestriction
 ]]></system-out>
   </testcase>
-  <testcase name="testInitialization" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.557"/>
-  <testcase name="testInitialization" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.397"/>
-  <testcase name="testCardFieldPromptTexts" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.544">
+  <testcase name="testInitialization" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.425"/>
+  <testcase name="testInitialization" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.391"/>
+  <testcase name="testCardFieldPromptTexts" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.398">
     <system-out><![CDATA[FXML loading failed, skipping testCardFieldPromptTexts
 ]]></system-out>
   </testcase>
-  <testcase name="testCardFieldPromptTexts" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.402">
+  <testcase name="testCardFieldPromptTexts" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.393">
     <system-out><![CDATA[FXML loading failed, skipping testCardFieldPromptTexts
 ]]></system-out>
   </testcase>
-  <testcase name="testWalletBalanceDisplay" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.546">
+  <testcase name="testWalletBalanceDisplay" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.394">
     <system-out><![CDATA[FXML loading failed, skipping testWalletBalanceDisplay
 ]]></system-out>
   </testcase>
@@ -202,82 +202,82 @@
     <system-out><![CDATA[FXML loading failed, skipping testWalletBalanceDisplay
 ]]></system-out>
   </testcase>
-  <testcase name="testWalletPaymentComponents" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.559">
+  <testcase name="testWalletPaymentComponents" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.4">
     <system-out><![CDATA[FXML loading failed, skipping testWalletPaymentComponents
 ]]></system-out>
   </testcase>
-  <testcase name="testWalletPaymentComponents" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.396">
+  <testcase name="testWalletPaymentComponents" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.394">
     <system-out><![CDATA[FXML loading failed, skipping testWalletPaymentComponents
 ]]></system-out>
   </testcase>
-  <testcase name="testCardExpiryYearRestriction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.559">
+  <testcase name="testCardExpiryYearRestriction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.401">
     <system-out><![CDATA[FXML loading failed, skipping testCardExpiryYearRestriction
 ]]></system-out>
   </testcase>
-  <testcase name="testCardExpiryYearRestriction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.391">
+  <testcase name="testCardExpiryYearRestriction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.393">
     <system-out><![CDATA[FXML loading failed, skipping testCardExpiryYearRestriction
 ]]></system-out>
   </testcase>
-  <testcase name="testOrderSummaryComponents" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.545">
+  <testcase name="testOrderSummaryComponents" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.397">
     <system-out><![CDATA[FXML loading failed, skipping testOrderSummaryComponents
 ]]></system-out>
   </testcase>
-  <testcase name="testOrderSummaryComponents" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.403">
+  <testcase name="testOrderSummaryComponents" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.393">
     <system-out><![CDATA[FXML loading failed, skipping testOrderSummaryComponents
 ]]></system-out>
   </testcase>
-  <testcase name="testCvvValidation" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.551"/>
-  <testcase name="testCvvValidation" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.401"/>
-  <testcase name="testCardNumberFormatting" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.559">
+  <testcase name="testCvvValidation" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.389"/>
+  <testcase name="testCvvValidation" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.398"/>
+  <testcase name="testCardNumberFormatting" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.394">
     <system-out><![CDATA[FXML loading failed, skipping testCardNumberFormatting
 ]]></system-out>
   </testcase>
-  <testcase name="testCardNumberFormatting" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.4">
+  <testcase name="testCardNumberFormatting" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.395">
     <system-out><![CDATA[FXML loading failed, skipping testCardNumberFormatting
 ]]></system-out>
   </testcase>
-  <testcase name="testCardCvvRestriction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.558">
+  <testcase name="testCardCvvRestriction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.4">
     <system-out><![CDATA[FXML loading failed, skipping testCardCvvRestriction
 ]]></system-out>
   </testcase>
-  <testcase name="testCardCvvRestriction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.438">
+  <testcase name="testCardCvvRestriction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.426">
     <system-out><![CDATA[FXML loading failed, skipping testCardCvvRestriction
 ]]></system-out>
   </testcase>
-  <testcase name="testCardValidationLogic" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.574"/>
-  <testcase name="testCardValidationLogic" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.403"/>
-  <testcase name="testPaymentSectionVisibility" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.563">
+  <testcase name="testCardValidationLogic" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.399"/>
+  <testcase name="testCardValidationLogic" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.402"/>
+  <testcase name="testPaymentSectionVisibility" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.412">
     <system-out><![CDATA[FXML loading failed, skipping testPaymentSectionVisibility
 ]]></system-out>
   </testcase>
-  <testcase name="testPaymentSectionVisibility" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.395">
+  <testcase name="testPaymentSectionVisibility" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.393">
     <system-out><![CDATA[FXML loading failed, skipping testPaymentSectionVisibility
 ]]></system-out>
   </testcase>
-  <testcase name="testDeliveryInformationDisplay" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.569">
+  <testcase name="testDeliveryInformationDisplay" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.4">
     <system-out><![CDATA[FXML loading failed, skipping testDeliveryInformationDisplay
 ]]></system-out>
   </testcase>
-  <testcase name="testDeliveryInformationDisplay" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.41">
+  <testcase name="testDeliveryInformationDisplay" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.398">
     <system-out><![CDATA[FXML loading failed, skipping testDeliveryInformationDisplay
 ]]></system-out>
   </testcase>
-  <testcase name="testConfirmPaymentButtonAction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.556">
+  <testcase name="testConfirmPaymentButtonAction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.425">
     <system-out><![CDATA[FXML loading failed, skipping testConfirmPaymentButtonAction
 ]]></system-out>
   </testcase>
-  <testcase name="testConfirmPaymentButtonAction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.427">
+  <testcase name="testConfirmPaymentButtonAction" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.408">
     <system-out><![CDATA[FXML loading failed, skipping testConfirmPaymentButtonAction
 ]]></system-out>
   </testcase>
-  <testcase name="testDeliveryInformationReadOnly" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.549">
+  <testcase name="testDeliveryInformationReadOnly" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.396">
     <system-out><![CDATA[FXML loading failed, skipping testDeliveryInformationReadOnly
 ]]></system-out>
   </testcase>
-  <testcase name="testDeliveryInformationReadOnly" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.431">
+  <testcase name="testDeliveryInformationReadOnly" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.398">
     <system-out><![CDATA[FXML loading failed, skipping testDeliveryInformationReadOnly
 ]]></system-out>
   </testcase>
-  <testcase name="testExpiryDateValidation" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.545"/>
-  <testcase name="testExpiryDateValidation" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.405"/>
+  <testcase name="testExpiryDateValidation" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.404"/>
+  <testcase name="testExpiryDateValidation" classname="com.myapp.ui.payment.PaymentControllerTest" time="0.389"/>
 </testsuite>

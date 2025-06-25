@@ -431,6 +431,7 @@ public class NotificationController implements HttpHandler {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void handleCreateNotification(HttpExchange exchange) throws IOException {
         try {
             String requestBody = new String(exchange.getRequestBody().readAllBytes());
@@ -780,6 +781,7 @@ public class NotificationController implements HttpHandler {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void handleCreateOrderNotification(HttpExchange exchange) throws IOException {
         try {
             String requestBody = new String(exchange.getRequestBody().readAllBytes());
@@ -796,6 +798,7 @@ public class NotificationController implements HttpHandler {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void handleCreateOrderStatusChangedNotification(HttpExchange exchange) throws IOException {
         try {
             String requestBody = new String(exchange.getRequestBody().readAllBytes());
@@ -813,6 +816,7 @@ public class NotificationController implements HttpHandler {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void handleCreateDeliveryAssignedNotification(HttpExchange exchange) throws IOException {
         try {
             String requestBody = new String(exchange.getRequestBody().readAllBytes());

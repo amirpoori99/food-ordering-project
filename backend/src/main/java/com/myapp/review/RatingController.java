@@ -112,6 +112,7 @@ public class RatingController implements HttpHandler {
         }
     }
     
+    @SuppressWarnings("unchecked")
     private void handleCreateRating(HttpExchange exchange) throws IOException {
         String requestBody = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         Map<String, Object> request = JsonUtil.fromJson(requestBody, Map.class);
@@ -125,6 +126,7 @@ public class RatingController implements HttpHandler {
         sendResponse(exchange, 201, rating);
     }
     
+    @SuppressWarnings("unchecked")
     private void handleUpdateRating(HttpExchange exchange, Long ratingId) throws IOException {
         String requestBody = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         Map<String, Object> request = JsonUtil.fromJson(requestBody, Map.class);

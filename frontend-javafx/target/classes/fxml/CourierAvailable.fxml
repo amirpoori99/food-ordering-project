@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.ui.courier.CourierAvailableController">
+   <top>
+      <VBox spacing="15.0">
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+         
+         <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="← بازگشت" />
+            <Label text="وضعیت در دسترس بودن پیک" textFill="#2c3e50">
+               <font>
+                  <Font name="Arial Bold" size="24.0" />
+               </font>
+            </Label>
+         </HBox>
+      </VBox>
+   </top>
+   
+   <center>
+      <VBox alignment="CENTER" spacing="30.0">
+         <padding>
+            <Insets bottom="50.0" left="50.0" right="50.0" top="50.0" />
+         </padding>
+         
+         <!-- Status Card -->
+         <VBox styleClass="card" spacing="20.0" alignment="CENTER" maxWidth="400.0">
+            <padding>
+               <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+            </padding>
+            
+            <Label fx:id="statusIconLabel" text="🟢" textFill="#27ae60">
+               <font>
+                  <Font size="48.0" />
+               </font>
+            </Label>
+            
+            <Label fx:id="statusTextLabel" text="در دسترس" textFill="#27ae60">
+               <font>
+                  <Font name="Arial Bold" size="20.0" />
+               </font>
+            </Label>
+            
+            <Label fx:id="statusDescLabel" text="شما الآن برای دریافت سفارش در دسترس هستید" textFill="#7f8c8d" alignment="CENTER" wrapText="true">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            
+            <ToggleButton fx:id="availabilityToggle" mnemonicParsing="false" onAction="#handleToggleAvailability" 
+                          text="تغییر وضعیت" styleClass="large-toggle-button" selected="true" />
+         </VBox>
+         
+         <!-- Current Orders -->
+         <VBox styleClass="card" spacing="15.0" maxWidth="500.0">
+            <padding>
+               <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            
+            <Label text="سفارش‌های فعلی" textFill="#2c3e50">
+               <font>
+                  <Font name="Arial Bold" size="16.0" />
+               </font>
+            </Label>
+            
+            <VBox fx:id="activeOrdersContainer" spacing="10.0">
+               <Label text="هیچ سفارش فعالی ندارید" textFill="#7f8c8d" alignment="CENTER">
+                  <font>
+                     <Font size="12.0" />
+                  </font>
+               </Label>
+            </VBox>
+         </VBox>
+         
+         <!-- Quick Actions -->
+         <HBox spacing="15.0" alignment="CENTER">
+            <Button fx:id="viewHistoryButton" mnemonicParsing="false" onAction="#handleViewHistory" 
+                    text="تاریخچه تحویل‌ها" styleClass="secondary-button" />
+            <Button fx:id="settingsButton" mnemonicParsing="false" onAction="#handleSettings" 
+                    text="تنظیمات" styleClass="secondary-button" />
+         </HBox>
+      </VBox>
+   </center>
+   
+   <stylesheets>
+      <URL value="@../styles.css" />
+   </stylesheets>
+</BorderPane>

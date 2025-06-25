@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.ui.review.ReviewController">
+   <top>
+      <VBox spacing="15.0">
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+         
+         <!-- Header Section -->
+         <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="← بازگشت" />
+            <Label text="نظرات و امتیازدهی" textFill="#2c3e50">
+               <font>
+                  <Font name="Arial Bold" size="24.0" />
+               </font>
+            </Label>
+         </HBox>
+         
+         <!-- Review Tabs -->
+         <TabPane fx:id="reviewTabPane" tabClosingPolicy="UNAVAILABLE">
+            <Tab text="نوشتن نظر">
+               <VBox spacing="20.0">
+                  <padding>
+                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                  </padding>
+                  
+                  <!-- Order Info Card -->
+                  <VBox styleClass="card" spacing="10.0">
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                     
+                     <Label text="اطلاعات سفارش" textFill="#2c3e50">
+                        <font>
+                           <Font name="Arial Bold" size="16.0" />
+                        </font>
+                     </Label>
+                     
+                     <HBox alignment="CENTER_LEFT" spacing="20.0">
+                        <VBox spacing="5.0">
+                           <Label text="رستوران:" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="12.0" />
+                              </font>
+                           </Label>
+                           <Label fx:id="restaurantNameLabel" text="رستوران سنتی پارسی" textFill="#2c3e50">
+                              <font>
+                                 <Font name="Arial Bold" size="14.0" />
+                              </font>
+                           </Label>
+                        </VBox>
+                        
+                        <VBox spacing="5.0">
+                           <Label text="شماره سفارش:" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="12.0" />
+                              </font>
+                           </Label>
+                           <Label fx:id="orderIdLabel" text="#12345" textFill="#2c3e50">
+                              <font>
+                                 <Font name="Arial Bold" size="14.0" />
+                              </font>
+                           </Label>
+                        </VBox>
+                        
+                        <VBox spacing="5.0">
+                           <Label text="تاریخ سفارش:" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="12.0" />
+                              </font>
+                           </Label>
+                           <Label fx:id="orderDateLabel" text="۱۴۰۳/۰۱/۱۵" textFill="#2c3e50">
+                              <font>
+                                 <Font size="14.0" />
+                              </font>
+                           </Label>
+                        </VBox>
+                     </HBox>
+                  </VBox>
+                  
+                  <!-- Rating Section -->
+                  <VBox styleClass="card" spacing="15.0">
+                     <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                     </padding>
+                     
+                     <Label text="امتیاز کلی" textFill="#2c3e50">
+                        <font>
+                           <Font name="Arial Bold" size="16.0" />
+                        </font>
+                     </Label>
+                     
+                     <VBox spacing="10.0">
+                        <Label text="کیفیت کلی رستوران و غذا چطور بود؟" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <HBox fx:id="overallRatingContainer" spacing="5.0">
+                              <Button fx:id="star1Overall" mnemonicParsing="false" onAction="#handleOverallRating" 
+                                      text="☆" styleClass="star-button" userData="1">
+                                 <font>
+                                    <Font size="24.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="star2Overall" mnemonicParsing="false" onAction="#handleOverallRating" 
+                                      text="☆" styleClass="star-button" userData="2">
+                                 <font>
+                                    <Font size="24.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="star3Overall" mnemonicParsing="false" onAction="#handleOverallRating" 
+                                      text="☆" styleClass="star-button" userData="3">
+                                 <font>
+                                    <Font size="24.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="star4Overall" mnemonicParsing="false" onAction="#handleOverallRating" 
+                                      text="☆" styleClass="star-button" userData="4">
+                                 <font>
+                                    <Font size="24.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="star5Overall" mnemonicParsing="false" onAction="#handleOverallRating" 
+                                      text="☆" styleClass="star-button" userData="5">
+                                 <font>
+                                    <Font size="24.0" />
+                                 </font>
+                              </Button>
+                           </HBox>
+                           
+                           <Label fx:id="overallRatingLabel" text="امتیاز خود را انتخاب کنید" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="12.0" />
+                              </font>
+                           </Label>
+                        </HBox>
+                     </VBox>
+                     
+                     <!-- Food Quality Rating -->
+                     <VBox spacing="10.0">
+                        <Label text="کیفیت غذا" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <HBox fx:id="foodRatingContainer" spacing="5.0">
+                              <Button fx:id="star1Food" mnemonicParsing="false" onAction="#handleFoodRating" 
+                                      text="☆" styleClass="star-button-small" userData="1">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="star2Food" mnemonicParsing="false" onAction="#handleFoodRating" 
+                                      text="☆" styleClass="star-button-small" userData="2">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="star3Food" mnemonicParsing="false" onAction="#handleFoodRating" 
+                                      text="☆" styleClass="star-button-small" userData="3">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="star4Food" mnemonicParsing="false" onAction="#handleFoodRating" 
+                                      text="☆" styleClass="star-button-small" userData="4">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="star5Food" mnemonicParsing="false" onAction="#handleFoodRating" 
+                                      text="☆" styleClass="star-button-small" userData="5">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Button>
+                           </HBox>
+                           
+                           <Label fx:id="foodRatingLabel" text="کیفیت غذا" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="10.0" />
+                              </font>
+                           </Label>
+                        </HBox>
+                     </VBox>
+                     
+                     <!-- Delivery Rating -->
+                     <VBox spacing="10.0">
+                        <Label text="کیفیت تحویل" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <HBox fx:id="deliveryRatingContainer" spacing="5.0">
+                              <Button fx:id="star1Delivery" mnemonicParsing="false" onAction="#handleDeliveryRating" 
+                                      text="☆" styleClass="star-button-small" userData="1">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="star2Delivery" mnemonicParsing="false" onAction="#handleDeliveryRating" 
+                                      text="☆" styleClass="star-button-small" userData="2">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="star3Delivery" mnemonicParsing="false" onAction="#handleDeliveryRating" 
+                                      text="☆" styleClass="star-button-small" userData="3">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="star4Delivery" mnemonicParsing="false" onAction="#handleDeliveryRating" 
+                                      text="☆" styleClass="star-button-small" userData="4">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="star5Delivery" mnemonicParsing="false" onAction="#handleDeliveryRating" 
+                                      text="☆" styleClass="star-button-small" userData="5">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </Button>
+                           </HBox>
+                           
+                           <Label fx:id="deliveryRatingLabel" text="سرعت و کیفیت تحویل" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="10.0" />
+                              </font>
+                           </Label>
+                        </HBox>
+                     </VBox>
+                  </VBox>
+                  
+                  <!-- Comment Section -->
+                  <VBox styleClass="card" spacing="15.0">
+                     <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                     </padding>
+                     
+                     <Label text="نظر شما" textFill="#2c3e50">
+                        <font>
+                           <Font name="Arial Bold" size="16.0" />
+                        </font>
+                     </Label>
+                     
+                     <VBox spacing="10.0">
+                        <Label text="تجربه خود را با دیگران به اشتراک بگذارید (اختیاری)" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        
+                        <TextArea fx:id="commentTextArea" promptText="نظر خود را بنویسید..." 
+                                  wrapText="true" prefRowCount="4" styleClass="text-area" />
+                        
+                        <Label fx:id="characterCountLabel" text="0/500 کاراکتر" textFill="#bdc3c7" alignment="CENTER_RIGHT">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
+                     </VBox>
+                     
+                     <!-- Quick Comment Options -->
+                     <VBox spacing="10.0">
+                        <Label text="یا یکی از گزینه‌های زیر را انتخاب کنید:" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        
+                        <FlowPane hgap="10.0" vgap="10.0">
+                           <Button fx:id="quickComment1" mnemonicParsing="false" onAction="#handleQuickComment" 
+                                   text="عالی بود!" styleClass="tag-button" userData="عالی بود! پیشنهاد می‌کنم." />
+                           <Button fx:id="quickComment2" mnemonicParsing="false" onAction="#handleQuickComment" 
+                                   text="غذا خوشمزه بود" styleClass="tag-button" userData="غذا خوشمزه بود و تحویل سریع." />
+                           <Button fx:id="quickComment3" mnemonicParsing="false" onAction="#handleQuickComment" 
+                                   text="تحویل سریع" styleClass="tag-button" userData="تحویل سریع و پیک مودب." />
+                           <Button fx:id="quickComment4" mnemonicParsing="false" onAction="#handleQuickComment" 
+                                   text="کیفیت قابل قبول" styleClass="tag-button" userData="کیفیت قابل قبول اما قابل بهبود." />
+                           <Button fx:id="quickComment5" mnemonicParsing="false" onAction="#handleQuickComment" 
+                                   text="نیاز به بهبود" styleClass="tag-button" userData="کیفیت نیاز به بهبود دارد." />
+                        </FlowPane>
+                     </VBox>
+                  </VBox>
+                  
+                  <!-- Submit Section -->
+                  <HBox alignment="CENTER" spacing="15.0">
+                     <Button fx:id="cancelReviewButton" mnemonicParsing="false" onAction="#handleCancelReview" 
+                             text="انصراف" styleClass="secondary-button" />
+                     <Button fx:id="submitReviewButton" mnemonicParsing="false" onAction="#handleSubmitReview" 
+                             text="ثبت نظر" styleClass="primary-button" />
+                  </HBox>
+               </VBox>
+            </Tab>
+            
+            <Tab text="نظرات قبلی">
+               <VBox spacing="20.0">
+                  <padding>
+                     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                  </padding>
+                  
+                  <!-- Filter Section -->
+                  <HBox alignment="CENTER_LEFT" spacing="15.0">
+                     <Label text="فیلتر بر اساس:" textFill="#7f8c8d">
+                        <font>
+                           <Font size="12.0" />
+                        </font>
+                     </Label>
+                     
+                     <ComboBox fx:id="ratingFilterComboBox" promptText="همه امتیازها" prefWidth="120.0">
+                        <items>
+                           <FXCollections fx:factory="observableArrayList">
+                              <String fx:value="همه امتیازها" />
+                              <String fx:value="5 ستاره" />
+                              <String fx:value="4 ستاره" />
+                              <String fx:value="3 ستاره" />
+                              <String fx:value="2 ستاره" />
+                              <String fx:value="1 ستاره" />
+                           </FXCollections>
+                        </items>
+                     </ComboBox>
+                     
+                     <ComboBox fx:id="dateFilterComboBox" promptText="همه تاریخ‌ها" prefWidth="120.0">
+                        <items>
+                           <FXCollections fx:factory="observableArrayList">
+                              <String fx:value="همه تاریخ‌ها" />
+                              <String fx:value="هفته گذشته" />
+                              <String fx:value="ماه گذشته" />
+                              <String fx:value="سه ماه گذشته" />
+                           </FXCollections>
+                        </items>
+                     </ComboBox>
+                     
+                     <Button fx:id="applyFilterButton" mnemonicParsing="false" onAction="#handleApplyFilter" 
+                             text="اعمال فیلتر" styleClass="secondary-button" />
+                  </HBox>
+                  
+                  <!-- Reviews List -->
+                  <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
+                     <VBox fx:id="reviewsContainer" spacing="15.0">
+                        <!-- Reviews will be loaded dynamically -->
+                        
+                        <!-- Sample Review -->
+                        <VBox styleClass="card" spacing="10.0">
+                           <padding>
+                              <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                           </padding>
+                           
+                           <HBox alignment="CENTER_LEFT" spacing="15.0">
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <Label text="رستوران سنتی پارسی" textFill="#2c3e50">
+                                       <font>
+                                          <Font name="Arial Bold" size="14.0" />
+                                       </font>
+                                    </Label>
+                                    
+                                    <HBox spacing="2.0">
+                                       <Label text="★★★★☆" textFill="#f39c12">
+                                          <font>
+                                             <Font size="14.0" />
+                                          </font>
+                                       </Label>
+                                       <Label text="4.0" textFill="#7f8c8d">
+                                          <font>
+                                             <Font size="12.0" />
+                                          </font>
+                                       </Label>
+                                    </HBox>
+                                 </HBox>
+                                 
+                                 <Label text="سفارش #12345 - ۱۴۰۳/۰۱/۱۵" textFill="#7f8c8d">
+                                    <font>
+                                       <Font size="11.0" />
+                                    </font>
+                                 </Label>
+                                 
+                                 <Label text="غذا خوشمزه بود و تحویل سریع. پیشنهاد می‌کنم." textFill="#2c3e50" wrapText="true">
+                                    <font>
+                                       <Font size="12.0" />
+                                    </font>
+                                 </Label>
+                              </VBox>
+                              
+                              <VBox alignment="TOP_RIGHT" spacing="5.0">
+                                 <Button fx:id="editReviewButton1" mnemonicParsing="false" onAction="#handleEditReview" 
+                                         text="ویرایش" styleClass="small-button" userData="12345" />
+                                 <Button fx:id="deleteReviewButton1" mnemonicParsing="false" onAction="#handleDeleteReview" 
+                                         text="حذف" styleClass="small-danger-button" userData="12345" />
+                              </VBox>
+                           </HBox>
+                        </VBox>
+                        
+                        <!-- No Reviews Message -->
+                        <VBox fx:id="noReviewsContainer" alignment="CENTER" spacing="15.0" visible="false" managed="false">
+                           <Label text="هنوز نظری ثبت نکرده‌اید" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="16.0" />
+                              </font>
+                           </Label>
+                           <Label text="پس از دریافت سفارش، می‌توانید نظر خود را ثبت کنید" textFill="#bdc3c7">
+                              <font>
+                                 <Font size="12.0" />
+                              </font>
+                           </Label>
+                        </VBox>
+                     </VBox>
+                  </ScrollPane>
+               </VBox>
+            </Tab>
+         </TabPane>
+      </VBox>
+   </top>
+   
+   <stylesheets>
+      <URL value="@../styles.css" />
+   </stylesheets>
+</BorderPane>

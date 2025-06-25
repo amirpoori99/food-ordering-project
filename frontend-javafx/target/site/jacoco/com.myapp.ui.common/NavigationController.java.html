@@ -73,7 +73,7 @@ public class NavigationController {
         // Ensure stage operations are performed on JavaFX Application Thread
 <span class="pc bpc" id="L74" title="1 of 2 branches missed.">        if (Platform.isFxApplicationThread()) {</span>
 <span class="nc" id="L75">            initializeStageProperties();</span>
-<span class="nc" id="L76">        } else {</span>
+        } else {
 <span class="fc" id="L77">            Platform.runLater(this::initializeStageProperties);</span>
         }
 <span class="fc" id="L79">    }</span>
@@ -104,7 +104,7 @@ public class NavigationController {
         
 <span class="fc bfc" id="L105" title="All 2 branches covered.">        if (Platform.isFxApplicationThread()) {</span>
 <span class="nc" id="L106">            navigateToInternal(sceneName);</span>
-<span class="nc" id="L107">        } else {</span>
+        } else {
 <span class="fc" id="L108">            Platform.runLater(() -&gt; navigateToInternal(sceneName));</span>
         }
 <span class="fc" id="L110">    }</span>
@@ -123,12 +123,12 @@ public class NavigationController {
                 // Update window title based on scene
 <span class="fc" id="L124">                updateWindowTitle(sceneName);</span>
             }
-<span class="pc" id="L126">        } catch (IOException e) {</span>
+<span class="nc" id="L126">        } catch (IOException e) {</span>
 <span class="nc bnc" id="L127" title="All 2 branches missed.">            if (!isTestMode()) {</span>
 <span class="nc" id="L128">                showError(&quot;Navigation Error&quot;, &quot;Could not load scene: &quot; + sceneName, e);</span>
             }
             // In test mode, silently handle the error to reduce noise
-        }
+<span class="fc" id="L131">        }</span>
 <span class="fc" id="L132">    }</span>
     
     /**
@@ -204,7 +204,7 @@ public class NavigationController {
 <span class="fc bfc" id="L204" title="All 2 branches covered.">        if (HttpClientUtil.isAuthenticated()) {</span>
             // User is authenticated, go to main screen
 <span class="fc" id="L206">            navigateTo(RESTAURANT_LIST_SCENE);</span>
-<span class="fc" id="L207">        } else {</span>
+        } else {
             // User not authenticated, go to login
 <span class="fc" id="L209">            navigateTo(LOGIN_SCENE);</span>
         }

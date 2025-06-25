@@ -318,6 +318,7 @@ public class ItemController implements HttpHandler {
         return null;
     }
     
+    @SuppressWarnings("unchecked")
     private Map<String, Object> parseJsonRequest(HttpExchange exchange) throws IOException {
         String requestBody = new String(exchange.getRequestBody().readAllBytes());
         return JsonUtil.fromJson(requestBody, Map.class);

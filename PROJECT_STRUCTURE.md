@@ -2,7 +2,7 @@
 
 ## 📊 **Project Overview: Enterprise-Grade Architecture**
 
-**Current Status:** Production Ready | **Test Coverage:** 95.3% | **Quality:** Industry Leading
+**Current Status:** 95% Complete | **Test Coverage:** 95.3% | **Technology:** Pure Java + JavaFX
 
 ---
 
@@ -10,7 +10,7 @@
 
 ```
 food-ordering-project/
-├── 📁 backend/                         # Java Spring Boot Backend
+├── 📁 backend/                         # Pure Java Backend (No Spring Framework)
 ├── 📁 frontend-javafx/                 # JavaFX Frontend Application  
 ├── 📄 README.md                        # Main project documentation
 ├── 📄 PROJECT_STRUCTURE.md             # This file - Complete structure
@@ -23,7 +23,7 @@ food-ordering-project/
 
 ---
 
-## 🏢 **Backend Structure (Java Spring Boot)**
+## 🏢 **Backend Structure (Pure Java with HttpServer)**
 
 ### **📁 Source Code Structure**
 
@@ -140,13 +140,12 @@ backend/
 │   │   │   │   ├── 📄 VendorService.java
 │   │   │   │   └── 📄 VendorRepository.java
 │   │   │   │
-│   │   │   └── 📄 ServerApp.java            # Main Application Entry Point
+│   │   │   └── 📄 ServerApp.java            # Main Application Entry Point (HttpServer)
 │   │   │
 │   │   └── 📁 resources/                    # Configuration Files
-│   │       ├── 📄 application.yml           # Spring Boot configuration
 │   │       ├── 📄 hibernate.cfg.xml         # Hibernate ORM configuration
 │   │       ├── 📄 logback.xml              # Logging configuration
-│   │       └── 📄 schema.sql               # Database schema
+│   │       └── 📄 openapi.yaml             # API documentation (2,504 lines)
 │   │
 │   └── 📁 test/                            # Comprehensive Test Suite
 │       └── 📁 java/com/myapp/
@@ -363,6 +362,7 @@ frontend-javafx/
 │           │   └── 📄 SessionManagementTest.java    # ✅ Session UI testing
 │           │
 │           ├── 📁 common/                   # Common UI Tests
+│           │   ├── 📄 BaseTestClass.java             # ✅ NEW - Base test framework
 │           │   ├── 📄 NavigationControllerTest.java # ✅ Navigation testing
 │           │   ├── 📄 AlertManagerTest.java         # ✅ Alert system testing
 │           │   ├── 📄 ValidationManagerTest.java    # ✅ Validation testing

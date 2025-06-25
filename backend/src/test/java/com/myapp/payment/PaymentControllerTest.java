@@ -196,7 +196,7 @@ class PaymentControllerTest {
 
             // Then
             assertNotNull(response);
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertTrue((Boolean) responseMap.get("success"));
             assertEquals("Payment processed successfully", responseMap.get("message"));
             
@@ -221,7 +221,7 @@ class PaymentControllerTest {
 
             // Then
             assertNotNull(response);
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertTrue((Boolean) responseMap.get("success"));
             
             verify(paymentService).processPayment(1L, 1L, "WALLET");
@@ -245,7 +245,7 @@ class PaymentControllerTest {
 
             // Then
             assertNotNull(response);
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertTrue((Boolean) responseMap.get("success"));
             
             verify(paymentService).processPayment(1L, 1L, "CASH_ON_DELIVERY");
@@ -655,6 +655,11 @@ class PaymentControllerTest {
     }
 
     // ==================== HELPER METHODS ====================
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> parseJsonToMap(String json) {
+        return JsonUtil.fromJson(json, Map.class);
+    }
 
     private Transaction createSampleTransaction(Long id, Double amount, TransactionType type) {
         Transaction transaction = new Transaction();

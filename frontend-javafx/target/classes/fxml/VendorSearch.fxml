@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.ui.vendor.VendorSearchController">
+   <top>
+      <VBox spacing="15.0">
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+         
+         <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="← بازگشت" />
+            <Label text="جستجوی رستوران‌ها" textFill="#2c3e50">
+               <font>
+                  <Font name="Arial Bold" size="24.0" />
+               </font>
+            </Label>
+         </HBox>
+         
+         <!-- Search Bar -->
+         <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <TextField fx:id="searchField" promptText="جستجو بر اساس نام رستوران، نوع غذا..." 
+                       prefWidth="300.0" HBox.hgrow="ALWAYS" />
+            
+            <ComboBox fx:id="categoryFilterComboBox" promptText="همه دسته‌ها" prefWidth="150.0">
+               <items>
+                  <FXCollections fx:factory="observableArrayList">
+                     <String fx:value="همه دسته‌ها" />
+                     <String fx:value="سنتی ایرانی" />
+                     <String fx:value="فست فود" />
+                     <String fx:value="ایتالیایی" />
+                     <String fx:value="کافه" />
+                     <String fx:value="شیرینی" />
+                  </FXCollections>
+               </items>
+            </ComboBox>
+            
+            <ComboBox fx:id="sortComboBox" value="محبوب‌ترین" prefWidth="120.0">
+               <items>
+                  <FXCollections fx:factory="observableArrayList">
+                     <String fx:value="محبوب‌ترین" />
+                     <String fx:value="نزدیک‌ترین" />
+                     <String fx:value="ارزان‌ترین" />
+                     <String fx:value="بالاترین امتیاز" />
+                     <String fx:value="سریع‌ترین" />
+                  </FXCollections>
+               </items>
+            </ComboBox>
+            
+            <Button fx:id="searchButton" mnemonicParsing="false" onAction="#handleSearch" 
+                    text="🔍" styleClass="icon-button" />
+         </HBox>
+         
+         <!-- Quick Filters -->
+         <FlowPane hgap="10.0" vgap="5.0">
+            <ToggleButton fx:id="deliveryFilter" text="ارسال رایگان" styleClass="filter-toggle" />
+            <ToggleButton fx:id="openNowFilter" text="اکنون باز" styleClass="filter-toggle" />
+            <ToggleButton fx:id="fastDeliveryFilter" text="ارسال سریع" styleClass="filter-toggle" />
+            <ToggleButton fx:id="discountFilter" text="تخفیف دارد" styleClass="filter-toggle" />
+            <ToggleButton fx:id="highRatingFilter" text="امتیاز بالا" styleClass="filter-toggle" />
+         </FlowPane>
+      </VBox>
+   </top>
+   
+   <center>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+         <VBox spacing="15.0">
+            <padding>
+               <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
+            </padding>
+            
+            <!-- Results Header -->
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <Label fx:id="resultsCountLabel" text="۱۵ رستوران یافت شد" textFill="#7f8c8d">
+                  <font>
+                     <Font size="12.0" />
+                  </font>
+               </Label>
+               
+               <Region HBox.hgrow="ALWAYS" />
+               
+               <ToggleButton fx:id="viewModeToggle" text="نمایش شبکه‌ای" styleClass="view-toggle" />
+            </HBox>
+            
+            <!-- Vendor Results -->
+            <VBox fx:id="vendorResultsContainer" spacing="15.0">
+               <!-- Sample Vendor Card -->
+               <HBox styleClass="vendor-card" spacing="15.0" onMouseClicked="#handleVendorClick" userData="1">
+                  <padding>
+                     <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                  </padding>
+                  
+                  <!-- Vendor Image Placeholder -->
+                  <VBox alignment="CENTER" prefWidth="100.0" prefHeight="80.0" styleClass="vendor-image">
+                     <Label text="🏪" textFill="#bdc3c7">
+                        <font>
+                           <Font size="32.0" />
+                        </font>
+                     </Label>
+                  </VBox>
+                  
+                  <!-- Vendor Info -->
+                  <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                     <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Label text="رستوران سنتی پارسی" textFill="#2c3e50">
+                           <font>
+                              <Font name="Arial Bold" size="16.0" />
+                           </font>
+                        </Label>
+                        
+                        <HBox spacing="5.0">
+                           <Label text="★★★★☆" textFill="#f39c12">
+                              <font>
+                                 <Font size="12.0" />
+                              </font>
+                           </Label>
+                           <Label text="4.2" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Label>
+                           <Label text="(۱۲۴ نظر)" textFill="#bdc3c7">
+                              <font>
+                                 <Font size="10.0" />
+                              </font>
+                           </Label>
+                        </HBox>
+                        
+                        <Label text="باز" textFill="#27ae60" styleClass="open-badge" />
+                     </HBox>
+                     
+                     <Label text="غذاهای سنتی ایرانی • خیابان ولیعصر" textFill="#7f8c8d">
+                        <font>
+                           <Font size="12.0" />
+                        </font>
+                     </Label>
+                     
+                     <HBox alignment="CENTER_LEFT" spacing="15.0">
+                        <Label text="🕒 ۲۰-۳۰ دقیقه" textFill="#7f8c8d">
+                           <font>
+                              <Font size="11.0" />
+                           </font>
+                        </Label>
+                        
+                        <Label text="🚚 ارسال رایگان" textFill="#27ae60">
+                           <font>
+                              <Font size="11.0" />
+                           </font>
+                        </Label>
+                        
+                        <Label text="💰 حداقل ۵۰,۰۰۰ تومان" textFill="#7f8c8d">
+                           <font>
+                              <Font size="11.0" />
+                           </font>
+                        </Label>
+                     </HBox>
+                     
+                     <HBox spacing="8.0">
+                        <Label text="۲۰٪ تخفیف" textFill="#e74c3c" styleClass="discount-badge" />
+                        <Label text="تحویل سریع" textFill="#3498db" styleClass="feature-badge" />
+                     </HBox>
+                  </VBox>
+                  
+                  <!-- Action Buttons -->
+                  <VBox spacing="8.0" alignment="CENTER_RIGHT">
+                     <Button fx:id="favoriteButton1" mnemonicParsing="false" onAction="#handleToggleFavorite" 
+                             text="♡" styleClass="favorite-button" userData="1" />
+                     <Button fx:id="viewMenuButton1" mnemonicParsing="false" onAction="#handleViewMenu" 
+                             text="مشاهده منو" styleClass="primary-button" userData="1" />
+                  </VBox>
+               </HBox>
+               
+               <!-- No Results Message -->
+               <VBox fx:id="noResultsContainer" alignment="CENTER" spacing="15.0" visible="false" managed="false">
+                  <Label text="هیچ رستورانی یافت نشد" textFill="#7f8c8d">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label text="فیلترهای جستجو را تغییر دهید" textFill="#bdc3c7">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                  </Label>
+               </VBox>
+            </VBox>
+         </VBox>
+      </ScrollPane>
+   </center>
+   
+   <stylesheets>
+      <URL value="@../styles.css" />
+   </stylesheets>
+</BorderPane>

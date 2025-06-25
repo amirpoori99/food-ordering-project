@@ -124,23 +124,23 @@ import java.util.stream.Collectors;
     private void setupFilterCombos() {
         // Status filter
 <span class="nc" id="L126">        statusFilterCombo.getItems().addAll(</span>
-<span class="nc" id="L127">            &quot;همه وضعیت‌ها&quot;,</span>
-<span class="nc" id="L128">            &quot;در انتظار تأیید&quot;, </span>
-<span class="nc" id="L129">            &quot;در حال آماده‌سازی&quot;, </span>
-<span class="nc" id="L130">            &quot;آماده ارسال&quot;, </span>
-<span class="nc" id="L131">            &quot;در حال ارسال&quot;, </span>
-<span class="nc" id="L132">            &quot;تحویل داده شده&quot;, </span>
-<span class="nc" id="L133">            &quot;لغو شده&quot;</span>
+            &quot;همه وضعیت‌ها&quot;,
+            &quot;در انتظار تأیید&quot;, 
+            &quot;در حال آماده‌سازی&quot;, 
+            &quot;آماده ارسال&quot;, 
+            &quot;در حال ارسال&quot;, 
+            &quot;تحویل داده شده&quot;, 
+            &quot;لغو شده&quot;
         );
 <span class="nc" id="L135">        statusFilterCombo.setValue(&quot;همه وضعیت‌ها&quot;);</span>
         
         // Date filter
 <span class="nc" id="L138">        dateFilterCombo.getItems().addAll(</span>
-<span class="nc" id="L139">            &quot;همه تاریخ‌ها&quot;,</span>
-<span class="nc" id="L140">            &quot;امروز&quot;,</span>
-<span class="nc" id="L141">            &quot;هفته گذشته&quot;, </span>
-<span class="nc" id="L142">            &quot;ماه گذشته&quot;,</span>
-<span class="nc" id="L143">            &quot;3 ماه گذشته&quot;</span>
+            &quot;همه تاریخ‌ها&quot;,
+            &quot;امروز&quot;,
+            &quot;هفته گذشته&quot;, 
+            &quot;ماه گذشته&quot;,
+            &quot;3 ماه گذشته&quot;
         );
 <span class="nc" id="L145">        dateFilterCombo.setValue(&quot;همه تاریخ‌ها&quot;);</span>
 <span class="nc" id="L146">    }</span>
@@ -172,58 +172,58 @@ import java.util.stream.Collectors;
 <span class="nc" id="L172">                List&lt;OrderHistory&gt; mockOrders = new ArrayList&lt;&gt;();</span>
                 
 <span class="nc" id="L174">                mockOrders.add(new OrderHistory(</span>
-<span class="nc" id="L175">                    &quot;FO123456&quot;, </span>
+                    &quot;FO123456&quot;, 
 <span class="nc" id="L176">                    LocalDateTime.now().minusDays(1),</span>
-<span class="nc" id="L177">                    &quot;تحویل داده شده&quot;,</span>
-<span class="nc" id="L178">                    &quot;رستوران ایتالیایی&quot;,</span>
-<span class="nc" id="L179">                    68000.0,</span>
+                    &quot;تحویل داده شده&quot;,
+                    &quot;رستوران ایتالیایی&quot;,
+                    68000.0,
 <span class="nc" id="L180">                    Arrays.asList(</span>
-<span class="nc" id="L181">                        new OrderItem(&quot;پیتزا مارگاریتا&quot;, 25000.0, 2),</span>
-<span class="nc" id="L182">                        new OrderItem(&quot;نوشابه&quot;, 9000.0, 2)</span>
+                        new OrderItem(&quot;پیتزا مارگاریتا&quot;, 25000.0, 2),
+                        new OrderItem(&quot;نوشابه&quot;, 9000.0, 2)
                     ),
-<span class="nc" id="L184">                    &quot;تهران، خیابان ولیعصر، پلاک 123&quot;,</span>
-<span class="nc" id="L185">                    &quot;09123456789&quot;,</span>
+                    &quot;تهران، خیابان ولیعصر، پلاک 123&quot;,
+                    &quot;09123456789&quot;,
 <span class="nc" id="L186">                    LocalDateTime.now().minusDays(1).plusHours(1),</span>
-<span class="nc" id="L187">                    &quot;پرداخت با کارت&quot;,</span>
-<span class="nc" id="L188">                    &quot;پرداخت شده&quot;,</span>
-<span class="nc" id="L189">                    &quot;PAY789123&quot;</span>
+                    &quot;پرداخت با کارت&quot;,
+                    &quot;پرداخت شده&quot;,
+                    &quot;PAY789123&quot;
                 ));
                 
 <span class="nc" id="L192">                mockOrders.add(new OrderHistory(</span>
-<span class="nc" id="L193">                    &quot;FO123457&quot;,</span>
+                    &quot;FO123457&quot;,
 <span class="nc" id="L194">                    LocalDateTime.now().minusDays(3),</span>
-<span class="nc" id="L195">                    &quot;در حال ارسال&quot;,</span>
-<span class="nc" id="L196">                    &quot;فست فود سارا&quot;,</span>
-<span class="nc" id="L197">                    45000.0,</span>
+                    &quot;در حال ارسال&quot;,
+                    &quot;فست فود سارا&quot;,
+                    45000.0,
 <span class="nc" id="L198">                    Arrays.asList(</span>
-<span class="nc" id="L199">                        new OrderItem(&quot;برگر کلاسیک&quot;, 18000.0, 1),</span>
-<span class="nc" id="L200">                        new OrderItem(&quot;سیب زمینی&quot;, 12000.0, 1),</span>
-<span class="nc" id="L201">                        new OrderItem(&quot;نوشابه&quot;, 9000.0, 1)</span>
+                        new OrderItem(&quot;برگر کلاسیک&quot;, 18000.0, 1),
+                        new OrderItem(&quot;سیب زمینی&quot;, 12000.0, 1),
+                        new OrderItem(&quot;نوشابه&quot;, 9000.0, 1)
                     ),
-<span class="nc" id="L203">                    &quot;تهران، میدان آزادی، کوچه گل‌ها&quot;,</span>
-<span class="nc" id="L204">                    &quot;09987654321&quot;,</span>
+                    &quot;تهران، میدان آزادی، کوچه گل‌ها&quot;,
+                    &quot;09987654321&quot;,
 <span class="nc" id="L205">                    LocalDateTime.now().plusMinutes(30),</span>
-<span class="nc" id="L206">                    &quot;پرداخت در محل&quot;,</span>
-<span class="nc" id="L207">                    &quot;در انتظار&quot;,</span>
-<span class="nc" id="L208">                    &quot;COD456789&quot;</span>
+                    &quot;پرداخت در محل&quot;,
+                    &quot;در انتظار&quot;,
+                    &quot;COD456789&quot;
                 ));
                 
 <span class="nc" id="L211">                mockOrders.add(new OrderHistory(</span>
-<span class="nc" id="L212">                    &quot;FO123458&quot;,</span>
+                    &quot;FO123458&quot;,
 <span class="nc" id="L213">                    LocalDateTime.now().minusDays(7),</span>
-<span class="nc" id="L214">                    &quot;لغو شده&quot;,</span>
-<span class="nc" id="L215">                    &quot;رستوران سنتی&quot;,</span>
-<span class="nc" id="L216">                    85000.0,</span>
+                    &quot;لغو شده&quot;,
+                    &quot;رستوران سنتی&quot;,
+                    85000.0,
 <span class="nc" id="L217">                    Arrays.asList(</span>
-<span class="nc" id="L218">                        new OrderItem(&quot;چلو کباب کوبیده&quot;, 35000.0, 1),</span>
-<span class="nc" id="L219">                        new OrderItem(&quot;چلو کباب برگ&quot;, 45000.0, 1)</span>
+                        new OrderItem(&quot;چلو کباب کوبیده&quot;, 35000.0, 1),
+                        new OrderItem(&quot;چلو کباب برگ&quot;, 45000.0, 1)
                     ),
-<span class="nc" id="L221">                    &quot;تهران، خیابان کریمخان، پلاک 45&quot;,</span>
-<span class="nc" id="L222">                    &quot;09334455666&quot;,</span>
-<span class="nc" id="L223">                    null,</span>
-<span class="nc" id="L224">                    &quot;کیف پول&quot;,</span>
-<span class="nc" id="L225">                    &quot;لغو شده&quot;,</span>
-<span class="nc" id="L226">                    &quot;CANCEL123&quot;</span>
+                    &quot;تهران، خیابان کریمخان، پلاک 45&quot;,
+                    &quot;09334455666&quot;,
+                    null,
+                    &quot;کیف پول&quot;,
+                    &quot;لغو شده&quot;,
+                    &quot;CANCEL123&quot;
                 ));
                 
 <span class="nc" id="L229">                return mockOrders;</span>
@@ -327,7 +327,7 @@ import java.util.stream.Collectors;
 <span class="nc bnc" id="L327" title="All 2 branches missed.">        for (OrderHistory order : filteredOrders) {</span>
 <span class="nc" id="L328">            VBox orderBox = createOrderListItem(order);</span>
 <span class="nc" id="L329">            orderListContainer.getChildren().add(orderBox);</span>
-        }
+<span class="nc" id="L330">        }</span>
 <span class="nc" id="L331">    }</span>
 
     /**
@@ -374,7 +374,7 @@ import java.util.stream.Collectors;
 <span class="nc" id="L374">            orderBox.setStyle(orderBox.getStyle() + &quot;-fx-background-color: #f8f9fa;&quot;));</span>
 <span class="nc" id="L375">        orderBox.setOnMouseExited(e -&gt; </span>
 <span class="nc" id="L376">            orderBox.setStyle(orderBox.getStyle().replace(&quot;-fx-background-color: #f8f9fa;&quot;, </span>
-<span class="nc" id="L377">                                                         &quot;-fx-background-color: white;&quot;)));</span>
+                                                         &quot;-fx-background-color: white;&quot;)));
         
 <span class="nc" id="L379">        return orderBox;</span>
     }
@@ -442,7 +442,7 @@ import java.util.stream.Collectors;
             
 <span class="nc" id="L443">            itemBox.getChildren().addAll(nameLabel, quantityLabel, priceLabel);</span>
 <span class="nc" id="L444">            orderItemsContainer.getChildren().add(itemBox);</span>
-        }
+<span class="nc" id="L445">        }</span>
 <span class="nc" id="L446">    }</span>
 
     /**
@@ -783,10 +783,10 @@ import java.util.stream.Collectors;
         private String paymentStatus;
         private String trackingNumber;
 
-<span class="fc" id="L786">        public OrderHistory(String orderNumber, LocalDateTime orderDate, String status, </span>
+        public OrderHistory(String orderNumber, LocalDateTime orderDate, String status, 
                           String restaurantName, double totalAmount, List&lt;OrderItem&gt; items,
                           String deliveryAddress, String deliveryPhone, LocalDateTime deliveryTime,
-                          String paymentMethod, String paymentStatus, String trackingNumber) {
+<span class="fc" id="L789">                          String paymentMethod, String paymentStatus, String trackingNumber) {</span>
 <span class="fc" id="L790">            this.orderNumber = orderNumber;</span>
 <span class="fc" id="L791">            this.orderDate = orderDate;</span>
 <span class="fc" id="L792">            this.status = status;</span>

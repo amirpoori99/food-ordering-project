@@ -206,7 +206,7 @@ public class CouponController implements HttpHandler {
     
     private void createCoupon(HttpExchange exchange) throws IOException {
         String requestBody = new String(exchange.getRequestBody().readAllBytes());
-        Map<String, Object> requestData = JsonUtil.fromJson(requestBody, Map.class);
+        Map<String, Object> requestData = parseJsonRequest(requestBody);
         
         String code = getStringFromMap(requestData, "code");
         String description = getStringFromMap(requestData, "description");
@@ -258,7 +258,7 @@ public class CouponController implements HttpHandler {
     
     private void activateCoupon(HttpExchange exchange, Long id) throws IOException {
         String requestBody = new String(exchange.getRequestBody().readAllBytes());
-        Map<String, Object> requestData = JsonUtil.fromJson(requestBody, Map.class);
+        Map<String, Object> requestData = parseJsonRequest(requestBody);
         Long activatedBy = getLongFromMap(requestData, "activatedBy");
         
         couponService.activateCoupon(id, activatedBy);
@@ -267,7 +267,7 @@ public class CouponController implements HttpHandler {
     
     private void deactivateCoupon(HttpExchange exchange, Long id) throws IOException {
         String requestBody = new String(exchange.getRequestBody().readAllBytes());
-        Map<String, Object> requestData = JsonUtil.fromJson(requestBody, Map.class);
+        Map<String, Object> requestData = parseJsonRequest(requestBody);
         Long deactivatedBy = getLongFromMap(requestData, "deactivatedBy");
         
         couponService.deactivateCoupon(id, deactivatedBy);
@@ -276,7 +276,7 @@ public class CouponController implements HttpHandler {
     
     private void applyCoupon(HttpExchange exchange) throws IOException {
         String requestBody = new String(exchange.getRequestBody().readAllBytes());
-        Map<String, Object> requestData = JsonUtil.fromJson(requestBody, Map.class);
+        Map<String, Object> requestData = parseJsonRequest(requestBody);
         
         String couponCode = getStringFromMap(requestData, "couponCode");
         Double orderAmount = getDoubleFromMap(requestData, "orderAmount");
@@ -315,7 +315,7 @@ public class CouponController implements HttpHandler {
     
     private void updateCoupon(HttpExchange exchange, Long id) throws IOException {
         String requestBody = new String(exchange.getRequestBody().readAllBytes());
-        Map<String, Object> requestData = JsonUtil.fromJson(requestBody, Map.class);
+        Map<String, Object> requestData = parseJsonRequest(requestBody);
         
         String description = getStringFromMap(requestData, "description");
         Double minOrderAmount = getDoubleFromMap(requestData, "minOrderAmount");
@@ -351,7 +351,7 @@ public class CouponController implements HttpHandler {
     
     private void deleteCoupon(HttpExchange exchange, Long id) throws IOException {
         String requestBody = new String(exchange.getRequestBody().readAllBytes());
-        Map<String, Object> requestData = JsonUtil.fromJson(requestBody, Map.class);
+        Map<String, Object> requestData = parseJsonRequest(requestBody);
         Long deletedBy = getLongFromMap(requestData, "deletedBy");
         
         couponService.deleteCoupon(id, deletedBy);
@@ -359,6 +359,11 @@ public class CouponController implements HttpHandler {
     }
     
     // ==================== HELPER METHODS ====================
+    
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> parseJsonRequest(String requestBody) {
+        return JsonUtil.fromJson(requestBody, Map.class);
+    }
     
     private Long extractIdFromPath(String path) {
         String[] parts = path.split("/");

@@ -240,6 +240,7 @@ public class FavoritesController implements HttpHandler {
     /**
      * Handle POST requests
      */
+    @SuppressWarnings("unchecked")
     private void handlePost(HttpExchange exchange, String endpoint) throws IOException {
         String requestBody = new String(exchange.getRequestBody().readAllBytes());
         
@@ -273,6 +274,7 @@ public class FavoritesController implements HttpHandler {
     /**
      * Handle PUT requests
      */
+    @SuppressWarnings("unchecked")
     private void handlePut(HttpExchange exchange, String endpoint) throws IOException {
         String requestBody = new String(exchange.getRequestBody().readAllBytes());
         

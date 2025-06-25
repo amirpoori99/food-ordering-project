@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.ui.auth.RegisterController">
+   <content>
+      <VBox>
+         <children>
+            <Label text="ثبت‌نام در سیستم" />
+            <TextField fx:id="fullNameField" promptText="نام کامل" />
+            <TextField fx:id="phoneField" promptText="شماره تلفن" />
+            <TextField fx:id="emailField" promptText="ایمیل (اختیاری)" />
+            <PasswordField fx:id="passwordField" promptText="رمز عبور" />
+            <PasswordField fx:id="confirmPasswordField" promptText="تکرار رمز عبور" />
+            <TextArea fx:id="addressField" promptText="آدرس" />
+            <ComboBox fx:id="roleComboBox" promptText="نقش" />
+            <Button fx:id="registerButton" onAction="#handleRegister" text="ثبت‌نام" />
+            <Hyperlink fx:id="loginLink" onAction="#handleLoginLink" text="ورود" />
+            <Label fx:id="statusLabel" text="" />
+            <ProgressIndicator fx:id="loadingIndicator" visible="false" />
+         </children>
+      </VBox>
+   </content>
+</ScrollPane>

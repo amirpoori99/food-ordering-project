@@ -29,6 +29,7 @@ public class LoginController implements Initializable {
 
     private NavigationController navigationController;
     private Preferences preferences;
+    private boolean isLoginInProgress = false;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -74,6 +75,11 @@ public class LoginController implements Initializable {
      */
     @FXML
     private void handleLogin() {
+        // Prevent multiple login attempts
+        if (isLoginInProgress) {
+            return;
+        }
+        
         String phone = phoneField.getText().trim();
         String password = passwordField.getText();
         
@@ -83,6 +89,7 @@ public class LoginController implements Initializable {
         }
         
         // Start login process
+        isLoginInProgress = true;
         setLoading(true);
         clearStatus();
         
@@ -96,6 +103,7 @@ public class LoginController implements Initializable {
         
         loginTask.setOnSucceeded(e -> {
             Platform.runLater(() -> {
+                isLoginInProgress = false;
                 setLoading(false);
                 HttpClientUtil.ApiResponse response = loginTask.getValue();
                 handleLoginResponse(response, phone);
@@ -104,6 +112,7 @@ public class LoginController implements Initializable {
         
         loginTask.setOnFailed(e -> {
             Platform.runLater(() -> {
+                isLoginInProgress = false;
                 setLoading(false);
                 Throwable exception = loginTask.getException();
                 handleLoginError(exception);
@@ -182,9 +191,17 @@ public class LoginController implements Initializable {
     public void handleLoginError(Throwable exception) {
         String errorMessage = "خطا در اتصال به سرور";
         
-        if (exception instanceof IOException) {
+        if (exception == null) {
+            errorMessage = "خطا در اتصال به سرور";
+        } else if (exception instanceof java.net.SocketTimeoutException || 
+                   exception.getMessage() != null && exception.getMessage().contains("timeout")) {
             errorMessage = "خطا در اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید";
-        } else if (exception != null && exception.getMessage() != null) {
+        } else if (exception instanceof java.net.UnknownHostException ||
+                   exception.getMessage() != null && exception.getMessage().contains("connection")) {
+            errorMessage = "خطا در اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید";
+        } else if (exception instanceof IOException) {
+            errorMessage = "خطا در اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید";
+        } else if (exception.getMessage() != null) {
             errorMessage = exception.getMessage();
         }
         

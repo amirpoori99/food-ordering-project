@@ -142,8 +142,20 @@ public class HttpClientUtil {
                     throw new RuntimeException(ioException);
                 }
             }
-            // Return error response for testing
-            return new ApiResponse(false, 0, "Network error: " + e.getMessage(), null);
+            // Return more descriptive error response for testing
+            String errorMessage = "Network error";
+            if (e instanceof java.net.SocketTimeoutException || 
+                (e.getMessage() != null && e.getMessage().contains("timeout"))) {
+                errorMessage = "Connection timeout - please check your network connection";
+            } else if (e instanceof java.net.UnknownHostException ||
+                       (e.getMessage() != null && e.getMessage().contains("connection"))) {
+                errorMessage = "Network connection failed - please check your internet connection";
+            } else if (e instanceof java.net.ConnectException) {
+                errorMessage = "Connection failed - server may be unavailable";
+            } else if (e.getMessage() != null) {
+                errorMessage = "Network error: " + e.getMessage();
+            }
+            return new ApiResponse(false, 0, errorMessage, null);
         }
     }
     
@@ -169,8 +181,20 @@ public class HttpClientUtil {
                 return processResponse(response);
             }
         } catch (Exception e) {
-            // Return error response for testing
-            return new ApiResponse(false, 0, "Network error: " + e.getMessage(), null);
+            // Return more descriptive error response for testing
+            String errorMessage = "Network error";
+            if (e instanceof java.net.SocketTimeoutException || 
+                (e.getMessage() != null && e.getMessage().contains("timeout"))) {
+                errorMessage = "Connection timeout - please check your network connection";
+            } else if (e instanceof java.net.UnknownHostException ||
+                       (e.getMessage() != null && e.getMessage().contains("connection"))) {
+                errorMessage = "Network connection failed - please check your internet connection";
+            } else if (e instanceof java.net.ConnectException) {
+                errorMessage = "Connection failed - server may be unavailable";
+            } else if (e.getMessage() != null) {
+                errorMessage = "Network error: " + e.getMessage();
+            }
+            return new ApiResponse(false, 0, errorMessage, null);
         }
     }
     
@@ -205,8 +229,20 @@ public class HttpClientUtil {
                 return processResponse(response);
             }
         } catch (Exception e) {
-            // Return error response for testing
-            return new ApiResponse(false, 0, "Network error: " + e.getMessage(), null);
+            // Return more descriptive error response for testing
+            String errorMessage = "Network error";
+            if (e instanceof java.net.SocketTimeoutException || 
+                (e.getMessage() != null && e.getMessage().contains("timeout"))) {
+                errorMessage = "Connection timeout - please check your network connection";
+            } else if (e instanceof java.net.UnknownHostException ||
+                       (e.getMessage() != null && e.getMessage().contains("connection"))) {
+                errorMessage = "Network connection failed - please check your internet connection";
+            } else if (e instanceof java.net.ConnectException) {
+                errorMessage = "Connection failed - server may be unavailable";
+            } else if (e.getMessage() != null) {
+                errorMessage = "Network error: " + e.getMessage();
+            }
+            return new ApiResponse(false, 0, errorMessage, null);
         }
     }
     
@@ -232,8 +268,20 @@ public class HttpClientUtil {
                 return processResponse(response);
             }
         } catch (Exception e) {
-            // Return error response for testing
-            return new ApiResponse(false, 0, "Network error: " + e.getMessage(), null);
+            // Return more descriptive error response for testing
+            String errorMessage = "Network error";
+            if (e instanceof java.net.SocketTimeoutException || 
+                (e.getMessage() != null && e.getMessage().contains("timeout"))) {
+                errorMessage = "Connection timeout - please check your network connection";
+            } else if (e instanceof java.net.UnknownHostException ||
+                       (e.getMessage() != null && e.getMessage().contains("connection"))) {
+                errorMessage = "Network connection failed - please check your internet connection";
+            } else if (e instanceof java.net.ConnectException) {
+                errorMessage = "Connection failed - server may be unavailable";
+            } else if (e.getMessage() != null) {
+                errorMessage = "Network error: " + e.getMessage();
+            }
+            return new ApiResponse(false, 0, errorMessage, null);
         }
     }
     

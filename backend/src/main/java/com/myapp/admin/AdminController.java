@@ -141,8 +141,22 @@ public class AdminController implements HttpHandler {
         List<User> users = adminService.getAllUsers(searchTerm, role, page, size);
         Long totalCount = adminService.countUsers(searchTerm, role);
         
+        // Filter sensitive fields from users for security
+        List<Map<String, Object>> safeUsers = users.stream().map(user -> {
+            Map<String, Object> safeUser = new HashMap<>();
+            safeUser.put("id", user.getId());
+            safeUser.put("fullName", user.getFullName());
+            safeUser.put("phone", user.getPhone());
+            safeUser.put("email", user.getEmail());
+            safeUser.put("role", user.getRole());
+            safeUser.put("address", user.getAddress());
+            safeUser.put("isActive", user.getIsActive());
+            // Intentionally exclude passwordHash for security
+            return safeUser;
+        }).toList();
+        
         Map<String, Object> response = new HashMap<>();
-        response.put("users", users);
+        response.put("users", safeUsers);
         response.put("totalCount", totalCount);
         response.put("page", page);
         response.put("size", size);
@@ -159,7 +173,18 @@ public class AdminController implements HttpHandler {
         Long userId = extractIdFromPath(exchange.getRequestURI().getPath(), "/api/admin/users/");
         User user = adminService.getUserById(userId);
         
-        String responseBody = JsonUtil.toJson(user);
+        // Filter sensitive fields for security
+        Map<String, Object> safeUser = new HashMap<>();
+        safeUser.put("id", user.getId());
+        safeUser.put("fullName", user.getFullName());
+        safeUser.put("phone", user.getPhone());
+        safeUser.put("email", user.getEmail());
+        safeUser.put("role", user.getRole());
+        safeUser.put("address", user.getAddress());
+        safeUser.put("isActive", user.getIsActive());
+        // Intentionally exclude passwordHash for security
+        
+        String responseBody = JsonUtil.toJson(safeUser);
         sendResponse(exchange, 200, responseBody);
     }
     
@@ -170,6 +195,7 @@ public class AdminController implements HttpHandler {
         Long userId = extractIdFromPath(exchange.getRequestURI().getPath(), "/api/admin/users/", "/status");
         
         String requestBody = new String(exchange.getRequestBody().readAllBytes());
+        @SuppressWarnings("unchecked")
         Map<String, Object> request = JsonUtil.fromJson(requestBody, Map.class);
         
         Boolean isActive = (Boolean) request.get("isActive");
@@ -230,6 +256,7 @@ public class AdminController implements HttpHandler {
         Long restaurantId = extractIdFromPath(exchange.getRequestURI().getPath(), "/api/admin/restaurants/", "/status");
         
         String requestBody = new String(exchange.getRequestBody().readAllBytes());
+        @SuppressWarnings("unchecked")
         Map<String, Object> request = JsonUtil.fromJson(requestBody, Map.class);
         
         String status = (String) request.get("status");
@@ -299,6 +326,7 @@ public class AdminController implements HttpHandler {
         Long orderId = extractIdFromPath(exchange.getRequestURI().getPath(), "/api/admin/orders/", "/status");
         
         String requestBody = new String(exchange.getRequestBody().readAllBytes());
+        @SuppressWarnings("unchecked")
         Map<String, Object> request = JsonUtil.fromJson(requestBody, Map.class);
         
         String status = (String) request.get("status");

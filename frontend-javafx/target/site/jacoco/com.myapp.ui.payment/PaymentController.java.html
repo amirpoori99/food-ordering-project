@@ -231,7 +231,7 @@ import java.util.*;
 <span class="fc bfc" id="L231" title="All 2 branches covered.">        for (OrderItem item : orderItems) {</span>
 <span class="fc" id="L232">            VBox itemBox = createOrderItemDisplay(item);</span>
 <span class="fc" id="L233">            orderItemsContainer.getChildren().add(itemBox);</span>
-        }
+<span class="fc" id="L234">        }</span>
 <span class="fc" id="L235">    }</span>
 
     /**
@@ -309,7 +309,7 @@ import java.util.*;
 <span class="nc bnc" id="L309" title="All 2 branches missed.">        if (walletBalance &gt;= total) {</span>
 <span class="nc" id="L310">            walletStatusLabel.setText(&quot;موجودی کافی برای پرداخت&quot;);</span>
 <span class="nc" id="L311">            walletStatusLabel.setStyle(&quot;-fx-text-fill: #28a745;&quot;);</span>
-<span class="nc" id="L312">        } else {</span>
+        } else {
 <span class="nc" id="L313">            walletStatusLabel.setText(&quot;موجودی ناکافی - نیاز به شارژ: &quot; + </span>
 <span class="nc" id="L314">                                    formatCurrency(total - walletBalance) + &quot; تومان&quot;);</span>
 <span class="nc" id="L315">            walletStatusLabel.setStyle(&quot;-fx-text-fill: #dc3545;&quot;);</span>
@@ -346,11 +346,11 @@ import java.util.*;
 <span class="nc" id="L346">        String year = cardExpiryYearField.getText().trim();</span>
 <span class="nc" id="L347">        String cvv = cardCvvField.getText().trim();</span>
         
-<span class="nc bnc" id="L349" title="All 4 branches missed.">        return cardNumber.length() == 16 &amp;&amp; </span>
+<span class="nc bnc" id="L349" title="All 2 branches missed.">        return cardNumber.length() == 16 &amp;&amp; </span>
 <span class="nc bnc" id="L350" title="All 2 branches missed.">               !holderName.isEmpty() &amp;&amp; </span>
 <span class="nc bnc" id="L351" title="All 2 branches missed.">               month.length() == 2 &amp;&amp; </span>
 <span class="nc bnc" id="L352" title="All 2 branches missed.">               year.length() == 4 &amp;&amp; </span>
-<span class="nc" id="L353">               cvv.length() &gt;= 3;</span>
+<span class="nc bnc" id="L353" title="All 2 branches missed.">               cvv.length() &gt;= 3;</span>
     }
 
     /**

@@ -88,7 +88,7 @@ public class NotificationRepository {
         Transaction transaction = null;
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.remove(notification);
+            session.remove(session.contains(notification) ? notification : session.merge(notification));
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
@@ -188,7 +188,7 @@ public class NotificationRepository {
             String hql = "FROM Notification n WHERE n.relatedEntityId = :orderId AND n.type IN (:orderTypes) AND n.isDeleted = false ORDER BY n.createdAt DESC";
             Query<Notification> query = session.createQuery(hql, Notification.class);
             query.setParameter("orderId", orderId);
-            query.setParameterList("orderTypes", List.of(NotificationType.ORDER_CREATED, NotificationType.ORDER_STATUS_CHANGED, NotificationType.DELIVERY_ASSIGNED));
+            query.setParameter("orderTypes", List.of(NotificationType.ORDER_CREATED, NotificationType.ORDER_STATUS_CHANGED, NotificationType.DELIVERY_ASSIGNED));
             return query.getResultList();
         } catch (Exception e) {
             throw new RuntimeException("Error finding order notifications: " + e.getMessage(), e);
@@ -201,7 +201,7 @@ public class NotificationRepository {
             Query<Notification> query = session.createQuery(hql, Notification.class);
             query.setParameter("userId", userId);
             query.setParameter("orderId", orderId);
-            query.setParameterList("orderTypes", List.of(NotificationType.ORDER_CREATED, NotificationType.ORDER_STATUS_CHANGED, NotificationType.DELIVERY_ASSIGNED));
+            query.setParameter("orderTypes", List.of(NotificationType.ORDER_CREATED, NotificationType.ORDER_STATUS_CHANGED, NotificationType.DELIVERY_ASSIGNED));
             return query.getResultList();
         } catch (Exception e) {
             throw new RuntimeException("Error finding user order notifications: " + e.getMessage(), e);

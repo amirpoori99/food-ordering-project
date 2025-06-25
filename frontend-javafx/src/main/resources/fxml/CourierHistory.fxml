@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.ui.courier.CourierHistoryController">
+   <top>
+      <VBox spacing="15.0">
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+         
+         <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="← بازگشت" />
+            <Label text="تاریخچه تحویل‌ها" textFill="#2c3e50">
+               <font>
+                  <Font name="Arial Bold" size="24.0" />
+               </font>
+            </Label>
+         </HBox>
+         
+         <!-- Filter Bar -->
+         <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <ComboBox fx:id="dateFilterComboBox" promptText="همه تاریخ‌ها" prefWidth="120.0">
+               <items>
+                  <FXCollections fx:factory="observableArrayList">
+                     <String fx:value="امروز" />
+                     <String fx:value="هفته گذشته" />
+                     <String fx:value="ماه گذشته" />
+                     <String fx:value="همه تاریخ‌ها" />
+                  </FXCollections>
+               </items>
+            </ComboBox>
+            
+            <ComboBox fx:id="statusFilterComboBox" promptText="همه وضعیت‌ها" prefWidth="120.0">
+               <items>
+                  <FXCollections fx:factory="observableArrayList">
+                     <String fx:value="تحویل شده" />
+                     <String fx:value="لغو شده" />
+                     <String fx:value="همه وضعیت‌ها" />
+                  </FXCollections>
+               </items>
+            </ComboBox>
+            
+            <Button fx:id="applyFilterButton" mnemonicParsing="false" onAction="#handleApplyFilter" 
+                    text="اعمال فیلتر" styleClass="secondary-button" />
+         </HBox>
+      </VBox>
+   </top>
+   
+   <center>
+      <VBox spacing="15.0">
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
+         </padding>
+         
+         <!-- Summary Cards -->
+         <HBox spacing="20.0" alignment="CENTER">
+            <VBox styleClass="summary-card" spacing="5.0" alignment="CENTER" prefWidth="150.0">
+               <padding>
+                  <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+               </padding>
+               
+               <Label fx:id="totalDeliveriesLabel" text="۲۳" textFill="#2c3e50">
+                  <font>
+                     <Font name="Arial Bold" size="24.0" />
+                  </font>
+               </Label>
+               <Label text="کل تحویل‌ها" textFill="#7f8c8d">
+                  <font>
+                     <Font size="12.0" />
+                  </font>
+               </Label>
+            </VBox>
+            
+            <VBox styleClass="summary-card" spacing="5.0" alignment="CENTER" prefWidth="150.0">
+               <padding>
+                  <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+               </padding>
+               
+               <Label fx:id="todayDeliveriesLabel" text="۵" textFill="#27ae60">
+                  <font>
+                     <Font name="Arial Bold" size="24.0" />
+                  </font>
+               </Label>
+               <Label text="تحویل‌های امروز" textFill="#7f8c8d">
+                  <font>
+                     <Font size="12.0" />
+                  </font>
+               </Label>
+            </VBox>
+            
+            <VBox styleClass="summary-card" spacing="5.0" alignment="CENTER" prefWidth="150.0">
+               <padding>
+                  <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+               </padding>
+               
+               <Label fx:id="totalEarningsLabel" text="۴۵۰,۰۰۰" textFill="#f39c12">
+                  <font>
+                     <Font name="Arial Bold" size="20.0" />
+                  </font>
+               </Label>
+               <Label text="درآمد کل (تومان)" textFill="#7f8c8d">
+                  <font>
+                     <Font size="12.0" />
+                  </font>
+               </Label>
+            </VBox>
+         </HBox>
+         
+         <!-- Delivery History List -->
+         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
+            <VBox fx:id="deliveryHistoryContainer" spacing="10.0">
+               <!-- Sample Delivery Record -->
+               <VBox styleClass="card" spacing="10.0">
+                  <padding>
+                     <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                  </padding>
+                  
+                  <HBox alignment="CENTER_LEFT" spacing="15.0">
+                     <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <Label text="سفارش #۱۲۳۴۵" textFill="#2c3e50">
+                              <font>
+                                 <Font name="Arial Bold" size="14.0" />
+                              </font>
+                           </Label>
+                           <Label text="تحویل شده" textFill="#27ae60" styleClass="status-badge" />
+                        </HBox>
+                        
+                        <Label text="رستوران سنتی پارسی پارسی → خیابان شریعتی" textFill="#7f8c8d">
+                           <font>
+                              <Font size="12.0" />
+                           </font>
+                        </Label>
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="15.0">
+                           <Label text="زمان: ۱۴:۳۰ - ۱۵:۰۰" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Label>
+                           <Label text="مسافت: ۳.۲ کیلومتر" textFill="#7f8c8d">
+                              <font>
+                                 <Font size="11.0" />
+                              </font>
+                           </Label>
+                        </HBox>
+                     </VBox>
+                     
+                     <VBox alignment="CENTER_RIGHT" spacing="5.0">
+                        <Label text="۲۰,۰۰۰ تومان" textFill="#27ae60">
+                           <font>
+                              <Font name="Arial Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="امروز" textFill="#bdc3c7">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Label>
+                     </VBox>
+                  </HBox>
+               </VBox>
+            </VBox>
+         </ScrollPane>
+      </VBox>
+   </center>
+   
+   <stylesheets>
+      <URL value="@../styles.css" />
+   </stylesheets>
+</BorderPane>
