@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FrontendConstants.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">food-ordering-frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.common</a> &gt; <span class="el_source">FrontendConstants.java</span></div><h1>FrontendConstants.java</h1><pre class="source lang-java linenums">package com.myapp.ui.common;
+
+/**
+ * Frontend-specific constants for JavaFX application
+ */
+public final class FrontendConstants {
+    
+    // Private constructor to prevent instantiation
+<span class="nc" id="L9">    private FrontendConstants() {</span>
+<span class="nc" id="L10">        throw new UnsupportedOperationException(&quot;This is a utility class and cannot be instantiated&quot;);</span>
+    }
+    
+    // ==================== API Configuration ====================
+    public static final class API {
+        public static final String BASE_URL = &quot;http://localhost:8000/api&quot;;
+        public static final String AUTH_LOGIN = &quot;/auth/login&quot;;
+        public static final String AUTH_REGISTER = &quot;/auth/register&quot;;
+        public static final String AUTH_LOGOUT = &quot;/auth/logout&quot;;
+        public static final String AUTH_REFRESH = &quot;/auth/refresh&quot;;
+        
+        public static final String RESTAURANTS = &quot;/restaurants&quot;;
+        public static final String ORDERS = &quot;/orders&quot;;
+        public static final String ITEMS = &quot;/items&quot;;
+        public static final String PAYMENTS = &quot;/payments&quot;;
+        public static final String PROFILE = &quot;/auth/profile&quot;;
+        
+        private API() {}
+    }
+    
+    // ==================== HTTP Configuration ====================
+    public static final class HTTP {
+        public static final int CONNECT_TIMEOUT_SECONDS = 30;
+        public static final int READ_TIMEOUT_SECONDS = 60;
+        public static final int WRITE_TIMEOUT_SECONDS = 60;
+        public static final String CONTENT_TYPE_JSON = &quot;application/json; charset=utf-8&quot;;
+        public static final String AUTHORIZATION_HEADER = &quot;Authorization&quot;;
+        public static final String BEARER_PREFIX = &quot;Bearer &quot;;
+        
+        private HTTP() {}
+    }
+    
+    // ==================== UI Constants ====================
+    public static final class UI {
+        // Window dimensions
+        public static final double DEFAULT_WINDOW_WIDTH = 1200;
+        public static final double DEFAULT_WINDOW_HEIGHT = 800;
+        public static final double MIN_WINDOW_WIDTH = 800;
+        public static final double MIN_WINDOW_HEIGHT = 600;
+        
+        // Colors
+        public static final String PRIMARY_COLOR = &quot;#007bff&quot;;
+        public static final String SUCCESS_COLOR = &quot;#28a745&quot;;
+        public static final String WARNING_COLOR = &quot;#ffc107&quot;;
+        public static final String DANGER_COLOR = &quot;#dc3545&quot;;
+        public static final String INFO_COLOR = &quot;#17a2b8&quot;;
+        public static final String SECONDARY_COLOR = &quot;#6c757d&quot;;
+        
+        // CSS Classes
+        public static final String SUCCESS_STYLE = &quot;-fx-background-color: #d4edda; -fx-text-fill: #155724;&quot;;
+        public static final String ERROR_STYLE = &quot;-fx-background-color: #f8d7da; -fx-text-fill: #721c24;&quot;;
+        public static final String WARNING_STYLE = &quot;-fx-background-color: #fff3cd; -fx-text-fill: #856404;&quot;;
+        public static final String INFO_STYLE = &quot;-fx-background-color: #d1ecf1; -fx-text-fill: #0c5460;&quot;;
+        
+        // Animation durations (milliseconds)
+        public static final int FADE_DURATION = 300;
+        public static final int SLIDE_DURATION = 500;
+        public static final int LOADING_ANIMATION_DURATION = 1000;
+        
+        private UI() {}
+    }
+    
+    // ==================== Messages ====================
+    public static final class MESSAGES {
+        // Persian messages for UI
+        public static final String LOGIN_SUCCESS = &quot;ورود موفقیت‌آمیز بود&quot;;
+        public static final String LOGIN_FAILED = &quot;خطا در ورود&quot;;
+        public static final String REGISTER_SUCCESS = &quot;ثبت‌نام موفقیت‌آمیز بود&quot;;
+        public static final String REGISTER_FAILED = &quot;خطا در ثبت‌نام&quot;;
+        public static final String LOGOUT_SUCCESS = &quot;خروج موفقیت‌آمیز بود&quot;;
+        public static final String PROFILE_UPDATED = &quot;پروفایل بروزرسانی شد&quot;;
+        public static final String ORDER_PLACED = &quot;سفارش ثبت شد&quot;;
+        public static final String PAYMENT_SUCCESS = &quot;پرداخت موفقیت‌آمیز بود&quot;;
+        public static final String PAYMENT_FAILED = &quot;خطا در پرداخت&quot;;
+        
+        // Error messages
+        public static final String NETWORK_ERROR = &quot;خطا در ارتباط با سرور&quot;;
+        public static final String INVALID_CREDENTIALS = &quot;شماره تلفن یا رمز عبور اشتباه است&quot;;
+        public static final String REQUIRED_FIELD = &quot;این فیلد الزامی است&quot;;
+        public static final String INVALID_EMAIL = &quot;فرمت ایمیل صحیح نیست&quot;;
+        public static final String INVALID_PHONE = &quot;فرمت شماره تلفن صحیح نیست&quot;;
+        public static final String WEAK_PASSWORD = &quot;رمز عبور باید حداقل ۸ کاراکتر باشد&quot;;
+        public static final String PASSWORD_MISMATCH = &quot;رمز عبور و تکرار آن یکسان نیستند&quot;;
+        
+        // Loading messages
+        public static final String LOADING = &quot;در حال بارگذاری...&quot;;
+        public static final String PROCESSING = &quot;در حال پردازش...&quot;;
+        public static final String CONNECTING = &quot;در حال اتصال...&quot;;
+        public static final String SAVING = &quot;در حال ذخیره...&quot;;
+        
+        private MESSAGES() {}
+    }
+    
+    // ==================== Validation ====================
+    public static final class VALIDATION {
+        public static final int MIN_PASSWORD_LENGTH = 8;
+        public static final int MAX_PASSWORD_LENGTH = 128;
+        public static final int PHONE_LENGTH = 11;
+        public static final String PHONE_PREFIX = &quot;09&quot;;
+        public static final int MAX_NAME_LENGTH = 100;
+        public static final int MAX_EMAIL_LENGTH = 100;
+        public static final int MAX_ADDRESS_LENGTH = 500;
+        
+        // Regex patterns
+        public static final String EMAIL_PATTERN = &quot;^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$&quot;;
+        public static final String PHONE_PATTERN = &quot;^09\\d{9}$&quot;;
+        public static final String PERSIAN_NAME_PATTERN = &quot;^[\\u0600-\\u06FF\\u0750-\\u077F\\u08A0-\\u08FF\\uFB50-\\uFDFF\\uFE70-\\uFEFF\\s\\w.-]+$&quot;;
+        
+        private VALIDATION() {}
+    }
+    
+    // ==================== File System ====================
+    public static final class FILES {
+<span class="nc" id="L123">        public static final String USER_DATA_DIR = System.getProperty(&quot;user.home&quot;) + &quot;/.food-ordering&quot;;</span>
+        public static final String SETTINGS_FILE = &quot;settings.json&quot;;
+        public static final String CACHE_DIR = &quot;cache&quot;;
+<span class="nc" id="L126">        public static final String LOGS_DIR = &quot;logs&quot;;</span>
+        
+        private FILES() {}
+    }
+    
+    // ==================== Currency &amp; Formatting ====================
+    public static final class FORMAT {
+        public static final String CURRENCY_SYMBOL = &quot;تومان&quot;;
+        public static final String DECIMAL_FORMAT = &quot;#,##0&quot;;
+        public static final String DECIMAL_FORMAT_WITH_FRACTION = &quot;#,##0.00&quot;;
+        public static final String DATE_FORMAT = &quot;yyyy/MM/dd&quot;;
+        public static final String TIME_FORMAT = &quot;HH:mm&quot;;
+        public static final String DATETIME_FORMAT = &quot;yyyy/MM/dd HH:mm&quot;;
+        
+        private FORMAT() {}
+    }
+    
+    // ==================== Test Configuration ====================
+    public static final class TEST {
+        public static final int DEFAULT_TIMEOUT_SECONDS = 30;
+        public static final int LONG_TIMEOUT_SECONDS = 60;
+        public static final int UI_WAIT_TIME_MS = 100;
+        public static final int NETWORK_TIMEOUT_MS = 5000;
+        
+        // Test data
+        public static final String TEST_PHONE = &quot;09123456789&quot;;
+        public static final String TEST_EMAIL = &quot;test@example.com&quot;;
+        public static final String TEST_PASSWORD = &quot;TestPass123@&quot;;
+        public static final String TEST_NAME = &quot;تست کاربر&quot;;
+        
+        private TEST() {}
+    }
+    
+    // ==================== Performance ====================
+    public static final class PERFORMANCE {
+        public static final int MAX_CACHE_SIZE = 100;
+        public static final int CACHE_EXPIRY_MINUTES = 30;
+        public static final int MAX_CONCURRENT_REQUESTS = 10;
+        public static final int REQUEST_RETRY_COUNT = 3;
+        public static final int REQUEST_RETRY_DELAY_MS = 1000;
+        
+        private PERFORMANCE() {}
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

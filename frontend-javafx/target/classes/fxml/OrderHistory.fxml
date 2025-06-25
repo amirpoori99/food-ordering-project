@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.ui.order.OrderHistoryController">
+   <top>
+      <VBox>
+         <children>
+            <MenuBar>
+               <menus>
+                  <Menu text="ناوبری">
+                     <items>
+                        <MenuItem fx:id="backMenuItem" onAction="#handleBack" text="بازگشت به صفحه اصلی" />
+                        <MenuItem fx:id="profileMenuItem" onAction="#handleProfile" text="پروفایل" />
+                        <MenuItem fx:id="cartMenuItem" onAction="#handleCart" text="سبد خرید" />
+                        <MenuItem fx:id="logoutMenuItem" onAction="#handleLogout" text="خروج" />
+                     </items>
+                  </Menu>
+                  <Menu text="فیلتر">
+                     <items>
+                        <MenuItem fx:id="allOrdersMenuItem" onAction="#handleShowAllOrders" text="همه سفارش‌ها" />
+                        <MenuItem fx:id="pendingOrdersMenuItem" onAction="#handleShowPendingOrders" text="در انتظار" />
+                        <MenuItem fx:id="completedOrdersMenuItem" onAction="#handleShowCompletedOrders" text="تکمیل شده" />
+                        <MenuItem fx:id="cancelledOrdersMenuItem" onAction="#handleShowCancelledOrders" text="لغو شده" />
+                     </items>
+                  </Menu>
+               </menus>
+            </MenuBar>
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+               <children>
+                  <Label text="تاریخچه سفارش‌ها">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="orderCountLabel" style="-fx-text-fill: #6c757d;" text="(0 سفارش)" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <TextField fx:id="searchField" promptText="جستجو در سفارش‌ها..." />
+                  <Button fx:id="searchButton" onAction="#handleSearch" text="جستجو" />
+                  <Button fx:id="refreshButton" onAction="#handleRefresh" text="بروزرسانی" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </HBox>
+         </children>
+      </VBox>
+   </top>
+   <center>
+      <SplitPane dividerPositions="0.75" orientation="HORIZONTAL">
+         <items>
+            <!-- Left Side - Order List -->
+            <VBox spacing="10.0">
+               <children>
+                  <!-- Filter Controls -->
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                     <children>
+                        <Label text="فیلتر بر اساس:" />
+                        <ComboBox fx:id="statusFilterCombo" onAction="#handleStatusFilter" prefWidth="150.0" promptText="وضعیت سفارش" />
+                        <ComboBox fx:id="dateFilterCombo" onAction="#handleDateFilter" prefWidth="150.0" promptText="بازه زمانی" />
+                        <Button fx:id="clearFiltersButton" onAction="#handleClearFilters" text="پاک کردن فیلترها" />
+                     </children>
+                  </HBox>
+                  
+                  <!-- Order List -->
+                  <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
+                     <content>
+                        <VBox fx:id="orderListContainer" spacing="10.0">
+                           <children>
+                              <!-- Orders will be populated dynamically -->
+                              <Label fx:id="emptyOrdersLabel" style="-fx-text-fill: #6c757d; -fx-font-size: 16; -fx-padding: 20;" text="هیچ سفارشی یافت نشد" visible="false" />
+                           </children>
+                        </VBox>
+                     </content>
+                  </ScrollPane>
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </VBox>
+            
+            <!-- Right Side - Order Details -->
+            <VBox spacing="15.0" style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-width: 1 0 0 1;">
+               <children>
+                  <Label text="جزئیات سفارش">
+                     <font>
+                        <Font name="System Bold" size="16.0" />
+                     </font>
+                  </Label>
+                  
+                  <!-- Order Information -->
+                  <VBox fx:id="orderDetailsContainer" spacing="15.0" visible="false">
+                     <!-- Order Header -->
+                     <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-radius: 5; -fx-background-radius: 5;">
+                        <children>
+                           <GridPane hgap="10.0" vgap="8.0">
+                              <columnConstraints>
+                                 <ColumnConstraints hgrow="NEVER" minWidth="100.0" />
+                                 <ColumnConstraints hgrow="ALWAYS" />
+                              </columnConstraints>
+                              <children>
+                                 <Label text="شماره سفارش:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                 <Label fx:id="orderNumberLabel" style="-fx-font-weight: bold;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                 
+                                 <Label text="تاریخ سفارش:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                 <Label fx:id="orderDateLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                 
+                                 <Label text="وضعیت:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                 <Label fx:id="orderStatusLabel" style="-fx-font-weight: bold;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                 
+                                 <Label text="رستوران:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                                 <Label fx:id="restaurantNameLabel" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                 
+                                 <Label text="مبلغ کل:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                                 <Label fx:id="totalAmountLabel" style="-fx-font-weight: bold; -fx-text-fill: #28a745;" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              </children>
+                           </GridPane>
+                        </children>
+                        <padding>
+                           <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                        </padding>
+                     </VBox>
+                     
+                     <!-- Order Items -->
+                     <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-radius: 5; -fx-background-radius: 5;">
+                        <children>
+                           <Label text="آیتم‌های سفارش">
+                              <font>
+                                 <Font name="System Bold" size="14.0" />
+                              </font>
+                           </Label>
+                           <ScrollPane fx:id="orderItemsScrollPane" fitToWidth="true" hbarPolicy="NEVER" maxHeight="200.0" vbarPolicy="AS_NEEDED">
+                              <content>
+                                 <VBox fx:id="orderItemsContainer" spacing="5.0" />
+                              </content>
+                           </ScrollPane>
+                        </children>
+                        <padding>
+                           <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                        </padding>
+                     </VBox>
+                     
+                     <!-- Delivery Information -->
+                     <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-radius: 5; -fx-background-radius: 5;">
+                        <children>
+                           <Label text="اطلاعات تحویل">
+                              <font>
+                                 <Font name="System Bold" size="14.0" />
+                              </font>
+                           </Label>
+                           <GridPane hgap="10.0" vgap="8.0">
+                              <columnConstraints>
+                                 <ColumnConstraints hgrow="NEVER" minWidth="80.0" />
+                                 <ColumnConstraints hgrow="ALWAYS" />
+                              </columnConstraints>
+                              <children>
+                                 <Label text="آدرس:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                 <Label fx:id="deliveryAddressLabel" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                 
+                                 <Label text="تلفن:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                 <Label fx:id="deliveryPhoneLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                 
+                                 <Label text="زمان تحویل:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                 <Label fx:id="deliveryTimeLabel" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              </children>
+                           </GridPane>
+                        </children>
+                        <padding>
+                           <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                        </padding>
+                     </VBox>
+                     
+                     <!-- Payment Information -->
+                     <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-radius: 5; -fx-background-radius: 5;">
+                        <children>
+                           <Label text="اطلاعات پرداخت">
+                              <font>
+                                 <Font name="System Bold" size="14.0" />
+                              </font>
+                           </Label>
+                           <GridPane hgap="10.0" vgap="8.0">
+                              <columnConstraints>
+                                 <ColumnConstraints hgrow="NEVER" minWidth="100.0" />
+                                 <ColumnConstraints hgrow="ALWAYS" />
+                              </columnConstraints>
+                              <children>
+                                 <Label text="روش پرداخت:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                 <Label fx:id="paymentMethodLabel" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                 
+                                 <Label text="وضعیت پرداخت:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                 <Label fx:id="paymentStatusLabel" style="-fx-font-weight: bold;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                 
+                                 <Label text="شماره پیگیری:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                 <Label fx:id="trackingNumberLabel" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              </children>
+                           </GridPane>
+                        </children>
+                        <padding>
+                           <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                        </padding>
+                     </VBox>
+                     
+                     <!-- Action Buttons -->
+                     <VBox spacing="10.0">
+                        <children>
+                           <Button fx:id="reorderButton" onAction="#handleReorder" style="-fx-background-color: #28a745; -fx-text-fill: white;" text="سفارش مجدد" />
+                           <Button fx:id="trackOrderButton" onAction="#handleTrackOrder" style="-fx-background-color: #17a2b8; -fx-text-fill: white;" text="پیگیری سفارش" />
+                           <Button fx:id="cancelOrderButton" onAction="#handleCancelOrder" style="-fx-background-color: #dc3545; -fx-text-fill: white;" text="لغو سفارش" visible="false" />
+                           <Button fx:id="downloadReceiptButton" onAction="#handleDownloadReceipt" style="-fx-background-color: #6c757d; -fx-text-fill: white;" text="دانلود فاکتور" />
+                        </children>
+                     </VBox>
+                  </VBox>
+                  
+                  <!-- No Selection Message -->
+                  <VBox fx:id="noSelectionContainer" alignment="CENTER" spacing="20.0" VBox.vgrow="ALWAYS">
+                     <children>
+                        <Label style="-fx-text-fill: #6c757d; -fx-font-size: 16;" text="📋" />
+                        <Label style="-fx-text-fill: #6c757d; -fx-font-size: 14;" text="برای مشاهده جزئیات، یک سفارش را انتخاب کنید" />
+                     </children>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+            </VBox>
+         </items>
+      </SplitPane>
+   </center>
+   <bottom>
+      <VBox>
+         <children>
+            <Separator />
+            <HBox alignment="CENTER" spacing="10.0">
+               <children>
+                  <Label fx:id="statusLabel" text="آماده" />
+                  <ProgressIndicator fx:id="loadingIndicator" maxHeight="20.0" maxWidth="20.0" visible="false" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </HBox>
+         </children>
+      </VBox>
+   </bottom>
+</BorderPane>

@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RestaurantListController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">food-ordering-frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.restaurant</a> &gt; <span class="el_source">RestaurantListController.java</span></div><h1>RestaurantListController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.restaurant;
+
+import com.myapp.ui.common.HttpClientUtil;
+import com.myapp.ui.common.NavigationController;
+import com.fasterxml.jackson.databind.JsonNode;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.geometry.Insets;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
+/**
+ * Controller for Restaurant List screen
+ * Displays available restaurants and handles user interactions
+ */
+<span class="fc" id="L27">public class RestaurantListController implements Initializable {</span>
+
+    @FXML private TextField searchField;
+    @FXML private Button searchButton;
+    @FXML private Button refreshButton;
+    @FXML private ListView&lt;Restaurant&gt; restaurantListView;
+    @FXML private Label statusLabel;
+    @FXML private MenuItem profileMenuItem;
+    @FXML private MenuItem orderHistoryMenuItem;
+    @FXML private MenuItem logoutMenuItem;
+    @FXML private MenuItem cartMenuItem;
+    @FXML private MenuItem favoritesMenuItem;
+
+    private NavigationController navigationController;
+<span class="fc" id="L41">    private List&lt;Restaurant&gt; allRestaurants = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L42">    private List&lt;Restaurant&gt; filteredRestaurants = new ArrayList&lt;&gt;();</span>
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+<span class="fc" id="L46">        this.navigationController = NavigationController.getInstance();</span>
+        
+<span class="fc" id="L48">        setupUI();</span>
+<span class="fc" id="L49">        loadRestaurants();</span>
+<span class="fc" id="L50">    }</span>
+
+    /**
+     * Setup UI components and event handlers
+     */
+    private void setupUI() {
+        // Setup restaurant list view with custom cell factory
+<span class="fc" id="L57">        restaurantListView.setCellFactory(listView -&gt; new RestaurantListCell());</span>
+        
+        // Setup search functionality
+<span class="pc" id="L60">        searchField.setOnAction(e -&gt; handleSearch());</span>
+<span class="fc" id="L61">        searchField.textProperty().addListener((obs, oldText, newText) -&gt; {</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">            if (newText.trim().isEmpty()) {</span>
+<span class="nc" id="L63">                displayRestaurants(allRestaurants);</span>
+            }
+<span class="fc" id="L65">        });</span>
+        
+        // Initial status
+<span class="fc" id="L68">        setStatus(&quot;در حال بارگذاری...&quot;);</span>
+<span class="fc" id="L69">    }</span>
+
+    /**
+     * Load restaurants from backend
+     */
+    private void loadRestaurants() {
+<span class="fc" id="L75">        Task&lt;List&lt;Restaurant&gt;&gt; loadTask = new Task&lt;List&lt;Restaurant&gt;&gt;() {</span>
+            @Override
+            protected List&lt;Restaurant&gt; call() throws Exception {
+<span class="fc" id="L78">                HttpClientUtil.ApiResponse response = HttpClientUtil.get(&quot;/restaurants&quot;);</span>
+                
+<span class="pc bpc" id="L80" title="3 of 4 branches missed.">                if (response.isSuccess() &amp;&amp; response.getData() != null) {</span>
+<span class="nc" id="L81">                    List&lt;Restaurant&gt; restaurants = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L82">                    JsonNode dataArray = response.getData();</span>
+                    
+<span class="nc bnc" id="L84" title="All 2 branches missed.">                    if (dataArray.isArray()) {</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">                        for (JsonNode restaurantNode : dataArray) {</span>
+<span class="nc" id="L86">                            Restaurant restaurant = parseRestaurant(restaurantNode);</span>
+<span class="nc" id="L87">                            restaurants.add(restaurant);</span>
+                        }
+                    }
+                    
+<span class="nc" id="L91">                    return restaurants;</span>
+                } else {
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">                    throw new RuntimeException(response.getMessage() != null ? </span>
+<span class="pc" id="L94">                                               response.getMessage() : &quot;خطا در بارگذاری رستوران‌ها&quot;);</span>
+                }
+            }
+        };
+        
+<span class="fc" id="L99">        loadTask.setOnSucceeded(e -&gt; {</span>
+<span class="nc" id="L100">            Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L101">                allRestaurants = loadTask.getValue();</span>
+<span class="nc" id="L102">                filteredRestaurants = new ArrayList&lt;&gt;(allRestaurants);</span>
+<span class="nc" id="L103">                displayRestaurants(filteredRestaurants);</span>
+<span class="nc" id="L104">                setStatus(allRestaurants.size() + &quot; رستوران یافت شد&quot;);</span>
+<span class="nc" id="L105">            });</span>
+<span class="nc" id="L106">        });</span>
+        
+<span class="fc" id="L108">        loadTask.setOnFailed(e -&gt; {</span>
+<span class="fc" id="L109">            Platform.runLater(() -&gt; {</span>
+<span class="fc" id="L110">                Throwable exception = loadTask.getException();</span>
+<span class="fc" id="L111">                String errorMessage = &quot;خطا در بارگذاری رستوران‌ها&quot;;</span>
+<span class="pc bpc" id="L112" title="2 of 4 branches missed.">                if (exception != null &amp;&amp; exception.getMessage() != null) {</span>
+<span class="fc" id="L113">                    errorMessage = exception.getMessage();</span>
+                }
+<span class="fc" id="L115">                setStatus(errorMessage);</span>
+<span class="fc" id="L116">                showError(&quot;خطا&quot;, errorMessage);</span>
+<span class="fc" id="L117">            });</span>
+<span class="fc" id="L118">        });</span>
+        
+<span class="fc" id="L120">        Thread loadThread = new Thread(loadTask);</span>
+<span class="fc" id="L121">        loadThread.setDaemon(true);</span>
+<span class="fc" id="L122">        loadThread.start();</span>
+<span class="fc" id="L123">    }</span>
+
+    /**
+     * Parse restaurant from JSON node
+     */
+    private Restaurant parseRestaurant(JsonNode node) {
+<span class="nc" id="L129">        Restaurant restaurant = new Restaurant();</span>
+<span class="nc" id="L130">        restaurant.setId(node.get(&quot;id&quot;).asLong());</span>
+<span class="nc" id="L131">        restaurant.setName(node.get(&quot;name&quot;).asText());</span>
+<span class="nc" id="L132">        restaurant.setAddress(node.get(&quot;address&quot;).asText());</span>
+<span class="nc" id="L133">        restaurant.setPhone(node.get(&quot;phone&quot;).asText());</span>
+<span class="nc" id="L134">        restaurant.setStatus(node.get(&quot;status&quot;).asText());</span>
+<span class="nc" id="L135">        return restaurant;</span>
+    }
+
+    /**
+     * Display restaurants in the list view
+     */
+    private void displayRestaurants(List&lt;Restaurant&gt; restaurants) {
+<span class="nc" id="L142">        restaurantListView.getItems().clear();</span>
+<span class="nc" id="L143">        restaurantListView.getItems().addAll(restaurants);</span>
+<span class="nc" id="L144">    }</span>
+
+    /**
+     * Handle search functionality
+     */
+    @FXML
+    private void handleSearch() {
+<span class="nc" id="L151">        String searchText = searchField.getText().trim().toLowerCase();</span>
+        
+<span class="nc bnc" id="L153" title="All 2 branches missed.">        if (searchText.isEmpty()) {</span>
+<span class="nc" id="L154">            displayRestaurants(allRestaurants);</span>
+<span class="nc" id="L155">            setStatus(allRestaurants.size() + &quot; رستوران یافت شد&quot;);</span>
+<span class="nc" id="L156">        } else {</span>
+<span class="nc" id="L157">            filteredRestaurants = allRestaurants.stream()</span>
+<span class="nc" id="L158">                .filter(restaurant -&gt; </span>
+<span class="nc bnc" id="L159" title="All 2 branches missed.">                    restaurant.getName().toLowerCase().contains(searchText) ||</span>
+<span class="nc bnc" id="L160" title="All 2 branches missed.">                    restaurant.getAddress().toLowerCase().contains(searchText))</span>
+<span class="nc" id="L161">                .toList();</span>
+            
+<span class="nc" id="L163">            displayRestaurants(filteredRestaurants);</span>
+<span class="nc" id="L164">            setStatus(filteredRestaurants.size() + &quot; رستوران در نتایج جستجو&quot;);</span>
+        }
+<span class="nc" id="L166">    }</span>
+
+    /**
+     * Handle refresh button
+     */
+    @FXML
+    private void handleRefresh() {
+<span class="fc" id="L173">        searchField.clear();</span>
+<span class="fc" id="L174">        loadRestaurants();</span>
+<span class="fc" id="L175">    }</span>
+
+    /**
+     * Handle profile menu item
+     */
+    @FXML
+    private void handleProfile() {
+<span class="nc" id="L182">        navigationController.navigateTo(NavigationController.PROFILE_SCENE);</span>
+<span class="nc" id="L183">    }</span>
+
+    /**
+     * Handle order history menu item
+     */
+    @FXML
+    private void handleOrderHistory() {
+<span class="nc" id="L190">        navigationController.navigateTo(NavigationController.ORDER_HISTORY_SCENE);</span>
+<span class="nc" id="L191">    }</span>
+
+    /**
+     * Handle cart menu item
+     */
+    @FXML
+    private void handleCart() {
+<span class="nc" id="L198">        navigationController.navigateTo(NavigationController.CART_SCENE);</span>
+<span class="nc" id="L199">    }</span>
+
+    /**
+     * Handle favorites menu item
+     */
+    @FXML
+    private void handleFavorites() {
+        // TODO: Navigate to favorites scene when implemented
+<span class="nc" id="L207">        showInfo(&quot;اطلاع&quot;, &quot;صفحه علاقه‌مندی‌ها در حال توسعه است&quot;);</span>
+<span class="nc" id="L208">    }</span>
+
+    /**
+     * Handle logout menu item
+     */
+    @FXML
+    private void handleLogout() {
+<span class="nc" id="L215">        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);</span>
+<span class="nc" id="L216">        confirmAlert.setTitle(&quot;تأیید خروج&quot;);</span>
+<span class="nc" id="L217">        confirmAlert.setHeaderText(&quot;آیا مطمئن هستید؟&quot;);</span>
+<span class="nc" id="L218">        confirmAlert.setContentText(&quot;آیا می‌خواهید از حساب کاربری خود خارج شوید؟&quot;);</span>
+        
+<span class="nc" id="L220">        confirmAlert.showAndWait().ifPresent(response -&gt; {</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">            if (response == ButtonType.OK) {</span>
+<span class="nc" id="L222">                navigationController.logout();</span>
+            }
+<span class="nc" id="L224">        });</span>
+<span class="nc" id="L225">    }</span>
+
+    /**
+     * Set status message
+     */
+    private void setStatus(String message) {
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">        if (statusLabel != null) {</span>
+<span class="fc" id="L232">            statusLabel.setText(message);</span>
+        }
+<span class="fc" id="L234">    }</span>
+
+    /**
+     * Show error dialog
+     */
+    private void showError(String title, String message) {
+<span class="fc" id="L240">        Alert alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="fc" id="L241">        alert.setTitle(title);</span>
+<span class="fc" id="L242">        alert.setHeaderText(null);</span>
+<span class="fc" id="L243">        alert.setContentText(message);</span>
+<span class="fc" id="L244">        alert.showAndWait();</span>
+<span class="fc" id="L245">    }</span>
+
+    /**
+     * Show info dialog
+     */
+    private void showInfo(String title, String message) {
+<span class="nc" id="L251">        Alert alert = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L252">        alert.setTitle(title);</span>
+<span class="nc" id="L253">        alert.setHeaderText(null);</span>
+<span class="nc" id="L254">        alert.setContentText(message);</span>
+<span class="nc" id="L255">        alert.showAndWait();</span>
+<span class="nc" id="L256">    }</span>
+
+    // ==================== INNER CLASSES ====================
+
+    /**
+     * Custom list cell for displaying restaurant information
+     */
+    private static class RestaurantListCell extends ListCell&lt;Restaurant&gt; {
+        @Override
+        protected void updateItem(Restaurant restaurant, boolean empty) {
+<span class="fc" id="L266">            super.updateItem(restaurant, empty);</span>
+            
+<span class="pc bpc" id="L268" title="1 of 4 branches missed.">            if (empty || restaurant == null) {</span>
+<span class="fc" id="L269">                setGraphic(null);</span>
+<span class="fc" id="L270">                setText(null);</span>
+<span class="fc" id="L271">            } else {</span>
+<span class="fc" id="L272">                VBox content = createRestaurantCell(restaurant);</span>
+<span class="fc" id="L273">                setGraphic(content);</span>
+<span class="fc" id="L274">                setText(null);</span>
+            }
+<span class="fc" id="L276">        }</span>
+        
+        private VBox createRestaurantCell(Restaurant restaurant) {
+<span class="fc" id="L279">            VBox vbox = new VBox(5);</span>
+<span class="fc" id="L280">            vbox.setPadding(new Insets(10));</span>
+<span class="fc" id="L281">            vbox.setStyle(&quot;-fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;&quot;);</span>
+            
+            // Restaurant name
+<span class="fc" id="L284">            Label nameLabel = new Label(restaurant.getName());</span>
+<span class="fc" id="L285">            nameLabel.setFont(Font.font(&quot;System&quot;, FontWeight.BOLD, 16));</span>
+            
+            // Restaurant address
+<span class="fc" id="L288">            Label addressLabel = new Label(&quot;📍 &quot; + restaurant.getAddress());</span>
+<span class="fc" id="L289">            addressLabel.setStyle(&quot;-fx-text-fill: #666666;&quot;);</span>
+            
+            // Restaurant phone
+<span class="fc" id="L292">            Label phoneLabel = new Label(&quot;📞 &quot; + restaurant.getPhone());</span>
+<span class="fc" id="L293">            phoneLabel.setStyle(&quot;-fx-text-fill: #666666;&quot;);</span>
+            
+            // Status
+<span class="fc" id="L296">            Label statusLabel = new Label(&quot;وضعیت: &quot; + getStatusText(restaurant.getStatus()));</span>
+<span class="fc" id="L297">            statusLabel.setStyle(&quot;-fx-text-fill: &quot; + getStatusColor(restaurant.getStatus()) + &quot;;&quot;);</span>
+            
+            // Action buttons
+<span class="fc" id="L300">            HBox buttonBox = new HBox(10);</span>
+<span class="fc" id="L301">            Button viewMenuButton = new Button(&quot;مشاهده منو&quot;);</span>
+<span class="fc" id="L302">            Button addToFavoritesButton = new Button(&quot;افزودن به علاقه‌مندی‌ها&quot;);</span>
+            
+<span class="fc" id="L304">            viewMenuButton.setOnAction(e -&gt; {</span>
+                // TODO: Navigate to menu view
+<span class="nc" id="L306">                System.out.println(&quot;نمایش منوی رستوران: &quot; + restaurant.getName());</span>
+<span class="nc" id="L307">            });</span>
+            
+<span class="fc" id="L309">            addToFavoritesButton.setOnAction(e -&gt; {</span>
+                // TODO: Add to favorites
+<span class="nc" id="L311">                System.out.println(&quot;افزودن به علاقه‌مندی‌ها: &quot; + restaurant.getName());</span>
+<span class="nc" id="L312">            });</span>
+            
+<span class="fc" id="L314">            buttonBox.getChildren().addAll(viewMenuButton, addToFavoritesButton);</span>
+            
+<span class="fc" id="L316">            vbox.getChildren().addAll(nameLabel, addressLabel, phoneLabel, statusLabel, buttonBox);</span>
+            
+<span class="fc" id="L318">            return vbox;</span>
+        }
+        
+        private String getStatusText(String status) {
+<span class="pc bpc" id="L322" title="3 of 5 branches missed.">            switch (status.toUpperCase()) {</span>
+<span class="fc" id="L323">                case &quot;APPROVED&quot;: return &quot;تأیید شده&quot;;</span>
+<span class="fc" id="L324">                case &quot;PENDING&quot;: return &quot;در انتظار تأیید&quot;;</span>
+<span class="nc" id="L325">                case &quot;REJECTED&quot;: return &quot;رد شده&quot;;</span>
+<span class="nc" id="L326">                case &quot;SUSPENDED&quot;: return &quot;تعلیق شده&quot;;</span>
+<span class="nc" id="L327">                default: return status;</span>
+            }
+        }
+        
+        private String getStatusColor(String status) {
+<span class="pc bpc" id="L332" title="3 of 5 branches missed.">            switch (status.toUpperCase()) {</span>
+<span class="fc" id="L333">                case &quot;APPROVED&quot;: return &quot;#4CAF50&quot;;</span>
+<span class="fc" id="L334">                case &quot;PENDING&quot;: return &quot;#FF9800&quot;;</span>
+<span class="nc" id="L335">                case &quot;REJECTED&quot;: return &quot;#F44336&quot;;</span>
+<span class="nc" id="L336">                case &quot;SUSPENDED&quot;: return &quot;#9E9E9E&quot;;</span>
+<span class="nc" id="L337">                default: return &quot;#666666&quot;;</span>
+            }
+        }
+    }
+
+    // ==================== DATA MODEL ====================
+
+    /**
+     * Restaurant data model for UI
+     */
+<span class="fc" id="L347">    public static class Restaurant {</span>
+        private Long id;
+        private String name;
+        private String address;
+        private String phone;
+        private String status;
+
+        // Getters and setters
+<span class="fc" id="L355">        public Long getId() { return id; }</span>
+<span class="fc" id="L356">        public void setId(Long id) { this.id = id; }</span>
+
+<span class="fc" id="L358">        public String getName() { return name; }</span>
+<span class="fc" id="L359">        public void setName(String name) { this.name = name; }</span>
+
+<span class="fc" id="L361">        public String getAddress() { return address; }</span>
+<span class="fc" id="L362">        public void setAddress(String address) { this.address = address; }</span>
+
+<span class="fc" id="L364">        public String getPhone() { return phone; }</span>
+<span class="fc" id="L365">        public void setPhone(String phone) { this.phone = phone; }</span>
+
+<span class="fc" id="L367">        public String getStatus() { return status; }</span>
+<span class="fc" id="L368">        public void setStatus(String status) { this.status = status; }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

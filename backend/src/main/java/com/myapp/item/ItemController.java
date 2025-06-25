@@ -1,10 +1,14 @@
 package com.myapp.item;
 
+import com.myapp.common.constants.ApplicationConstants;
 import com.myapp.common.exceptions.NotFoundException;
 import com.myapp.common.models.FoodItem;
 import com.myapp.common.utils.JsonUtil;
+import com.myapp.common.utils.MapParsingUtil;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,6 +37,7 @@ import java.util.HashMap;
  */
 public class ItemController implements HttpHandler {
     
+    private static final Logger logger = LoggerFactory.getLogger(ItemController.class);
     private final ItemService itemService;
     
     public ItemController() {
@@ -187,18 +192,28 @@ public class ItemController implements HttpHandler {
     }
     
     private void addItem(HttpExchange exchange) throws IOException {
-        Map<String, Object> requestData = parseJsonRequest(exchange);
-        
-        Long restaurantId = getLongFromMap(requestData, "restaurantId");
-        String name = getStringFromMap(requestData, "name");
-        String description = getOptionalStringFromMap(requestData, "description", "");
-        Double price = getDoubleFromMap(requestData, "price");
-        String category = getStringFromMap(requestData, "category");
-        String imageUrl = getOptionalStringFromMap(requestData, "imageUrl", null);
-        Integer quantity = getOptionalIntFromMap(requestData, "quantity", 1);
-        
-        FoodItem item = itemService.addItem(restaurantId, name, description, price, category, imageUrl, quantity);
-        sendJsonResponse(exchange, 201, item);
+        try {
+            Map<String, Object> requestData = parseJsonRequest(exchange);
+            
+            // Validate required fields
+            MapParsingUtil.validateRequiredFields(requestData, "restaurantId", "name", "price", "category");
+            
+            Long restaurantId = MapParsingUtil.getLongFromMap(requestData, "restaurantId");
+            String name = MapParsingUtil.getStringFromMap(requestData, "name");
+            String description = MapParsingUtil.getOptionalStringFromMap(requestData, "description", "");
+            Double price = MapParsingUtil.getDoubleFromMap(requestData, "price");
+            String category = MapParsingUtil.getStringFromMap(requestData, "category");
+            String imageUrl = MapParsingUtil.getOptionalStringFromMap(requestData, "imageUrl", null);
+            Integer quantity = MapParsingUtil.getOptionalIntegerFromMap(requestData, "quantity", 1);
+            
+            logger.info("Adding new item: {} for restaurant: {}", name, restaurantId);
+            FoodItem item = itemService.addItem(restaurantId, name, description, price, category, imageUrl, quantity);
+            
+            sendJsonResponse(exchange, ApplicationConstants.HTTP_STATUS.CREATED, item);
+        } catch (Exception e) {
+            logger.error("Error adding item: {}", e.getMessage(), e);
+            throw e;
+        }
     }
     
     // ==================== PUT ENDPOINTS ====================
@@ -224,28 +239,36 @@ public class ItemController implements HttpHandler {
     private void updateItem(HttpExchange exchange, Long id) throws IOException {
         Map<String, Object> requestData = parseJsonRequest(exchange);
         
-        String name = getOptionalStringFromMap(requestData, "name", null);
-        String description = getOptionalStringFromMap(requestData, "description", null);
-        Double price = getOptionalDoubleFromMap(requestData, "price", -1.0);
-        String category = getOptionalStringFromMap(requestData, "category", null);
-        String imageUrl = getOptionalStringFromMap(requestData, "imageUrl", null);
-        Integer quantity = getOptionalIntFromMap(requestData, "quantity", null);
+        String name = MapParsingUtil.getOptionalStringFromMap(requestData, "name", null);
+        String description = MapParsingUtil.getOptionalStringFromMap(requestData, "description", null);
+        Double price = requestData.containsKey("price") ? MapParsingUtil.getDoubleFromMap(requestData, "price") : null;
+        String category = MapParsingUtil.getOptionalStringFromMap(requestData, "category", null);
+        String imageUrl = MapParsingUtil.getOptionalStringFromMap(requestData, "imageUrl", null);
+        Integer quantity = MapParsingUtil.getOptionalIntegerFromMap(requestData, "quantity", null);
         
         FoodItem item = itemService.updateItem(id, name, description, price, category, imageUrl, quantity);
         sendJsonResponse(exchange, 200, item);
     }
     
     private void updateItemAvailability(HttpExchange exchange, Long id) throws IOException {
-        Map<String, Object> requestData = parseJsonRequest(exchange);
-        Boolean available = getBooleanFromMap(requestData, "available");
-        
-        itemService.updateAvailability(id, available);
-        sendJsonResponse(exchange, 200, Map.of("message", "Item availability updated successfully"));
+        try {
+            Map<String, Object> requestData = parseJsonRequest(exchange);
+            Boolean available = MapParsingUtil.getBooleanFromMap(requestData, "available");
+            
+            logger.info("Updating availability for item {} to {}", id, available);
+            itemService.updateAvailability(id, available);
+            
+            sendJsonResponse(exchange, ApplicationConstants.HTTP_STATUS.OK, 
+                Map.of("message", ApplicationConstants.SUCCESS_MESSAGES.ITEM_UPDATED));
+        } catch (Exception e) {
+            logger.error("Error updating item availability: {}", e.getMessage(), e);
+            throw e;
+        }
     }
     
     private void updateItemQuantity(HttpExchange exchange, Long id) throws IOException {
         Map<String, Object> requestData = parseJsonRequest(exchange);
-        Integer quantity = getIntFromMap(requestData, "quantity");
+        Integer quantity = MapParsingUtil.getIntegerFromMap(requestData, "quantity");
         
         itemService.updateQuantity(id, quantity);
         sendJsonResponse(exchange, 200, Map.of("message", "Item quantity updated successfully"));
@@ -300,62 +323,11 @@ public class ItemController implements HttpHandler {
         return JsonUtil.fromJson(requestBody, Map.class);
     }
     
-    private String getStringFromMap(Map<String, Object> map, String key) {
-        Object value = map.get(key);
-        if (value == null) throw new IllegalArgumentException("Missing required field: " + key);
-        return value.toString();
-    }
-    
-    private String getOptionalStringFromMap(Map<String, Object> map, String key, String defaultValue) {
-        Object value = map.get(key);
-        return value != null ? value.toString() : defaultValue;
-    }
-    
-    private Long getLongFromMap(Map<String, Object> map, String key) {
-        Object value = map.get(key);
-        if (value == null) throw new IllegalArgumentException("Missing required field: " + key);
-        if (value instanceof Number) return ((Number) value).longValue();
-        return Long.parseLong(value.toString());
-    }
-    
-    private Double getDoubleFromMap(Map<String, Object> map, String key) {
-        Object value = map.get(key);
-        if (value == null) throw new IllegalArgumentException("Missing required field: " + key);
-        if (value instanceof Number) return ((Number) value).doubleValue();
-        return Double.parseDouble(value.toString());
-    }
-    
-    private Double getOptionalDoubleFromMap(Map<String, Object> map, String key, Double defaultValue) {
-        Object value = map.get(key);
-        if (value == null) return defaultValue;
-        if (value instanceof Number) return ((Number) value).doubleValue();
-        return Double.parseDouble(value.toString());
-    }
-    
-    private Integer getIntFromMap(Map<String, Object> map, String key) {
-        Object value = map.get(key);
-        if (value == null) throw new IllegalArgumentException("Missing required field: " + key);
-        if (value instanceof Number) return ((Number) value).intValue();
-        return Integer.parseInt(value.toString());
-    }
-    
-    private Integer getOptionalIntFromMap(Map<String, Object> map, String key, Integer defaultValue) {
-        Object value = map.get(key);
-        if (value == null) return defaultValue;
-        if (value instanceof Number) return ((Number) value).intValue();
-        return Integer.parseInt(value.toString());
-    }
-    
-    private Boolean getBooleanFromMap(Map<String, Object> map, String key) {
-        Object value = map.get(key);
-        if (value == null) throw new IllegalArgumentException("Missing required field: " + key);
-        if (value instanceof Boolean) return (Boolean) value;
-        return Boolean.parseBoolean(value.toString());
-    }
+    // Removed redundant map parsing methods - now using MapParsingUtil
     
     private void sendJsonResponse(HttpExchange exchange, int statusCode, Object data) throws IOException {
         String jsonResponse = JsonUtil.toJson(data);
-        exchange.getResponseHeaders().set("Content-Type", "application/json");
+        exchange.getResponseHeaders().set("Content-Type", ApplicationConstants.CONTENT_TYPE.APPLICATION_JSON);
         exchange.sendResponseHeaders(statusCode, jsonResponse.getBytes().length);
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(jsonResponse.getBytes());
@@ -368,6 +340,7 @@ public class ItemController implements HttpHandler {
             "status", statusCode,
             "timestamp", java.time.Instant.now().toString()
         );
+        logger.warn("Sending error response: {} - {}", statusCode, message);
         sendJsonResponse(exchange, statusCode, errorResponse);
     }
 }

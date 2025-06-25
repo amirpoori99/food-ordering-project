@@ -26,6 +26,10 @@ class NavigationControllerTest extends ApplicationTest {
         // Clear authentication state before each test
         HttpClientUtil.clearTokens();
         
+        // Reset singleton instance for clean state
+        NavigationController.resetInstance();
+        navigationController = NavigationController.getInstance();
+        
         // Clear navigation cache
         navigationController.clearCache();
     }
@@ -73,7 +77,18 @@ class NavigationControllerTest extends ApplicationTest {
         @Test
         @DisplayName("Initialize sets stage properties correctly")
         void initialize_setsStagePropertiesCorrectly() {
+            // Ensure clean state and no authentication
+            HttpClientUtil.clearTokens();
+            navigationController.clearCache();
+            
             navigationController.initialize(testStage);
+            
+            // Wait for JavaFX Platform.runLater to complete
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             
             assertThat(testStage.getTitle()).isEqualTo("Food Ordering System");
             assertThat(testStage.isResizable()).isTrue();

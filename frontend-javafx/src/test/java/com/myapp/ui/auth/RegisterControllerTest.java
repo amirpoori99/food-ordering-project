@@ -16,10 +16,12 @@ import java.util.concurrent.TimeoutException;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.myapp.ui.common.TestFXBase;
+
 /**
  * Simplified tests for RegisterController
  */
-public class RegisterControllerTest extends ApplicationTest {
+public class RegisterControllerTest extends TestFXBase {
 
     private RegisterController controller;
     private NavigationController mockNavigationController;
@@ -38,12 +40,15 @@ public class RegisterControllerTest extends ApplicationTest {
     private ProgressIndicator loadingIndicator;
 
     @BeforeAll
-    static void setUpClass() throws Exception {
+    public static void setUpClass() throws Exception {
         FxToolkit.registerPrimaryStage();
     }
 
     @BeforeEach
-    void setUp() throws Exception {
+    @Override
+    public void setUp() throws Exception {
+        super.setUp(); // Call parent setup first
+        
         // Create controller
         controller = new RegisterController();
         
@@ -98,7 +103,7 @@ public class RegisterControllerTest extends ApplicationTest {
     }
 
     @AfterEach
-    void tearDown() {
+    public void tearDown() {
         Platform.runLater(() -> {
             fullNameField.clear();
             phoneField.clear();
@@ -114,7 +119,7 @@ public class RegisterControllerTest extends ApplicationTest {
     }
 
     @AfterAll
-    static void tearDownClass() throws TimeoutException {
+    public static void tearDownClass() throws TimeoutException {
         FxToolkit.cleanupStages();
     }
 

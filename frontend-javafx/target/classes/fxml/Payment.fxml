@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.ui.payment.PaymentController">
+   <top>
+      <VBox>
+         <children>
+            <MenuBar>
+               <menus>
+                  <Menu text="ناوبری">
+                     <items>
+                        <MenuItem fx:id="backToCartMenuItem" onAction="#handleBackToCart" text="بازگشت به سبد خرید" />
+                        <MenuItem fx:id="profileMenuItem" onAction="#handleProfile" text="پروفایل" />
+                        <MenuItem fx:id="orderHistoryMenuItem" onAction="#handleOrderHistory" text="تاریخچه سفارشات" />
+                        <MenuItem fx:id="logoutMenuItem" onAction="#handleLogout" text="خروج" />
+                     </items>
+                  </Menu>
+               </menus>
+            </MenuBar>
+            <HBox alignment="CENTER" spacing="10.0">
+               <children>
+                  <Label text="پرداخت و تکمیل سفارش">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </HBox>
+         </children>
+      </VBox>
+   </top>
+   <center>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+         <content>
+            <HBox spacing="20.0">
+               <children>
+                  <!-- Left Side - Payment Methods and Details -->
+                  <VBox spacing="15.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <!-- Payment Method Selection -->
+                        <VBox spacing="10.0" style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 5; -fx-background-radius: 5;">
+                           <children>
+                              <Label text="روش پرداخت">
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                              </Label>
+                              <VBox spacing="8.0">
+                                 <children>
+                                    <RadioButton fx:id="cardPaymentRadio" text="پرداخت با کارت بانکی">
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="paymentMethodGroup" />
+                                       </toggleGroup>
+                                    </RadioButton>
+                                    <RadioButton fx:id="walletPaymentRadio" text="پرداخت از کیف پول" toggleGroup="$paymentMethodGroup" />
+                                    <RadioButton fx:id="codPaymentRadio" selected="true" text="پرداخت در محل (نقدی)" toggleGroup="$paymentMethodGroup" />
+                                 </children>
+                              </VBox>
+                           </children>
+                           <padding>
+                              <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                           </padding>
+                        </VBox>
+
+                        <!-- Card Payment Details -->
+                        <VBox fx:id="cardPaymentSection" spacing="10.0" style="-fx-background-color: #e7f3ff; -fx-border-color: #b3d9ff; -fx-border-radius: 5; -fx-background-radius: 5;" visible="false">
+                           <children>
+                              <Label text="اطلاعات کارت بانکی">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              <GridPane hgap="10.0" vgap="10.0">
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="NEVER" minWidth="100.0" />
+                                    <ColumnConstraints hgrow="ALWAYS" />
+                                 </columnConstraints>
+                                 <children>
+                                    <Label text="شماره کارت:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                    <TextField fx:id="cardNumberField" promptText="1234-5678-9012-3456" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                    
+                                    <Label text="نام صاحب کارت:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                    <TextField fx:id="cardHolderNameField" promptText="نام کامل" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    
+                                    <Label text="تاریخ انقضا:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                    <HBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                       <children>
+                                          <TextField fx:id="cardExpiryMonthField" maxWidth="60.0" promptText="MM" />
+                                          <Label text="/" />
+                                          <TextField fx:id="cardExpiryYearField" maxWidth="80.0" promptText="YYYY" />
+                                       </children>
+                                    </HBox>
+                                    
+                                    <Label text="CVV:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                                    <TextField fx:id="cardCvvField" maxWidth="100.0" promptText="123" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                 </children>
+                              </GridPane>
+                           </children>
+                           <padding>
+                              <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                           </padding>
+                        </VBox>
+
+                        <!-- Wallet Payment Details -->
+                        <VBox fx:id="walletPaymentSection" spacing="10.0" style="-fx-background-color: #f0f8e7; -fx-border-color: #c3e6cb; -fx-border-radius: 5; -fx-background-radius: 5;" visible="false">
+                           <children>
+                              <Label text="پرداخت از کیف پول">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                 <children>
+                                    <Label text="موجودی فعلی:" />
+                                    <Label fx:id="walletBalanceLabel" style="-fx-text-fill: #28a745; -fx-font-weight: bold;" text="0 تومان" />
+                                    <Button fx:id="refreshWalletButton" onAction="#handleRefreshWallet" text="بروزرسانی" />
+                                 </children>
+                              </HBox>
+                              <Label fx:id="walletStatusLabel" style="-fx-text-fill: #6c757d;" text="" />
+                           </children>
+                           <padding>
+                              <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                           </padding>
+                        </VBox>
+
+                        <!-- COD Payment Details -->
+                        <VBox fx:id="codPaymentSection" spacing="10.0" style="-fx-background-color: #fff3cd; -fx-border-color: #ffeaa7; -fx-border-radius: 5; -fx-background-radius: 5;">
+                           <children>
+                              <Label text="پرداخت در محل">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              <Label text="مبلغ سفارش در زمان تحویل به صورت نقدی پرداخت خواهد شد." wrapText="true" />
+                              <Label style="-fx-text-fill: #856404;" text="⚠️ لطفاً مبلغ دقیق آماده داشته باشید." />
+                           </children>
+                           <padding>
+                              <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                           </padding>
+                        </VBox>
+
+                        <!-- Delivery Information Confirmation -->
+                        <VBox spacing="10.0" style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 5; -fx-background-radius: 5;">
+                           <children>
+                              <Label text="تأیید اطلاعات تحویل">
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                              </Label>
+                              <GridPane hgap="10.0" vgap="10.0">
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="NEVER" minWidth="80.0" />
+                                    <ColumnConstraints hgrow="ALWAYS" />
+                                 </columnConstraints>
+                                 <children>
+                                    <Label text="آدرس:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                    <TextArea fx:id="deliveryAddressDisplay" editable="false" maxHeight="80.0" minHeight="80.0" style="-fx-background-color: #e9ecef;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                    
+                                    <Label text="تلفن:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                    <TextField fx:id="deliveryPhoneDisplay" editable="false" style="-fx-background-color: #e9ecef;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    
+                                    <Label text="توضیحات:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                    <TextArea fx:id="orderNotesDisplay" editable="false" maxHeight="60.0" minHeight="60.0" style="-fx-background-color: #e9ecef;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                 </children>
+                              </GridPane>
+                           </children>
+                           <padding>
+                              <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                           </padding>
+                        </VBox>
+                     </children>
+                  </VBox>
+                  
+                  <!-- Right Side - Order Summary -->
+                  <VBox minWidth="350.0" spacing="15.0" style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-width: 1;">
+                     <children>
+                        <Label text="خلاصه سفارش">
+                           <font>
+                              <Font name="System Bold" size="16.0" />
+                           </font>
+                        </Label>
+                        
+                        <!-- Order Items -->
+                        <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-radius: 5; -fx-background-radius: 5;">
+                           <children>
+                              <Label text="آیتم‌های سفارش">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              <ScrollPane fx:id="orderItemsScrollPane" fitToWidth="true" hbarPolicy="NEVER" maxHeight="200.0" vbarPolicy="AS_NEEDED">
+                                 <content>
+                                    <VBox fx:id="orderItemsContainer" spacing="5.0" />
+                                 </content>
+                              </ScrollPane>
+                           </children>
+                           <padding>
+                              <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                           </padding>
+                        </VBox>
+                        
+                        <!-- Price Breakdown -->
+                        <VBox spacing="10.0" style="-fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-radius: 5; -fx-background-radius: 5;">
+                           <children>
+                              <GridPane hgap="10.0" vgap="8.0">
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="NEVER" minWidth="100.0" />
+                                    <ColumnConstraints hgrow="ALWAYS" />
+                                 </columnConstraints>
+                                 <children>
+                                    <Label text="جمع کالاها:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                    <Label fx:id="subtotalLabel" text="0 تومان" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                    
+                                    <Label text="هزینه ارسال:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                    <Label fx:id="deliveryFeeLabel" text="0 تومان" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    
+                                    <Label text="تخفیف:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                    <Label fx:id="discountLabel" text="0 تومان" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    
+                                    <Separator GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                                    
+                                    <Label text="مجموع نهایی:" style="-fx-font-weight: bold; -fx-font-size: 16;" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                                    <Label fx:id="totalAmountLabel" style="-fx-font-weight: bold; -fx-text-fill: #28a745; -fx-font-size: 16;" text="0 تومان" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                 </children>
+                              </GridPane>
+                           </children>
+                           <padding>
+                              <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                           </padding>
+                        </VBox>
+                        
+                        <!-- Payment Action Buttons -->
+                        <VBox spacing="10.0">
+                           <children>
+                              <Button fx:id="confirmPaymentButton" onAction="#handleConfirmPayment" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold; -fx-pref-height: 50;" text="تأیید و پرداخت" />
+                              <Button fx:id="backToCartButton" onAction="#handleBackToCart" style="-fx-background-color: #6c757d; -fx-text-fill: white;" text="بازگشت به سبد خرید" />
+                           </children>
+                        </VBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                     </padding>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+            </HBox>
+         </content>
+      </ScrollPane>
+   </center>
+   <bottom>
+      <VBox>
+         <children>
+            <Separator />
+            <HBox alignment="CENTER" spacing="10.0">
+               <children>
+                  <Label fx:id="statusLabel" text="آماده" />
+                  <ProgressIndicator fx:id="loadingIndicator" maxHeight="20.0" maxWidth="20.0" visible="false" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </HBox>
+         </children>
+      </VBox>
+   </bottom>
+</BorderPane>
