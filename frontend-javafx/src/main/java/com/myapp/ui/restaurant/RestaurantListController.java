@@ -21,8 +21,25 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * Controller for Restaurant List screen
- * Displays available restaurants and handles user interactions
+ * کنترلر لیست رستوران‌ها
+ * 
+ * این کلاس مسئول نمایش و مدیریت لیست رستوران‌ها شامل:
+ * - بارگذاری رستوران‌ها از backend
+ * - جستجو در رستوران‌ها بر اساس نام و آدرس
+ * - نمایش اطلاعات رستوران با custom cell factory
+ * - مدیریت منوی navigation
+ * - تعامل با رستوران‌ها (مشاهده منو، علاقه‌مندی)
+ * 
+ * ویژگی‌ها:
+ * - Real-time search
+ * - Custom ListView cells
+ * - Background data loading
+ * - Error handling
+ * - Status management
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class RestaurantListController implements Initializable {
 

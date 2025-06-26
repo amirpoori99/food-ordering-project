@@ -1,0 +1,52 @@
+[Unit]
+Description=Food Ordering System Backend Service
+Documentation=https://github.com/yourcompany/food-ordering-system
+After=network.target postgresql.service
+Wants=postgresql.service
+Requires=network.target
+
+[Service]
+Type=simple
+User=food-ordering
+Group=food-ordering
+WorkingDirectory=/opt/food-ordering
+ExecStart=/usr/bin/java -jar /opt/food-ordering/food-ordering-backend.jar --spring.profiles.active=production
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill -TERM $MAINPID
+
+# Environment variables
+Environment=JAVA_OPTS="-Xmx2g -Xms1g -XX:+UseG1GC -XX:+UseStringDeduplication"
+Environment=SERVER_HOST=0.0.0.0
+Environment=SERVER_PORT=8081
+Environment=SPRING_PROFILES_ACTIVE=production
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/food-ordering/logs /opt/food-ordering/uploads /tmp
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Restart policy
+Restart=always
+RestartSec=30
+StartLimitInterval=350
+StartLimitBurst=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=food-ordering
+
+# Process management
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStartSec=60
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target 

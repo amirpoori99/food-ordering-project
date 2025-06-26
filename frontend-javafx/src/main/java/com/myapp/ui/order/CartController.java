@@ -17,7 +17,25 @@ import java.text.NumberFormat;
 import java.util.*;
 
 /**
- * Controller for Shopping Cart screen
+ * کنترلر سبد خرید
+ * 
+ * این کلاس مسئول مدیریت رابط کاربری سبد خرید شامل:
+ * - نمایش آیتم‌های اضافه شده به سبد
+ * - مدیریت تعداد و انتخاب آیتم‌ها
+ * - محاسبه مبلغ کل و هزینه ارسال
+ * - اعمال کد تخفیف
+ * - اعتبارسنجی اطلاعات تحویل
+ * - انتقال به صفحه پرداخت
+ * 
+ * ویژگی‌ها:
+ * - Real-time calculation مبلغ
+ * - Dynamic UI creation برای cart items
+ * - Validation برای checkout
+ * - Currency formatting فارسی
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class CartController implements Initializable {
 
@@ -48,10 +66,21 @@ public class CartController implements Initializable {
     @FXML private Label statusLabel;
     @FXML private ProgressIndicator loadingIndicator;
 
+    /** کنترلر navigation برای تغییر صفحات */
     private NavigationController navigationController;
+    
+    /** لیست آیتم‌های موجود در سبد خرید */
     private List<CartItem> cartItems = new ArrayList<>();
+    
+    /** فرمت کردن ارز به فارسی */
     private final NumberFormat currencyFormat = NumberFormat.getInstance(new Locale("fa", "IR"));
 
+    /**
+     * متد مقداردهی اولیه کنترلر
+     * 
+     * @param location URL location
+     * @param resources منابع زبان
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.navigationController = NavigationController.getInstance();
@@ -59,24 +88,40 @@ public class CartController implements Initializable {
         loadCart();
     }
 
+    /**
+     * راه‌اندازی کامپوننت‌های UI و event listener ها
+     * 
+     * تنظیمات:
+     * - فرمت کردن ارز
+     * - listener ها برای اعتبارسنجی فیلدها
+     * - فعال/غیرفعال کردن دکمه تسویه حساب
+     */
     private void setupUI() {
         currencyFormat.setGroupingUsed(true);
         setStatus("در حال بارگذاری سبد خرید...");
         
-        // Setup listeners
+        // تنظیم listener ها برای اعتبارسنجی realtime
         deliveryAddressField.textProperty().addListener((obs, oldVal, newVal) -> validateCheckoutButton());
         deliveryPhoneField.textProperty().addListener((obs, oldVal, newVal) -> validateCheckoutButton());
         couponCodeField.textProperty().addListener((obs, oldVal, newVal) -> 
             applyCouponButton.setDisable(newVal.trim().isEmpty()));
     }
 
+    /**
+     * بارگذاری آیتم‌های سبد خرید از سرور
+     * 
+     * از background task استفاده می‌کند تا UI freeze نشود
+     * در حال حاضر از mock data استفاده می‌کند
+     */
     private void loadCart() {
         setLoading(true);
         
+        // background task برای بارگذاری داده‌ها
         Task<List<CartItem>> loadTask = new Task<List<CartItem>>() {
             @Override
             protected List<CartItem> call() throws Exception {
-                Thread.sleep(1000); // Simulate loading
+                Thread.sleep(1000); // شبیه‌سازی تأخیر شبکه
+                // ایجاد mock data برای نمایش
                 List<CartItem> mockItems = new ArrayList<>();
                 mockItems.add(new CartItem(1L, "پیتزا مارگاریتا", 25000.0, 2, "رستوران ایتالیایی"));
                 mockItems.add(new CartItem(2L, "برگر کلاسیک", 18000.0, 1, "فست فود سارا"));
@@ -84,6 +129,7 @@ public class CartController implements Initializable {
             }
         };
         
+        // پردازش نتیجه موفق
         loadTask.setOnSucceeded(e -> Platform.runLater(() -> {
             setLoading(false);
             cartItems = loadTask.getValue();
@@ -92,6 +138,7 @@ public class CartController implements Initializable {
             setStatus("سبد خرید بارگذاری شد");
         }));
         
+        // پردازش خطا
         loadTask.setOnFailed(e -> Platform.runLater(() -> {
             setLoading(false);
             setStatus("خطا در بارگذاری سبد خرید");
