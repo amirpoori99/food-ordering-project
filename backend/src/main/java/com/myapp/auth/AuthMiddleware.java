@@ -5,52 +5,59 @@ import com.sun.net.httpserver.HttpExchange;
 import io.jsonwebtoken.JwtException;
 
 /**
- * Authentication middleware for JWT token validation
- * Provides methods to authenticate requests and extract user information
+ * میان‌افزار احراز هویت برای اعتبارسنجی JWT token
+ * این کلاس متدهایی برای احراز هویت درخواست‌ها و استخراج اطلاعات کاربر فراهم می‌کند
+ * تمام عملیات امنیتی مربوط به JWT در این کلاس متمرکز شده است
  */
 public class AuthMiddleware {
     
     /**
-     * Authenticate request using JWT token from Authorization header
+     * احراز هویت درخواست با استفاده از JWT token از header Authorization
      * 
-     * @param exchange HTTP exchange
-     * @return AuthResult containing authentication information
+     * @param exchange HTTP exchange حاوی درخواست
+     * @return AuthResult حاوی اطلاعات احراز هویت
      */
     public static AuthResult authenticate(HttpExchange exchange) {
+        // استخراج header Authorization از درخواست
         String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
         
         if (authHeader == null) {
             return AuthResult.unauthenticated("Missing Authorization header");
         }
         
+        // استخراج token از header (فرمت: Bearer <token>)
         String token = JWTUtil.extractBearerToken(authHeader);
         if (token == null) {
             return AuthResult.unauthenticated("Invalid Authorization header format. Use 'Bearer <token>'");
         }
         
-        return authenticateToken(token);
+        return authenticateToken(token);  // اعتبارسنجی token
     }
     
     /**
-     * Authenticate using JWT token directly
+     * احراز هویت مستقیم با استفاده از JWT token
      * 
-     * @param token JWT token
-     * @return AuthResult containing authentication information
+     * @param token JWT token برای اعتبارسنجی
+     * @return AuthResult حاوی اطلاعات احراز هویت
      */
     public static AuthResult authenticateToken(String token) {
         try {
+            // بررسی معتبر بودن token
             if (!JWTUtil.validateToken(token)) {
                 return AuthResult.unauthenticated("Invalid token");
             }
             
+            // بررسی انقضای token
             if (JWTUtil.isTokenExpired(token)) {
                 return AuthResult.unauthenticated("Token expired");
             }
             
+            // بررسی نوع token (باید Access Token باشد)
             if (!JWTUtil.isAccessToken(token)) {
                 return AuthResult.unauthenticated("Invalid token type. Access token required");
             }
             
+            // استخراج اطلاعات کاربر از token
             Long userId = JWTUtil.getUserIdFromToken(token);
             String phone = JWTUtil.getPhoneFromToken(token);
             String role = JWTUtil.getRoleFromToken(token);
@@ -65,22 +72,22 @@ public class AuthMiddleware {
     }
     
     /**
-     * Check if user has required role
+     * بررسی داشتن نقش مورد نیاز توسط کاربر
      * 
-     * @param authResult Authentication result
-     * @param requiredRole Required role
-     * @return true if user has the role, false otherwise
+     * @param authResult نتیجه احراز هویت
+     * @param requiredRole نقش مورد نیاز
+     * @return true اگر کاربر نقش مورد نیاز را داشته باشد، در غیر اینصورت false
      */
     public static boolean hasRole(AuthResult authResult, String requiredRole) {
         return authResult.isAuthenticated() && requiredRole.equals(authResult.getRole());
     }
     
     /**
-     * Check if user has any of the required roles
+     * بررسی داشتن هر یک از نقش‌های مورد نیاز توسط کاربر
      * 
-     * @param authResult Authentication result
-     * @param requiredRoles Array of required roles
-     * @return true if user has any of the roles, false otherwise
+     * @param authResult نتیجه احراز هویت
+     * @param requiredRoles آرایه نقش‌های مورد نیاز
+     * @return true اگر کاربر حداقل یکی از نقش‌ها را داشته باشد، در غیر اینصورت false
      */
     public static boolean hasAnyRole(AuthResult authResult, String... requiredRoles) {
         if (!authResult.isAuthenticated()) {
@@ -97,55 +104,61 @@ public class AuthMiddleware {
     }
     
     /**
-     * Check if authenticated user is the same as the requested user ID
+     * بررسی اینکه آیا کاربر احراز هویت شده همان کاربر درخواست شده است
+     * یا اینکه کاربر دارای مجوز مدیریت است
      * 
-     * @param authResult Authentication result
-     * @param requestedUserId Requested user ID
-     * @return true if same user or user has admin privileges
+     * @param authResult نتیجه احراز هویت
+     * @param requestedUserId شناسه کاربر درخواست شده
+     * @return true اگر همان کاربر باشد یا مجوز مدیریت داشته باشد
      */
     public static boolean isSameUserOrAdmin(AuthResult authResult, Long requestedUserId) {
         if (!authResult.isAuthenticated()) {
             return false;
         }
         
-        // Check if same user
+        // بررسی همان کاربر بودن
         if (authResult.getUserId().equals(requestedUserId)) {
             return true;
         }
         
-        // Check if admin (for future admin role implementation)
+        // بررسی مجوز مدیریت (برای پیاده‌سازی آینده نقش admin)
         return "admin".equals(authResult.getRole());
     }
     
     /**
-     * Refresh access token using refresh token
+     * تجدید Access Token با استفاده از Refresh Token
      * 
-     * @param refreshToken Refresh token
-     * @param authRepository Authentication repository for user validation
-     * @return AuthResult with new access token or error
+     * @param refreshToken Refresh Token برای تجدید
+     * @param authRepository مخزن احراز هویت برای اعتبارسنجی کاربر
+     * @return AuthResult حاوی Access Token جدید یا خطا
      */
     public static AuthResult refreshAccessToken(String refreshToken, AuthRepository authRepository) {
         try {
+            // بررسی معتبر بودن Refresh Token
             if (!JWTUtil.validateToken(refreshToken)) {
                 return AuthResult.unauthenticated("Invalid refresh token");
             }
             
+            // بررسی انقضای Refresh Token
             if (JWTUtil.isTokenExpired(refreshToken)) {
                 return AuthResult.unauthenticated("Refresh token expired");
             }
             
+            // بررسی نوع token (باید Refresh Token باشد)
             if (!JWTUtil.isRefreshToken(refreshToken)) {
                 return AuthResult.unauthenticated("Invalid token type. Refresh token required");
             }
             
+            // استخراج شناسه کاربر از token
             Long userId = JWTUtil.getUserIdFromToken(refreshToken);
             
-            // Verify user still exists
+            // بررسی وجود کاربر در دیتابیس
             var userOpt = authRepository.findById(userId);
             if (userOpt.isEmpty()) {
                 return AuthResult.unauthenticated("User not found");
             }
             
+            // تولید جفت token جدید
             var user = userOpt.get();
             String[] tokens = JWTUtil.generateTokenPair(user.getId(), user.getPhone(), user.getRole().toString());
             
@@ -159,91 +172,93 @@ public class AuthMiddleware {
     }
     
     /**
-     * Extract user ID from request path parameter
+     * استخراج شناسه کاربر از پارامتر مسیر درخواست
      * 
      * @param exchange HTTP exchange
-     * @param paramName Parameter name (e.g., "userId")
-     * @return User ID or null if not found or invalid
+     * @param paramName نام پارامتر (مثل "userId")
+     * @return شناسه کاربر یا null در صورت عدم یافتن یا نامعتبر بودن
      */
     public static Long extractUserIdFromPath(HttpExchange exchange, String paramName) {
         try {
             String path = exchange.getRequestURI().getPath();
             String[] segments = path.split("/");
             
+            // جستجو برای پارامتر مشخص شده
             for (int i = 0; i < segments.length - 1; i++) {
                 if (segments[i].equals(paramName) && i + 1 < segments.length) {
                     return Long.parseLong(segments[i + 1]);
                 }
             }
             
-            // Alternative: look for numeric segment after known patterns
+            // روش جایگزین: جستجو برای بخش عددی بعد از الگوهای شناخته شده
             if (path.contains("/users/") || path.contains("/user/")) {
                 for (String segment : segments) {
                     try {
                         return Long.parseLong(segment);
                     } catch (NumberFormatException ignored) {
-                        // Continue searching
+                        // ادامه جستجو
                     }
                 }
             }
             
         } catch (Exception e) {
-            // Log error in production
+            // در محیط production باید خطا log شود
         }
         
         return null;
     }
     
     /**
-     * Check if request requires authentication based on path
+     * بررسی اینکه آیا درخواست نیاز به احراز هویت دارد بر اساس مسیر
      * 
-     * @param path Request path
-     * @return true if authentication required, false otherwise
+     * @param path مسیر درخواست
+     * @return true اگر احراز هویت لازم باشد، در غیر اینصورت false
      */
     public static boolean requiresAuthentication(String path) {
-        // Public endpoints that don't require authentication
+        // endpoint های عمومی که نیاز به احراز هویت ندارند
         String[] publicPaths = {
-            "/api/auth/register",
-            "/api/auth/login",
-            "/api/auth/refresh",
-            "/api/health",
-            "/api/status"
+            "/api/auth/register",    // ثبت نام
+            "/api/auth/login",       // ورود
+            "/api/auth/refresh",     // تجدید token
+            "/api/health",           // بررسی سلامت
+            "/api/status"            // وضعیت سیستم
         };
         
+        // بررسی اینکه آیا مسیر در لیست عمومی است
         for (String publicPath : publicPaths) {
             if (path.startsWith(publicPath)) {
                 return false;
             }
         }
         
-        // All other API endpoints require authentication
+        // تمام endpoint های دیگر API نیاز به احراز هویت دارند
         return path.startsWith("/api/");
     }
     
     /**
-     * Get required role for specific endpoint
+     * دریافت نقش مورد نیاز برای endpoint خاص
      * 
-     * @param path Request path
-     * @param method HTTP method
-     * @return Required role or null if no specific role required
+     * @param path مسیر درخواست
+     * @param method متد HTTP
+     * @return نقش مورد نیاز یا null اگر نقش خاصی لازم نباشد
      */
     public static String getRequiredRole(String path, String method) {
-        // Restaurant management - sellers only
+        // مدیریت رستوران - فقط فروشندگان
         if (path.startsWith("/api/restaurants") && ("POST".equals(method) || "PUT".equals(method) || "DELETE".equals(method))) {
             return "seller";
         }
         
-        // Delivery management - delivery only
+        // مدیریت تحویل - فقط پیک‌ها
         if (path.startsWith("/api/delivery") && ("PUT".equals(method) || "POST".equals(method))) {
             return "delivery";
         }
         
-        // Admin endpoints (for future implementation)
+        // endpoint های مدیریت (برای پیاده‌سازی آینده)
         if (path.startsWith("/api/admin/")) {
             return "admin";
         }
         
-        // Most endpoints are accessible by any authenticated user
+        // اکثر endpoint ها برای هر کاربر احراز هویت شده قابل دسترسی هستند
         return null;
     }
 } 

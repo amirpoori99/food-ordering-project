@@ -1,5 +1,6 @@
 package com.myapp.common.utils;
 
+// وارد کردن کتابخانه‌های امنیتی و رمزنگاری
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -7,40 +8,48 @@ import java.util.Base64;
 import java.util.regex.Pattern;
 
 /**
- * Utility class for password operations
- * Provides secure password hashing, verification, and validation
+ * کلاس ابزاری برای عملیات رمز عبور
+ * شامل hash کردن امن، تأیید و اعتبارسنجی رمز عبور
+ * از الگوریتم SHA-256 با Salt تصادفی استفاده می‌کند
  */
 public class PasswordUtil {
     
+    // الگوریتم hash مورد استفاده
     private static final String HASH_ALGORITHM = "SHA-256";
+    
+    // طول Salt تصادفی (32 بایت)
     private static final int SALT_LENGTH = 32;
+    
+    // مولد عدد تصادفی امن
     private static final SecureRandom random = new SecureRandom();
     
-    // Password validation patterns
+    // الگوی اعتبارسنجی رمز عبور (حداقل 8 کاراکتر، شامل حروف کوچک، بزرگ، عدد و کاراکتر خاص)
     private static final Pattern PASSWORD_PATTERN = Pattern.compile(
         "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$"
     );
     
     /**
-     * Hash a password with a randomly generated salt
+     * تولید hash امن برای رمز عبور با Salt تصادفی
      * 
-     * @param password The plain text password
-     * @return A string containing the salt and hashed password separated by ':'
+     * @param password رمز عبور متنی
+     * @return رشته حاوی Salt و رمز عبور hash شده جدا شده با ':'
+     * @throws IllegalArgumentException در صورت null یا خالی بودن رمز عبور
      */
     public static String hashPassword(String password) {
+        // اعتبارسنجی ورودی
         if (password == null || password.isEmpty()) {
             throw new IllegalArgumentException("Password cannot be null or empty");
         }
         
         try {
-            // Generate a random salt
+            // تولید Salt تصادفی
             byte[] salt = new byte[SALT_LENGTH];
             random.nextBytes(salt);
             
-            // Hash the password with the salt
+            // hash کردن رمز عبور با Salt
             String hashedPassword = hashPasswordWithSalt(password, salt);
             
-            // Return salt:hashedPassword format
+            // برگرداندن در فرمت salt:hashedPassword
             return Base64.getEncoder().encodeToString(salt) + ":" + hashedPassword;
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Failed to hash password", e);
@@ -48,57 +57,60 @@ public class PasswordUtil {
     }
     
     /**
-     * Verify a password against a stored hash
+     * تأیید رمز عبور در مقابل hash ذخیره شده
      * 
-     * @param password The plain text password to verify
-     * @param storedHash The stored hash in format "salt:hashedPassword"
-     * @return true if password matches, false otherwise
+     * @param password رمز عبور متنی برای تأیید
+     * @param storedHash hash ذخیره شده در فرمت "salt:hashedPassword"
+     * @return true اگر رمز عبور مطابقت داشته باشد، در غیر اینصورت false
      */
     public static boolean verifyPassword(String password, String storedHash) {
+        // بررسی null بودن ورودی‌ها
         if (password == null || storedHash == null) {
             return false;
         }
         
         try {
-            // Split the stored hash to get salt and hash
+            // تجزیه hash ذخیره شده برای دریافت Salt و hash
             String[] parts = storedHash.split(":");
             if (parts.length != 2) {
-                return false;
+                return false; // فرمت نامعتبر
             }
             
-            // Decode the salt
+            // رمزگشایی Salt
             byte[] salt = Base64.getDecoder().decode(parts[0]);
             String expectedHash = parts[1];
             
-            // Hash the provided password with the same salt
+            // hash کردن رمز عبور ارائه شده با همان Salt
             String actualHash = hashPasswordWithSalt(password, salt);
             
-            // Compare hashes using constant-time comparison
+            // مقایسه hash ها با روش constant-time برای جلوگیری از timing attack
             return constantTimeEquals(expectedHash, actualHash);
         } catch (Exception e) {
-            // Log the exception in a real application
+            // در برنامه واقعی باید exception را log کرد
             return false;
         }
     }
     
     /**
-     * Hash password with a specific salt
+     * hash کردن رمز عبور با Salt مشخص
+     * متد کمکی برای hash کردن با Salt داده شده
      */
     private static String hashPasswordWithSalt(String password, byte[] salt) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
         
-        // Add salt to the digest
+        // افزودن Salt به digest
         md.update(salt);
         
-        // Hash the password
+        // hash کردن رمز عبور
         byte[] hashedPassword = md.digest(password.getBytes());
         
-        // Return base64 encoded hash
+        // برگرداندن hash encode شده با base64
         return Base64.getEncoder().encodeToString(hashedPassword);
     }
     
     /**
-     * Constant-time string comparison to prevent timing attacks
+     * مقایسه رشته با زمان ثابت برای جلوگیری از timing attack
+     * این روش از timing attack جلوگیری می‌کند
      */
     private static boolean constantTimeEquals(String a, String b) {
         if (a.length() != b.length()) {
@@ -107,37 +119,39 @@ public class PasswordUtil {
         
         int result = 0;
         for (int i = 0; i < a.length(); i++) {
-            result |= a.charAt(i) ^ b.charAt(i);
+            result |= a.charAt(i) ^ b.charAt(i); // XOR برای مقایسه
         }
         
-        return result == 0;
+        return result == 0; // اگر همه کاراکترها یکسان باشند، result برابر 0 است
     }
     
     /**
-     * Validate password strength
+     * اعتبارسنجی قدرت رمز عبور
      * 
-     * @param password The password to validate
-     * @return true if password meets strength requirements
+     * @param password رمز عبور برای اعتبارسنجی
+     * @return true اگر رمز عبور الزامات قدرت را برآورده کند
      */
     public static boolean isValidPassword(String password) {
         if (password == null) {
             return false;
         }
         
-        return PASSWORD_PATTERN.matcher(password).matches();
+        return PASSWORD_PATTERN.matcher(password).matches(); // بررسی با regex pattern
     }
     
     /**
-     * Get password strength requirements as a readable string
+     * دریافت الزامات قدرت رمز عبور به صورت رشته قابل خواندن
+     * 
+     * @return متن شامل الزامات رمز عبور
      */
     public static String getPasswordRequirements() {
         return "Password must contain:\n" +
-               "- At least 8 characters\n" +
-               "- At least one uppercase letter (A-Z)\n" +
-               "- At least one lowercase letter (a-z)\n" +
-               "- At least one digit (0-9)\n" +
-               "- At least one special character (@#$%^&+=)\n" +
-               "- No whitespace characters";
+               "- At least 8 characters\n" +                      // حداقل 8 کاراکتر
+               "- At least one uppercase letter (A-Z)\n" +        // حداقل یک حرف بزرگ
+               "- At least one lowercase letter (a-z)\n" +        // حداقل یک حرف کوچک
+               "- At least one digit (0-9)\n" +                   // حداقل یک عدد
+               "- At least one special character (@#$%^&+=)\n" +   // حداقل یک کاراکتر خاص
+               "- No whitespace characters";                      // بدون فضای خالی
     }
     
     /**

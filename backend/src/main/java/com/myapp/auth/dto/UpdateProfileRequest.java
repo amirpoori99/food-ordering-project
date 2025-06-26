@@ -1,20 +1,36 @@
 package com.myapp.auth.dto;
 
+/**
+ * کلاس درخواست به‌روزرسانی پروفایل - DTO برای به‌روزرسانی اطلاعات کاربر
+ * این کلاس فقط فیلدهای قابل به‌روزرسانی را شامل می‌شود
+ * از الگوی Partial Update استفاده می‌کند (فقط فیلدهای ارسال شده به‌روز می‌شوند)
+ */
 public class UpdateProfileRequest {
-    private String fullName;
-    private String email;
-    private String address;
+    private String fullName; // نام و نام خانوادگی جدید (اختیاری)
+    private String email;    // آدرس ایمیل جدید (اختیاری)
+    private String address;  // آدرس جدید (اختیاری)
 
+    /**
+     * سازنده پیش‌فرض - برای framework ها و JSON deserialization
+     */
     public UpdateProfileRequest() {
     }
 
+    /**
+     * سازنده کامل - برای ایجاد درخواست با تمام فیلدها
+     * 
+     * @param fullName نام و نام خانوادگی جدید
+     * @param email آدرس ایمیل جدید
+     * @param address آدرس جدید
+     */
     public UpdateProfileRequest(String fullName, String email, String address) {
-        this.fullName = fullName;
-        this.email = email;
-        this.address = address;
+        this.fullName = fullName; // تنظیم نام کامل جدید
+        this.email = email;       // تنظیم ایمیل جدید
+        this.address = address;   // تنظیم آدرس جدید
     }
 
-    public String getFullName() { return fullName; }
-    public String getEmail() { return email; }
-    public String getAddress() { return address; }
+    // متدهای Getter برای دسترسی به داده‌ها
+    public String getFullName() { return fullName; } // دریافت نام کامل جدید
+    public String getEmail() { return email; }       // دریافت ایمیل جدید
+    public String getAddress() { return address; }   // دریافت آدرس جدید
 } 

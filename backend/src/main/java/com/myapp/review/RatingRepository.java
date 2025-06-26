@@ -16,15 +16,63 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Repository class for Rating entity operations
- * Handles database operations for ratings and reviews
+ * Repository لایه دسترسی داده برای entity های Rating (نظرات و امتیازات)
+ * 
+ * این کلاس تمام عملیات پایگاه داده مربوط به مدیریت نظرات و امتیازدهی را ارائه می‌دهد:
+ * 
+ * === عملیات CRUD پایه ===
+ * - save(): ذخیره/به‌روزرسانی نظر و امتیاز
+ * - findById(): جستجو بر اساس شناسه
+ * - delete(): حذف نظر
+ * - findAll(): دریافت تمام نظرات
+ * 
+ * === جستجوهای تخصصی ===
+ * - findByUserAndRestaurant(): نظر کاربر برای رستوران خاص (unique constraint)
+ * - findByRestaurant(): تمام نظرات رستوران
+ * - findByUser(): تمام نظرات کاربر
+ * - findByScoreRange(): نظرات در بازه امتیاز مشخص
+ * - findVerifiedRatings(): نظرات تایید شده
+ * - findRatingsWithReviews(): نظراتی که متن نظر دارند
+ * - findRecentRatings(): نظرات اخیر (در چند روز گذشته)
+ * 
+ * === عملیات آماری ===
+ * - getAverageRating(): میانگین امتیاز رستوران
+ * - getRatingCount(): تعداد نظرات رستوران
+ * - getRatingDistribution(): توزیع امتیازات (تعداد هر امتیاز 1-5)
+ * - getTopRatedRestaurants(): رستوران‌های برتر بر اساس امتیاز
+ * 
+ * === صفحه‌بندی و شمارش ===
+ * - findWithPagination(): دریافت با صفحه‌بندی
+ * - countAll(): تعداد کل نظرات
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Unique Constraint: هر کاربر فقط یک نظر برای هر رستوران
+ * - Statistical Queries: queries پیچیده برای آمارگیری
+ * - Rating Distribution: تحلیل توزیع امتیازات
+ * - Verification Support: پشتیبانی از نظرات تایید شده
+ * - Temporal Filtering: فیلتر بر اساس زمان
+ * - Aggregation Functions: استفاده از توابع آماری SQL
+ * - Error Handling: مدیریت خطاها با try-catch
+ * - Logging: ثبت تمام عملیات
+ * - HQL Queries: استفاده از Hibernate Query Language
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class RatingRepository {
     
+    /** Logger برای ثبت عملیات و خطاها */
     private static final Logger logger = LoggerFactory.getLogger(RatingRepository.class);
     
     /**
-     * Saves a new rating or updates existing one
+     * ذخیره نظر جدید یا به‌روزرسانی نظر موجود
+     * 
+     * این متد بر اساس وجود ID تشخیص می‌دهد که آیا باید نظر جدید ایجاد کند یا موجودی را به‌روزرسانی کند
+     * 
+     * @param rating شیء نظر برای ذخیره
+     * @return نظر ذخیره شده یا به‌روزرسانی شده
+     * @throws RuntimeException در صورت خطا در ذخیره‌سازی
      */
     public Rating save(Rating rating) {
         Transaction transaction = null;
@@ -32,9 +80,11 @@ public class RatingRepository {
             transaction = session.beginTransaction();
             
             if (rating.getId() == null) {
+                // ایجاد نظر جدید
                 session.persist(rating);
                 logger.info("Created new rating: {}", rating);
             } else {
+                // به‌روزرسانی نظر موجود
                 rating = session.merge(rating);
                 logger.info("Updated rating: {}", rating);
             }
@@ -52,7 +102,10 @@ public class RatingRepository {
     }
     
     /**
-     * Finds rating by ID
+     * جستجوی نظر بر اساس شناسه
+     * 
+     * @param id شناسه نظر
+     * @return Optional حاوی نظر یا empty در صورت عدم وجود
      */
     public Optional<Rating> findById(Long id) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -65,7 +118,13 @@ public class RatingRepository {
     }
     
     /**
-     * Finds rating by user and restaurant (unique constraint)
+     * جستجوی نظر بر اساس کاربر و رستوران (محدودیت یکتایی)
+     * 
+     * هر کاربر فقط می‌تواند یک نظر برای هر رستوران داشته باشد
+     * 
+     * @param user کاربر نظردهنده
+     * @param restaurant رستوران مورد نظر
+     * @return Optional حاوی نظر یا empty در صورت عدم وجود
      */
     public Optional<Rating> findByUserAndRestaurant(User user, Restaurant restaurant) {
         if (user == null || restaurant == null) {
@@ -90,7 +149,12 @@ public class RatingRepository {
     }
     
     /**
-     * Finds all ratings for a restaurant
+     * دریافت تمام نظرات مربوط به رستوران خاص
+     * 
+     * نظرات بر اساس تاریخ ایجاد (جدیدترین ابتدا) مرتب می‌شوند
+     * 
+     * @param restaurant رستوران مورد نظر
+     * @return لیست نظرات رستوران
      */
     public List<Rating> findByRestaurant(Restaurant restaurant) {
         if (restaurant == null) {
@@ -113,7 +177,10 @@ public class RatingRepository {
     }
     
     /**
-     * Finds all ratings by a user
+     * دریافت تمام نظرات ثبت شده توسط کاربر خاص
+     * 
+     * @param user کاربر مورد نظر
+     * @return لیست نظرات کاربر (مرتب شده بر اساس تاریخ)
      */
     public List<Rating> findByUser(User user) {
         if (user == null) {
@@ -135,7 +202,11 @@ public class RatingRepository {
     }
     
     /**
-     * Finds ratings by score range
+     * جستجوی نظرات در بازه امتیاز مشخص
+     * 
+     * @param minScore حداقل امتیاز (شامل)
+     * @param maxScore حداکثر امتیاز (شامل)
+     * @return لیست نظرات در بازه امتیاز
      */
     public List<Rating> findByScoreRange(int minScore, int maxScore) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -154,7 +225,11 @@ public class RatingRepository {
     }
     
     /**
-     * Finds verified ratings
+     * دریافت نظرات تایید شده
+     * 
+     * نظراتی که توسط مدیریت سیستم تایید شده‌اند
+     * 
+     * @return لیست نظرات تایید شده
      */
     public List<Rating> findVerifiedRatings() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -170,7 +245,11 @@ public class RatingRepository {
     }
     
     /**
-     * Finds ratings with reviews (non-empty review text)
+     * دریافت نظراتی که متن نظر دارند
+     * 
+     * نظراتی که علاوه بر امتیاز، متن توضیحی نیز ارائه کرده‌اند
+     * 
+     * @return لیست نظرات دارای متن
      */
     public List<Rating> findRatingsWithReviews() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -186,7 +265,10 @@ public class RatingRepository {
     }
     
     /**
-     * Finds recent ratings (within specified days)
+     * دریافت نظرات اخیر (در چند روز گذشته)
+     * 
+     * @param days تعداد روزهای گذشته
+     * @return لیست نظرات اخیر
      */
     public List<Rating> findRecentRatings(int days) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -204,7 +286,10 @@ public class RatingRepository {
     }
     
     /**
-     * Gets average rating for a restaurant
+     * محاسبه میانگین امتیاز رستوران
+     * 
+     * @param restaurant رستوران مورد نظر
+     * @return میانگین امتیاز (0.0 در صورت عدم وجود نظر)
      */
     public Double getAverageRating(Restaurant restaurant) {
         if (restaurant == null) {
@@ -228,7 +313,10 @@ public class RatingRepository {
     }
     
     /**
-     * Gets rating count for a restaurant
+     * شمارش تعداد نظرات رستوران
+     * 
+     * @param restaurant رستوران مورد نظر
+     * @return تعداد نظرات (0 در صورت عدم وجود)
      */
     public Long getRatingCount(Restaurant restaurant) {
         if (restaurant == null) {
@@ -252,7 +340,12 @@ public class RatingRepository {
     }
     
     /**
-     * Gets rating distribution for a restaurant (count per score)
+     * دریافت توزیع امتیازات رستوران (تعداد هر امتیاز از 1 تا 5)
+     * 
+     * این متد برای نمایش نمودار توزیع امتیازات استفاده می‌شود
+     * 
+     * @param restaurant رستوران مورد نظر
+     * @return Map حاوی تعداد هر امتیاز (1-5)
      */
     public Map<Integer, Long> getRatingDistribution(Restaurant restaurant) {
         if (restaurant == null) {
@@ -268,12 +361,12 @@ public class RatingRepository {
             List<Object[]> results = query.getResultList();
             Map<Integer, Long> distribution = new java.util.HashMap<>();
             
-            // Initialize all scores to 0
+            // مقداردهی اولیه تمام امتیازها به 0
             for (int i = 1; i <= 5; i++) {
                 distribution.put(i, 0L);
             }
             
-            // Fill in actual counts
+            // پر کردن تعداد واقعی
             for (Object[] result : results) {
                 Integer score = (Integer) result[0];
                 Long count = (Long) result[1];
@@ -290,7 +383,13 @@ public class RatingRepository {
     }
     
     /**
-     * Gets top rated restaurants
+     * دریافت رستوران‌های برتر بر اساس امتیاز
+     * 
+     * فقط رستوران‌هایی که حداقل 5 نظر دارند در نظر گرفته می‌شوند
+     * ابتدا بر اساس میانگین امتیاز و سپس تعداد نظرات مرتب می‌شوند
+     * 
+     * @param limit تعداد رستوران‌های برتر
+     * @return لیست Object[] حاوی [restaurantId, restaurantName, averageRating, ratingCount]
      */
     public List<Object[]> getTopRatedRestaurants(int limit) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -313,7 +412,10 @@ public class RatingRepository {
     }
     
     /**
-     * Deletes a rating
+     * حذف نظر بر اساس شناسه
+     * 
+     * @param id شناسه نظر
+     * @return true در صورت حذف موفق، false در غیر این صورت
      */
     public boolean delete(Long id) {
         if (id == null) {
@@ -351,7 +453,9 @@ public class RatingRepository {
     }
     
     /**
-     * Gets all ratings (for admin purposes)
+     * دریافت تمام نظرات (برای مقاصد مدیریتی)
+     * 
+     * @return لیست تمام نظرات (مرتب شده بر اساس تاریخ ایجاد)
      */
     public List<Rating> findAll() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -367,7 +471,13 @@ public class RatingRepository {
     }
     
     /**
-     * Gets ratings with pagination
+     * دریافت نظرات با صفحه‌بندی
+     * 
+     * برای بهبود عملکرد در صفحات مدیریت با تعداد زیاد نظرات
+     * 
+     * @param offset شروع از رکورد (شروع از 0)
+     * @param limit تعداد رکوردها در هر صفحه
+     * @return لیست نظرات با صفحه‌بندی
      */
     public List<Rating> findWithPagination(int offset, int limit) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -385,7 +495,11 @@ public class RatingRepository {
     }
     
     /**
-     * Counts total ratings
+     * شمارش کل تعداد نظرات
+     * 
+     * برای آمارهای کلی و محاسبه pagination
+     * 
+     * @return تعداد کل نظرات
      */
     public Long countAll() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {

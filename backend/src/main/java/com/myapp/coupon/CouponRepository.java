@@ -14,17 +14,68 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Repository class for Coupon data access operations
- * Handles all database operations for coupons
+ * Repository لایه دسترسی داده برای entity های Coupon
+ * 
+ * این کلاس تمام عملیات پایگاه داده مربوط به مدیریت کوپن‌های تخفیف را ارائه می‌دهد:
+ * 
+ * === عملیات CRUD پایه ===
+ * - save(): ذخیره کوپن جدید
+ * - update(): به‌روزرسانی کوپن موجود
+ * - findById(): جستجو بر اساس شناسه
+ * - findByCode(): جستجو بر اساس کد کوپن
+ * - delete(): حذف کوپن
+ * - existsByCode(): بررسی وجود کد کوپن
+ * 
+ * === جستجوهای وضعیت ===
+ * - findActiveCoupons(): کوپن‌های فعال
+ * - findValidCoupons(): کوپن‌های معتبر (فعال + در بازه زمانی)
+ * - findExpiredCoupons(): کوپن‌های منقضی
+ * - findCouponsExpiringSoon(): کوپن‌های نزدیک به انقضا
+ * 
+ * === جستجوهای تخصصی ===
+ * - findByRestaurant(): کوپن‌های رستوران خاص
+ * - findGlobalCoupons(): کوپن‌های سراسری
+ * - findByType(): کوپن‌ها بر اساس نوع (درصد/مبلغ ثابت)
+ * - findByCreatedBy(): کوپن‌های ایجاد شده توسط کاربر خاص
+ * - findApplicableCoupons(): کوپن‌های قابل اعمال برای سفارش
+ * 
+ * === صفحه‌بندی و آمار ===
+ * - findWithPagination(): دریافت با صفحه‌بندی
+ * - findAll(): تمام کوپن‌ها
+ * - countAll(): تعداد کل کوپن‌ها
+ * - countActive(): تعداد کوپن‌های فعال
+ * 
+ * === مدیریت استفاده ===
+ * - incrementUsageCount(): افزایش تعداد استفاده
+ * - decrementUsageCount(): کاهش تعداد استفاده (برای استرداد)
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Complex Business Queries: queries پیچیده برای منطق کسب‌وکار
+ * - Date Range Validation: اعتبارسنجی بازه زمانی
+ * - Usage Tracking: ردیابی تعداد استفاده
+ * - Restaurant Scoping: پشتیبانی از کوپن‌های عمومی و اختصاصی
+ * - Transaction Management: مدیریت تراکنش‌ها
+ * - Error Handling: مدیریت خطاها با try-catch
+ * - Logging: ثبت تمام عملیات
+ * - HQL Queries: استفاده از Hibernate Query Language
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class CouponRepository {
     
+    /** Logger برای ثبت عملیات و خطاها */
     private static final Logger logger = LoggerFactory.getLogger(CouponRepository.class);
     
     // ==================== BASIC CRUD OPERATIONS ====================
     
     /**
-     * Saves a new coupon to the database
+     * ذخیره کوپن جدید در پایگاه داده
+     * 
+     * @param coupon شیء کوپن برای ذخیره
+     * @return کوپن ذخیره شده با ID تخصیص داده شده
+     * @throws RuntimeException در صورت خطا در ذخیره‌سازی
      */
     public Coupon save(Coupon coupon) {
         Transaction tx = null;
@@ -42,7 +93,13 @@ public class CouponRepository {
     }
     
     /**
-     * Updates an existing coupon
+     * به‌روزرسانی کوپن موجود
+     * 
+     * تاریخ updatedAt به صورت خودکار به‌روزرسانی می‌شود
+     * 
+     * @param coupon شیء کوپن برای به‌روزرسانی
+     * @return کوپن به‌روزرسانی شده
+     * @throws RuntimeException در صورت خطا در به‌روزرسانی
      */
     public Coupon update(Coupon coupon) {
         Transaction tx = null;
@@ -61,7 +118,11 @@ public class CouponRepository {
     }
     
     /**
-     * Finds a coupon by ID
+     * جستجوی کوپن بر اساس شناسه
+     * 
+     * @param id شناسه کوپن
+     * @return Optional حاوی کوپن یا empty در صورت عدم وجود
+     * @throws RuntimeException در صورت خطا در جستجو
      */
     public Optional<Coupon> findById(Long id) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -74,7 +135,13 @@ public class CouponRepository {
     }
     
     /**
-     * Finds a coupon by code
+     * جستجوی کوپن بر اساس کد کوپن
+     * 
+     * کد کوپن یکتا است و برای اعتبارسنجی استفاده می‌شود
+     * 
+     * @param code کد کوپن
+     * @return Optional حاوی کوپن یا empty در صورت عدم وجود
+     * @throws RuntimeException در صورت خطا در جستجو
      */
     public Optional<Coupon> findByCode(String code) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -89,7 +156,13 @@ public class CouponRepository {
     }
     
     /**
-     * Checks if a coupon code exists
+     * بررسی وجود کد کوپن در سیستم
+     * 
+     * برای جلوگیری از ایجاد کد تکراری استفاده می‌شود
+     * 
+     * @param code کد کوپن برای بررسی
+     * @return true اگر کد وجود داشته باشد، false در غیر این صورت
+     * @throws RuntimeException در صورت خطا در بررسی
      */
     public boolean existsByCode(String code) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -104,7 +177,11 @@ public class CouponRepository {
     }
     
     /**
-     * Deletes a coupon by ID
+     * حذف کوپن بر اساس شناسه
+     * 
+     * @param id شناسه کوپن
+     * @return true در صورت حذف موفق، false در صورت عدم وجود
+     * @throws RuntimeException در صورت خطا در حذف
      */
     public boolean delete(Long id) {
         Transaction tx = null;
@@ -129,7 +206,12 @@ public class CouponRepository {
     // ==================== QUERY METHODS ====================
     
     /**
-     * Gets all active coupons
+     * دریافت تمام کوپن‌های فعال
+     * 
+     * کوپن‌هایی که isActive = true دارند
+     * 
+     * @return لیست کوپن‌های فعال (مرتب شده بر اساس تاریخ ایجاد)
+     * @throws RuntimeException در صورت خطا در جستجو
      */
     public List<Coupon> findActiveCoupons() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -143,7 +225,15 @@ public class CouponRepository {
     }
     
     /**
-     * Gets all valid coupons (active and within date range)
+     * دریافت تمام کوپن‌های معتبر
+     * 
+     * کوپن‌هایی که:
+     * - فعال هستند (isActive = true)
+     * - در بازه زمانی معتبر قرار دارند
+     * - هنوز محدودیت استفاده را نداشته‌اند
+     * 
+     * @return لیست کوپن‌های معتبر
+     * @throws RuntimeException در صورت خطا در جستجو
      */
     public List<Coupon> findValidCoupons() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -162,15 +252,21 @@ public class CouponRepository {
     }
     
     /**
-     * Gets coupons by restaurant (null restaurant means global coupons)
+     * دریافت کوپن‌های مربوط به رستوران خاص
+     * 
+     * @param restaurant شیء رستوران (null برای کوپن‌های سراسری)
+     * @return لیست کوپن‌های رستوران یا سراسری
+     * @throws RuntimeException در صورت خطا در جستجو
      */
     public List<Coupon> findByRestaurant(Restaurant restaurant) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Query<Coupon> query;
             if (restaurant == null) {
+                // کوپن‌های سراسری
                 query = session.createQuery(
                     "FROM Coupon c WHERE c.restaurant IS NULL ORDER BY c.createdAt DESC", Coupon.class);
             } else {
+                // کوپن‌های اختصاصی رستوران
                 query = session.createQuery(
                     "FROM Coupon c WHERE c.restaurant = :restaurant ORDER BY c.createdAt DESC", Coupon.class);
                 query.setParameter("restaurant", restaurant);
@@ -183,15 +279,21 @@ public class CouponRepository {
     }
     
     /**
-     * Gets coupons by restaurant ID
+     * دریافت کوپن‌های مربوط به رستوران خاص (بر اساس ID)
+     * 
+     * @param restaurantId شناسه رستوران (null برای کوپن‌های سراسری)
+     * @return لیست کوپن‌های رستوران یا سراسری
+     * @throws RuntimeException در صورت خطا در جستجو
      */
     public List<Coupon> findByRestaurantId(Long restaurantId) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Query<Coupon> query;
             if (restaurantId == null) {
+                // کوپن‌های سراسری
                 query = session.createQuery(
                     "FROM Coupon c WHERE c.restaurant IS NULL ORDER BY c.createdAt DESC", Coupon.class);
             } else {
+                // کوپن‌های اختصاصی رستوران
                 query = session.createQuery(
                     "FROM Coupon c WHERE c.restaurant.id = :restaurantId ORDER BY c.createdAt DESC", Coupon.class);
                 query.setParameter("restaurantId", restaurantId);
@@ -204,7 +306,12 @@ public class CouponRepository {
     }
     
     /**
-     * Gets global coupons (applicable to all restaurants)
+     * دریافت کوپن‌های سراسری
+     * 
+     * کوپن‌هایی که برای تمام رستوران‌ها قابل استفاده هستند
+     * 
+     * @return لیست کوپن‌های سراسری
+     * @throws RuntimeException در صورت خطا در جستجو
      */
     public List<Coupon> findGlobalCoupons() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -218,7 +325,12 @@ public class CouponRepository {
     }
     
     /**
-     * Gets expired coupons
+     * دریافت کوپن‌های منقضی شده
+     * 
+     * کوپن‌هایی که تاریخ انقضایشان گذشته است
+     * 
+     * @return لیست کوپن‌های منقضی (مرتب شده بر اساس تاریخ انقضا)
+     * @throws RuntimeException در صورت خطا در جستجو
      */
     public List<Coupon> findExpiredCoupons() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -234,7 +346,14 @@ public class CouponRepository {
     }
     
     /**
-     * Gets coupons expiring soon (within specified days)
+     * دریافت کوپن‌های نزدیک به انقضا
+     * 
+     * کوپن‌هایی که در چند روز آینده منقضی می‌شوند
+     * برای هشدار و اطلاع‌رسانی به کاربران استفاده می‌شود
+     * 
+     * @param days تعداد روزهای آینده
+     * @return لیست کوپن‌های نزدیک به انقضا (مرتب شده بر اساس تاریخ انقضا)
+     * @throws RuntimeException در صورت خطا در جستجو
      */
     public List<Coupon> findCouponsExpiringSoon(int days) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -254,7 +373,11 @@ public class CouponRepository {
     }
     
     /**
-     * Gets coupons by type
+     * دریافت کوپن‌ها بر اساس نوع
+     * 
+     * @param type نوع کوپن (PERCENTAGE، FIXED_AMOUNT)
+     * @return لیست کوپن‌های از نوع مشخص شده
+     * @throws RuntimeException در صورت خطا در جستجو
      */
     public List<Coupon> findByType(Coupon.CouponType type) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -269,7 +392,13 @@ public class CouponRepository {
     }
     
     /**
-     * Gets coupons created by specific user
+     * دریافت کوپن‌های ایجاد شده توسط کاربر خاص
+     * 
+     * برای مدیریت کوپن‌ها توسط ادمین‌ها یا مالکان رستوران‌ها
+     * 
+     * @param createdBy شناسه کاربر ایجادکننده
+     * @return لیست کوپن‌های ایجاد شده توسط کاربر
+     * @throws RuntimeException در صورت خطا در جستجو
      */
     public List<Coupon> findByCreatedBy(Long createdBy) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -284,7 +413,14 @@ public class CouponRepository {
     }
     
     /**
-     * Gets coupons with pagination
+     * دریافت کوپن‌ها با صفحه‌بندی
+     * 
+     * برای بهبود عملکرد در صفحات مدیریت با تعداد زیاد کوپن
+     * 
+     * @param page شماره صفحه (شروع از 0)
+     * @param size تعداد رکورد در هر صفحه
+     * @return لیست کوپن‌ها با صفحه‌بندی
+     * @throws RuntimeException در صورت خطا در جستجو
      */
     public List<Coupon> findWithPagination(int page, int size) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -300,7 +436,12 @@ public class CouponRepository {
     }
     
     /**
-     * Counts total coupons
+     * شمارش کل تعداد کوپن‌ها
+     * 
+     * برای آمارهای کلی و محاسبه pagination
+     * 
+     * @return تعداد کل کوپن‌ها
+     * @throws RuntimeException در صورت خطا در شمارش
      */
     public Long countAll() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -313,7 +454,12 @@ public class CouponRepository {
     }
     
     /**
-     * Counts active coupons
+     * شمارش تعداد کوپن‌های فعال
+     * 
+     * برای آمارهای dashboard
+     * 
+     * @return تعداد کوپن‌های فعال
+     * @throws RuntimeException در صورت خطا در شمارش
      */
     public Long countActive() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -327,7 +473,12 @@ public class CouponRepository {
     }
     
     /**
-     * Gets all coupons
+     * دریافت تمام کوپن‌ها
+     * 
+     * برای مدیریت کلی سیستم توسط ادمین‌ها
+     * 
+     * @return لیست تمام کوپن‌ها (مرتب شده بر اساس تاریخ ایجاد)
+     * @throws RuntimeException در صورت خطا در جستجو
      */
     public List<Coupon> findAll() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -343,7 +494,19 @@ public class CouponRepository {
     // ==================== BUSINESS LOGIC QUERIES ====================
     
     /**
-     * Finds applicable coupons for a specific order amount and restaurant
+     * یافتن کوپن‌های قابل اعمال برای سفارش خاص
+     * 
+     * این متد پیچیده‌ترین query است که شامل:
+     * - بررسی فعال بودن کوپن
+     * - بررسی بازه زمانی معتبر
+     * - بررسی محدودیت استفاده
+     * - بررسی حداقل مبلغ سفارش
+     * - بررسی تطبیق با رستوران (عمومی یا اختصاصی)
+     * 
+     * @param orderAmount مبلغ سفارش
+     * @param restaurantId شناسه رستوران
+     * @return لیست کوپن‌های قابل اعمال (مرتب شده بر اساس نوع و مقدار)
+     * @throws RuntimeException در صورت خطا در جستجو
      */
     public List<Coupon> findApplicableCoupons(Double orderAmount, Long restaurantId) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -366,7 +529,13 @@ public class CouponRepository {
     }
     
     /**
-     * Updates coupon usage count
+     * افزایش تعداد استفاده کوپن
+     * 
+     * زمانی که کوپن در سفارش استفاده می‌شود، باید تعداد استفاده آن افزایش یابد
+     * تاریخ updatedAt نیز به‌روزرسانی می‌شود
+     * 
+     * @param couponId شناسه کوپن
+     * @throws RuntimeException در صورت خطا در به‌روزرسانی
      */
     public void incrementUsageCount(Long couponId) {
         Transaction tx = null;
@@ -386,7 +555,13 @@ public class CouponRepository {
     }
     
     /**
-     * Decrements coupon usage count (for refunds)
+     * کاهش تعداد استفاده کوپن
+     * 
+     * برای مواقع استرداد سفارش یا لغو استفاده از کوپن
+     * تعداد استفاده نمی‌تواند کمتر از 0 شود
+     * 
+     * @param couponId شناسه کوپن
+     * @throws RuntimeException در صورت خطا در به‌روزرسانی
      */
     public void decrementUsageCount(Long couponId) {
         Transaction tx = null;

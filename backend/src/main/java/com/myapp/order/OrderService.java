@@ -10,15 +10,24 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Service class for order management and shopping cart operations.
- * Handles order placement, validation, and lifecycle management.
+ * سرویس مدیریت سفارشات و عملیات سبد خرید
+ * این کلاس مسئول پردازش تمام منطق کسب‌وکار مربوط به سفارشات است
+ * شامل ثبت سفارش، اعتبارسنجی، مدیریت چرخه حیات سفارش و سبد خرید
  */
 public class OrderService {
     
+    // Repository های مورد نیاز برای دسترسی به داده
     private final OrderRepository orderRepository;
     private final ItemRepository itemRepository;
     private final RestaurantRepository restaurantRepository;
     
+    /**
+     * سازنده سرویس سفارش با تزریق وابستگی‌ها
+     * 
+     * @param orderRepository repository سفارشات
+     * @param itemRepository repository آیتم‌های غذایی
+     * @param restaurantRepository repository رستوران‌ها
+     */
     public OrderService(OrderRepository orderRepository, ItemRepository itemRepository, RestaurantRepository restaurantRepository) {
         this.orderRepository = orderRepository;
         this.itemRepository = itemRepository;
@@ -26,10 +35,19 @@ public class OrderService {
     }
     
     /**
-     * Creates a new order for the given customer and restaurant.
-     * This represents creating a shopping cart.
+     * ایجاد سفارش جدید برای مشتری و رستوران مشخص
+     * این عملیات معادل ایجاد سبد خرید است
+     * 
+     * @param customerId شناسه مشتری
+     * @param restaurantId شناسه رستوران
+     * @param deliveryAddress آدرس تحویل
+     * @param phone شماره تلفن تماس
+     * @return سفارش ایجاد شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن ورودی‌ها
+     * @throws NotFoundException در صورت یافت نشدن رستوران
      */
     public Order createOrder(Long customerId, Long restaurantId, String deliveryAddress, String phone) {
+        // اعتبارسنجی ورودی‌ها
         if (customerId == null) {
             throw new IllegalArgumentException("Customer ID cannot be null");
         }
@@ -43,7 +61,7 @@ public class OrderService {
             throw new IllegalArgumentException("Phone number cannot be empty");
         }
         
-        // Validate restaurant exists and is approved
+        // بررسی وجود و در دسترس بودن رستوران
         Optional<Restaurant> restaurantOpt = restaurantRepository.findById(restaurantId);
         if (restaurantOpt.isEmpty()) {
             throw new NotFoundException("Restaurant", restaurantId);
@@ -54,18 +72,27 @@ public class OrderService {
             throw new IllegalArgumentException("Restaurant is not available for orders. Status: " + restaurant.getStatus());
         }
         
-        // Create user object (in real app, would fetch from UserRepository)
+        // ایجاد شیء کاربر (در برنامه واقعی از UserRepository دریافت می‌شود)
         User customer = new User();
         customer.setId(customerId);
         
+        // ایجاد سفارش جدید
         Order order = Order.createNew(customer, restaurant, deliveryAddress.trim(), phone.trim());
         return orderRepository.saveNew(order);
     }
     
     /**
-     * Adds an item to the shopping cart (order).
+     * افزودن آیتم به سبد خرید (سفارش)
+     * 
+     * @param orderId شناسه سفارش
+     * @param itemId شناسه آیتم غذایی
+     * @param quantity تعداد مورد نظر
+     * @return سفارش به‌روزرسانی شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     * @throws NotFoundException در صورت یافت نشدن سفارش یا آیتم
      */
     public Order addItemToCart(Long orderId, Long itemId, int quantity) {
+        // اعتبارسنجی ورودی‌ها
         if (orderId == null) {
             throw new IllegalArgumentException("Order ID cannot be null");
         }
@@ -76,7 +103,7 @@ public class OrderService {
             throw new IllegalArgumentException("Quantity must be positive, got: " + quantity);
         }
         
-        // Find the order
+        // یافتن سفارش
         Optional<Order> orderOpt = orderRepository.findById(orderId);
         if (orderOpt.isEmpty()) {
             throw new NotFoundException("Order", orderId);
@@ -84,12 +111,12 @@ public class OrderService {
         
         Order order = orderOpt.get();
         
-        // Validate order is still pending (can be modified)
+        // بررسی اینکه سفارش هنوز قابل تغییر است (وضعیت PENDING)
         if (order.getStatus() != OrderStatus.PENDING) {
             throw new IllegalArgumentException("Cannot modify order with status: " + order.getStatus());
         }
         
-        // Find the item
+        // یافتن آیتم غذایی
         Optional<FoodItem> itemOpt = itemRepository.findById(itemId);
         if (itemOpt.isEmpty()) {
             throw new NotFoundException("Food item", itemId);
@@ -97,23 +124,23 @@ public class OrderService {
         
         FoodItem item = itemOpt.get();
         
-        // Validate item belongs to the same restaurant
+        // بررسی تعلق آیتم به همان رستوران سفارش
         if (!item.getRestaurant().getId().equals(order.getRestaurant().getId())) {
             throw new IllegalArgumentException("Item does not belong to the order's restaurant");
         }
         
-        // Validate item is available
+        // بررسی در دسترس بودن آیتم
         if (!item.getAvailable()) {
             throw new IllegalArgumentException("Item is not available: " + item.getName());
         }
         
-        // Validate sufficient stock
+        // بررسی موجودی کافی
         if (!item.isInStock() || item.getQuantity() < quantity) {
             throw new IllegalArgumentException("Insufficient stock for item: " + item.getName() + 
                                              ". Available: " + item.getQuantity() + ", Requested: " + quantity);
         }
         
-        // Add item to order
+        // افزودن آیتم به سفارش
         order.addItem(item, quantity);
         
         return orderRepository.save(order);

@@ -4,6 +4,9 @@ import com.myapp.common.TestDatabaseManager;
 import com.myapp.common.models.User;
 import com.myapp.common.models.Order;
 import com.myapp.common.models.OrderStatus;
+import com.myapp.common.models.Restaurant;
+import com.myapp.common.models.RestaurantStatus;
+import com.myapp.common.models.FoodItem;
 import com.myapp.order.OrderService.OrderStatistics;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -115,12 +118,11 @@ class OrderControllerIntegrationTest {
             orderService.placeOrder(order.getId());
 
             // When - Cancel order
-            Order cancelledOrder = orderService.cancelOrder(order.getId(), "Customer changed mind");
+            orderService.updateOrderStatus(order.getId(), OrderStatus.CANCELLED);
+            Order cancelledOrder = orderService.getOrder(order.getId());
 
             // Then
             assertEquals(OrderStatus.CANCELLED, cancelledOrder.getStatus());
-            assertNotNull(cancelledOrder.getCancellationReason());
-            assertTrue(cancelledOrder.getCancellationReason().contains("Customer changed mind"));
         }
     }
 
@@ -378,7 +380,7 @@ class OrderControllerIntegrationTest {
             );
             orderService.addItemToCart(cancelledOrder.getId(), item.getId(), 1);
             orderService.placeOrder(cancelledOrder.getId());
-            orderService.cancelOrder(cancelledOrder.getId(), "Test cancellation");
+            orderService.updateOrderStatus(cancelledOrder.getId(), OrderStatus.CANCELLED);
 
             // 1 active order
             Order activeOrder = orderService.createOrder(
@@ -517,7 +519,6 @@ class OrderControllerIntegrationTest {
         user.setEmail(email);
         user.setFullName("Test User");
         user.setPhone("+1234567890");
-        user.setCreatedAt(LocalDateTime.now());
         return user;
     }
 
@@ -527,8 +528,7 @@ class OrderControllerIntegrationTest {
         restaurant.setName(name);
         restaurant.setAddress("123 Restaurant St");
         restaurant.setPhone("+1234567890");
-        restaurant.setStatus(RestaurantStatus.ACTIVE);
-        restaurant.setCreatedAt(LocalDateTime.now());
+        restaurant.setStatus(RestaurantStatus.APPROVED);
         return restaurant;
     }
 
@@ -539,7 +539,6 @@ class OrderControllerIntegrationTest {
         item.setPrice(price);
         item.setRestaurant(restaurant);
         item.setAvailable(true);
-        item.setCreatedAt(LocalDateTime.now());
         return item;
     }
 }

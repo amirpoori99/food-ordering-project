@@ -10,22 +10,71 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Service class for menu management operations.
- * Handles menu operations for restaurant vendors.
+ * سرویس مدیریت منوی رستوران‌ها
+ * 
+ * این کلاس منطق کسب‌وکار مربوط به مدیریت منوی رستوران‌ها را پیاده‌سازی می‌کند:
+ * 
+ * === عملیات CRUD منو ===
+ * - افزودن آیتم جدید به منو
+ * - به‌روزرسانی آیتم‌های موجود
+ * - حذف آیتم از منو
+ * - دریافت منوی کامل یا فیلتر شده
+ * 
+ * === مدیریت موجودی ===
+ * - به‌روزرسانی وضعیت در دسترس بودن
+ * - مدیریت موجودی آیتم‌ها
+ * - شناسایی آیتم‌های کم موجودی
+ * - مدیریت وضعیت out-of-stock
+ * 
+ * === دسته‌بندی و جستجو ===
+ * - مدیریت دسته‌بندی آیتم‌ها
+ * - فیلتر بر اساس دسته
+ * - جستجوی آیتم‌های منو
+ * 
+ * === آمار و گزارش ===
+ * - آمار کلی منو
+ * - گزارش موجودی
+ * - تحلیل در دسترس بودن آیتم‌ها
+ * 
+ * ویژگی‌های کلیدی:
+ * - Input Validation: اعتبارسنجی کامل ورودی‌ها
+ * - Business Rules: اعمال قوانین کسب‌وکار
+ * - Error Handling: مدیریت خطاهای مختلف
+ * - Data Integrity: حفظ یکپارچگی داده‌ها
+ * - Permission Checking: بررسی مالکیت رستوران
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class MenuService {
     
+    /** Repository مدیریت منو */
     private final MenuRepository menuRepository;
+    
+    /** Repository آیتم‌های غذایی */
     private final ItemRepository itemRepository;
+    
+    /** Repository رستوران‌ها */
     private final RestaurantRepository restaurantRepository;
     
+    /**
+     * سازنده پیش‌فرض
+     * Dependencies را به صورت خودکار ایجاد می‌کند
+     */
     public MenuService() {
         this.menuRepository = new MenuRepository();
         this.itemRepository = new ItemRepository();
         this.restaurantRepository = new RestaurantRepository();
     }
     
-    // Constructor for dependency injection (testing)
+    /**
+     * سازنده برای dependency injection (تست)
+     * 
+     * @param menuRepository repository منو
+     * @param itemRepository repository آیتم‌ها
+     * @param restaurantRepository repository رستوران‌ها
+     */
     public MenuService(MenuRepository menuRepository, ItemRepository itemRepository, RestaurantRepository restaurantRepository) {
         this.menuRepository = menuRepository;
         this.itemRepository = itemRepository;
@@ -33,14 +82,21 @@ public class MenuService {
     }
     
     /**
-     * Get complete menu for a restaurant
+     * دریافت منوی کامل یک رستوران
+     * 
+     * شامل تمام آیتم‌ها بدون در نظر گیری وضعیت در دسترس بودن
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست کامل آیتم‌های منو
+     * @throws IllegalArgumentException اگر ID نامعتبر باشد
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
      */
     public List<FoodItem> getRestaurantMenu(Long restaurantId) {
         if (restaurantId == null || restaurantId <= 0) {
             throw new IllegalArgumentException("Restaurant ID must be positive");
         }
         
-        // Verify restaurant exists
+        // بررسی وجود رستوران
         if (!restaurantRepository.existsById(restaurantId)) {
             throw new NotFoundException("Restaurant", restaurantId);
         }
@@ -49,14 +105,21 @@ public class MenuService {
     }
     
     /**
-     * Get only available menu items for a restaurant
+     * دریافت آیتم‌های در دسترس منوی رستوران
+     * 
+     * فقط آیتم‌هایی که available=true و quantity>0 هستند
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست آیتم‌های قابل سفارش
+     * @throws IllegalArgumentException اگر ID نامعتبر باشد
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
      */
     public List<FoodItem> getAvailableMenu(Long restaurantId) {
         if (restaurantId == null || restaurantId <= 0) {
             throw new IllegalArgumentException("Restaurant ID must be positive");
         }
         
-        // Verify restaurant exists
+        // بررسی وجود رستوران
         if (!restaurantRepository.existsById(restaurantId)) {
             throw new NotFoundException("Restaurant", restaurantId);
         }
@@ -65,12 +128,24 @@ public class MenuService {
     }
     
     /**
-     * Add a new item to restaurant menu
+     * افزودن آیتم جدید به منوی رستوران
+     * 
+     * آیتم با موجودی اولیه صفر ایجاد می‌شود
+     * vendor باید موجودی را به صورت جداگانه تنظیم کند
+     * 
+     * @param restaurantId شناسه رستوران
+     * @param name نام آیتم غذایی
+     * @param description توضیحات آیتم
+     * @param price قیمت آیتم
+     * @param category دسته‌بندی آیتم
+     * @return آیتم ایجاد شده
+     * @throws IllegalArgumentException اگر ورودی‌ها نامعتبر باشند
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
      */
     public FoodItem addItemToMenu(Long restaurantId, String name, String description, Double price, String category) {
         validateAddItemInput(restaurantId, name, description, price, category);
         
-        // Verify restaurant exists and get it
+        // بررسی وجود رستوران و دریافت آن
         Optional<Restaurant> restaurantOpt = restaurantRepository.findById(restaurantId);
         if (restaurantOpt.isEmpty()) {
             throw new NotFoundException("Restaurant", restaurantId);
@@ -78,16 +153,22 @@ public class MenuService {
         
         Restaurant restaurant = restaurantOpt.get();
         
-        // Create new food item
+        // ایجاد آیتم غذایی جدید
         FoodItem foodItem = FoodItem.forMenu(name.trim(), description.trim(), price, category.trim(), restaurant);
-        // Set initial quantity to 0 - vendor should explicitly set inventory
+        
+        // تنظیم موجودی اولیه به صفر - vendor باید به صورت صریح موجودی تنظیم کند
         foodItem.setQuantity(0);
         
         return itemRepository.save(foodItem);
     }
     
     /**
-     * Add item to menu using FoodItem object
+     * افزودن آیتم به منو با استفاده از شیء FoodItem
+     * 
+     * @param foodItem آیتم غذایی برای افزودن
+     * @return آیتم ایجاد شده
+     * @throws IllegalArgumentException اگر آیتم یا رستوران نامعتبر باشد
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
      */
     public FoodItem addItemToMenu(FoodItem foodItem) {
         if (foodItem == null) {
@@ -100,7 +181,7 @@ public class MenuService {
         validateAddItemInput(foodItem.getRestaurant().getId(), foodItem.getName(), 
                            foodItem.getDescription(), foodItem.getPrice(), foodItem.getCategory());
         
-        // Verify restaurant exists
+        // بررسی وجود رستوران
         if (!restaurantRepository.existsById(foodItem.getRestaurant().getId())) {
             throw new NotFoundException("Restaurant", foodItem.getRestaurant().getId());
         }
@@ -109,14 +190,27 @@ public class MenuService {
     }
     
     /**
-     * Update an existing menu item
+     * به‌روزرسانی آیتم موجود در منو
+     * 
+     * تنها فیلدهای ارائه شده (غیر null) به‌روزرسانی می‌شوند
+     * 
+     * @param itemId شناسه آیتم
+     * @param name نام جدید (اختیاری)
+     * @param description توضیحات جدید (اختیاری)
+     * @param price قیمت جدید (اختیاری)
+     * @param category دسته‌بندی جدید (اختیاری)
+     * @param quantity موجودی جدید (اختیاری)
+     * @param available وضعیت در دسترس بودن (اختیاری)
+     * @return آیتم به‌روزرسانی شده
+     * @throws IllegalArgumentException اگر پارامترها نامعتبر باشند
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
      */
     public FoodItem updateMenuItem(Long itemId, String name, String description, Double price, String category, Integer quantity, Boolean available) {
         if (itemId == null || itemId <= 0) {
             throw new IllegalArgumentException("Item ID must be positive");
         }
         
-        // Get existing item
+        // دریافت آیتم موجود
         Optional<FoodItem> itemOpt = itemRepository.findById(itemId);
         if (itemOpt.isEmpty()) {
             throw new NotFoundException("Food item", itemId);
@@ -124,7 +218,7 @@ public class MenuService {
         
         FoodItem existingItem = itemOpt.get();
         
-        // Update fields if provided
+        // به‌روزرسانی فیلدها در صورت ارائه
         if (name != null && !name.trim().isEmpty()) {
             if (name.trim().length() > 100) {
                 throw new IllegalArgumentException("Food item name cannot exceed 100 characters");
@@ -168,7 +262,15 @@ public class MenuService {
     }
     
     /**
-     * Update menu item using FoodItem object
+     * به‌روزرسانی آیتم منو با استفاده از شیء FoodItem
+     * 
+     * فقط فیلدهای non-null به‌روزرسانی می‌شوند
+     * رستوران آیتم تغییر نمی‌کند
+     * 
+     * @param foodItem آیتم با اطلاعات جدید
+     * @return آیتم به‌روزرسانی شده
+     * @throws IllegalArgumentException اگر آیتم یا ID نامعتبر باشد
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
      */
     public FoodItem updateMenuItem(FoodItem foodItem) {
         if (foodItem == null) {
@@ -178,7 +280,7 @@ public class MenuService {
             throw new IllegalArgumentException("Food item ID must be positive");
         }
         
-        // Get existing item to preserve all fields
+        // دریافت آیتم موجود برای حفظ تمام فیلدها
         Optional<FoodItem> existingOpt = itemRepository.findById(foodItem.getId());
         if (existingOpt.isEmpty()) {
             throw new NotFoundException("Food item", foodItem.getId());
@@ -186,7 +288,7 @@ public class MenuService {
         
         FoodItem existingItem = existingOpt.get();
         
-        // Update only provided fields
+        // به‌روزرسانی تنها فیلدهای ارائه شده
         if (foodItem.getName() != null && !foodItem.getName().trim().isEmpty()) {
             if (foodItem.getName().trim().length() > 100) {
                 throw new IllegalArgumentException("Food item name cannot exceed 100 characters");
@@ -226,21 +328,27 @@ public class MenuService {
             existingItem.setAvailable(foodItem.getAvailable());
         }
         
-        // Preserve restaurant association
-        // (restaurant should not change via update)
+        // حفظ اتصال رستوران
+        // (رستوران نباید از طریق update تغییر کند)
         
         return itemRepository.save(existingItem);
     }
     
     /**
-     * Remove an item from menu
+     * حذف آیتم از منو
+     * 
+     * این عمل آیتم را کاملاً از سیستم حذف می‌کند
+     * 
+     * @param itemId شناسه آیتم
+     * @throws IllegalArgumentException اگر ID نامعتبر باشد
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
      */
     public void removeItemFromMenu(Long itemId) {
         if (itemId == null || itemId <= 0) {
             throw new IllegalArgumentException("Item ID must be positive");
         }
         
-        // Verify item exists
+        // بررسی وجود آیتم
         if (!itemRepository.existsById(itemId)) {
             throw new NotFoundException("Food item", itemId);
         }
@@ -249,7 +357,13 @@ public class MenuService {
     }
     
     /**
-     * Set item availability status
+     * تنظیم وضعیت در دسترس بودن آیتم
+     * 
+     * @param itemId شناسه آیتم
+     * @param available وضعیت جدید
+     * @return آیتم به‌روزرسانی شده
+     * @throws IllegalArgumentException اگر ID نامعتبر باشد
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
      */
     public FoodItem setItemAvailability(Long itemId, boolean available) {
         if (itemId == null || itemId <= 0) {
@@ -268,7 +382,13 @@ public class MenuService {
     }
     
     /**
-     * Update item quantity
+     * به‌روزرسانی موجودی آیتم
+     * 
+     * @param itemId شناسه آیتم
+     * @param quantity موجودی جدید
+     * @return آیتم به‌روزرسانی شده
+     * @throws IllegalArgumentException اگر پارامترها نامعتبر باشند
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
      */
     public FoodItem updateItemQuantity(Long itemId, int quantity) {
         if (itemId == null || itemId <= 0) {
@@ -290,7 +410,13 @@ public class MenuService {
     }
     
     /**
-     * Get menu items by category for a restaurant
+     * دریافت آیتم‌های منو بر اساس دسته‌بندی
+     * 
+     * @param restaurantId شناسه رستوران
+     * @param category دسته‌بندی
+     * @return لیست آیتم‌های دسته مشخص
+     * @throws IllegalArgumentException اگر پارامترها نامعتبر باشند
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
      */
     public List<FoodItem> getMenuByCategory(Long restaurantId, String category) {
         if (restaurantId == null || restaurantId <= 0) {
@@ -300,7 +426,7 @@ public class MenuService {
             throw new IllegalArgumentException("Category cannot be empty");
         }
         
-        // Verify restaurant exists
+        // بررسی وجود رستوران
         if (!restaurantRepository.existsById(restaurantId)) {
             throw new NotFoundException("Restaurant", restaurantId);
         }
@@ -309,14 +435,19 @@ public class MenuService {
     }
     
     /**
-     * Get all categories for a restaurant menu
+     * دریافت تمام دسته‌بندی‌های منوی رستوران
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست دسته‌بندی‌های منحصر به فرد
+     * @throws IllegalArgumentException اگر ID نامعتبر باشد
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
      */
     public List<String> getMenuCategories(Long restaurantId) {
         if (restaurantId == null || restaurantId <= 0) {
             throw new IllegalArgumentException("Restaurant ID must be positive");
         }
         
-        // Verify restaurant exists
+        // بررسی وجود رستوران
         if (!restaurantRepository.existsById(restaurantId)) {
             throw new NotFoundException("Restaurant", restaurantId);
         }
@@ -325,7 +456,13 @@ public class MenuService {
     }
     
     /**
-     * Get low stock items for a restaurant
+     * دریافت آیتم‌های کم موجودی رستوران
+     * 
+     * @param restaurantId شناسه رستوران
+     * @param threshold آستانه کم موجودی
+     * @return لیست آیتم‌های با موجودی کمتر از آستانه
+     * @throws IllegalArgumentException اگر پارامترها نامعتبر باشند
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
      */
     public List<FoodItem> getLowStockItems(Long restaurantId, int threshold) {
         if (restaurantId == null || restaurantId <= 0) {
@@ -335,7 +472,7 @@ public class MenuService {
             throw new IllegalArgumentException("Threshold cannot be negative");
         }
         
-        // Verify restaurant exists
+        // بررسی وجود رستوران
         if (!restaurantRepository.existsById(restaurantId)) {
             throw new NotFoundException("Restaurant", restaurantId);
         }
@@ -344,14 +481,21 @@ public class MenuService {
     }
     
     /**
-     * Get menu statistics for a restaurant
+     * دریافت آمار منوی رستوران
+     * 
+     * شامل تعداد کل آیتم‌ها، آیتم‌های در دسترس، ناموجود، کم موجودی
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return آمار کامل منو
+     * @throws IllegalArgumentException اگر ID نامعتبر باشد
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
      */
     public MenuStatistics getMenuStatistics(Long restaurantId) {
         if (restaurantId == null || restaurantId <= 0) {
             throw new IllegalArgumentException("Restaurant ID must be positive");
         }
         
-        // Verify restaurant exists
+        // بررسی وجود رستوران
         if (!restaurantRepository.existsById(restaurantId)) {
             throw new NotFoundException("Restaurant", restaurantId);
         }
@@ -368,7 +512,12 @@ public class MenuService {
     }
     
     /**
-     * Check if restaurant owns the menu item
+     * بررسی مالکیت رستوران برای آیتم منو
+     * 
+     * @param restaurantId شناسه رستوران
+     * @param itemId شناسه آیتم
+     * @return true اگر آیتم متعلق به رستوران باشد
+     * @throws IllegalArgumentException اگر IDها نامعتبر باشند
      */
     public boolean isRestaurantOwner(Long restaurantId, Long itemId) {
         if (restaurantId == null || restaurantId <= 0) {
@@ -388,7 +537,14 @@ public class MenuService {
     }
     
     /**
-     * Validate input for adding new item
+     * اعتبارسنجی ورودی‌های افزودن آیتم جدید
+     * 
+     * @param restaurantId شناسه رستوران
+     * @param name نام آیتم
+     * @param description توضیحات
+     * @param price قیمت
+     * @param category دسته‌بندی
+     * @throws IllegalArgumentException اگر هر یک از ورودی‌ها نامعتبر باشد
      */
     private void validateAddItemInput(Long restaurantId, String name, String description, Double price, String category) {
         if (restaurantId == null || restaurantId <= 0) {
@@ -418,15 +574,29 @@ public class MenuService {
     }
     
     /**
-     * Menu statistics class
+     * کلاس آمار منو
+     * 
+     * حاوی اطلاعات آماری مربوط به منوی رستوران
      */
     public static class MenuStatistics {
+        /** تعداد کل آیتم‌ها */
         private final int totalItems;
+        
+        /** تعداد آیتم‌های در دسترس */
         private final int availableItems;
+        
+        /** تعداد آیتم‌های غیر قابل دسترس */
         private final int unavailableItems;
+        
+        /** تعداد آیتم‌های تمام شده */
         private final int outOfStockItems;
+        
+        /** تعداد آیتم‌های کم موجودی */
         private final int lowStockItems;
         
+        /**
+         * سازنده آمار منو
+         */
         public MenuStatistics(int totalItems, int availableItems, int unavailableItems, int outOfStockItems, int lowStockItems) {
             this.totalItems = totalItems;
             this.availableItems = availableItems;
@@ -435,12 +605,29 @@ public class MenuService {
             this.lowStockItems = lowStockItems;
         }
         
+        /** @return تعداد کل آیتم‌ها */
         public int getTotalItems() { return totalItems; }
+        
+        /** @return تعداد آیتم‌های در دسترس */
         public int getAvailableItems() { return availableItems; }
+        
+        /** @return تعداد آیتم‌های غیر قابل دسترس */
         public int getUnavailableItems() { return unavailableItems; }
+        
+        /** @return تعداد آیتم‌های تمام شده */
         public int getOutOfStockItems() { return outOfStockItems; }
+        
+        /** @return تعداد آیتم‌های کم موجودی */
         public int getLowStockItems() { return lowStockItems; }
+        
+        /** @return تعداد آیتم‌های موجود */
         public int getInStockItems() { return totalItems - outOfStockItems; }
+        
+        /**
+         * محاسبه درصد در دسترس بودن
+         * 
+         * @return درصد آیتم‌های در دسترس (0-100)
+         */
         public double getAvailabilityPercentage() { 
             return totalItems > 0 ? (double) availableItems / totalItems * 100 : 0.0; 
         }

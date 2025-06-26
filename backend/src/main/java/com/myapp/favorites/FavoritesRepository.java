@@ -16,15 +16,64 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * JPA Repository for Favorite entity operations
- * Handles database operations for user favorites
+ * Repository لایه دسترسی داده برای entity های Favorite
+ * 
+ * این کلاس تمام عملیات پایگاه داده مربوط به مدیریت علاقه‌مندی‌های کاربران را ارائه می‌دهد:
+ * 
+ * === عملیات CRUD پایه ===
+ * - save(): ذخیره یا به‌روزرسانی علاقه‌مندی
+ * - findById(): جستجو بر اساس شناسه
+ * - delete(): حذف علاقه‌مندی
+ * 
+ * === جستجوهای تخصصی ===
+ * - findByUser(): علاقه‌مندی‌های کاربر خاص
+ * - findByRestaurant(): علاقه‌مندی‌های رستوران خاص
+ * - findByUserAndRestaurant(): جستجوی ترکیبی
+ * - findRecentFavorites(): علاقه‌مندی‌های اخیر
+ * - findFavoritesWithNotes(): علاقه‌مندی‌های دارای یادداشت
+ * 
+ * === عملیات آماری ===
+ * - countByUser(): تعداد علاقه‌مندی‌های کاربر
+ * - countByRestaurant(): تعداد علاقه‌مندی‌های رستوران
+ * - countAll(): کل تعداد علاقه‌مندی‌ها
+ * 
+ * === صفحه‌بندی ===
+ * - findWithPagination(): دریافت با صفحه‌بندی
+ * - findAll(): تمام علاقه‌مندی‌ها (برای ادمین)
+ * 
+ * === متدهای Legacy ===
+ * - save(userId, restaurantId): روش قدیمی ذخیره
+ * - find(userId, restaurantId): روش قدیمی جستجو
+ * - listByUser(): نام قدیمی findByUser
+ * - clear(): پاکسازی کامل (تست)
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Transaction Management: مدیریت تراکنش‌ها
+ * - Error Handling: مدیریت خطاها با try-catch
+ * - Logging: ثبت تمام عملیات و خطاها
+ * - HQL Queries: استفاده از Hibernate Query Language
+ * - Null Safety: بررسی null برای ورودی‌ها
+ * - Performance: Sort و Order بهینه
+ * - Backward Compatibility: حفظ سازگاری با نسخه قبل
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class FavoritesRepository {
 
+    /** Logger برای ثبت عملیات و خطاها */
     private static final Logger logger = LoggerFactory.getLogger(FavoritesRepository.class);
 
     /**
-     * Saves a new favorite or updates existing one
+     * ذخیره علاقه‌مندی جدید یا به‌روزرسانی موجود
+     * 
+     * این متد از JPA merge و persist استفاده می‌کند تا بر اساس وجود ID
+     * تصمیم بگیرد که آیا باید رکورد جدید ایجاد کند یا موجود را به‌روزرسانی کند
+     * 
+     * @param favorite شیء علاقه‌مندی برای ذخیره
+     * @return علاقه‌مندی ذخیره شده با ID تخصیص داده شده
+     * @throws RuntimeException در صورت خطا در ذخیره‌سازی
      */
     public Favorite save(Favorite favorite) {
         Transaction transaction = null;
@@ -32,9 +81,11 @@ public class FavoritesRepository {
             transaction = session.beginTransaction();
             
             if (favorite.getId() == null) {
+                // رکورد جدید - از persist استفاده می‌کنیم
                 session.persist(favorite);
                 logger.info("Created new favorite: {}", favorite);
             } else {
+                // به‌روزرسانی رکورد موجود - از merge استفاده می‌کنیم
                 favorite = session.merge(favorite);
                 logger.info("Updated favorite: {}", favorite);
             }
@@ -52,7 +103,16 @@ public class FavoritesRepository {
     }
 
     /**
-     * Legacy method for backward compatibility
+     * متد Legacy برای سازگاری با نسخه قبل
+     * 
+     * این متد شیوه قدیمی ذخیره علاقه‌مندی با userId و restaurantId است
+     * ابتدا User و Restaurant را از دیتابیس load می‌کند سپس Favorite ایجاد می‌کند
+     * 
+     * @param userId شناسه کاربر
+     * @param restaurantId شناسه رستوران
+     * @return علاقه‌مندی ایجاد شده
+     * @throws IllegalArgumentException اگر کاربر یا رستوران یافت نشود
+     * @throws RuntimeException در صورت خطا در ذخیره‌سازی
      */
     public Favorite save(long userId, long restaurantId) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -74,7 +134,10 @@ public class FavoritesRepository {
     }
 
     /**
-     * Finds favorite by ID
+     * جستجوی علاقه‌مندی بر اساس شناسه
+     * 
+     * @param id شناسه علاقه‌مندی
+     * @return Optional حاوی علاقه‌مندی یا empty در صورت عدم وجود
      */
     public Optional<Favorite> findById(Long id) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -87,7 +150,14 @@ public class FavoritesRepository {
     }
 
     /**
-     * Finds favorite by user and restaurant
+     * جستجوی علاقه‌مندی بر اساس کاربر و رستوران
+     * 
+     * این متد برای بررسی اینکه آیا کاربر خاص، رستوران خاص را به علاقه‌مندی‌هایش
+     * اضافه کرده است یا خیر استفاده می‌شود
+     * 
+     * @param user شیء کاربر
+     * @param restaurant شیء رستوران
+     * @return Optional حاوی علاقه‌مندی یا empty در صورت عدم وجود
      */
     public Optional<Favorite> findByUserAndRestaurant(User user, Restaurant restaurant) {
         if (user == null || restaurant == null) {
@@ -110,11 +180,17 @@ public class FavoritesRepository {
                         restaurant != null ? restaurant.getId() : "null", 
                         e.getMessage(), e);
             return Optional.empty();
-    }
+        }
     }
 
     /**
-     * Legacy method for backward compatibility
+     * متد Legacy برای سازگاری با نسخه قبل
+     * 
+     * همان کار findByUserAndRestaurant را انجام می‌دهد اما با ID به جای شیء
+     * 
+     * @param userId شناسه کاربر
+     * @param restaurantId شناسه رستوران
+     * @return Optional حاوی علاقه‌مندی یا empty در صورت عدم وجود
      */
     public Optional<Favorite> find(long userId, long restaurantId) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -134,7 +210,13 @@ public class FavoritesRepository {
     }
 
     /**
-     * Gets all favorites for a user
+     * دریافت تمام علاقه‌مندی‌های یک کاربر
+     * 
+     * نتایج بر اساس تاریخ ایجاد به صورت نزولی مرتب می‌شوند
+     * (جدیدترین‌ها اول)
+     * 
+     * @param user شیء کاربر
+     * @return لیست علاقه‌مندی‌های کاربر
      */
     public List<Favorite> findByUser(User user) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -147,11 +229,16 @@ public class FavoritesRepository {
         } catch (Exception e) {
             logger.error("Error finding favorites for user {}: {}", user.getId(), e.getMessage(), e);
             return List.of();
-    }
+        }
     }
 
     /**
-     * Legacy method for backward compatibility
+     * متد Legacy برای سازگاری با نسخه قبل
+     * 
+     * همان کار findByUser را انجام می‌دهد اما با userId به جای شیء User
+     * 
+     * @param userId شناسه کاربر
+     * @return لیست علاقه‌مندی‌های کاربر
      */
     public List<Favorite> listByUser(long userId) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -168,7 +255,13 @@ public class FavoritesRepository {
     }
 
     /**
-     * Gets all favorites for a restaurant
+     * دریافت تمام علاقه‌مندی‌های یک رستوران
+     * 
+     * برای بررسی محبوبیت رستوران و آمارگیری استفاده می‌شود
+     * نتایج بر اساس تاریخ ایجاد مرتب می‌شوند
+     * 
+     * @param restaurant شیء رستوران
+     * @return لیست علاقه‌مندی‌های رستوران
      */
     public List<Favorite> findByRestaurant(Restaurant restaurant) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -186,7 +279,12 @@ public class FavoritesRepository {
     }
 
     /**
-     * Gets recent favorites (within specified days)
+     * دریافت علاقه‌مندی‌های اخیر (در چند روز گذشته)
+     * 
+     * برای تحلیل trend ها و الگوهای رفتاری کاربران مفید است
+     * 
+     * @param days تعداد روزهای گذشته
+     * @return لیست علاقه‌مندی‌های اخیر
      */
     public List<Favorite> findRecentFavorites(int days) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -203,7 +301,12 @@ public class FavoritesRepository {
     }
 
     /**
-     * Gets favorites with notes
+     * دریافت علاقه‌مندی‌های دارای یادداشت
+     * 
+     * برخی کاربران یادداشت‌هایی برای علاقه‌مندی‌هایشان می‌نویسند
+     * این متد تنها علاقه‌مندی‌های دارای یادداشت را برمی‌گرداند
+     * 
+     * @return لیست علاقه‌مندی‌های دارای یادداشت
      */
     public List<Favorite> findFavoritesWithNotes() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -219,7 +322,12 @@ public class FavoritesRepository {
     }
 
     /**
-     * Gets count of favorites for a restaurant
+     * شمارش تعداد علاقه‌مندی‌های یک رستوران
+     * 
+     * برای محاسبه امتیاز محبوبیت رستوران استفاده می‌شود
+     * 
+     * @param restaurant شیء رستوران
+     * @return تعداد علاقه‌مندی‌ها
      */
     public Long countByRestaurant(Restaurant restaurant) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -238,7 +346,12 @@ public class FavoritesRepository {
     }
 
     /**
-     * Gets count of favorites for a user
+     * شمارش تعداد علاقه‌مندی‌های یک کاربر
+     * 
+     * برای پروفایل کاربر و آمارهای شخصی استفاده می‌شود
+     * 
+     * @param user شیء کاربر
+     * @return تعداد علاقه‌مندی‌ها
      */
     public Long countByUser(User user) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -256,7 +369,10 @@ public class FavoritesRepository {
     }
 
     /**
-     * Deletes a favorite by ID
+     * حذف علاقه‌مندی بر اساس شناسه
+     * 
+     * @param id شناسه علاقه‌مندی
+     * @return true در صورت حذف موفق، false در غیر این صورت
      */
     public boolean delete(Long id) {
         Transaction transaction = null;
@@ -278,21 +394,26 @@ public class FavoritesRepository {
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
-    }
+            }
             logger.error("Error deleting favorite {}: {}", id, e.getMessage(), e);
             return false;
         }
     }
 
     /**
-     * Legacy method for backward compatibility
+     * متد Legacy برای حذف علاقه‌مندی
+     * 
+     * ابتدا علاقه‌مندی را پیدا می‌کند سپس آن را حذف می‌کند
+     * 
+     * @param userId شناسه کاربر
+     * @param restaurantId شناسه رستوران
      */
     public void delete(long userId, long restaurantId) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Optional<Favorite> favorite = find(userId, restaurantId);
             if (favorite.isPresent()) {
                 delete(favorite.get().getId());
-    }
+            }
         } catch (Exception e) {
             logger.error("Error deleting favorite for user {} and restaurant {}: {}", 
                         userId, restaurantId, e.getMessage(), e);
@@ -300,7 +421,11 @@ public class FavoritesRepository {
     }
 
     /**
-     * Gets all favorites (for admin purposes)
+     * دریافت تمام علاقه‌مندی‌ها (برای اهداف مدیریتی)
+     * 
+     * این متد معمولاً توسط ادمین‌ها برای بررسی کل سیستم استفاده می‌شود
+     * 
+     * @return لیست تمام علاقه‌مندی‌ها
      */
     public List<Favorite> findAll() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -316,7 +441,13 @@ public class FavoritesRepository {
     }
 
     /**
-     * Gets favorites with pagination
+     * دریافت علاقه‌مندی‌ها با صفحه‌بندی
+     * 
+     * برای بهبود عملکرد در صفحات با تعداد زیاد علاقه‌مندی
+     * 
+     * @param offset نقطه شروع (تعداد رکوردهای skip شده)
+     * @param limit حداکثر تعداد رکوردهای برگشتی
+     * @return لیست علاقه‌مندی‌ها با صفحه‌بندی
      */
     public List<Favorite> findWithPagination(int offset, int limit) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -334,7 +465,11 @@ public class FavoritesRepository {
     }
 
     /**
-     * Counts total favorites
+     * شمارش کل علاقه‌مندی‌ها
+     * 
+     * برای آمارهای کلی سیستم و محاسبه pagination
+     * 
+     * @return تعداد کل علاقه‌مندی‌ها
      */
     public Long countAll() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -351,7 +486,10 @@ public class FavoritesRepository {
     }
 
     /**
-     * Legacy method for backward compatibility
+     * متد Legacy برای پاکسازی کامل علاقه‌مندی‌ها
+     * 
+     * ⚠️ خطرناک: تمام علاقه‌مندی‌ها را حذف می‌کند
+     * معمولاً فقط در تست‌ها استفاده می‌شود
      */
     public void clear() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {

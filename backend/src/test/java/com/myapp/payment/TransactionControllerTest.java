@@ -16,6 +16,7 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -255,12 +256,9 @@ class TransactionControllerTest {
             when(exchange.getRequestURI()).thenReturn(URI.create("/api/transactions/wallet/statistics?userId=1"));
             
             // Mock wallet statistics object
-            var mockStatistics = new Object() {
-                public final double totalCharged = 1000.0;
-                public final double totalWithdrawn = 300.0;
-                public final double currentBalance = 700.0;
-                public final long totalTransactions = 15L;
-            };
+            WalletService.WalletStatistics mockStatistics = new WalletService.WalletStatistics(
+                700.0, 1000.0, 300.0, 10L, 5L
+            );
             
             when(walletService.getWalletStatistics(1L)).thenReturn(mockStatistics);
             
@@ -304,7 +302,7 @@ class TransactionControllerTest {
             when(exchange.getRequestURI()).thenReturn(URI.create("/api/transactions/123"));
             
             Transaction transaction = createMockTransaction(123L, TransactionType.WALLET_CHARGE, 100.0);
-            when(paymentRepository.findById(123L)).thenReturn(transaction);
+            when(paymentRepository.findById(123L)).thenReturn(Optional.of(transaction));
             
             // When
             transactionController.handle(exchange);
@@ -324,7 +322,7 @@ class TransactionControllerTest {
             when(exchange.getRequestMethod()).thenReturn("GET");
             when(exchange.getRequestURI()).thenReturn(URI.create("/api/transactions/999"));
             
-            when(paymentRepository.findById(999L)).thenReturn(null);
+            when(paymentRepository.findById(999L)).thenReturn(Optional.empty());
             
             // When
             transactionController.handle(exchange);

@@ -9,54 +9,128 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Service layer for food item management
- * Handles business logic, validation, and inventory operations
+ * سرویس مدیریت آیتم‌های غذایی
+ * 
+ * این کلاس منطق کسب‌وکار مربوط به مدیریت آیتم‌های غذایی را پیاده‌سازی می‌کند:
+ * 
+ * === مدیریت آیتم‌ها ===
+ * - افزودن آیتم جدید به منوی رستوران
+ * - به‌روزرسانی اطلاعات آیتم‌ها
+ * - حذف آیتم از منو
+ * - دریافت اطلاعات آیتم‌ها
+ * 
+ * === مدیریت موجودی ===
+ * - کنترل موجودی آیتم‌ها
+ * - افزایش و کاهش موجودی
+ * - بررسی موجود بودن آیتم
+ * - شناسایی آیتم‌های کم موجودی
+ * 
+ * === جستجو و فیلتر ===
+ * - جستجوی آیتم‌ها بر اساس کلیدواژه
+ * - فیلتر بر اساس دسته‌بندی
+ * - فیلتر بر اساس رستوران
+ * - آیتم‌های در دسترس برای مشتریان
+ * 
+ * === اعتبارسنجی ===
+ * - بررسی مالکیت رستوران
+ * - اعتبارسنجی داده‌های ورودی
+ * - اعمال قوانین کسب‌وکار
+ * - کنترل محدودیت‌ها
+ * 
+ * === گزارش و آمار ===
+ * - آمار منوی رستوران
+ * - تحلیل موجودی
+ * - دسته‌بندی‌های رستوران
+ * 
+ * ویژگی‌های کلیدی:
+ * - Input Validation: اعتبارسنجی کامل ورودی‌ها
+ * - Business Rules: اعمال قوانین کسب‌وکار
+ * - Inventory Management: مدیریت هوشمند موجودی
+ * - Data Integrity: حفظ یکپارچگی داده‌ها
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class ItemService {
     
+    /** Repository آیتم‌های غذایی */
     private final ItemRepository itemRepository;
+    
+    /** Repository رستوران‌ها */
     private final RestaurantRepository restaurantRepository;
     
+    /**
+     * سازنده سرویس آیتم‌ها
+     * 
+     * @param itemRepository repository آیتم‌ها
+     * @param restaurantRepository repository رستوران‌ها
+     */
     public ItemService(ItemRepository itemRepository, RestaurantRepository restaurantRepository) {
         this.itemRepository = itemRepository;
         this.restaurantRepository = restaurantRepository;
     }
     
     /**
-     * Add a new food item to a restaurant's menu
-     * Validates restaurant ownership and item data
+     * افزودن آیتم جدید به منوی رستوران
+     * 
+     * مالکیت رستوران و صحت داده‌های آیتم بررسی می‌شود
+     * 
+     * @param restaurantId شناسه رستوران
+     * @param name نام آیتم
+     * @param description توضیحات آیتم
+     * @param price قیمت آیتم
+     * @param category دسته‌بندی آیتم
+     * @param imageUrl آدرس تصویر آیتم
+     * @param quantity موجودی اولیه
+     * @return آیتم ایجاد شده
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
+     * @throws IllegalArgumentException اگر داده‌ها نامعتبر باشند
      */
     public FoodItem addItem(Long restaurantId, String name, String description, 
                            double price, String category, String imageUrl, int quantity) {
-        // Validate restaurant exists
+        // بررسی وجود رستوران
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
             .orElseThrow(() -> new NotFoundException("Restaurant", restaurantId));
         
-        // Validate input data
+        // اعتبارسنجی داده‌های آیتم
         validateItemData(name, description, price, category, quantity);
         
-        // Create new food item
+        // ایجاد آیتم غذایی جدید
         FoodItem item = FoodItem.forMenu(name, description, price, category, restaurant);
         if (imageUrl != null && !imageUrl.trim().isEmpty()) {
             item = FoodItem.forMenuWithImage(name, description, price, category, imageUrl, restaurant);
         }
         
-        // Set quantity after creation
+        // تنظیم موجودی پس از ایجاد
         item.setQuantity(quantity);
         
         return itemRepository.saveNew(item);
     }
     
     /**
-     * Update an existing food item
-     * Validates ownership and maintains business rules
+     * به‌روزرسانی آیتم موجود در منو
+     * 
+     * مالکیت و قوانین کسب‌وکار بررسی می‌شود
+     * تنها فیلدهای ارائه شده به‌روزرسانی می‌شوند
+     * 
+     * @param itemId شناسه آیتم
+     * @param name نام جدید (اختیاری)
+     * @param description توضیحات جدید (اختیاری)
+     * @param price قیمت جدید (اختیاری)
+     * @param category دسته‌بندی جدید (اختیاری)
+     * @param imageUrl آدرس تصویر جدید (اختیاری)
+     * @param quantity موجودی جدید (اختیاری)
+     * @return آیتم به‌روزرسانی شده
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
+     * @throws IllegalArgumentException اگر داده‌ها نامعتبر باشند
      */
     public FoodItem updateItem(Long itemId, String name, String description, 
                               double price, String category, String imageUrl, Integer quantity) {
         FoodItem item = itemRepository.findById(itemId)
             .orElseThrow(() -> new NotFoundException("Food item", itemId));
         
-        // Update fields if provided
+        // به‌روزرسانی فیلدها در صورت ارائه
         if (name != null && !name.trim().isEmpty()) {
             item.setName(name.trim());
         }
@@ -80,7 +154,11 @@ public class ItemService {
     }
     
     /**
-     * Get food item by ID with validation
+     * دریافت آیتم غذایی بر اساس شناسه
+     * 
+     * @param itemId شناسه آیتم
+     * @return آیتم غذایی
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
      */
     public FoodItem getItem(Long itemId) {
         return itemRepository.findById(itemId)
@@ -88,10 +166,14 @@ public class ItemService {
     }
     
     /**
-     * Get all items for a specific restaurant
+     * دریافت تمام آیتم‌های یک رستوران
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست آیتم‌های رستوران
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
      */
     public List<FoodItem> getRestaurantItems(Long restaurantId) {
-        // Validate restaurant exists
+        // بررسی وجود رستوران
         restaurantRepository.findById(restaurantId)
             .orElseThrow(() -> new NotFoundException("Restaurant", restaurantId));
         
@@ -99,10 +181,16 @@ public class ItemService {
     }
     
     /**
-     * Get only available items for a restaurant (for customer view)
+     * دریافت آیتم‌های در دسترس رستوران (برای نمایش به مشتری)
+     * 
+     * فقط آیتم‌هایی که available=true و quantity>0 هستند
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست آیتم‌های قابل سفارش
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
      */
     public List<FoodItem> getAvailableItems(Long restaurantId) {
-        // Validate restaurant exists
+        // بررسی وجود رستوران
         restaurantRepository.findById(restaurantId)
             .orElseThrow(() -> new NotFoundException("Restaurant", restaurantId));
         
@@ -110,7 +198,13 @@ public class ItemService {
     }
     
     /**
-     * Search food items by keyword across all restaurants
+     * جستجوی آیتم‌های غذایی بر اساس کلیدواژه
+     * 
+     * در تمام رستوران‌ها جستجو می‌کند
+     * 
+     * @param keyword کلیدواژه جستجو
+     * @return لیست آیتم‌های مطابق
+     * @throws IllegalArgumentException اگر کلیدواژه خالی باشد
      */
     public List<FoodItem> searchItems(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {

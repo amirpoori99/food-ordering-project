@@ -10,48 +10,76 @@ import com.myapp.common.utils.JWTUtil;
 
 import java.util.Objects;
 
+/**
+ * سرویس احراز هویت - لایه منطق کسب‌وکار برای عملیات احراز هویت
+ * این کلاس تمام عملیات مربوط به ثبت نام، ورود، تجدید token و مدیریت پروفایل را مدیریت می‌کند
+ * از الگوی Service Layer استفاده می‌کند
+ */
 public class AuthService {
 
-    private final AuthRepository repository;
+    private final AuthRepository repository;  // مخزن داده‌ها برای دسترسی به کاربران
 
+    /**
+     * سازنده سرویس احراز هویت
+     * 
+     * @param repository مخزن داده‌های احراز هویت
+     */
     public AuthService(AuthRepository repository) {
         this.repository = repository;
     }
 
     /**
-     * Registers a new user and returns persisted copy.
+     * ثبت نام کاربر جدید و بازگشت کپی ذخیره شده
+     * 
+     * @param req درخواست ثبت نام حاوی اطلاعات کاربر
+     * @return کاربر ثبت شده همراه با ID تولید شده
+     * @throws DuplicatePhoneException در صورت تکراری بودن شماره تلفن
      */
     public User register(RegisterRequest req) {
-        Objects.requireNonNull(req, "request must not be null");
+        Objects.requireNonNull(req, "request must not be null");  // اعتبارسنجی ورودی
+        
+        // ایجاد شیء کاربر از اطلاعات درخواست
         User user = new User(null,
         req.getFullName(), req.getPhone(), req.getEmail(),
         req.getPasswordHash(), req.getRole(), req.getAddress());
-        return repository.saveNew(user);
+        
+        return repository.saveNew(user);  // ذخیره کاربر در دیتابیس
     }
 
     /**
-     * Returns the user if phone & passwordHash match, otherwise throws InvalidCredentialsException.
+     * ورود کاربر با شماره تلفن و رمز عبور
+     * در صورت مطابقت، کاربر را برمی‌گرداند، در غیر اینصورت استثنا پرتاب می‌کند
+     * 
+     * @param phone شماره تلفن کاربر
+     * @param passwordHash رمز عبور hash شده
+     * @return کاربر وارد شده
+     * @throws InvalidCredentialsException در صورت نامعتبر بودن اعتبارات
      */
     public User login(String phone, String passwordHash) {
-        return repository.findByPhone(phone)
-                .filter(u -> u.getPasswordHash().equals(passwordHash))
-                .orElseThrow(InvalidCredentialsException::new);
+        return repository.findByPhone(phone)                            // یافتن کاربر با شماره تلفن
+                .filter(u -> u.getPasswordHash().equals(passwordHash))  // فیلتر بر اساس رمز عبور
+                .orElseThrow(InvalidCredentialsException::new);         // پرتاب استثنا در صورت عدم مطابقت
     }
     
     /**
-     * Login user and generate JWT tokens
+     * ورود کاربر و تولید JWT token ها
+     * این متد ورود کاربر را بررسی کرده و token های دسترسی و تجدید تولید می‌کند
      * 
-     * @param phone User phone
-     * @param passwordHash Password hash
-     * @return AuthResult with JWT tokens
+     * @param phone شماره تلفن کاربر
+     * @param passwordHash رمز عبور hash شده
+     * @return AuthResult حاوی JWT token ها
      */
     public AuthResult loginWithTokens(String phone, String passwordHash) {
         try {
+            // تلاش برای ورود کاربر
             User user = login(phone, passwordHash);
+            
+            // تولید جفت token (Access + Refresh)
             String[] tokens = JWTUtil.generateTokenPair(user.getId(), user.getPhone(), user.getRole().toString());
             
-            // Return AuthResult with both tokens
+            // بازگشت AuthResult با هر دو token
             return AuthResult.refreshed(user.getId(), user.getPhone(), user.getRole().toString(), tokens[0], tokens[1]);
+            
         } catch (InvalidCredentialsException e) {
             return AuthResult.unauthenticated("Invalid phone or password");
         } catch (Exception e) {
@@ -60,66 +88,95 @@ public class AuthService {
     }
     
     /**
-     * Refresh access token using refresh token
+     * تجدید Access Token با استفاده از Refresh Token
      * 
-     * @param refreshToken Refresh token
-     * @return AuthResult with new tokens
+     * @param refreshToken Refresh Token برای تجدید
+     * @return AuthResult حاوی token های جدید
      */
     public AuthResult refreshToken(String refreshToken) {
         return AuthMiddleware.refreshAccessToken(refreshToken, repository);
     }
     
     /**
-     * Validate access token
+     * اعتبارسنجی Access Token
      * 
-     * @param accessToken Access token
-     * @return AuthResult with user information
+     * @param accessToken Access Token برای اعتبارسنجی
+     * @return AuthResult حاوی اطلاعات کاربر
      */
     public AuthResult validateToken(String accessToken) {
         return AuthMiddleware.authenticateToken(accessToken);
     }
     
     /**
-     * Logout user (invalidate token on client side)
-     * Note: In a production system, you might want to maintain a blacklist of tokens
+     * خروج کاربر (invalidate کردن token در سمت کلاینت)
+     * توجه: در سیستم JWT stateless، خروج معمولاً در سمت کلاینت مدیریت می‌شود
+     * در سیستم‌های production ممکن است نیاز به نگهداری blacklist از token ها باشد
      * 
-     * @param userId User ID
-     * @return Success message
+     * @param userId شناسه کاربر
+     * @return پیام موفقیت
      */
     public String logout(Long userId) {
-        // In a stateless JWT system, logout is typically handled client-side
-        // by removing the token from storage
+        // در سیستم JWT stateless، خروج معمولاً با حذف token از storage کلاینت انجام می‌شود
         return "Logged out successfully";
     }
 
     /**
-     * Updates user profile (fullName, address, email). Will propagate DuplicatePhoneException on phone change.
+     * به‌روزرسانی پروفایل کاربر (نام کامل، آدرس، ایمیل)
+     * در صورت تغییر شماره تلفن، DuplicatePhoneException منتشر خواهد شد
+     * 
+     * @param updated کاربر با اطلاعات به‌روز شده
+     * @return کاربر به‌روز شده
+     * @throws DuplicatePhoneException در صورت تعارض شماره تلفن
      */
     public User updateProfile(User updated) throws DuplicatePhoneException {
         return repository.update(updated);
     }
 
     // ---------------------------------------------------------------------
-    // Profile operations
+    // عملیات پروفایل
 
+    /**
+     * دریافت پروفایل کاربر بر اساس شناسه
+     * 
+     * @param id شناسه کاربر
+     * @return پروفایل کاربر
+     * @throws NotFoundException در صورت عدم وجود کاربر
+     */
     public User getProfile(long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User", id));
     }
 
+    /**
+     * به‌روزرسانی پروفایل کاربر با درخواست جزئی
+     * فقط فیلدهای ارسال شده در درخواست به‌روز می‌شوند
+     * 
+     * @param id شناسه کاربر
+     * @param req درخواست به‌روزرسانی پروفایل
+     * @return کاربر به‌روز شده
+     * @throws NotFoundException در صورت عدم وجود کاربر
+     * @throws DuplicatePhoneException در صورت تعارض شماره تلفن
+     */
     public User updateProfile(long id, com.myapp.auth.dto.UpdateProfileRequest req) {
+        // یافتن کاربر موجود
         User existing = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User", id));
 
-        if (req.getFullName() != null) existing.setFullName(req.getFullName());
-        if (req.getEmail() != null) existing.setEmail(req.getEmail());
-        if (req.getAddress() != null) existing.setAddress(req.getAddress());
+        // به‌روزرسانی فقط فیلدهای ارسال شده (partial update)
+        if (req.getFullName() != null) existing.setFullName(req.getFullName());  // به‌روزرسانی نام کامل
+        if (req.getEmail() != null) existing.setEmail(req.getEmail());          // به‌روزرسانی ایمیل
+        if (req.getAddress() != null) existing.setAddress(req.getAddress());    // به‌روزرسانی آدرس
 
-        return repository.update(existing);
+        return repository.update(existing);  // ذخیره تغییرات در دیتابیس
     }
     
     /**
-     * Register a user directly (for HTTP API usage)
+     * ثبت کاربر مستقیم (برای استفاده در HTTP API)
+     * این متد برای ثبت نام مستقیم کاربران از طریق API استفاده می‌شود
+     * 
+     * @param user کاربر برای ثبت نام
+     * @return کاربر ثبت شده
+     * @throws DuplicatePhoneException در صورت تکراری بودن شماره تلفن
      */
     public User registerUser(User user) {
         return repository.saveNew(user);

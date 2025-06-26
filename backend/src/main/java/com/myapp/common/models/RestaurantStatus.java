@@ -1,8 +1,12 @@
 package com.myapp.common.models;
 
+/**
+ * enum وضعیت رستوران - نماینده حالت‌های مختلف یک رستوران در سیستم
+ * این enum مراحل تأیید و فعالیت رستوران را مشخص می‌کند
+ */
 public enum RestaurantStatus {
-    PENDING,
-    APPROVED,
-    REJECTED,
-    SUSPENDED
+    PENDING,    // در انتظار تأیید - رستوران ثبت شده اما هنوز تأیید نشده
+    APPROVED,   // تأیید شده - رستوران تأیید شده و فعال است
+    REJECTED,   // رد شده - رستوران رد شده و غیرفعال است
+    SUSPENDED   // تعلیق شده - رستوران به دلیل تخلف تعلیق شده است
 }

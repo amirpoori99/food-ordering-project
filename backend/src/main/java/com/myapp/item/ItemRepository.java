@@ -9,6 +9,44 @@ import org.hibernate.query.Query;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository لایه دسترسی به داده‌های آیتم‌های غذایی
+ * 
+ * این کلاس مسئول تمام عملیات دیتابیس مربوط به آیتم‌های غذایی است:
+ * 
+ * === عملیات CRUD ===
+ * - ایجاد آیتم جدید
+ * - خواندن آیتم‌ها با معیارهای مختلف
+ * - به‌روزرسانی آیتم‌های موجود
+ * - حذف آیتم‌ها
+ * 
+ * === جستجو و فیلتر ===
+ * - جستجو بر اساس کلیدواژه
+ * - فیلتر بر اساس رستوران
+ * - فیلتر بر اساس دسته‌بندی
+ * - یافتن آیتم‌های در دسترس
+ * - یافتن آیتم‌های کم موجودی
+ * 
+ * === مدیریت موجودی ===
+ * - به‌روزرسانی وضعیت در دسترس بودن
+ * - به‌روزرسانی مقدار موجودی
+ * - یافتن آیتم‌های کم موجودی
+ * 
+ * === گزارش و آمار ===
+ * - شمارش آیتم‌ها
+ * - دسته‌بندی‌های رستوران
+ * - آمار موجودی
+ * 
+ * ویژگی‌های کلیدی:
+ * - HQL Queries: استفاده از Hibernate Query Language
+ * - Transaction Management: مدیریت تراکنش‌ها
+ * - Resource Management: مدیریت Session ها
+ * - Query Optimization: بهینه‌سازی پرس و جوها
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 public class ItemRepository {
 
     public FoodItem saveNew(FoodItem foodItem) {

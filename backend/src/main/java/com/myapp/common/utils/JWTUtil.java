@@ -7,115 +7,129 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
- * JWT Utility class for token generation, validation, and parsing
- * Provides secure JWT authentication functionality
+ * کلاس ابزاری JWT - مدیریت تولید، اعتبارسنجی و پردازش token ها
+ * این کلاس عملکرد احراز هویت امن JWT را فراهم می‌کند
+ * شامل دو نوع token: Access Token و Refresh Token
  */
 public class JWTUtil {
     
-    // Secret key for JWT signing (in production, should be from environment variable)
+    // کلید مخفی برای امضای JWT (در محیط production باید از متغیر محیطی دریافت شود)
     private static final String SECRET_KEY = "mySecretKeyForJWTThatShouldBeVeryLongAndSecureInProductionEnvironment123456789";
     
-    // Token expiration times
-    private static final long ACCESS_TOKEN_VALIDITY = TimeUnit.HOURS.toMillis(24); // 24 hours
-    private static final long REFRESH_TOKEN_VALIDITY = TimeUnit.DAYS.toMillis(7); // 7 days
+    // زمان اعتبار token ها
+    private static final long ACCESS_TOKEN_VALIDITY = TimeUnit.HOURS.toMillis(24); // 24 ساعت
+    private static final long REFRESH_TOKEN_VALIDITY = TimeUnit.DAYS.toMillis(7);  // 7 روز
     
-    // JWT issuer
+    // صادرکننده JWT
     private static final String ISSUER = "food-ordering-app";
     
-    // Get signing key
+    /**
+     * دریافت کلید امضای رمزنگاری شده
+     * این متد کلید مخفی را به فرمت SecretKey تبدیل می‌کند
+     * 
+     * @return کلید امضای رمزنگاری شده
+     */
     private static SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
     
     /**
-     * Generate access token for authenticated user
+     * تولید Access Token برای کاربر احراز هویت شده
+     * این token برای دسترسی به API ها استفاده می‌شود
      * 
-     * @param userId User ID
-     * @param phone User phone number
-     * @param role User role (customer, seller, delivery)
-     * @return JWT access token
+     * @param userId شناسه کاربر
+     * @param phone شماره تلفن کاربر
+     * @param role نقش کاربر (customer, seller, delivery)
+     * @return JWT Access Token
+     * @throws IllegalArgumentException در صورت null بودن پارامترها
      */
     public static String generateAccessToken(Long userId, String phone, String role) {
+        // اعتبارسنجی ورودی‌ها
         if (userId == null || phone == null || role == null) {
             throw new IllegalArgumentException("UserId, phone, and role cannot be null");
         }
         
-        Date now = new Date();
-        Date expirationDate = new Date(now.getTime() + ACCESS_TOKEN_VALIDITY);
+        Date now = new Date();                                        // زمان فعلی
+        Date expirationDate = new Date(now.getTime() + ACCESS_TOKEN_VALIDITY); // زمان انقضا
         
         return Jwts.builder()
-                .subject(userId.toString())
-                .claim("phone", phone)
-                .claim("role", role)
-                .claim("type", "access")
-                .issuer(ISSUER)
-                .issuedAt(now)
-                .expiration(expirationDate)
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
+                .subject(userId.toString())           // شناسه کاربر به عنوان subject
+                .claim("phone", phone)                // شماره تلفن در claim
+                .claim("role", role)                  // نقش کاربر در claim
+                .claim("type", "access")              // نوع token
+                .issuer(ISSUER)                       // صادرکننده
+                .issuedAt(now)                        // زمان صدور
+                .expiration(expirationDate)           // زمان انقضا
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256) // امضا با HMAC-SHA256
+                .compact();                           // تولید نهایی token
     }
     
     /**
-     * Generate refresh token for user
+     * تولید Refresh Token برای کاربر
+     * این token برای تجدید Access Token استفاده می‌شود
      * 
-     * @param userId User ID
-     * @return JWT refresh token
+     * @param userId شناسه کاربر
+     * @return JWT Refresh Token
+     * @throws IllegalArgumentException در صورت null بودن userId
      */
     public static String generateRefreshToken(Long userId) {
+        // اعتبارسنجی ورودی
         if (userId == null) {
             throw new IllegalArgumentException("UserId cannot be null");
         }
         
-        Date now = new Date();
-        Date expirationDate = new Date(now.getTime() + REFRESH_TOKEN_VALIDITY);
+        Date now = new Date();                                         // زمان فعلی
+        Date expirationDate = new Date(now.getTime() + REFRESH_TOKEN_VALIDITY); // زمان انقضا
         
         return Jwts.builder()
-                .subject(userId.toString())
-                .claim("type", "refresh")
-                .issuer(ISSUER)
-                .issuedAt(now)
-                .expiration(expirationDate)
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
+                .subject(userId.toString())           // شناسه کاربر
+                .claim("type", "refresh")             // نوع token
+                .issuer(ISSUER)                       // صادرکننده
+                .issuedAt(now)                        // زمان صدور
+                .expiration(expirationDate)           // زمان انقضا
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256) // امضا
+                .compact();                           // تولید نهایی token
     }
     
     /**
-     * Validate JWT token
+     * اعتبارسنجی JWT token
+     * بررسی امضا، صادرکننده و ساختار token
      * 
-     * @param token JWT token to validate
-     * @return true if token is valid, false otherwise
+     * @param token JWT token برای اعتبارسنجی
+     * @return true اگر token معتبر باشد، در غیر اینصورت false
      */
     public static boolean validateToken(String token) {
         try {
+            // پردازش و اعتبارسنجی token
             Jwts.parser()
-                .verifyWith(getSigningKey())
-                .requireIssuer(ISSUER)
+                .verifyWith(getSigningKey())        // بررسی امضا
+                .requireIssuer(ISSUER)              // بررسی صادرکننده
                 .build()
-                .parseSignedClaims(token);
+                .parseSignedClaims(token);          // پردازش claims
             return true;
         } catch (JwtException | IllegalArgumentException e) {
-            return false;
+            return false; // token نامعتبر
         }
     }
     
     /**
-     * Get user ID from JWT token
+     * دریافت شناسه کاربر از JWT token
      * 
      * @param token JWT token
-     * @return User ID
-     * @throws JwtException if token is invalid
+     * @return شناسه کاربر
+     * @throws JwtException در صورت نامعتبر بودن token
      */
     public static Long getUserIdFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
-        return Long.parseLong(claims.getSubject());
+        return Long.parseLong(claims.getSubject()); // تبدیل subject به Long
     }
     
     /**
-     * Get user phone from JWT token
+     * دریافت شماره تلفن کاربر از JWT token
      * 
      * @param token JWT token
-     * @return User phone number
-     * @throws JwtException if token is invalid or doesn't contain phone
+     * @return شماره تلفن کاربر
+     * @throws JwtException در صورت نامعتبر بودن token یا عدم وجود phone
      */
     public static String getPhoneFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
@@ -127,11 +141,11 @@ public class JWTUtil {
     }
     
     /**
-     * Get user role from JWT token
+     * دریافت نقش کاربر از JWT token
      * 
      * @param token JWT token
-     * @return User role
-     * @throws JwtException if token is invalid or doesn't contain role
+     * @return نقش کاربر
+     * @throws JwtException در صورت نامعتبر بودن token یا عدم وجود role
      */
     public static String getRoleFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
@@ -143,11 +157,11 @@ public class JWTUtil {
     }
     
     /**
-     * Get token type (access/refresh) from JWT token
+     * دریافت نوع token (access/refresh) از JWT token
      * 
      * @param token JWT token
-     * @return Token type
-     * @throws JwtException if token is invalid or doesn't contain type
+     * @return نوع token
+     * @throws JwtException در صورت نامعتبر بودن token یا عدم وجود type
      */
     public static String getTokenType(String token) {
         Claims claims = getClaimsFromToken(token);
@@ -159,26 +173,26 @@ public class JWTUtil {
     }
     
     /**
-     * Check if token is expired
+     * بررسی انقضای token
      * 
      * @param token JWT token
-     * @return true if token is expired, false otherwise
+     * @return true اگر token منقضی شده باشد، در غیر اینصورت false
      */
     public static boolean isTokenExpired(String token) {
         try {
             Claims claims = getClaimsFromToken(token);
-            return claims.getExpiration().before(new Date());
+            return claims.getExpiration().before(new Date()); // مقایسه با زمان فعلی
         } catch (JwtException e) {
-            return true; // Consider invalid tokens as expired
+            return true; // token های نامعتبر را منقضی در نظر می‌گیریم
         }
     }
     
     /**
-     * Get expiration date from JWT token
+     * دریافت تاریخ انقضا از JWT token
      * 
      * @param token JWT token
-     * @return Expiration date
-     * @throws JwtException if token is invalid
+     * @return تاریخ انقضا
+     * @throws JwtException در صورت نامعتبر بودن token
      */
     public static Date getExpirationDateFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
@@ -186,11 +200,11 @@ public class JWTUtil {
     }
     
     /**
-     * Get issued at date from JWT token
+     * دریافت تاریخ صدور از JWT token
      * 
      * @param token JWT token
-     * @return Issued at date
-     * @throws JwtException if token is invalid
+     * @return تاریخ صدور
+     * @throws JwtException در صورت نامعتبر بودن token
      */
     public static Date getIssuedAtFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
@@ -198,10 +212,10 @@ public class JWTUtil {
     }
     
     /**
-     * Check if token is an access token
+     * بررسی اینکه آیا token از نوع Access است
      * 
      * @param token JWT token
-     * @return true if access token, false otherwise
+     * @return true اگر Access Token باشد، در غیر اینصورت false
      */
     public static boolean isAccessToken(String token) {
         try {
@@ -212,10 +226,10 @@ public class JWTUtil {
     }
     
     /**
-     * Check if token is a refresh token
+     * بررسی اینکه آیا token از نوع Refresh است
      * 
      * @param token JWT token
-     * @return true if refresh token, false otherwise
+     * @return true اگر Refresh Token باشد، در غیر اینصورت false
      */
     public static boolean isRefreshToken(String token) {
         try {
@@ -226,24 +240,24 @@ public class JWTUtil {
     }
     
     /**
-     * Extract Bearer token from Authorization header
+     * استخراج Bearer Token از header Authorization
      * 
-     * @param authorizationHeader Authorization header value
-     * @return JWT token or null if invalid format
+     * @param authorizationHeader مقدار header Authorization
+     * @return JWT token یا null در صورت نامعتبر بودن فرمت
      */
     public static String extractBearerToken(String authorizationHeader) {
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String token = authorizationHeader.substring(7).trim();
+            String token = authorizationHeader.substring(7).trim(); // حذف "Bearer " از ابتدا
             return token.isEmpty() ? null : token;
         }
         return null;
     }
     
     /**
-     * Get remaining time until token expires (in milliseconds)
+     * دریافت زمان باقیمانده تا انقضای token (بر حسب میلی‌ثانیه)
      * 
      * @param token JWT token
-     * @return Remaining time in milliseconds, or 0 if expired/invalid
+     * @return زمان باقیمانده بر حسب میلی‌ثانیه، یا 0 در صورت انقضا/نامعتبر بودن
      */
     public static long getRemainingTimeToExpire(String token) {
         if (token == null || token.trim().isEmpty()) {
@@ -252,18 +266,18 @@ public class JWTUtil {
         try {
             Date expiration = getExpirationDateFromToken(token);
             long remaining = expiration.getTime() - System.currentTimeMillis();
-            return Math.max(0, remaining);
+            return Math.max(0, remaining); // حداقل 0 برگردان
         } catch (JwtException | IllegalArgumentException e) {
             return 0;
         }
     }
     
     /**
-     * Check if user has specific role
+     * بررسی داشتن نقش خاص توسط کاربر
      * 
      * @param token JWT token
-     * @param requiredRole Required role
-     * @return true if user has the role, false otherwise
+     * @param requiredRole نقش مورد نیاز
+     * @return true اگر کاربر نقش مورد نیاز را داشته باشد، در غیر اینصورت false
      */
     public static boolean hasRole(String token, String requiredRole) {
         try {
@@ -275,48 +289,50 @@ public class JWTUtil {
     }
     
     /**
-     * Get all claims from JWT token
+     * دریافت تمام claims از JWT token
+     * متد کمکی برای استخراج اطلاعات از token
      * 
      * @param token JWT token
-     * @return Claims object
-     * @throws JwtException if token is invalid
+     * @return شیء Claims
+     * @throws JwtException در صورت نامعتبر بودن token
      */
     private static Claims getClaimsFromToken(String token) {
         return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .requireIssuer(ISSUER)
+                .verifyWith(getSigningKey())        // بررسی امضا
+                .requireIssuer(ISSUER)              // بررسی صادرکننده
                 .build()
-                .parseSignedClaims(token)
-                .getPayload();
+                .parseSignedClaims(token)           // پردازش token
+                .getPayload();                      // دریافت payload (claims)
     }
     
     /**
-     * Generate both access and refresh tokens for user
+     * تولید هر دو نوع token (Access و Refresh) برای کاربر
+     * این متد هر دو token مورد نیاز را به صورت همزمان تولید می‌کند
      * 
-     * @param userId User ID
-     * @param phone User phone number
-     * @param role User role
-     * @return Array containing [accessToken, refreshToken]
+     * @param userId شناسه کاربر
+     * @param phone شماره تلفن کاربر
+     * @param role نقش کاربر
+     * @return آرایه شامل [accessToken, refreshToken]
      */
     public static String[] generateTokenPair(Long userId, String phone, String role) {
-        String accessToken = generateAccessToken(userId, phone, role);
-        String refreshToken = generateRefreshToken(userId);
-        return new String[]{accessToken, refreshToken};
+        String accessToken = generateAccessToken(userId, phone, role);  // تولید Access Token
+        String refreshToken = generateRefreshToken(userId);             // تولید Refresh Token
+        return new String[]{accessToken, refreshToken};                 // برگرداندن هر دو
     }
     
     /**
-     * Get access token validity period in milliseconds
+     * دریافت دوره اعتبار Access Token بر حسب میلی‌ثانیه
      * 
-     * @return Access token validity period
+     * @return دوره اعتبار Access Token
      */
     public static long getAccessTokenValidity() {
         return ACCESS_TOKEN_VALIDITY;
     }
     
     /**
-     * Get refresh token validity period in milliseconds
+     * دریافت دوره اعتبار Refresh Token بر حسب میلی‌ثانیه
      * 
-     * @return Refresh token validity period
+     * @return دوره اعتبار Refresh Token
      */
     public static long getRefreshTokenValidity() {
         return REFRESH_TOKEN_VALIDITY;

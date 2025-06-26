@@ -12,13 +12,45 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 /**
- * Repository class for vendor operations from customer perspective
- * Provides specialized queries for vendor browsing and search
+ * Repository لایه دسترسی داده برای عملیات فروشندگان (Vendor Operations)
+ * 
+ * این کلاس تمام عملیات پایگاه داده مربوط به فروشندگان از دیدگاه مشتری را ارائه می‌دهد:
+ * 
+ * === جستجو و مرور فروشندگان ===
+ * - findById(): یافتن فروشنده با شناسه
+ * - searchVendors(): جستجو در نام و موقعیت فروشندگان
+ * - findByLocation(): یافتن فروشندگان در منطقه خاص
+ * - getFeaturedVendors(): فروشندگان برجسته/محبوب
+ * 
+ * === فیلتر و دسته‌بندی ===
+ * - findByFoodCategory(): فروشندگان بر اساس دسته غذا
+ * - findByFilters(): جستجوی پیشرفته با چندین فیلتر
+ * - getVendorsWithItemCounts(): فروشندگان همراه تعداد آیتم‌های منو
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Customer-Focused Queries: queries مختص دیدگاه مشتری
+ * - Status Filtering: فقط فروشندگان تایید شده
+ * - Search Optimization: جستجوی بهینه شده
+ * - Category-Based Discovery: کشف بر اساس دسته غذا
+ * - Location-Based Search: جستجوی موقعیت‌محور
+ * - Featured Content: محتوای برجسته
+ * - Multi-Filter Support: پشتیبانی از چندین فیلتر همزمان
+ * - Performance Optimization: بهینه‌سازی کارایی
+ * 
+ * === Inner Classes ===
+ * - VendorWithItemCount: کلاس داده فروشنده با تعداد آیتم‌ها
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class VendorRepository {
     
     /**
-     * Find vendor by ID
+     * یافتن فروشنده با شناسه
+     * 
+     * @param id شناسه فروشنده
+     * @return Optional حاوی فروشنده یا خالی
      */
     public Optional<Restaurant> findById(long id) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -30,7 +62,13 @@ public class VendorRepository {
     }
     
     /**
-     * Search vendors by name or location
+     * جستجوی فروشندگان بر اساس نام یا موقعیت
+     * 
+     * این متد در نام رستوران و آدرس آن جستجو می‌کند
+     * فقط رستوران‌های تایید شده را برمی‌گرداند
+     * 
+     * @param searchTerm عبارت جستجو
+     * @return لیست فروشندگان یافت شده
      */
     public List<Restaurant> searchVendors(String searchTerm) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -50,7 +88,12 @@ public class VendorRepository {
     }
     
     /**
-     * Find vendors by location/area
+     * یافتن فروشندگان در منطقه/موقعیت مشخص
+     * 
+     * جستجو در آدرس رستوران‌ها برای یافتن فروشندگان در منطقه خاص
+     * 
+     * @param location نام منطقه یا موقعیت
+     * @return لیست فروشندگان در آن منطقه
      */
     public List<Restaurant> findByLocation(String location) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -69,9 +112,12 @@ public class VendorRepository {
     }
     
     /**
-     * Get featured/popular vendors
-     * For now, returns approved vendors ordered by creation date (newest first)
-     * In future, this could be based on ratings, order count, etc.
+     * دریافت فروشندگان برجسته/محبوب
+     * 
+     * در حال حاضر، فروشندگان تایید شده را بر اساس تاریخ ثبت (جدیدترین اول) برمی‌گرداند
+     * در آینده، می‌تواند بر اساس امتیاز، تعداد سفارش و غیره باشد
+     * 
+     * @return لیست فروشندگان برجسته (حداکثر 10 مورد)
      */
     public List<Restaurant> getFeaturedVendors() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -80,7 +126,7 @@ public class VendorRepository {
             
             Query<Restaurant> query = session.createQuery(hql, Restaurant.class);
             query.setParameter("status", RestaurantStatus.APPROVED);
-            query.setMaxResults(10); // Limit to top 10
+            query.setMaxResults(10); // محدود به 10 مورد برتر
             
             return query.getResultList();
         } catch (Exception e) {
@@ -90,7 +136,13 @@ public class VendorRepository {
     }
     
     /**
-     * Find vendors that serve a specific food category
+     * یافتن فروشندگانی که دسته غذای مشخصی ارائه می‌دهند
+     * 
+     * از join با جدول FoodItem استفاده می‌کند تا فروشندگانی که
+     * حداقل یک آیتم در دسته مورد نظر دارند را پیدا کند
+     * 
+     * @param category دسته غذایی مورد نظر
+     * @return لیست فروشندگان ارائه‌دهنده آن دسته غذا
      */
     public List<Restaurant> findByFoodCategory(String category) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -112,7 +164,12 @@ public class VendorRepository {
     }
     
     /**
-     * Get vendors with their menu item counts
+     * دریافت فروشندگان همراه تعداد آیتم‌های منوی آنها
+     * 
+     * query آماری که تعداد آیتم‌های موجود هر فروشنده را محاسبه می‌کند
+     * بر اساس تعداد آیتم‌ها مرتب می‌شود (بیشترین اول)
+     * 
+     * @return لیست فروشندگان با تعداد آیتم‌هایشان
      */
     public List<VendorWithItemCount> getVendorsWithItemCounts() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -130,6 +187,7 @@ public class VendorRepository {
             List<Object[]> results = query.getResultList();
             List<VendorWithItemCount> vendors = new ArrayList<>();
             
+            // تبدیل نتایج خام به آبجکت‌های structured
             for (Object[] row : results) {
                 Long id = (Long) row[0];
                 String name = (String) row[1];
@@ -147,27 +205,43 @@ public class VendorRepository {
     }
     
     /**
-     * Get vendors by multiple filters
+     * جستجوی فروشندگان با چندین فیلتر همزمان
+     * 
+     * این متد امکان فیلتر کردن فروشندگان بر اساس ترکیبی از:
+     * - موقعیت جغرافیایی
+     * - دسته غذایی
+     * - عبارت جستجو در نام
+     * 
+     * query به صورت dynamic ساخته می‌شود تا فقط فیلترهای ارائه شده اعمال شوند
+     * 
+     * @param location موقعیت جغرافیایی (اختیاری)
+     * @param category دسته غذایی (اختیاری)  
+     * @param searchTerm عبارت جستجو در نام (اختیاری)
+     * @return لیست فروشندگان فیلتر شده
      */
     public List<Restaurant> findByFilters(String location, String category, String searchTerm) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             StringBuilder hqlBuilder = new StringBuilder();
             hqlBuilder.append("SELECT DISTINCT r FROM Restaurant r ");
             
+            // اگر فیلتر دسته‌بندی مشخص شده، join با FoodItem ضروری است
             if (category != null && !category.trim().isEmpty()) {
                 hqlBuilder.append("JOIN FoodItem f ON f.restaurant.id = r.id ");
             }
             
             hqlBuilder.append("WHERE r.status = :status ");
             
+            // اضافه کردن شرط موقعیت
             if (location != null && !location.trim().isEmpty()) {
                 hqlBuilder.append("AND LOWER(r.address) LIKE LOWER(:location) ");
             }
             
+            // اضافه کردن شرط دسته‌بندی
             if (category != null && !category.trim().isEmpty()) {
                 hqlBuilder.append("AND LOWER(f.category) = LOWER(:category) AND f.available = true ");
             }
             
+            // اضافه کردن شرط جستجوی نام
             if (searchTerm != null && !searchTerm.trim().isEmpty()) {
                 hqlBuilder.append("AND LOWER(r.name) LIKE LOWER(:searchTerm) ");
             }
@@ -175,6 +249,7 @@ public class VendorRepository {
             Query<Restaurant> query = session.createQuery(hqlBuilder.toString(), Restaurant.class);
             query.setParameter("status", RestaurantStatus.APPROVED);
             
+            // تنظیم پارامترهای مشروط
             if (location != null && !location.trim().isEmpty()) {
                 query.setParameter("location", "%" + location + "%");
             }
@@ -195,15 +270,32 @@ public class VendorRepository {
     }
     
     /**
-     * Data class for vendor with item count
+     * کلاس داده برای فروشنده همراه تعداد آیتم‌ها
+     * 
+     * این کلاس اطلاعات اساسی فروشنده به همراه تعداد آیتم‌های منوی او را نگه می‌دارد
+     * برای نمایش آمار و مقایسه فروشندگان مفید است
      */
     public static class VendorWithItemCount {
+        /** شناسه فروشنده */
         private final Long id;
+        /** نام فروشنده */
         private final String name;
+        /** آدرس فروشنده */
         private final String address;
+        /** توضیحات فروشنده (اختیاری) */
         private final String description;
+        /** تعداد آیتم‌های موجود در منو */
         private final int itemCount;
         
+        /**
+         * سازنده کلاس VendorWithItemCount
+         * 
+         * @param id شناسه فروشنده
+         * @param name نام فروشنده
+         * @param address آدرس فروشنده
+         * @param description توضیحات فروشنده
+         * @param itemCount تعداد آیتم‌های منو
+         */
         public VendorWithItemCount(Long id, String name, String address, String description, int itemCount) {
             this.id = id;
             this.name = name;
@@ -212,11 +304,16 @@ public class VendorRepository {
             this.itemCount = itemCount;
         }
         
-        // Getters
+        // Getters با کامنت فارسی
+        /** @return شناسه فروشنده */
         public Long getId() { return id; }
+        /** @return نام فروشنده */
         public String getName() { return name; }
+        /** @return آدرس فروشنده */
         public String getAddress() { return address; }
+        /** @return توضیحات فروشنده */
         public String getDescription() { return description; }
+        /** @return تعداد آیتم‌های منو */
         public int getItemCount() { return itemCount; }
     }
 }

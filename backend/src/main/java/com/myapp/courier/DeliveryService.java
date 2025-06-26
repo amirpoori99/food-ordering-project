@@ -10,8 +10,25 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Service class for managing delivery operations
- * Handles courier assignment, delivery tracking, and business logic
+ * سرویس مدیریت عملیات تحویل سفارشات
+ * 
+ * این کلاس مسئول پیاده‌سازی منطق کسب‌وکار مربوط به تحویل شامل:
+ * - ایجاد درخواست تحویل برای سفارشات
+ * - اختصاص پیک به تحویل‌ها
+ * - مدیریت مراحل مختلف تحویل (pickup, delivery)
+ * - لغو و به‌روزرسانی تحویل‌ها
+ * - محاسبه آمار و گزارش‌های پیک‌ها
+ * - validation قوانین کسب‌وکار
+ * 
+ * ویژگی‌های کلیدی:
+ * - State Management: مدیریت انتقال وضعیت‌ها
+ * - Courier Availability: بررسی در دسترس بودن پیک‌ها
+ * - Business Validation: اعتبارسنجی قوانین کسب‌وکار
+ * - Statistics Calculation: محاسبه آمار عملکرد
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class DeliveryService {
 

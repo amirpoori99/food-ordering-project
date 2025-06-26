@@ -14,24 +14,87 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Service class for Rating business logic
- * Handles all rating and review operations with validation
+ * Service لایه منطق کسب‌وکار برای مدیریت نظرات و امتیازدهی
+ * 
+ * این کلاس تمام عملیات مربوط به منطق کسب‌وکار نظرات و امتیازات را پیاده‌سازی می‌کند:
+ * 
+ * === عملیات اصلی CRUD ===
+ * - createRating(): ایجاد نظر و امتیاز جدید
+ * - updateRating(): به‌روزرسانی نظر موجود
+ * - getRating(): دریافت نظر بر اساس شناسه
+ * - deleteRating(): حذف نظر (فقط توسط صاحب نظر)
+ * 
+ * === جستجو و دریافت اطلاعات ===
+ * - getRestaurantRatings(): تمام نظرات رستوران
+ * - getUserRatings(): تمام نظرات کاربر
+ * - getRestaurantRatingStats(): آمار کامل امتیازات رستوران
+ * - hasUserRatedRestaurant(): بررسی نظردهی کاربر به رستوران
+ * - getUserRatingForRestaurant(): نظر کاربر برای رستوران خاص
+ * 
+ * === عملیات تعامل کاربران ===
+ * - markAsHelpful(): علامت‌گذاری نظر به عنوان مفید
+ * - removeHelpfulMark(): حذف علامت مفید از نظر
+ * 
+ * === عملیات مدیریتی ===
+ * - verifyRating(): تایید نظر (توسط ادمین)
+ * - unverifyRating(): لغو تایید نظر (توسط ادمین)
+ * - getAllRatings(): دریافت تمام نظرات (ادمین)
+ * 
+ * === فیلترها و جستجوهای پیشرفته ===
+ * - getRatingsByScore(): نظرات در بازه امتیاز
+ * - getVerifiedRatings(): نظرات تایید شده
+ * - getRatingsWithReviews(): نظرات دارای متن
+ * - getRecentRatings(): نظرات اخیر
+ * 
+ * === صفحه‌بندی و آمار ===
+ * - getRatingsWithPagination(): دریافت با صفحه‌بندی
+ * - getTotalRatingCount(): تعداد کل نظرات
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Business Rules Enforcement: اجرای قوانین کسب‌وکار
+ * - Data Validation: اعتبارسنجی کامل داده‌ها
+ * - User Permission Checks: بررسی مجوزهای کاربران
+ * - Duplicate Prevention: جلوگیری از نظر تکراری هر کاربر
+ * - Owner Restriction: منع نظردهی مالک به رستوران خود
+ * - Statistical Analysis: تحلیل آماری امتیازات
+ * - Error Handling: مدیریت خطاها و validation
+ * - Dependency Injection: پشتیبانی از تزریق وابستگی‌ها
+ * 
+ * === Inner Classes ===
+ * - RatingStats: کلاس آمار امتیازات رستوران
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class RatingService {
     
+    /** Logger برای ثبت عملیات و خطاها */
     private static final Logger logger = LoggerFactory.getLogger(RatingService.class);
     
+    /** Repository لایه دسترسی داده نظرات */
     private final RatingRepository ratingRepository;
+    /** Repository لایه دسترسی داده کاربران */
     private final AuthRepository authRepository;
+    /** Repository لایه دسترسی داده رستوران‌ها */
     private final RestaurantRepository restaurantRepository;
     
+    /**
+     * سازنده پیش‌فرض - Repository های مورد نیاز را ایجاد می‌کند
+     */
     public RatingService() {
         this.ratingRepository = new RatingRepository();
         this.authRepository = new AuthRepository();
         this.restaurantRepository = new RestaurantRepository();
     }
     
-    // Constructor for testing
+    /**
+     * سازنده برای تزریق وابستگی‌ها (برای تست‌ها)
+     * 
+     * @param ratingRepository repository نظرات
+     * @param authRepository repository کاربران
+     * @param restaurantRepository repository رستوران‌ها
+     */
     public RatingService(RatingRepository ratingRepository, AuthRepository authRepository, RestaurantRepository restaurantRepository) {
         this.ratingRepository = ratingRepository;
         this.authRepository = authRepository;
@@ -39,32 +102,45 @@ public class RatingService {
     }
     
     /**
-     * Creates a new rating for a restaurant
+     * ایجاد نظر و امتیاز جدید برای رستوران
+     * 
+     * قوانین کسب‌وکار:
+     * - هر کاربر فقط یک نظر برای هر رستوران
+     * - مالک رستوران نمی‌تواند به رستوران خودش نظر دهد
+     * - امتیاز باید بین 1 تا 5 باشد
+     * 
+     * @param userId شناسه کاربر نظردهنده
+     * @param restaurantId شناسه رستوران
+     * @param score امتیاز (1-5)
+     * @param reviewText متن نظر (اختیاری)
+     * @return نظر ایجاد شده
+     * @throws IllegalArgumentException در صورت ورودی‌های نامعتبر یا تکراری بودن
+     * @throws NotFoundException در صورت عدم وجود کاربر یا رستوران
      */
     public Rating createRating(Long userId, Long restaurantId, Integer score, String reviewText) {
         logger.info("Creating rating: userId={}, restaurantId={}, score={}", userId, restaurantId, score);
         
-        // Validate inputs
+        // اعتبارسنجی ورودی‌ها
         validateRatingInputs(userId, restaurantId, score);
         
-        // Get user and restaurant
+        // دریافت کاربر و رستوران
         User user = authRepository.findById(userId)
             .orElseThrow(() -> new NotFoundException("User", userId));
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
             .orElseThrow(() -> new NotFoundException("Restaurant", restaurantId));
         
-        // Check if user already rated this restaurant
+        // بررسی عدم وجود نظر قبلی از همین کاربر
         Optional<Rating> existingRating = ratingRepository.findByUserAndRestaurant(user, restaurant);
         if (existingRating.isPresent()) {
             throw new IllegalArgumentException("User has already rated this restaurant. Use update instead.");
         }
         
-        // Validate that user is not rating their own restaurant
+        // بررسی عدم نظردهی مالک به رستوران خودش
         if (restaurant.getOwnerId().equals(userId)) {
             throw new IllegalArgumentException("Restaurant owners cannot rate their own restaurants");
         }
         
-        // Create and save rating
+        // ایجاد و ذخیره نظر
         Rating rating = new Rating(user, restaurant, score, reviewText);
         Rating savedRating = ratingRepository.save(rating);
         
@@ -73,12 +149,21 @@ public class RatingService {
     }
     
     /**
-     * Updates an existing rating
+     * به‌روزرسانی نظر موجود
+     * 
+     * کاربران می‌توانند امتیاز و/یا متن نظر خود را ویرایش کنند
+     * 
+     * @param ratingId شناسه نظر
+     * @param newScore امتیاز جدید (اختیاری)
+     * @param newReviewText متن نظر جدید (اختیاری)
+     * @return نظر به‌روزرسانی شده
+     * @throws IllegalArgumentException در صورت ورودی‌های نامعتبر
+     * @throws NotFoundException در صورت عدم وجود نظر
      */
     public Rating updateRating(Long ratingId, Integer newScore, String newReviewText) {
         logger.info("Updating rating: ratingId={}, newScore={}", ratingId, newScore);
         
-        // Validate inputs
+        // اعتبارسنجی ورودی‌ها
         if (ratingId == null) {
             throw new IllegalArgumentException("Rating ID cannot be null");
         }
@@ -86,11 +171,11 @@ public class RatingService {
             throw new IllegalArgumentException("Rating score must be between 1 and 5");
         }
         
-        // Get existing rating
+        // دریافت نظر موجود
         Rating rating = ratingRepository.findById(ratingId)
             .orElseThrow(() -> new NotFoundException("Rating", ratingId));
         
-        // Update rating
+        // به‌روزرسانی نظر
         if (newScore != null) {
             rating.updateRating(newScore, newReviewText);
         } else if (newReviewText != null) {
@@ -103,7 +188,12 @@ public class RatingService {
     }
     
     /**
-     * Gets a rating by ID
+     * دریافت نظر بر اساس شناسه
+     * 
+     * @param ratingId شناسه نظر
+     * @return نظر یافت شده
+     * @throws IllegalArgumentException در صورت null بودن ID
+     * @throws NotFoundException در صورت عدم وجود نظر
      */
     public Rating getRating(Long ratingId) {
         if (ratingId == null) {
@@ -115,7 +205,12 @@ public class RatingService {
     }
     
     /**
-     * Gets all ratings for a restaurant
+     * دریافت تمام نظرات رستوران خاص
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست نظرات رستوران
+     * @throws IllegalArgumentException در صورت null بودن ID
+     * @throws NotFoundException در صورت عدم وجود رستوران
      */
     public List<Rating> getRestaurantRatings(Long restaurantId) {
         if (restaurantId == null) {
@@ -129,7 +224,12 @@ public class RatingService {
     }
     
     /**
-     * Gets all ratings by a user
+     * دریافت تمام نظرات ثبت شده توسط کاربر
+     * 
+     * @param userId شناسه کاربر
+     * @return لیست نظرات کاربر
+     * @throws IllegalArgumentException در صورت null بودن ID
+     * @throws NotFoundException در صورت عدم وجود کاربر
      */
     public List<Rating> getUserRatings(Long userId) {
         if (userId == null) {
@@ -143,7 +243,14 @@ public class RatingService {
     }
     
     /**
-     * Gets rating statistics for a restaurant
+     * دریافت آمار کامل امتیازات رستوران
+     * 
+     * شامل میانگین امتیاز، تعداد کل نظرات و توزیع امتیازات
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return آمار امتیازات رستوران
+     * @throws IllegalArgumentException در صورت null بودن ID
+     * @throws NotFoundException در صورت عدم وجود رستوران
      */
     public RatingStats getRestaurantRatingStats(Long restaurantId) {
         if (restaurantId == null) {
@@ -161,7 +268,11 @@ public class RatingService {
     }
     
     /**
-     * Checks if a user has rated a restaurant
+     * بررسی اینکه آیا کاربر به رستوران نظر داده است
+     * 
+     * @param userId شناسه کاربر
+     * @param restaurantId شناسه رستوران
+     * @return true اگر کاربر نظر داده باشد، false در غیر این صورت
      */
     public boolean hasUserRatedRestaurant(Long userId, Long restaurantId) {
         if (userId == null || restaurantId == null) {
@@ -184,7 +295,11 @@ public class RatingService {
     }
     
     /**
-     * Gets user's rating for a specific restaurant
+     * دریافت نظر کاربر برای رستوران خاص
+     * 
+     * @param userId شناسه کاربر
+     * @param restaurantId شناسه رستوران
+     * @return Optional حاوی نظر کاربر یا empty
      */
     public Optional<Rating> getUserRatingForRestaurant(Long userId, Long restaurantId) {
         if (userId == null || restaurantId == null) {
@@ -207,7 +322,15 @@ public class RatingService {
     }
     
     /**
-     * Deletes a rating (user can only delete their own rating)
+     * حذف نظر (فقط توسط صاحب نظر)
+     * 
+     * کاربران فقط می‌توانند نظرات خودشان را حذف کنند
+     * 
+     * @param ratingId شناسه نظر
+     * @param userId شناسه کاربر درخواست‌کننده حذف
+     * @return true در صورت حذف موفق، false در غیر این صورت
+     * @throws IllegalArgumentException در صورت null بودن IDs یا عدم مجوز
+     * @throws NotFoundException در صورت عدم وجود نظر
      */
     public boolean deleteRating(Long ratingId, Long userId) {
         logger.info("Deleting rating: ratingId={}, userId={}", ratingId, userId);
@@ -219,7 +342,7 @@ public class RatingService {
         Rating rating = ratingRepository.findById(ratingId)
             .orElseThrow(() -> new NotFoundException("Rating", ratingId));
         
-        // Check if user owns this rating
+        // بررسی مالکیت نظر
         if (!rating.getUser().getId().equals(userId)) {
             throw new IllegalArgumentException("Users can only delete their own ratings");
         }
@@ -232,7 +355,14 @@ public class RatingService {
     }
     
     /**
-     * Marks a rating as helpful (increment helpful count)
+     * علامت‌گذاری نظر به عنوان مفید
+     * 
+     * افزایش شمارنده "مفید بودن" نظر توسط سایر کاربران
+     * 
+     * @param ratingId شناسه نظر
+     * @return نظر به‌روزرسانی شده
+     * @throws IllegalArgumentException در صورت null بودن ID
+     * @throws NotFoundException در صورت عدم وجود نظر
      */
     public Rating markAsHelpful(Long ratingId) {
         if (ratingId == null) {
@@ -247,7 +377,14 @@ public class RatingService {
     }
     
     /**
-     * Removes helpful mark from a rating (decrement helpful count)
+     * حذف علامت مفید از نظر
+     * 
+     * کاهش شمارنده "مفید بودن" نظر
+     * 
+     * @param ratingId شناسه نظر
+     * @return نظر به‌روزرسانی شده
+     * @throws IllegalArgumentException در صورت null بودن ID
+     * @throws NotFoundException در صورت عدم وجود نظر
      */
     public Rating removeHelpfulMark(Long ratingId) {
         if (ratingId == null) {
@@ -262,7 +399,14 @@ public class RatingService {
     }
     
     /**
-     * Verifies a rating (admin only)
+     * تایید نظر (فقط توسط ادمین)
+     * 
+     * نظرات تایید شده اعتبار بیشتری دارند
+     * 
+     * @param ratingId شناسه نظر
+     * @return نظر تایید شده
+     * @throws IllegalArgumentException در صورت null بودن ID
+     * @throws NotFoundException در صورت عدم وجود نظر
      */
     public Rating verifyRating(Long ratingId) {
         if (ratingId == null) {
@@ -279,7 +423,12 @@ public class RatingService {
     }
     
     /**
-     * Unverifies a rating (admin only)
+     * لغو تایید نظر (فقط توسط ادمین)
+     * 
+     * @param ratingId شناسه نظر
+     * @return نظر با تایید لغو شده
+     * @throws IllegalArgumentException در صورت null بودن ID
+     * @throws NotFoundException در صورت عدم وجود نظر
      */
     public Rating unverifyRating(Long ratingId) {
         if (ratingId == null) {
@@ -296,7 +445,12 @@ public class RatingService {
     }
     
     /**
-     * Gets ratings by score range
+     * دریافت نظرات در بازه امتیاز مشخص
+     * 
+     * @param minScore حداقل امتیاز (1-5)
+     * @param maxScore حداکثر امتیاز (1-5)
+     * @return لیست نظرات در بازه امتیاز
+     * @throws IllegalArgumentException در صورت بازه نامعتبر
      */
     public List<Rating> getRatingsByScore(int minScore, int maxScore) {
         if (minScore < 1 || maxScore > 5 || minScore > maxScore) {
@@ -307,21 +461,31 @@ public class RatingService {
     }
     
     /**
-     * Gets verified ratings
+     * دریافت نظرات تایید شده
+     * 
+     * @return لیست نظرات تایید شده توسط ادمین
      */
     public List<Rating> getVerifiedRatings() {
         return ratingRepository.findVerifiedRatings();
     }
     
     /**
-     * Gets ratings with review text
+     * دریافت نظراتی که متن نظر دارند
+     * 
+     * نظراتی که علاوه بر امتیاز، توضیحات متنی نیز ارائه داده‌اند
+     * 
+     * @return لیست نظرات دارای متن
      */
     public List<Rating> getRatingsWithReviews() {
         return ratingRepository.findRatingsWithReviews();
     }
     
     /**
-     * Gets recent ratings (within specified days)
+     * دریافت نظرات اخیر (در چند روز گذشته)
+     * 
+     * @param days تعداد روزهای گذشته
+     * @return لیست نظرات اخیر
+     * @throws IllegalArgumentException در صورت تعداد روز منفی یا صفر
      */
     public List<Rating> getRecentRatings(int days) {
         if (days < 1) {
@@ -332,14 +496,23 @@ public class RatingService {
     }
     
     /**
-     * Gets all ratings (admin only)
+     * دریافت تمام نظرات (فقط برای ادمین)
+     * 
+     * @return لیست تمام نظرات سیستم
      */
     public List<Rating> getAllRatings() {
         return ratingRepository.findAll();
     }
     
     /**
-     * Gets ratings with pagination
+     * دریافت نظرات با صفحه‌بندی
+     * 
+     * برای بهبود عملکرد در صفحات مدیریت
+     * 
+     * @param page شماره صفحه (شروع از 0)
+     * @param size تعداد رکورد در هر صفحه
+     * @return لیست نظرات با صفحه‌بندی
+     * @throws IllegalArgumentException در صورت پارامترهای نامعتبر
      */
     public List<Rating> getRatingsWithPagination(int page, int size) {
         if (page < 0 || size < 1) {
@@ -351,7 +524,9 @@ public class RatingService {
     }
     
     /**
-     * Gets total rating count
+     * دریافت تعداد کل نظرات سیستم
+     * 
+     * @return تعداد کل نظرات
      */
     public Long getTotalRatingCount() {
         return ratingRepository.countAll();
@@ -359,6 +534,14 @@ public class RatingService {
     
     // Private helper methods
     
+    /**
+     * اعتبارسنجی ورودی‌های ایجاد نظر
+     * 
+     * @param userId شناسه کاربر
+     * @param restaurantId شناسه رستوران
+     * @param score امتیاز
+     * @throws IllegalArgumentException در صورت ورودی‌های نامعتبر
+     */
     private void validateRatingInputs(Long userId, Long restaurantId, Integer score) {
         if (userId == null) {
             throw new IllegalArgumentException("User ID cannot be null");
@@ -372,35 +555,56 @@ public class RatingService {
     }
     
     /**
-     * Inner class for rating statistics
+     * کلاس آمار امتیازات رستوران
+     * 
+     * این کلاس اطلاعات آماری کاملی از امتیازات رستوران ارائه می‌دهد:
+     * - میانگین امتیاز
+     * - تعداد کل نظرات
+     * - توزیع امتیازات (تعداد هر امتیاز از 1 تا 5)
+     * - متدهای کمکی برای نمایش و بررسی
      */
     public static class RatingStats {
+        /** میانگین امتیاز رستوران */
         private final Double averageRating;
+        /** تعداد کل نظرات */
         private final Long totalRatings;
+        /** توزیع امتیازات (امتیاز -> تعداد) */
         private final Map<Integer, Long> distribution;
         
+        /**
+         * سازنده کلاس آمار
+         * 
+         * @param averageRating میانگین امتیاز
+         * @param totalRatings تعداد کل نظرات
+         * @param distribution توزیع امتیازات
+         */
         public RatingStats(Double averageRating, Long totalRatings, Map<Integer, Long> distribution) {
             this.averageRating = averageRating != null ? averageRating : 0.0;
             this.totalRatings = totalRatings != null ? totalRatings : 0L;
             this.distribution = distribution != null ? distribution : Map.of();
         }
         
+        /** دریافت میانگین امتیاز */
         public Double getAverageRating() {
             return averageRating;
         }
         
+        /** دریافت تعداد کل نظرات */
         public Long getTotalRatings() {
             return totalRatings;
         }
         
+        /** دریافت توزیع امتیازات */
         public Map<Integer, Long> getDistribution() {
             return distribution;
         }
         
+        /** دریافت میانگین امتیاز با فرمت یک رقم اعشار */
         public String getAverageRatingFormatted() {
             return String.format("%.1f", averageRating);
         }
         
+        /** بررسی وجود نظر برای رستوران */
         public boolean hasRatings() {
             return totalRatings > 0;
         }

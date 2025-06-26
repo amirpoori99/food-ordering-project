@@ -24,35 +24,147 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * مجموعه تست‌های جامع DeliveryService
+ * 
+ * این کلاس تست تمام عملکردهای سرویس مدیریت تحویل سفارش‌ها را آزمایش می‌کند:
+ * 
+ * Test Categories:
+ * 1. Create Delivery Tests
+ *    - ایجاد تحویل جدید
+ *    - validation ورودی‌ها
+ *    - بررسی وجود سفارش
+ *    - مدیریت تحویل تکراری
+ * 
+ * 2. Assign Courier Tests
+ *    - تخصیص پیک به تحویل
+ *    - validation نقش پیک
+ *    - بررسی در دسترس بودن پیک
+ *    - مدیریت تخصیص تکراری
+ * 
+ * 3. Mark Picked Up Tests
+ *    - علامت‌گذاری تحویل گرفته شده
+ *    - authorization پیک
+ *    - مدیریت وضعیت workflow
+ * 
+ * 4. Mark Delivered Tests
+ *    - علامت‌گذاری تحویل داده شده
+ *    - تأیید پیک مربوطه
+ *    - مدیریت چرخه تحویل
+ * 
+ * 5. Cancel Delivery Tests
+ *    - لغو تحویل
+ *    - ثبت دلیل لغو
+ *    - مدیریت وضعیت لغو شده
+ * 
+ * 6. Get Delivery Tests
+ *    - دریافت تحویل با ID
+ *    - دریافت تحویل با شناسه سفارش
+ *    - مدیریت not found
+ * 
+ * 7. Courier Operations Tests
+ *    - عملیات مربوط به پیک
+ *    - تحویل‌های فعال پیک
+ *    - تاریخچه تحویل‌ها
+ *    - آمار پیک
+ *    - بررسی در دسترس بودن
+ * 
+ * 8. List Operations Tests
+ *    - لیست تحویل‌های pending
+ *    - فیلتر بر اساس وضعیت
+ *    - لیست تمام تحویل‌ها
+ * 
+ * 9. Admin Operations Tests
+ *    - عملیات مدیریتی
+ *    - تغییر وضعیت تحویل
+ *    - حذف تحویل لغو شده
+ * 
+ * 10. Parameter Validation Tests
+ *     - اعتبارسنجی پارامترها
+ *     - تست با enum values
+ *     - مدیریت null values
+ * 
+ * 11. Missing Methods Tests
+ *     - متدهای اضافی
+ *     - شمارش تحویل‌ها
+ *     - عملیات پیشرفته
+ * 
+ * 12. Edge Cases Tests
+ *     - موارد حدی
+ *     - سناریوهای خاص
+ *     - exception handling
+ * 
+ * Business Logic:
+ * - Delivery workflow management
+ * - Courier assignment system
+ * - Status transition validation
+ * - Real-time tracking
+ * - Performance monitoring
+ * 
+ * Integration Testing:
+ * - Multi-repository operations
+ * - Service layer coordination
+ * - Transaction consistency
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 @DisplayName("Delivery Service Tests")
 class DeliveryServiceTest {
 
+    /** Mock repository برای تحویل‌ها */
     @Mock
     private DeliveryRepository deliveryRepository;
     
+    /** Mock repository برای احراز هویت */
     @Mock
     private AuthRepository authRepository;
     
+    /** Mock repository برای سفارش‌ها */
     @Mock
     private OrderRepository orderRepository;
 
+    /** Service instance تحت تست */
     private DeliveryService deliveryService;
     
+    // Test data entities
+    /** کاربر مشتری نمونه */
     private User customer;
+    
+    /** کاربر پیک نمونه */
     private User courier;
+    
+    /** رستوران نمونه */
     private Restaurant restaurant;
+    
+    /** سفارش نمونه */
     private com.myapp.common.models.Order order;
+    
+    /** آیتم غذایی نمونه */
     private FoodItem foodItem;
+    
+    /** تحویل نمونه */
     private Delivery delivery;
 
+    /** AutoCloseable برای مدیریت mock ها */
     private AutoCloseable mocks;
 
+    /**
+     * راه‌اندازی قبل از هر تست
+     * 
+     * Operations:
+     * - initialize mock objects
+     * - setup service with dependencies
+     * - create test data entities
+     * - configure mock behaviors
+     */
     @BeforeEach
     void setUp() {
         mocks = MockitoAnnotations.openMocks(this);
         deliveryService = new DeliveryService(deliveryRepository, authRepository, orderRepository);
         
-        // Create test data using proper constructors
+        // ایجاد داده‌های تست با استفاده از constructor های مناسب
         customer = new User(1L, "John Doe", "1234567890", "john@example.com", 
                            "hashedpass", User.Role.BUYER, "123 Main St");
         
@@ -75,6 +187,13 @@ class DeliveryServiceTest {
         delivery.setId(1L);
     }
 
+    /**
+     * پاک‌سازی بعد از هر تست
+     * 
+     * Operations:
+     * - close mock objects
+     * - release resources
+     */
     @AfterEach
     void tearDown() throws Exception {
         if (mocks != null) {
@@ -82,22 +201,42 @@ class DeliveryServiceTest {
         }
     }
 
+    // ==================== تست‌های ایجاد تحویل ====================
+
+    /**
+     * تست‌های ایجاد تحویل
+     * 
+     * این دسته شامل تمام عملیات مربوط به ایجاد تحویل جدید:
+     * - ایجاد موفق تحویل
+     * - validation ورودی‌ها
+     * - بررسی وجود سفارش
+     * - مدیریت تحویل تکراری
+     */
     @Nested
     @DisplayName("Create Delivery Tests")
     class CreateDeliveryTests {
 
+        /**
+         * تست موفق ایجاد تحویل
+         * 
+         * Scenario: ایجاد تحویل جدید برای سفارش موجود
+         * Expected:
+         * - تحویل با موفقیت ایجاد شود
+         * - تمام validation ها انجام شوند
+         * - repository methods صحیح فراخوانی شوند
+         */
         @Test
         @DisplayName("Should create delivery successfully")
         void shouldCreateDeliverySuccessfully() {
-            // Given
+            // Given - آماده‌سازی mock behaviors
             when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
             when(deliveryRepository.findByOrderId(1L)).thenReturn(Optional.empty());
             when(deliveryRepository.save(any(Delivery.class))).thenReturn(delivery);
 
-            // When
+            // When - فراخوانی متد تحت تست
             Delivery result = deliveryService.createDelivery(1L, 5.0);
 
-            // Then
+            // Then - بررسی نتایج
             assertNotNull(result);
             assertEquals(delivery.getId(), result.getId());
             verify(orderRepository).findById(1L);
@@ -105,6 +244,12 @@ class DeliveryServiceTest {
             verify(deliveryRepository).save(any(Delivery.class));
         }
 
+        /**
+         * تست خطا برای ID سفارش null
+         * 
+         * Scenario: تلاش ایجاد تحویل بدون مشخص کردن سفارش
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception when order ID is null")
         void shouldThrowExceptionWhenOrderIdIsNull() {
@@ -115,6 +260,12 @@ class DeliveryServiceTest {
             assertEquals("Order ID cannot be null", exception.getMessage());
         }
 
+        /**
+         * تست خطا برای هزینه منفی
+         * 
+         * Scenario: ارسال هزینه تحویل منفی
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception when fee is negative")
         void shouldThrowExceptionWhenFeeIsNegative() {
@@ -125,6 +276,12 @@ class DeliveryServiceTest {
             assertEquals("Estimated fee cannot be null or negative", exception.getMessage());
         }
 
+        /**
+         * تست خطا برای سفارش یافت نشده
+         * 
+         * Scenario: ایجاد تحویل برای سفارش غیرموجود
+         * Expected: NotFoundException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception when order not found")
         void shouldThrowExceptionWhenOrderNotFound() {
@@ -138,6 +295,12 @@ class DeliveryServiceTest {
             assertTrue(exception.getMessage().contains("Order not found"));
         }
 
+        /**
+         * تست خطا برای تحویل موجود
+         * 
+         * Scenario: تلاش ایجاد تحویل دوم برای همان سفارش
+         * Expected: IllegalStateException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception when delivery already exists")
         void shouldThrowExceptionWhenDeliveryAlreadyExists() {
@@ -153,10 +316,30 @@ class DeliveryServiceTest {
         }
     }
 
+    // ==================== تست‌های تخصیص پیک ====================
+
+    /**
+     * تست‌های تخصیص پیک
+     * 
+     * این دسته شامل تمام عملیات مربوط به تخصیص پیک:
+     * - تخصیص موفق پیک
+     * - validation نقش کاربر
+     * - بررسی در دسترس بودن پیک
+     * - مدیریت تخصیص تکراری
+     */
     @Nested
     @DisplayName("Assign Courier Tests")
     class AssignCourierTests {
 
+        /**
+         * تست موفق تخصیص پیک
+         * 
+         * Scenario: تخصیص پیک در دسترس به تحویل
+         * Expected:
+         * - پیک با موفقیت تخصیص یابد
+         * - تمام validation ها انجام شوند
+         * - وضعیت تحویل به‌روزرسانی شود
+         */
         @Test
         @DisplayName("Should assign courier successfully")
         void shouldAssignCourierSuccessfully() {
@@ -177,6 +360,12 @@ class DeliveryServiceTest {
             verify(deliveryRepository).update(any(Delivery.class));
         }
 
+        /**
+         * تست خطا برای ID تحویل null
+         * 
+         * Scenario: تلاش تخصیص پیک بدون مشخص کردن تحویل
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception when delivery ID is null")
         void shouldThrowExceptionWhenDeliveryIdIsNull() {
@@ -187,6 +376,12 @@ class DeliveryServiceTest {
             assertEquals("Delivery ID cannot be null", exception.getMessage());
         }
 
+        /**
+         * تست خطا برای ID پیک null
+         * 
+         * Scenario: تلاش تخصیص بدون مشخص کردن پیک
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception when courier ID is null")
         void shouldThrowExceptionWhenCourierIdIsNull() {
@@ -197,6 +392,12 @@ class DeliveryServiceTest {
             assertEquals("Courier ID cannot be null", exception.getMessage());
         }
 
+        /**
+         * تست خطا برای تحویل یافت نشده
+         * 
+         * Scenario: تلاش تخصیص پیک به تحویل غیرموجود
+         * Expected: NotFoundException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception when delivery not found")
         void shouldThrowExceptionWhenDeliveryNotFound() {
@@ -210,6 +411,12 @@ class DeliveryServiceTest {
             assertTrue(exception.getMessage().contains("Delivery not found"));
         }
 
+        /**
+         * تست خطا برای پیک یافت نشده
+         * 
+         * Scenario: تلاش تخصیص کاربر غیرموجود
+         * Expected: NotFoundException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception when courier not found")
         void shouldThrowExceptionWhenCourierNotFound() {
@@ -224,6 +431,12 @@ class DeliveryServiceTest {
             assertTrue(exception.getMessage().contains("Courier not found"));
         }
 
+        /**
+         * تست خطا برای کاربر غیرپیک
+         * 
+         * Scenario: تلاش تخصیص کاربری که نقش پیک ندارد
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception when user is not a courier")
         void shouldThrowExceptionWhenUserIsNotCourier() {
@@ -240,6 +453,12 @@ class DeliveryServiceTest {
             assertEquals("User is not a courier", exception.getMessage());
         }
 
+        /**
+         * تست خطا برای پیک قبلاً تخصیص یافته
+         * 
+         * Scenario: تلاش تخصیص پیکی که قبلاً مشغول است
+         * Expected: IllegalStateException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception when courier is already assigned")
         void shouldThrowExceptionWhenCourierIsAlreadyAssigned() {
@@ -257,15 +476,39 @@ class DeliveryServiceTest {
         }
     }
 
+    // ==================== تست‌های علامت‌گذاری تحویل گرفته شده ====================
+
+    /**
+     * تست‌های علامت‌گذاری تحویل گرفته شده
+     * 
+     * این دسته شامل عملیات مربوط به pickup:
+     * - علامت‌گذاری موفق pickup
+     * - authorization پیک
+     * - مدیریت workflow
+     */
     @Nested
     @DisplayName("Mark Picked Up Tests")
     class MarkPickedUpTests {
 
+        /**
+         * راه‌اندازی خاص این دسته تست
+         * 
+         * Operations:
+         * - تخصیص پیک به تحویل
+         */
         @BeforeEach
         void setUp() {
             delivery.assignToCourier(courier);
         }
 
+        /**
+         * تست موفق علامت‌گذاری pickup
+         * 
+         * Scenario: پیک تحویل را از رستوران تحویل می‌گیرد
+         * Expected:
+         * - وضعیت تحویل به picked up تغییر کند
+         * - زمان pickup ثبت شود
+         */
         @Test
         @DisplayName("Should mark pickup successfully")
         void shouldMarkPickupSuccessfully() {
@@ -282,6 +525,12 @@ class DeliveryServiceTest {
             verify(deliveryRepository).update(any(Delivery.class));
         }
 
+        /**
+         * تست خطا برای ID تحویل null
+         * 
+         * Scenario: تلاش pickup بدون مشخص کردن تحویل
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception when delivery ID is null")
         void shouldThrowExceptionWhenDeliveryIdIsNull() {
@@ -292,6 +541,12 @@ class DeliveryServiceTest {
             assertEquals("Delivery ID cannot be null", exception.getMessage());
         }
 
+        /**
+         * تست خطا برای پیک تخصیص نیافته
+         * 
+         * Scenario: تلاش pickup توسط پیک غیرمجاز
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception when courier is not assigned")
         void shouldThrowExceptionWhenCourierIsNotAssigned() {
@@ -306,6 +561,12 @@ class DeliveryServiceTest {
             assertEquals("Courier is not assigned to this delivery", exception.getMessage());
         }
 
+        /**
+         * تست خطا برای پیک اشتباه
+         * 
+         * Scenario: تلاش pickup توسط پیک متفاوت
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception when wrong courier tries to pickup")
         void shouldThrowExceptionWhenWrongCourierTriesToPickup() {

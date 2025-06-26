@@ -14,32 +14,66 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * REST API Controller for Admin Dashboard
+ * REST API Controller لپنل مدیریت (Admin Dashboard)
  * 
- * Endpoints:
- * GET    /api/admin/dashboard                          - Get dashboard statistics
- * GET    /api/admin/users                              - Get all users with filtering
- * GET    /api/admin/users/{userId}                     - Get user by ID
- * PUT    /api/admin/users/{userId}/status              - Update user status
- * GET    /api/admin/restaurants                        - Get all restaurants with filtering
- * GET    /api/admin/restaurants/{restaurantId}         - Get restaurant by ID
- * PUT    /api/admin/restaurants/{restaurantId}/status  - Update restaurant status
- * GET    /api/admin/orders                             - Get all orders with filtering
- * GET    /api/admin/orders/{orderId}                   - Get order by ID
- * PUT    /api/admin/orders/{orderId}/status            - Update order status
- * GET    /api/admin/transactions                       - Get all transactions with filtering
- * GET    /api/admin/transactions/{transactionId}       - Get transaction by ID
- * GET    /api/admin/deliveries                         - Get all deliveries with filtering
- * GET    /api/admin/deliveries/{deliveryId}            - Get delivery by ID
- * GET    /api/admin/statistics/daily                   - Get daily statistics
- * GET    /api/admin/statistics/users                   - Get user statistics by role
- * GET    /api/admin/statistics/restaurants             - Get restaurant statistics by status
- * GET    /api/admin/statistics/orders                  - Get order statistics by status
+ * این کلاس تمام endpoints API مربوط به عملیات مدیریتی سیستم سفارش غذا را پیاده‌سازی می‌کند:
+ * 
+ * === Dashboard و آمار کلی ===
+ * GET    /api/admin/dashboard                         - دریافت آمار dashboard
+ * GET    /api/admin/statistics/daily                  - آمار روزانه
+ * GET    /api/admin/statistics/users                  - آمار کاربران بر اساس نقش
+ * GET    /api/admin/statistics/restaurants            - آمار رستوران‌ها بر اساس وضعیت
+ * GET    /api/admin/statistics/orders                 - آمار سفارشات بر اساس وضعیت
+ * 
+ * === مدیریت کاربران (User Management) ===
+ * GET    /api/admin/users                             - دریافت تمام کاربران با فیلتر
+ * GET    /api/admin/users/{userId}                    - دریافت کاربر با شناسه
+ * PUT    /api/admin/users/{userId}/status             - تغییر وضعیت کاربر
+ * 
+ * === مدیریت رستوران‌ها (Restaurant Management) ===
+ * GET    /api/admin/restaurants                       - دریافت تمام رستوران‌ها با فیلتر
+ * GET    /api/admin/restaurants/{restaurantId}        - دریافت رستوران با شناسه
+ * PUT    /api/admin/restaurants/{restaurantId}/status - تغییر وضعیت رستوران
+ * 
+ * === مدیریت سفارشات (Order Management) ===
+ * GET    /api/admin/orders                            - دریافت تمام سفارشات با فیلتر
+ * GET    /api/admin/orders/{orderId}                  - دریافت سفارش با شناسه
+ * PUT    /api/admin/orders/{orderId}/status           - تغییر وضعیت سفارش
+ * 
+ * === مدیریت تراکنش‌ها (Transaction Management) ===
+ * GET    /api/admin/transactions                      - دریافت تمام تراکنش‌ها با فیلتر
+ * GET    /api/admin/transactions/{transactionId}      - دریافت تراکنش با شناسه
+ * 
+ * === مدیریت تحویل (Delivery Management) ===
+ * GET    /api/admin/deliveries                        - دریافت تمام تحویل‌ها با فیلتر
+ * GET    /api/admin/deliveries/{deliveryId}           - دریافت تحویل با شناسه
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - RESTful API Design: طراحی API مبتنی بر استانداردهای REST
+ * - Comprehensive Filtering: فیلترهای جامع برای همه endpoints
+ * - Pagination Support: پشتیبانی از صفحه‌بندی
+ * - Security Filtering: فیلتر کردن فیلدهای حساس
+ * - Error Handling: مدیریت جامع خطاها
+ * - CORS Support: پشتیبانی از Cross-Origin Resource Sharing
+ * - JSON Response Format: فرمت پاسخ JSON استاندارد
+ * - Query Parameter Parsing: پردازش پارامترهای query
+ * - Path Parameter Extraction: استخراج پارامترهای path
+ * - HTTP Status Codes: کدهای وضعیت HTTP مناسب
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class AdminController implements HttpHandler {
     
+    /** سرویس لایه منطق کسب‌وکار مدیریت */
     private final AdminService adminService;
     
+    /**
+     * سازنده با تزریق AdminService
+     * 
+     * @param adminService سرویس عملیات مدیریتی
+     */
     public AdminController(AdminService adminService) {
         this.adminService = adminService;
     }
@@ -50,6 +84,7 @@ public class AdminController implements HttpHandler {
         String path = exchange.getRequestURI().getPath();
         
         try {
+            // مسیریابی درخواست‌ها بر اساس path و method
             if (path.equals("/api/admin/dashboard") && "GET".equals(method)) {
                 getDashboardStatistics(exchange);
             } else if (path.equals("/api/admin/users") && "GET".equals(method)) {
@@ -99,14 +134,21 @@ public class AdminController implements HttpHandler {
         }
     }
 
-    // ==================== DASHBOARD ====================
+    // ==================== Dashboard و آمار کلی (DASHBOARD) ====================
     
     /**
-     * GET /api/admin/dashboard - Get dashboard statistics
+     * GET /api/admin/dashboard - دریافت آمار dashboard
+     * 
+     * این endpoint آمار کلی سیستم را برای نمایش در صفحه اصلی پنل مدیریت برمی‌گرداند
+     * شامل: تعداد کاربران، رستوران‌ها، سفارشات، درآمد کل، سفارشات امروز و ...
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در I/O
      */
     private void getDashboardStatistics(HttpExchange exchange) throws IOException {
         AdminRepository.SystemStatistics stats = adminService.getSystemStatistics();
         
+        // ساخت پاسخ JSON
         Map<String, Object> response = new HashMap<>();
         response.put("totalUsers", stats.getTotalUsers());
         response.put("totalRestaurants", stats.getTotalRestaurants());
@@ -124,24 +166,35 @@ public class AdminController implements HttpHandler {
         sendResponse(exchange, 200, responseBody);
     }
 
-    // ==================== USER MANAGEMENT ====================
+    // ==================== مدیریت کاربران (USER MANAGEMENT) ====================
     
     /**
-     * GET /api/admin/users - Get all users with filtering
+     * GET /api/admin/users - دریافت تمام کاربران با فیلتر
+     * 
+     * پارامترهای query قابل قبول:
+     * - search: عبارت جستجو در نام، ایمیل و تلفن
+     * - role: فیلتر بر اساس نقش (CUSTOMER, ADMIN, VENDOR, COURIER)
+     * - page: شماره صفحه (پیش‌فرض 0)
+     * - size: تعداد رکورد در صفحه (پیش‌فرض 20)
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در I/O
      */
     private void getAllUsers(HttpExchange exchange) throws IOException {
         URI uri = exchange.getRequestURI();
         Map<String, String> params = parseQueryParameters(uri.getQuery());
         
+        // استخراج پارامترها
         String searchTerm = params.get("search");
         String role = params.get("role");
         int page = parseIntParam(params.get("page"), 0);
         int size = parseIntParam(params.get("size"), 20);
         
+        // دریافت کاربران و تعداد کل
         List<User> users = adminService.getAllUsers(searchTerm, role, page, size);
         Long totalCount = adminService.countUsers(searchTerm, role);
         
-        // Filter sensitive fields from users for security
+        // فیلتر کردن فیلدهای حساس برای امنیت
         List<Map<String, Object>> safeUsers = users.stream().map(user -> {
             Map<String, Object> safeUser = new HashMap<>();
             safeUser.put("id", user.getId());
@@ -151,10 +204,11 @@ public class AdminController implements HttpHandler {
             safeUser.put("role", user.getRole());
             safeUser.put("address", user.getAddress());
             safeUser.put("isActive", user.getIsActive());
-            // Intentionally exclude passwordHash for security
+            // عمداً رمز عبور هش شده را برای امنیت حذف می‌کنیم
             return safeUser;
         }).toList();
         
+        // ساخت پاسخ با pagination metadata
         Map<String, Object> response = new HashMap<>();
         response.put("users", safeUsers);
         response.put("totalCount", totalCount);
@@ -167,13 +221,16 @@ public class AdminController implements HttpHandler {
     }
     
     /**
-     * GET /api/admin/users/{userId} - Get user by ID
+     * GET /api/admin/users/{userId} - دریافت کاربر با شناسه
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در I/O
      */
     private void getUserById(HttpExchange exchange) throws IOException {
         Long userId = extractIdFromPath(exchange.getRequestURI().getPath(), "/api/admin/users/");
         User user = adminService.getUserById(userId);
         
-        // Filter sensitive fields for security
+        // فیلتر کردن فیلدهای حساس برای امنیت
         Map<String, Object> safeUser = new HashMap<>();
         safeUser.put("id", user.getId());
         safeUser.put("fullName", user.getFullName());
@@ -182,18 +239,28 @@ public class AdminController implements HttpHandler {
         safeUser.put("role", user.getRole());
         safeUser.put("address", user.getAddress());
         safeUser.put("isActive", user.getIsActive());
-        // Intentionally exclude passwordHash for security
+        // عمداً رمز عبور هش شده را برای امنیت حذف می‌کنیم
         
         String responseBody = JsonUtil.toJson(safeUser);
         sendResponse(exchange, 200, responseBody);
     }
     
     /**
-     * PUT /api/admin/users/{userId}/status - Update user status
+     * PUT /api/admin/users/{userId}/status - تغییر وضعیت کاربر
+     * 
+     * Body JSON مورد نیاز:
+     * {
+     *   "isActive": true/false,
+     *   "adminId": شناسه ادمین درخواست‌کننده
+     * }
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در I/O
      */
     private void updateUserStatus(HttpExchange exchange) throws IOException {
         Long userId = extractIdFromPath(exchange.getRequestURI().getPath(), "/api/admin/users/", "/status");
         
+        // خواندن و پردازش JSON body
         String requestBody = new String(exchange.getRequestBody().readAllBytes());
         @SuppressWarnings("unchecked")
         Map<String, Object> request = JsonUtil.fromJson(requestBody, Map.class);
@@ -210,10 +277,19 @@ public class AdminController implements HttpHandler {
         sendResponse(exchange, 200, "{\"message\":\"User status updated successfully\"}");
     }
 
-    // ==================== RESTAURANT MANAGEMENT ====================
+    // ==================== مدیریت رستوران‌ها (RESTAURANT MANAGEMENT) ====================
     
     /**
-     * GET /api/admin/restaurants - Get all restaurants with filtering
+     * GET /api/admin/restaurants - دریافت تمام رستوران‌ها با فیلتر
+     * 
+     * پارامترهای query قابل قبول:
+     * - search: عبارت جستجو در نام و آدرس رستوران
+     * - status: فیلتر بر اساس وضعیت (ACTIVE, INACTIVE, PENDING_APPROVAL)
+     * - page: شماره صفحه
+     * - size: تعداد رکورد در صفحه
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در I/O
      */
     private void getAllRestaurants(HttpExchange exchange) throws IOException {
         URI uri = exchange.getRequestURI();
@@ -239,7 +315,10 @@ public class AdminController implements HttpHandler {
     }
     
     /**
-     * GET /api/admin/restaurants/{restaurantId} - Get restaurant by ID
+     * GET /api/admin/restaurants/{restaurantId} - دریافت رستوران با شناسه
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در I/O
      */
     private void getRestaurantById(HttpExchange exchange) throws IOException {
         Long restaurantId = extractIdFromPath(exchange.getRequestURI().getPath(), "/api/admin/restaurants/");
@@ -250,7 +329,16 @@ public class AdminController implements HttpHandler {
     }
     
     /**
-     * PUT /api/admin/restaurants/{restaurantId}/status - Update restaurant status
+     * PUT /api/admin/restaurants/{restaurantId}/status - تغییر وضعیت رستوران
+     * 
+     * Body JSON مورد نیاز:
+     * {
+     *   "status": "ACTIVE" | "INACTIVE" | "PENDING_APPROVAL",
+     *   "adminId": شناسه ادمین درخواست‌کننده
+     * }
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در I/O
      */
     private void updateRestaurantStatus(HttpExchange exchange) throws IOException {
         Long restaurantId = extractIdFromPath(exchange.getRequestURI().getPath(), "/api/admin/restaurants/", "/status");
@@ -266,6 +354,7 @@ public class AdminController implements HttpHandler {
             throw new IllegalArgumentException("status field is required");
         }
         
+        // تبدیل string به enum
         RestaurantStatus statusEnum;
         try {
             statusEnum = RestaurantStatus.valueOf(status.toUpperCase());
@@ -278,10 +367,21 @@ public class AdminController implements HttpHandler {
         sendResponse(exchange, 200, "{\"message\":\"Restaurant status updated successfully\"}");
     }
 
-    // ==================== ORDER MANAGEMENT ====================
+    // ==================== مدیریت سفارشات (ORDER MANAGEMENT) ====================
     
     /**
-     * GET /api/admin/orders - Get all orders with filtering
+     * GET /api/admin/orders - دریافت تمام سفارشات با فیلتر
+     * 
+     * پارامترهای query قابل قبول:
+     * - search: عبارت جستجو در آدرس تحویل و شماره تلفن
+     * - status: فیلتر بر اساس وضعیت سفارش
+     * - customerId: شناسه مشتری
+     * - restaurantId: شناسه رستوران
+     * - page: شماره صفحه
+     * - size: تعداد رکورد در صفحه
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در I/O
      */
     private void getAllOrders(HttpExchange exchange) throws IOException {
         URI uri = exchange.getRequestURI();
@@ -309,7 +409,10 @@ public class AdminController implements HttpHandler {
     }
     
     /**
-     * GET /api/admin/orders/{orderId} - Get order by ID
+     * GET /api/admin/orders/{orderId} - دریافت سفارش با شناسه
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در I/O
      */
     private void getOrderById(HttpExchange exchange) throws IOException {
         Long orderId = extractIdFromPath(exchange.getRequestURI().getPath(), "/api/admin/orders/");
@@ -320,7 +423,18 @@ public class AdminController implements HttpHandler {
     }
     
     /**
-     * PUT /api/admin/orders/{orderId}/status - Update order status
+     * PUT /api/admin/orders/{orderId}/status - تغییر وضعیت سفارش
+     * 
+     * این endpoint به ادمین اجازه تغییر دستی وضعیت سفارش را می‌دهد
+     * 
+     * Body JSON مورد نیاز:
+     * {
+     *   "status": "PENDING" | "CONFIRMED" | "PREPARING" | "READY" | "DELIVERED" | "CANCELLED",
+     *   "adminId": شناسه ادمین درخواست‌کننده
+     * }
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در I/O
      */
     private void updateOrderStatus(HttpExchange exchange) throws IOException {
         Long orderId = extractIdFromPath(exchange.getRequestURI().getPath(), "/api/admin/orders/", "/status");
@@ -348,10 +462,21 @@ public class AdminController implements HttpHandler {
         sendResponse(exchange, 200, "{\"message\":\"Order status updated successfully\"}");
     }
 
-    // ==================== TRANSACTION MANAGEMENT ====================
+    // ==================== مدیریت تراکنش‌ها (TRANSACTION MANAGEMENT) ====================
     
     /**
-     * GET /api/admin/transactions - Get all transactions with filtering
+     * GET /api/admin/transactions - دریافت تمام تراکنش‌ها با فیلتر
+     * 
+     * پارامترهای query قابل قبول:
+     * - search: عبارت جستجو در شناسه مرجع، توضیحات و روش پرداخت
+     * - status: فیلتر بر اساس وضعیت تراکنش
+     * - type: فیلتر بر اساس نوع تراکنش (PAYMENT, REFUND, WALLET_CHARGE)
+     * - userId: شناسه کاربر
+     * - page: شماره صفحه
+     * - size: تعداد رکورد در صفحه
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در I/O
      */
     private void getAllTransactions(HttpExchange exchange) throws IOException {
         URI uri = exchange.getRequestURI();
@@ -379,7 +504,10 @@ public class AdminController implements HttpHandler {
     }
     
     /**
-     * GET /api/admin/transactions/{transactionId} - Get transaction by ID
+     * GET /api/admin/transactions/{transactionId} - دریافت تراکنش با شناسه
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در I/O
      */
     private void getTransactionById(HttpExchange exchange) throws IOException {
         Long transactionId = extractIdFromPath(exchange.getRequestURI().getPath(), "/api/admin/transactions/");
@@ -389,10 +517,20 @@ public class AdminController implements HttpHandler {
         sendResponse(exchange, 200, responseBody);
     }
 
-    // ==================== DELIVERY MANAGEMENT ====================
+    // ==================== مدیریت تحویل (DELIVERY MANAGEMENT) ====================
     
     /**
-     * GET /api/admin/deliveries - Get all deliveries with filtering
+     * GET /api/admin/deliveries - دریافت تمام تحویل‌ها با فیلتر
+     * 
+     * پارامترهای query قابل قبول:
+     * - search: عبارت جستجو در یادداشت‌های تحویل
+     * - status: فیلتر بر اساس وضعیت تحویل
+     * - courierId: شناسه پیک
+     * - page: شماره صفحه
+     * - size: تعداد رکورد در صفحه
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در I/O
      */
     private void getAllDeliveries(HttpExchange exchange) throws IOException {
         URI uri = exchange.getRequestURI();
@@ -419,7 +557,10 @@ public class AdminController implements HttpHandler {
     }
     
     /**
-     * GET /api/admin/deliveries/{deliveryId} - Get delivery by ID
+     * GET /api/admin/deliveries/{deliveryId} - دریافت تحویل با شناسه
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در I/O
      */
     private void getDeliveryById(HttpExchange exchange) throws IOException {
         Long deliveryId = extractIdFromPath(exchange.getRequestURI().getPath(), "/api/admin/deliveries/");
@@ -429,10 +570,16 @@ public class AdminController implements HttpHandler {
         sendResponse(exchange, 200, responseBody);
     }
 
-    // ==================== STATISTICS ====================
+    // ==================== آمار و گزارشات (STATISTICS) ====================
     
     /**
-     * GET /api/admin/statistics/daily - Get daily statistics
+     * GET /api/admin/statistics/daily - دریافت آمار روزانه
+     * 
+     * پارامترهای query قابل قبول:
+     * - days: تعداد روزهای گذشته (پیش‌فرض 7)
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در I/O
      */
     private void getDailyStatistics(HttpExchange exchange) throws IOException {
         URI uri = exchange.getRequestURI();
@@ -447,7 +594,12 @@ public class AdminController implements HttpHandler {
     }
     
     /**
-     * GET /api/admin/statistics/users - Get user statistics by role
+     * GET /api/admin/statistics/users - دریافت آمار کاربران بر اساس نقش
+     * 
+     * برای نمایش نمودار توزیع نقش‌های کاربران
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در I/O
      */
     private void getUserStatistics(HttpExchange exchange) throws IOException {
         Map<User.Role, Long> stats = adminService.getUserStatsByRole();
@@ -457,7 +609,12 @@ public class AdminController implements HttpHandler {
     }
     
     /**
-     * GET /api/admin/statistics/restaurants - Get restaurant statistics by status
+     * GET /api/admin/statistics/restaurants - دریافت آمار رستوران‌ها بر اساس وضعیت
+     * 
+     * برای نمایش نمودار توزیع وضعیت رستوران‌ها
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در I/O
      */
     private void getRestaurantStatistics(HttpExchange exchange) throws IOException {
         Map<RestaurantStatus, Long> stats = adminService.getRestaurantStatsByStatus();
@@ -467,7 +624,12 @@ public class AdminController implements HttpHandler {
     }
     
     /**
-     * GET /api/admin/statistics/orders - Get order statistics by status
+     * GET /api/admin/statistics/orders - دریافت آمار سفارشات بر اساس وضعیت
+     * 
+     * برای نمایش نمودار توزیع وضعیت سفارشات
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در I/O
      */
     private void getOrderStatistics(HttpExchange exchange) throws IOException {
         Map<OrderStatus, Long> stats = adminService.getOrderStatsByStatus();
@@ -476,10 +638,13 @@ public class AdminController implements HttpHandler {
         sendResponse(exchange, 200, responseBody);
     }
 
-    // ==================== HELPER METHODS ====================
+    // ==================== متدهای کمکی (HELPER METHODS) ====================
     
     /**
-     * Parse query parameters from query string
+     * پردازش پارامترهای query از رشته query
+     * 
+     * @param query رشته query از URL
+     * @return Map حاوی پارامترها
      */
     private Map<String, String> parseQueryParameters(String query) {
         Map<String, String> params = new HashMap<>();
@@ -498,7 +663,11 @@ public class AdminController implements HttpHandler {
     }
     
     /**
-     * Extract ID from path
+     * استخراج شناسه از path
+     * 
+     * @param path مسیر درخواست
+     * @param prefix پیشوند path
+     * @return شناسه استخراج شده
      */
     private Long extractIdFromPath(String path, String prefix) {
         String idStr = path.substring(prefix.length());
@@ -506,7 +675,12 @@ public class AdminController implements HttpHandler {
     }
     
     /**
-     * Extract ID from path with suffix
+     * استخراج شناسه از path با پسوند
+     * 
+     * @param path مسیر درخواست
+     * @param prefix پیشوند path
+     * @param suffix پسوند path
+     * @return شناسه استخراج شده
      */
     private Long extractIdFromPath(String path, String prefix, String suffix) {
         String pathWithoutPrefix = path.substring(prefix.length());
@@ -515,7 +689,11 @@ public class AdminController implements HttpHandler {
     }
     
     /**
-     * Parse integer parameter with default value
+     * پردازش پارامتر integer با مقدار پیش‌فرض
+     * 
+     * @param param رشته پارامتر
+     * @param defaultValue مقدار پیش‌فرض
+     * @return مقدار integer پردازش شده
      */
     private int parseIntParam(String param, int defaultValue) {
         if (param == null || param.trim().isEmpty()) {
@@ -529,7 +707,10 @@ public class AdminController implements HttpHandler {
     }
     
     /**
-     * Parse Long parameter
+     * پردازش پارامتر Long اختیاری
+     * 
+     * @param param رشته پارامتر
+     * @return مقدار Long یا null
      */
     private Long parseLongParam(String param) {
         if (param == null || param.trim().isEmpty()) {
@@ -543,7 +724,12 @@ public class AdminController implements HttpHandler {
     }
     
     /**
-     * Extract Long value from request map
+     * استخراج مقدار Long از Map درخواست
+     * 
+     * @param request Map حاوی داده‌های درخواست
+     * @param key کلید مورد نظر
+     * @return مقدار Long استخراج شده
+     * @throws IllegalArgumentException در صورت عدم وجود یا نامعتبر بودن مقدار
      */
     private Long extractLong(Map<String, Object> request, String key) {
         Object value = request.get(key);
@@ -564,14 +750,21 @@ public class AdminController implements HttpHandler {
     }
     
     /**
-     * Send HTTP response
+     * ارسال پاسخ HTTP
+     * 
+     * @param exchange شیء HttpExchange
+     * @param statusCode کد وضعیت HTTP
+     * @param response محتوای پاسخ JSON
+     * @throws IOException در صورت خطا در I/O
      */
     private void sendResponse(HttpExchange exchange, int statusCode, String response) throws IOException {
+        // تنظیم headers
         exchange.getResponseHeaders().set("Content-Type", "application/json");
         exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
         exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Content-Type, Authorization");
         
+        // ارسال پاسخ
         byte[] responseBytes = response.getBytes();
         exchange.sendResponseHeaders(statusCode, responseBytes.length);
         

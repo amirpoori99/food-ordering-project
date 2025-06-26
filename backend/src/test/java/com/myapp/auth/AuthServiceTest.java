@@ -14,24 +14,94 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.*;
 
+/**
+ * مجموعه تست‌های جامع برای AuthService
+ * 
+ * این کلاس تست شامل تست‌های زیر است:
+ * 
+ * 1. تست‌های ثبت نام (Registration Tests):
+ *    - ثبت نام معتبر با داده‌های کامل و ناقص
+ *    - تست‌های edge case (null values، empty strings)
+ *    - تست duplicate phone number
+ *    - تست انواع role های مختلف
+ * 
+ * 2. تست‌های ورود (Login Tests):
+ *    - ورود با اطلاعات صحیح و غلط
+ *    - تست case sensitivity
+ *    - تست null/empty inputs
+ *    - تست multiple login attempts
+ * 
+ * 3. تست‌های مدیریت پروفایل (Profile Management):
+ *    - دریافت پروفایل کاربر
+ *    - به‌روزرسانی پروفایل
+ *    - تست‌های partial updates
+ * 
+ * 4. تست‌های منطق کسب‌وکار (Business Logic):
+ *    - تست‌های end-to-end
+ *    - تست‌های concurrency
+ * 
+ * Test Patterns استفاده شده:
+ * - AAA Pattern (Arrange, Act, Assert)
+ * - Parameterized Tests برای تست multiple scenarios
+ * - Nested Test Classes برای گروه‌بندی منطقی
+ * - DisplayName برای توضیحات واضح
+ * - BeforeEach setup برای تمیز کردن database
+ * 
+ * Testing Libraries:
+ * - JUnit 5: framework اصلی تست
+ * - AssertJ: assertion library قدرتمند
+ * - Parameterized Tests: تست scenarios مختلف
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 @DisplayName("AuthService Comprehensive Tests")
 class AuthServiceTest {
 
+    /** instance سرویس احراز هویت تحت تست */
     private AuthService service;
+    
+    /** repository برای دسترسی مستقیم به database در تست‌ها */
     private AuthRepository repo;
 
+    /**
+     * راه‌اندازی اولیه قبل از هر تست
+     * 
+     * این متد:
+     * - AuthRepository جدید ایجاد می‌کند
+     * - AuthService با repository injection می‌سازد
+     * - database را تمیز می‌کند تا تست‌ها مستقل باشند
+     */
     @BeforeEach
     void setUp() {
         repo = new AuthRepository();
         service = new AuthService(repo);
-        // Clean database before each test
+        // تمیز کردن database قبل از هر تست برای استقلال تست‌ها
         repo.deleteAll();
     }
 
+    /**
+     * Helper method برای ایجاد RegisterRequest ساده
+     * 
+     * @param phone شماره تلفن کاربر
+     * @return RegisterRequest با مقادیر پیش‌فرض
+     */
     private RegisterRequest req(String phone) {
         return new RegisterRequest("Test User", phone, "t@test.com", "hash", User.Role.BUYER, "Address");
     }
 
+    /**
+     * Helper method برای ایجاد RegisterRequest کامل
+     * 
+     * @param fullName نام کامل
+     * @param phone شماره تلفن
+     * @param email ایمیل
+     * @param passwordHash hash رمز عبور
+     * @param role نقش کاربر
+     * @param address آدرس
+     * @return RegisterRequest با مقادیر مشخص شده
+     */
     private RegisterRequest req(String fullName, String phone, String email, String passwordHash, User.Role role, String address) {
         return new RegisterRequest(fullName, phone, email, passwordHash, role, address);
     }

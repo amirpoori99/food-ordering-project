@@ -1,14 +1,15 @@
- package com.myapp.common.models;
+package com.myapp.common.models;
 
 /**
- * Order Status Enum - Represents different states of an order
+ * enum وضعیت سفارش - نماینده حالت‌های مختلف یک سفارش
+ * این enum جریان کاری (workflow) سفارش از ابتدا تا انتها را مشخص می‌کند
  */
 public enum OrderStatus {
-    PENDING,        // Order created but not confirmed
-    CONFIRMED,      // Order confirmed by customer
-    PREPARING,      // Restaurant is preparing the order
-    READY,          // Order is ready for pickup/delivery
-    OUT_FOR_DELIVERY, // Order is being delivered
-    DELIVERED,      // Order has been delivered
-    CANCELLED       // Order was cancelled
+    PENDING,          // در انتظار - سفارش ایجاد شده اما تأیید نشده
+    CONFIRMED,        // تأیید شده - سفارش توسط مشتری تأیید شده
+    PREPARING,        // در حال آماده‌سازی - رستوران در حال تهیه سفارش است
+    READY,            // آماده - سفارش آماده برداشت/تحویل است
+    OUT_FOR_DELIVERY, // در حال ارسال - سفارش توسط پیک ارسال می‌شود
+    DELIVERED,        // تحویل داده شده - سفارش به مشتری تحویل داده شده
+    CANCELLED         // لغو شده - سفارش لغو شده است
 } 

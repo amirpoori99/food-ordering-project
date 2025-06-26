@@ -74,49 +74,87 @@ public class RestaurantController implements HttpHandler {
         }
     }
     
-    // ==================== GET ENDPOINTS ====================
+    // ==================== GET ENDPOINTS - پردازش درخواست‌های GET ====================
     
+    /**
+     * پردازش تمام درخواست‌های GET مربوط به رستوران‌ها
+     * 
+     * @param exchange شیء HttpExchange
+     * @param path مسیر درخواست
+     * @throws IOException در صورت خطا در پردازش
+     */
     private void handleGet(HttpExchange exchange, String path) throws IOException {
         if (path.equals("/api/restaurants")) {
-            // GET /api/restaurants - Get all approved restaurants
+            // GET /api/restaurants - دریافت همه رستوران‌های تأیید شده
             getAllApprovedRestaurants(exchange);
         } else if (path.matches("/api/restaurants/\\d+")) {
-            // GET /api/restaurants/{id} - Get restaurant by ID
+            // GET /api/restaurants/{id} - دریافت رستوران با شناسه
             Long id = extractIdFromPath(path);
             getRestaurantById(exchange, id);
         } else if (path.matches("/api/restaurants/owner/\\d+")) {
-            // GET /api/restaurants/owner/{ownerId} - Get restaurants by owner
+            // GET /api/restaurants/owner/{ownerId} - دریافت رستوران‌های یک مالک
             Long ownerId = extractIdFromPath(path, "/api/restaurants/owner/");
             getRestaurantsByOwner(exchange, ownerId);
         } else if (path.matches("/api/restaurants/status/\\w+")) {
-            // GET /api/restaurants/status/{status} - Get restaurants by status
+            // GET /api/restaurants/status/{status} - دریافت رستوران‌ها بر اساس وضعیت
             String statusStr = extractStatusFromPath(path);
             getRestaurantsByStatus(exchange, statusStr);
         } else if (path.equals("/api/restaurants/statistics")) {
-            // GET /api/restaurants/statistics - Get restaurant statistics
+            // GET /api/restaurants/statistics - دریافت آمار رستوران‌ها
             getRestaurantStatistics(exchange);
         } else {
             sendErrorResponse(exchange, 404, "Endpoint not found");
         }
     }
     
+    /**
+     * دریافت همه رستوران‌های تأیید شده (برای نمایش عمومی)
+     * فقط رستوران‌هایی که وضعیت APPROVED دارند نمایش داده می‌شوند
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در پردازش
+     */
     private void getAllApprovedRestaurants(HttpExchange exchange) throws IOException {
         List<Restaurant> restaurants = restaurantService.getApprovedRestaurants();
         sendJsonResponse(exchange, 200, restaurants);
     }
     
+    /**
+     * دریافت اطلاعات رستوران با شناسه مشخص
+     * 
+     * @param exchange شیء HttpExchange
+     * @param id شناسه رستوران
+     * @throws IOException در صورت خطا در پردازش
+     */
     private void getRestaurantById(HttpExchange exchange, Long id) throws IOException {
         Restaurant restaurant = restaurantService.getRestaurantById(id);
         sendJsonResponse(exchange, 200, restaurant);
     }
     
+    /**
+     * دریافت همه رستوران‌های متعلق به یک مالک
+     * برای نمایش در پنل فروشندگان استفاده می‌شود
+     * 
+     * @param exchange شیء HttpExchange
+     * @param ownerId شناسه مالک رستوران
+     * @throws IOException در صورت خطا در پردازش
+     */
     private void getRestaurantsByOwner(HttpExchange exchange, Long ownerId) throws IOException {
         List<Restaurant> restaurants = restaurantService.getRestaurantsByOwner(ownerId);
         sendJsonResponse(exchange, 200, restaurants);
     }
     
+    /**
+     * دریافت رستوران‌ها بر اساس وضعیت
+     * برای فیلتر کردن رستوران‌ها در پنل مدیریت استفاده می‌شود
+     * 
+     * @param exchange شیء HttpExchange
+     * @param statusStr رشته وضعیت (PENDING, APPROVED, REJECTED, SUSPENDED)
+     * @throws IOException در صورت خطا در پردازش
+     */
     private void getRestaurantsByStatus(HttpExchange exchange, String statusStr) throws IOException {
         try {
+            // تبدیل رشته به enum RestaurantStatus
             RestaurantStatus status = RestaurantStatus.valueOf(statusStr.toUpperCase());
             List<Restaurant> restaurants = restaurantService.getRestaurantsByStatus(status);
             sendJsonResponse(exchange, 200, restaurants);
@@ -125,27 +163,42 @@ public class RestaurantController implements HttpHandler {
         }
     }
     
+    /**
+     * دریافت آمار کلی رستوران‌ها
+     * شامل تعداد کل، تأیید شده، در انتظار، رد شده و تعلیق شده
+     * فقط برای مدیران سیستم در دسترس است
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در پردازش
+     */
     private void getRestaurantStatistics(HttpExchange exchange) throws IOException {
         RestaurantService.RestaurantStatistics stats = restaurantService.getRestaurantStatistics();
         sendJsonResponse(exchange, 200, stats);
     }
     
-    // ==================== POST ENDPOINTS ====================
+    // ==================== POST ENDPOINTS - پردازش درخواست‌های POST ====================
     
+    /**
+     * پردازش تمام درخواست‌های POST مربوط به رستوران‌ها
+     * 
+     * @param exchange شیء HttpExchange
+     * @param path مسیر درخواست
+     * @throws IOException در صورت خطا در پردازش
+     */
     private void handlePost(HttpExchange exchange, String path) throws IOException {
         if (path.equals("/api/restaurants")) {
-            // POST /api/restaurants - Register new restaurant
+            // POST /api/restaurants - ثبت رستوران جدید
             registerRestaurant(exchange);
         } else if (path.matches("/api/restaurants/\\d+/approve")) {
-            // POST /api/restaurants/{id}/approve - Approve restaurant
+            // POST /api/restaurants/{id}/approve - تأیید رستوران
             Long id = extractIdFromPath(path, "/api/restaurants/", "/approve");
             approveRestaurant(exchange, id);
         } else if (path.matches("/api/restaurants/\\d+/reject")) {
-            // POST /api/restaurants/{id}/reject - Reject restaurant
+            // POST /api/restaurants/{id}/reject - رد رستوران
             Long id = extractIdFromPath(path, "/api/restaurants/", "/reject");
             rejectRestaurant(exchange, id);
         } else if (path.matches("/api/restaurants/\\d+/suspend")) {
-            // POST /api/restaurants/{id}/suspend - Suspend restaurant
+            // POST /api/restaurants/{id}/suspend - تعلیق رستوران
             Long id = extractIdFromPath(path, "/api/restaurants/", "/suspend");
             suspendRestaurant(exchange, id);
         } else {
@@ -153,42 +206,82 @@ public class RestaurantController implements HttpHandler {
         }
     }
     
+    /**
+     * ثبت رستوران جدید در سیستم
+     * رستوران با وضعیت PENDING ثبت می‌شود و منتظر تأیید مدیر است
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در پردازش
+     */
     private void registerRestaurant(HttpExchange exchange) throws IOException {
         Map<String, Object> requestData = parseJsonRequest(exchange);
         
+        // استخراج اطلاعات از درخواست
         Long ownerId = getLongFromMap(requestData, "ownerId");
         String name = getStringFromMap(requestData, "name");
         String address = getStringFromMap(requestData, "address");
         String phone = getStringFromMap(requestData, "phone");
         
+        // ثبت رستوران جدید
         Restaurant restaurant = restaurantService.registerRestaurant(ownerId, name, address, phone);
         sendJsonResponse(exchange, 201, restaurant);
     }
     
+    /**
+     * تأیید رستوران توسط مدیر
+     * وضعیت رستوران از PENDING به APPROVED تغییر می‌کند
+     * 
+     * @param exchange شیء HttpExchange
+     * @param id شناسه رستوران
+     * @throws IOException در صورت خطا در پردازش
+     */
     private void approveRestaurant(HttpExchange exchange, Long id) throws IOException {
         restaurantService.approveRestaurant(id);
         sendJsonResponse(exchange, 200, Map.of("message", "Restaurant approved successfully"));
     }
     
+    /**
+     * رد رستوران توسط مدیر
+     * وضعیت رستوران از PENDING به REJECTED تغییر می‌کند
+     * 
+     * @param exchange شیء HttpExchange
+     * @param id شناسه رستوران
+     * @throws IOException در صورت خطا در پردازش
+     */
     private void rejectRestaurant(HttpExchange exchange, Long id) throws IOException {
         restaurantService.rejectRestaurant(id);
         sendJsonResponse(exchange, 200, Map.of("message", "Restaurant rejected successfully"));
     }
     
+    /**
+     * تعلیق رستوران توسط مدیر
+     * رستوران از دسترس خارج می‌شود اما حذف نمی‌شود
+     * 
+     * @param exchange شیء HttpExchange
+     * @param id شناسه رستوران
+     * @throws IOException در صورت خطا در پردازش
+     */
     private void suspendRestaurant(HttpExchange exchange, Long id) throws IOException {
         restaurantService.suspendRestaurant(id);
         sendJsonResponse(exchange, 200, Map.of("message", "Restaurant suspended successfully"));
     }
     
-    // ==================== PUT ENDPOINTS ====================
+    // ==================== PUT ENDPOINTS - پردازش درخواست‌های PUT ====================
     
+    /**
+     * پردازش تمام درخواست‌های PUT مربوط به رستوران‌ها
+     * 
+     * @param exchange شیء HttpExchange
+     * @param path مسیر درخواست
+     * @throws IOException در صورت خطا در پردازش
+     */
     private void handlePut(HttpExchange exchange, String path) throws IOException {
         if (path.matches("/api/restaurants/\\d+")) {
-            // PUT /api/restaurants/{id} - Update restaurant information
+            // PUT /api/restaurants/{id} - به‌روزرسانی اطلاعات رستوران
             Long id = extractIdFromPath(path);
             updateRestaurant(exchange, id);
         } else if (path.matches("/api/restaurants/\\d+/status")) {
-            // PUT /api/restaurants/{id}/status - Update restaurant status
+            // PUT /api/restaurants/{id}/status - به‌روزرسانی وضعیت رستوران
             Long id = extractIdFromPath(path, "/api/restaurants/", "/status");
             updateRestaurantStatus(exchange, id);
         } else {
@@ -237,8 +330,15 @@ public class RestaurantController implements HttpHandler {
         sendJsonResponse(exchange, 200, Map.of("message", "Restaurant deleted successfully"));
     }
     
-    // ==================== UTILITY METHODS ====================
+    // ==================== UTILITY METHODS - متدهای کمکی ====================
     
+    /**
+     * استخراج شناسه از انتهای مسیر
+     * مثال: /api/restaurants/123 -> 123
+     * 
+     * @param path مسیر درخواست
+     * @return شناسه استخراج شده
+     */
     private Long extractIdFromPath(String path) {
         String[] parts = path.split("/");
         return Long.parseLong(parts[parts.length - 1]);

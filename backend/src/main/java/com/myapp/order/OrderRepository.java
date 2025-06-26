@@ -10,30 +10,58 @@ import org.hibernate.query.Query;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository سفارشات - لایه دسترسی به داده
+ * این کلاس مسئول تمام عملیات دیتابیس مربوط به سفارشات است
+ * از الگوی Repository Pattern برای جداسازی منطق دیتابیس استفاده می‌کند
+ * شامل eager loading برای بارگذاری کامل اطلاعات سفارش و آیتم‌ها
+ */
 public class OrderRepository {
 
+    /**
+     * ذخیره سفارش جدید در دیتابیس
+     * شناسه به صورت خودکار توسط Hibernate تولید می‌شود
+     * 
+     * @param order سفارش برای ذخیره
+     * @return سفارش ذخیره شده همراه با شناسه تولید شده
+     */
     public Order saveNew(Order order) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();
-            session.persist(order);   // ID will be generated
+            session.persist(order);   // شناسه به صورت خودکار تولید می‌شود
             tx.commit();
             return order;
         }
     }
 
+    /**
+     * ذخیره یا به‌روزرسانی سفارش
+     * اگر شناسه null باشد، سفارش جدید ایجاد می‌شود
+     * در غیر اینصورت سفارش موجود به‌روزرسانی می‌شود
+     * 
+     * @param order سفارش برای ذخیره/به‌روزرسانی
+     * @return سفارش ذخیره شده
+     */
     public Order save(Order order) {
         if (order.getId() == null) {
-            return saveNew(order);
+            return saveNew(order);  // ایجاد سفارش جدید
         } else {
             try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
                 Transaction tx = session.beginTransaction();
-                session.merge(order);
+                session.merge(order);  // به‌روزرسانی سفارش موجود
                 tx.commit();
                 return order;
             }
         }
     }
 
+    /**
+     * یافتن سفارش با شناسه همراه با بارگذاری کامل آیتم‌ها
+     * از left join fetch برای بارگذاری eager استفاده می‌کند
+     * 
+     * @param id شناسه سفارش
+     * @return Optional حاوی سفارش کامل یا خالی در صورت عدم وجود
+     */
     public Optional<Order> findById(Long id) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Query<Order> q = session.createQuery(
@@ -43,6 +71,13 @@ public class OrderRepository {
         }
     }
 
+    /**
+     * دریافت همه سفارشات یک مشتری همراه با آیتم‌ها
+     * مرتب شده بر اساس تاریخ سفارش (جدیدترین اول)
+     * 
+     * @param customerId شناسه مشتری
+     * @return لیست سفارشات مشتری
+     */
     public List<Order> findByCustomer(Long customerId) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Query<Order> q = session.createQuery(
@@ -52,6 +87,13 @@ public class OrderRepository {
         }
     }
 
+    /**
+     * دریافت همه سفارشات یک رستوران همراه با آیتم‌ها
+     * مرتب شده بر اساس تاریخ سفارش (جدیدترین اول)
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست سفارشات رستوران
+     */
     public List<Order> findByRestaurant(Long restaurantId) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Query<Order> q = session.createQuery(
@@ -61,6 +103,13 @@ public class OrderRepository {
         }
     }
 
+    /**
+     * دریافت سفارشات بر اساس وضعیت
+     * مرتب شده بر اساس تاریخ سفارش (جدیدترین اول)
+     * 
+     * @param status وضعیت مورد نظر
+     * @return لیست سفارشات با وضعیت مشخص
+     */
     public List<Order> findByStatus(OrderStatus status) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Query<Order> q = session.createQuery(
@@ -70,6 +119,13 @@ public class OrderRepository {
         }
     }
 
+    /**
+     * دریافت سفارشات مشتری با وضعیت خاص
+     * 
+     * @param customerId شناسه مشتری
+     * @param status وضعیت مورد نظر
+     * @return لیست سفارشات مشتری با وضعیت مشخص
+     */
     public List<Order> findByCustomerAndStatus(Long customerId, OrderStatus status) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Query<Order> q = session.createQuery(
@@ -81,6 +137,13 @@ public class OrderRepository {
         }
     }
 
+    /**
+     * دریافت سفارشات رستوران با وضعیت خاص
+     * 
+     * @param restaurantId شناسه رستوران
+     * @param status وضعیت مورد نظر
+     * @return لیست سفارشات رستوران با وضعیت مشخص
+     */
     public List<Order> findByRestaurantAndStatus(Long restaurantId, OrderStatus status) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Query<Order> q = session.createQuery(
@@ -92,6 +155,12 @@ public class OrderRepository {
         }
     }
 
+    /**
+     * دریافت سفارشات در انتظار تأیید
+     * مرتب شده بر اساس تاریخ سفارش (قدیمی‌ترین اول برای پردازش)
+     * 
+     * @return لیست سفارشات PENDING
+     */
     public List<Order> findPendingOrders() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Query<Order> q = session.createQuery(
@@ -101,21 +170,33 @@ public class OrderRepository {
         }
     }
 
+    /**
+     * دریافت سفارشات فعال (غیر از تحویل شده و لغو شده)
+     * مرتب شده بر اساس تاریخ سفارش (جدیدترین اول)
+     * 
+     * @return لیست سفارشات فعال
+     */
     public List<Order> findActiveOrders() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Query<Order> q = session.createQuery(
                     "from Order where status in (:statuses) order by orderDate desc", Order.class);
             q.setParameterList("statuses", List.of(
-                OrderStatus.PENDING, 
-                OrderStatus.CONFIRMED, 
-                OrderStatus.PREPARING, 
-                OrderStatus.READY, 
-                OrderStatus.OUT_FOR_DELIVERY
+                OrderStatus.PENDING,         // در انتظار
+                OrderStatus.CONFIRMED,       // تأیید شده
+                OrderStatus.PREPARING,       // در حال آماده‌سازی
+                OrderStatus.READY,           // آماده
+                OrderStatus.OUT_FOR_DELIVERY // در حال تحویل
             ));
             return q.getResultList();
         }
     }
 
+    /**
+     * دریافت همه سفارشات
+     * مرتب شده بر اساس تاریخ سفارش (جدیدترین اول)
+     * 
+     * @return لیست همه سفارشات
+     */
     public List<Order> findAll() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Query<Order> q = session.createQuery("from Order order by orderDate desc", Order.class);
@@ -123,28 +204,45 @@ public class OrderRepository {
         }
     }
 
+    /**
+     * به‌روزرسانی وضعیت سفارش
+     * 
+     * @param id شناسه سفارش
+     * @param status وضعیت جدید
+     */
     public void updateStatus(Long id, OrderStatus status) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();
             Order order = session.get(Order.class, id);
             if (order != null) {
-                order.setStatus(status);
+                order.setStatus(status);  // تنها در صورت وجود سفارش به‌روزرسانی می‌شود
             }
             tx.commit();
         }
     }
 
+    /**
+     * حذف سفارش با شناسه
+     * 
+     * @param id شناسه سفارش برای حذف
+     */
     public void delete(Long id) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();
             Order order = session.get(Order.class, id);
             if (order != null) {
-                session.remove(order);
+                session.remove(order);  // حذف تنها در صورت وجود سفارش
             }
             tx.commit();
         }
     }
 
+    /**
+     * بررسی وجود سفارش با شناسه
+     * 
+     * @param id شناسه سفارش
+     * @return true اگر سفارش وجود داشته باشد
+     */
     public boolean existsById(Long id) {
         if (id == null || id <= 0) {
             return false;
@@ -157,16 +255,25 @@ public class OrderRepository {
         }
     }
 
+    /**
+     * به‌روزرسانی سفارش موجود
+     * 
+     * @param order سفارش برای به‌روزرسانی
+     * @return سفارش به‌روزرسانی شده
+     */
     public Order update(Order order) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();
-            Order updated = (Order) session.merge(order);
+            Order updated = (Order) session.merge(order);  // merge برای به‌روزرسانی
             tx.commit();
             return updated;
         }
     }
 
-    // Utility method for cleaning database during tests
+    /**
+     * حذف همه سفارشات (متد کمکی برای تست‌ها)
+     * این متد فقط در محیط تست استفاده می‌شود
+     */
     public void deleteAll() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();

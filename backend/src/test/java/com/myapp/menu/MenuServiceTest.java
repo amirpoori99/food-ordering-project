@@ -17,21 +17,116 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * مجموعه تست‌های جامع MenuService
+ * 
+ * این کلاس تست تمام عملکردهای سرویس مدیریت منو را آزمایش می‌کند:
+ * 
+ * Test Categories:
+ * 1. Menu Retrieval Tests
+ *    - دریافت منوی رستوران
+ *    - فیلتر آیتم‌های موجود
+ *    - مدیریت منوی خالی
+ *    - validation پارامترها
+ * 
+ * 2. Add Item to Menu Tests
+ *    - اضافه کردن آیتم جدید
+ *    - اعتبارسنجی ورودی‌ها
+ *    - مدیریت whitespace
+ *    - validation محدودیت‌های length
+ *    - validation قیمت
+ * 
+ * 3. Update Menu Item Tests
+ *    - به‌روزرسانی کامل آیتم
+ *    - به‌روزرسانی جزئی
+ *    - حفظ فیلدهای تغییر نکرده
+ *    - validation تغییرات
+ * 
+ * 4. Remove Item from Menu Tests
+ *    - حذف آیتم از منو
+ *    - مدیریت آیتم غیرموجود
+ *    - validation شناسه
+ * 
+ * 5. Item Availability Tests
+ *    - تنظیم وضعیت موجودی
+ *    - به‌روزرسانی تعداد آیتم
+ *    - مدیریت stock
+ * 
+ * 6. Menu Category Tests
+ *    - دسته‌بندی آیتم‌ها
+ *    - فیلتر بر اساس دسته
+ *    - لیست دسته‌ها
+ * 
+ * 7. Menu Statistics Tests
+ *    - آمار منو
+ *    - محاسبه metrics
+ *    - تحلیل عملکرد
+ * 
+ * 8. Restaurant Ownership Tests
+ *    - تأیید مالکیت رستوران
+ *    - authorization بر آیتم‌ها
+ * 
+ * 9. Low Stock Tests
+ *    - تشخیص آیتم‌های کم موجود
+ *    - alert مدیریت موجودی
+ * 
+ * Database Integration:
+ * - Hibernate Session management
+ * - Transaction handling
+ * - Data cleanup
+ * - Real database operations
+ * 
+ * Business Logic:
+ * - Menu management workflow
+ * - Inventory tracking
+ * - Category management
+ * - Statistics calculation
+ * - Ownership validation
+ * 
+ * Test Coverage: Complete coverage of MenuService functionality
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 @DisplayName("Menu Service Comprehensive Tests - Complete Coverage")
 class MenuServiceTest {
     
+    /** SessionFactory برای تست‌های پایگاه داده */
     private static SessionFactory sessionFactory;
+    
+    /** Session جاری برای هر تست */
     private Session session;
+    
+    /** Service instance تحت تست */
     private MenuService menuService;
+    
+    /** Repository dependencies */
     private MenuRepository menuRepository;
     private ItemRepository itemRepository;
     private RestaurantRepository restaurantRepository;
     
+    /**
+     * راه‌اندازی کلی قبل از تمام تست‌ها
+     * 
+     * Operations:
+     * - initialize SessionFactory
+     * - setup database connection
+     */
     @BeforeAll
     static void setUpClass() {
         sessionFactory = DatabaseUtil.getSessionFactory();
     }
     
+    /**
+     * راه‌اندازی قبل از هر تست
+     * 
+     * Operations:
+     * - open new database session
+     * - initialize repositories
+     * - setup MenuService with dependencies
+     * - clean database for isolated tests
+     */
     @BeforeEach
     void setUp() {
         session = sessionFactory.openSession();
@@ -40,10 +135,17 @@ class MenuServiceTest {
         restaurantRepository = new RestaurantRepository();
         menuService = new MenuService(menuRepository, itemRepository, restaurantRepository);
         
-        // Clean up database
+        // پاک‌سازی پایگاه داده
         cleanDatabase();
     }
     
+    /**
+     * پاک‌سازی بعد از هر تست
+     * 
+     * Operations:
+     * - close database session
+     * - release resources
+     */
     @AfterEach
     void tearDown() {
         if (session != null) {
@@ -51,6 +153,14 @@ class MenuServiceTest {
         }
     }
     
+    /**
+     * پاک‌سازی پایگاه داده برای تست‌های مستقل
+     * 
+     * Operations:
+     * - delete all FoodItems
+     * - delete all Restaurants
+     * - ensure clean state
+     */
     private void cleanDatabase() {
         session.beginTransaction();
         session.createQuery("DELETE FROM FoodItem").executeUpdate();
@@ -58,16 +168,33 @@ class MenuServiceTest {
         session.getTransaction().commit();
     }
     
-    // ==================== MENU RETRIEVAL TESTS ====================
+    // ==================== تست‌های دریافت منو ====================
     
+    /**
+     * تست‌های دریافت منو
+     * 
+     * این دسته شامل تمام عملیات مربوط به دریافت و نمایش منو:
+     * - دریافت کامل منوی رستوران
+     * - فیلتر آیتم‌های موجود
+     * - مدیریت منوی خالی
+     * - validation و error handling
+     */
     @Nested
     @DisplayName("Menu Retrieval Tests")
     class MenuRetrievalTests {
         
+        /**
+         * تست موفق دریافت منوی رستوران
+         * 
+         * Scenario: درخواست منوی رستوران با آیتم‌های مختلف
+         * Expected:
+         * - تمام آیتم‌های رستوران برگردانده شوند
+         * - هم آیتم‌های موجود و هم ناموجود
+         */
         @Test
         @DisplayName("Should get restaurant menu successfully")
         void getRestaurantMenu_ValidRestaurant_Success() {
-            // Given
+            // Given - آماده‌سازی رستوران و آیتم‌ها
             Restaurant restaurant = createAndSaveRestaurant();
             FoodItem item1 = createAndSaveFoodItem(restaurant, "Pizza", 25.99, true);
             FoodItem item2 = createAndSaveFoodItem(restaurant, "Burger", 18.99, false);
@@ -82,6 +209,12 @@ class MenuServiceTest {
             assertTrue(menu.stream().anyMatch(item -> item.getName().equals("Burger")));
         }
         
+        /**
+         * تست دریافت آیتم‌های موجود فقط
+         * 
+         * Scenario: فیلتر منو برای نمایش آیتم‌های موجود
+         * Expected: فقط آیتم‌های available=true برگردانده شوند
+         */
         @Test
         @DisplayName("Should get available menu items only")
         void getAvailableMenu_ValidRestaurant_Success() {
@@ -100,6 +233,12 @@ class MenuServiceTest {
             assertTrue(availableMenu.get(0).getAvailable());
         }
         
+        /**
+         * تست بازگشت لیست خالی برای رستوران بدون منو
+         * 
+         * Scenario: رستوران جدید بدون آیتم منو
+         * Expected: لیست خالی (نه null) برگردانده شود
+         */
         @Test
         @DisplayName("Should return empty list for restaurant with no menu")
         void getRestaurantMenu_EmptyMenu_Success() {
@@ -114,6 +253,12 @@ class MenuServiceTest {
             assertTrue(menu.isEmpty());
         }
         
+        /**
+         * تست خطا برای ID رستوران null
+         * 
+         * Scenario: ارسال null به عنوان ID رستوران
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for null restaurant ID")
         void getRestaurantMenu_NullId_ThrowsException() {
@@ -124,6 +269,14 @@ class MenuServiceTest {
             assertEquals("Restaurant ID must be positive", exception.getMessage());
         }
         
+        /**
+         * تست خطا برای ID رستوران نامعتبر
+         * 
+         * @param restaurantId ID نامعتبر برای تست
+         * 
+         * Scenario: ارسال ID منفی یا صفر
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @ParameterizedTest
         @ValueSource(longs = {0, -1, -10})
         @DisplayName("Should throw exception for invalid restaurant ID")
@@ -135,6 +288,12 @@ class MenuServiceTest {
             assertEquals("Restaurant ID must be positive", exception.getMessage());
         }
         
+        /**
+         * تست خطا برای رستوران غیرموجود
+         * 
+         * Scenario: درخواست منو برای رستوران که وجود ندارد
+         * Expected: NotFoundException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for non-existent restaurant")
         void getRestaurantMenu_NonExistentRestaurant_ThrowsException() {
@@ -146,12 +305,32 @@ class MenuServiceTest {
         }
     }
     
-    // ==================== ADD ITEM TO MENU TESTS ====================
+    // ==================== تست‌های اضافه کردن آیتم به منو ====================
     
+    /**
+     * تست‌های اضافه کردن آیتم به منو
+     * 
+     * این دسته شامل تمام عملیات اضافه کردن آیتم جدید:
+     * - اضافه کردن با داده‌های معتبر
+     * - validation فیلدهای مختلف
+     * - مدیریت whitespace
+     * - محدودیت‌های طول رشته
+     * - validation قیمت
+     */
     @Nested
     @DisplayName("Add Item to Menu Tests")
     class AddItemToMenuTests {
         
+        /**
+         * تست موفق اضافه کردن آیتم به منو
+         * 
+         * Scenario: اضافه کردن آیتم جدید با تمام اطلاعات
+         * Expected:
+         * - آیتم با ID منحصر به فرد ایجاد شود
+         * - تمام فیلدها صحیح ذخیره شوند
+         * - available = true (پیش‌فرض)
+         * - quantity = 0 (پیش‌فرض)
+         */
         @Test
         @DisplayName("Should add item to menu successfully")
         void addItemToMenu_ValidData_Success() {
@@ -175,6 +354,12 @@ class MenuServiceTest {
             assertEquals(0, addedItem.getQuantity());
         }
         
+        /**
+         * تست تمیز کردن whitespace از ورودی
+         * 
+         * Scenario: ورودی با فاصله‌های اضافی
+         * Expected: فاصله‌های ابتدا و انتها حذف شوند
+         */
         @Test
         @DisplayName("Should trim whitespace from input")
         void addItemToMenu_TrimsWhitespace_Success() {
@@ -192,6 +377,12 @@ class MenuServiceTest {
             assertEquals("Italian", addedItem.getCategory());
         }
         
+        /**
+         * تست اضافه کردن با استفاده از object FoodItem
+         * 
+         * Scenario: ارسال آبجکت FoodItem کامل
+         * Expected: آیتم صحیح ذخیره شود
+         */
         @Test
         @DisplayName("Should add item using FoodItem object")
         void addItemToMenu_FoodItemObject_Success() {
@@ -211,6 +402,12 @@ class MenuServiceTest {
             assertEquals("Fast Food", addedItem.getCategory());
         }
         
+        /**
+         * تست خطا برای ID رستوران null
+         * 
+         * Scenario: تلاش اضافه کردن آیتم بدون مشخص کردن رستوران
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for null restaurant ID")
         void addItemToMenu_NullRestaurantId_ThrowsException() {
@@ -221,6 +418,14 @@ class MenuServiceTest {
             assertEquals("Restaurant ID must be positive", exception.getMessage());
         }
         
+        /**
+         * تست خطا برای ID رستوران نامعتبر
+         * 
+         * @param restaurantId ID نامعتبر
+         * 
+         * Scenario: ID منفی یا صفر
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @ParameterizedTest
         @ValueSource(longs = {0, -1, -10})
         @DisplayName("Should throw exception for invalid restaurant ID")
@@ -232,6 +437,12 @@ class MenuServiceTest {
             assertEquals("Restaurant ID must be positive", exception.getMessage());
         }
         
+        /**
+         * تست خطا برای رستوران غیرموجود
+         * 
+         * Scenario: اضافه کردن آیتم به رستوران که وجود ندارد
+         * Expected: NotFoundException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for non-existent restaurant")
         void addItemToMenu_NonExistentRestaurant_ThrowsException() {
@@ -242,6 +453,14 @@ class MenuServiceTest {
             assertEquals("Restaurant not found with id=999", exception.getMessage());
         }
         
+        /**
+         * تست خطا برای نام خالی
+         * 
+         * @param name نام نامعتبر
+         * 
+         * Scenario: نام آیتم خالی یا فقط شامل فاصله
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @ParameterizedTest
         @ValueSource(strings = {"", "   ", "\t", "\n"})
         @DisplayName("Should throw exception for empty name")
@@ -256,6 +475,12 @@ class MenuServiceTest {
             assertEquals("Food item name cannot be empty", exception.getMessage());
         }
         
+        /**
+         * تست خطا برای نام null
+         * 
+         * Scenario: عدم ارسال نام آیتم
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for null name")
         void addItemToMenu_NullName_ThrowsException() {
@@ -269,6 +494,12 @@ class MenuServiceTest {
             assertEquals("Food item name cannot be empty", exception.getMessage());
         }
         
+        /**
+         * تست خطا برای نام خیلی طولانی
+         * 
+         * Scenario: نام آیتم بیش از 100 کاراکتر
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for very long name")
         void addItemToMenu_VeryLongName_ThrowsException() {
@@ -283,6 +514,12 @@ class MenuServiceTest {
             assertEquals("Food item name cannot exceed 100 characters", exception.getMessage());
         }
         
+        /**
+         * تست خطا برای توضیحات خیلی طولانی
+         * 
+         * Scenario: توضیحات بیش از 500 کاراکتر
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for very long description")
         void addItemToMenu_VeryLongDescription_ThrowsException() {
@@ -297,6 +534,12 @@ class MenuServiceTest {
             assertEquals("Food item description cannot exceed 500 characters", exception.getMessage());
         }
         
+        /**
+         * تست خطا برای دسته‌بندی خیلی طولانی
+         * 
+         * Scenario: نام دسته بیش از 50 کاراکتر
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for very long category")
         void addItemToMenu_VeryLongCategory_ThrowsException() {
@@ -311,6 +554,14 @@ class MenuServiceTest {
             assertEquals("Category cannot exceed 50 characters", exception.getMessage());
         }
         
+        /**
+         * تست خطا برای قیمت نامعتبر
+         * 
+         * @param price قیمت نامعتبر
+         * 
+         * Scenario: قیمت منفی، صفر، یا خیلی بالا
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @ParameterizedTest
         @ValueSource(doubles = {0.0, 0.001, -1.0, 10000.0})
         @DisplayName("Should throw exception for invalid price")
@@ -325,6 +576,12 @@ class MenuServiceTest {
             assertEquals("Price must be between 0.01 and 9999.99", exception.getMessage());
         }
         
+        /**
+         * تست خطا برای FoodItem null
+         * 
+         * Scenario: ارسال null به جای آبجکت FoodItem
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for null FoodItem")
         void addItemToMenu_NullFoodItem_ThrowsException() {
@@ -336,7 +593,7 @@ class MenuServiceTest {
         }
     }
     
-    // ==================== UPDATE MENU ITEM TESTS ====================
+    // ==================== تست‌های به‌روزرسانی آیتم منو ====================
     
     @Nested
     @DisplayName("Update Menu Item Tests")
@@ -443,7 +700,7 @@ class MenuServiceTest {
         }
     }
     
-    // ==================== REMOVE ITEM FROM MENU TESTS ====================
+    // ==================== تست‌های حذف آیتم از منو ====================
     
     @Nested
     @DisplayName("Remove Item from Menu Tests")
@@ -485,7 +742,7 @@ class MenuServiceTest {
         }
     }
     
-    // ==================== ITEM AVAILABILITY TESTS ====================
+    // ==================== تست‌های موجودی آیتم ====================
     
     @Nested
     @DisplayName("Item Availability Tests")
@@ -534,7 +791,7 @@ class MenuServiceTest {
         }
     }
     
-    // ==================== MENU CATEGORY TESTS ====================
+    // ==================== تست‌های دسته‌بندی منو ====================
     
     @Nested
     @DisplayName("Menu Category Tests")
@@ -597,7 +854,7 @@ class MenuServiceTest {
         }
     }
     
-    // ==================== MENU STATISTICS TESTS ====================
+    // ==================== تست‌های آمار منو ====================
     
     @Nested
     @DisplayName("Menu Statistics Tests")
@@ -662,7 +919,7 @@ class MenuServiceTest {
         }
     }
     
-    // ==================== RESTAURANT OWNERSHIP TESTS ====================
+    // ==================== تست‌های تأیید مالکیت رستوران ====================
     
     @Nested
     @DisplayName("Restaurant Ownership Tests")
@@ -702,7 +959,7 @@ class MenuServiceTest {
         }
     }
     
-    // ==================== LOW STOCK TESTS ====================
+    // ==================== تست‌های تشخیص آیتم‌های کم موجود ====================
     
     @Nested
     @DisplayName("Low Stock Tests")
@@ -749,7 +1006,7 @@ class MenuServiceTest {
         }
     }
     
-    // ==================== HELPER METHODS ====================
+    // ==================== متدهای کمکی ====================
     
     private Restaurant createAndSaveRestaurant() {
         Restaurant restaurant = Restaurant.forRegistration(1L, "Test Restaurant", "Tehran, Iran", "021-123456");

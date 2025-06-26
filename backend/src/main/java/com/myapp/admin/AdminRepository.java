@@ -12,15 +12,73 @@ import java.util.HashMap;
 import java.util.Optional;
 
 /**
- * Repository for Admin Dashboard Operations
- * Provides comprehensive admin functionality for managing the food ordering system
+ * Repository لایه دسترسی داده برای عملیات پنل مدیریت (Admin Dashboard)
+ * 
+ * این کلاس تمام عملیات پایگاه داده مربوط به مدیریت سیستم سفارش غذا را ارائه می‌دهد:
+ * 
+ * === مدیریت کاربران (User Management) ===
+ * - getAllUsers(): دریافت تمام کاربران با فیلتر و جستجو
+ * - countUsers(): شمارش کاربران با فیلتر
+ * - getUserStatsByRole(): آمار کاربران بر اساس نقش
+ * - updateUserStatus(): فعال/غیرفعال کردن کاربر
+ * 
+ * === مدیریت رستوران‌ها (Restaurant Management) ===
+ * - getAllRestaurants(): دریافت تمام رستوران‌ها با فیلتر
+ * - countRestaurants(): شمارش رستوران‌ها
+ * - getRestaurantStatsByStatus(): آمار رستوران‌ها بر اساس وضعیت
+ * 
+ * === مدیریت سفارشات (Order Management) ===
+ * - getAllOrders(): دریافت تمام سفارشات با فیلترهای پیشرفته
+ * - countOrders(): شمارش سفارشات
+ * - getOrderStatsByStatus(): آمار سفارشات بر اساس وضعیت
+ * 
+ * === مدیریت تراکنش‌ها (Transaction Management) ===
+ * - getAllTransactions(): دریافت تمام تراکنش‌ها با فیلتر
+ * - countTransactions(): شمارش تراکنش‌ها
+ * 
+ * === مدیریت تحویل (Delivery Management) ===
+ * - getAllDeliveries(): دریافت تمام تحویل‌ها با فیلتر
+ * - countDeliveries(): شمارش تحویل‌ها
+ * 
+ * === آمار سیستم (System Statistics) ===
+ * - getSystemStatistics(): آمار کلی سیستم
+ * - getDailyStatistics(): آمار روزانه
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Advanced Filtering: فیلترهای پیشرفته برای همه entities
+ * - Search Functionality: جستجوی متنی در تمام بخش‌ها
+ * - Pagination Support: پشتیبانی از صفحه‌بندی
+ * - Statistical Queries: queries آماری پیچیده
+ * - Dynamic Query Building: ساخت پویای queries
+ * - Performance Optimization: بهینه‌سازی کارایی queries
+ * - Comprehensive Admin Operations: عملیات جامع مدیریتی
+ * - Real-time Statistics: آمار real-time سیستم
+ * 
+ * === Inner Classes ===
+ * - SystemStatistics: کلاس آمار کلی سیستم
+ * - DailyStatistics: کلاس آمار روزانه
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class AdminRepository {
 
-    // ==================== USER MANAGEMENT ====================
+    // ==================== مدیریت کاربران (USER MANAGEMENT) ====================
     
     /**
-     * Get all users with optional filtering
+     * دریافت تمام کاربران با فیلتر و جستجوی پیشرفته
+     * 
+     * این متد امکان جستجو و فیلتر کاربران را بر اساس معیارهای مختلف فراهم می‌کند:
+     * - جستجو در نام، ایمیل و شماره تلفن
+     * - فیلتر بر اساس نقش کاربر
+     * - صفحه‌بندی برای بهبود عملکرد
+     * 
+     * @param searchTerm عبارت جستجو (در نام، ایمیل، تلفن)
+     * @param role نقش کاربر برای فیلتر (اختیاری)
+     * @param limit تعداد رکوردها در هر صفحه (0 = نامحدود)
+     * @param offset شروع از رکورد (برای pagination)
+     * @return لیست کاربران فیلتر شده
      */
     public List<User> getAllUsers(String searchTerm, User.Role role, int limit, int offset) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -59,7 +117,13 @@ public class AdminRepository {
     }
     
     /**
-     * Count total users with filtering
+     * شمارش کل کاربران با فیلترهای اعمال شده
+     * 
+     * برای محاسبه pagination و آمارگیری
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param role نقش کاربر
+     * @return تعداد کل کاربران
      */
     public Long countUsers(String searchTerm, User.Role role) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -89,7 +153,11 @@ public class AdminRepository {
     }
     
     /**
-     * Get user statistics by role
+     * دریافت آمار کاربران بر اساس نقش
+     * 
+     * برای نمایش نمودار توزیع کاربران در پنل مدیریت
+     * 
+     * @return Map حاوی تعداد کاربران هر نقش
      */
     public Map<User.Role, Long> getUserStatsByRole() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -110,7 +178,12 @@ public class AdminRepository {
     }
     
     /**
-     * Block/Unblock user
+     * فعال/غیرفعال کردن کاربر
+     * 
+     * مدیران می‌توانند کاربران را مسدود یا فعال کنند
+     * 
+     * @param userId شناسه کاربر
+     * @param isActive وضعیت فعال/غیرفعال
      */
     public void updateUserStatus(Long userId, boolean isActive) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -126,10 +199,16 @@ public class AdminRepository {
         }
     }
 
-    // ==================== RESTAURANT MANAGEMENT ====================
+    // ==================== مدیریت رستوران‌ها (RESTAURANT MANAGEMENT) ====================
     
     /**
-     * Get all restaurants with filtering
+     * دریافت تمام رستوران‌ها با فیلتر و جستجو
+     * 
+     * @param searchTerm عبارت جستجو (در نام و آدرس رستوران)
+     * @param status وضعیت رستوران برای فیلتر
+     * @param limit تعداد رکوردها در هر صفحه
+     * @param offset شروع از رکورد
+     * @return لیست رستوران‌های فیلتر شده
      */
     public List<Restaurant> getAllRestaurants(String searchTerm, RestaurantStatus status, int limit, int offset) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -168,7 +247,11 @@ public class AdminRepository {
     }
     
     /**
-     * Count restaurants with filtering
+     * شمارش رستوران‌ها با فیلترهای اعمال شده
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت رستوران
+     * @return تعداد کل رستوران‌ها
      */
     public Long countRestaurants(String searchTerm, RestaurantStatus status) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -198,7 +281,11 @@ public class AdminRepository {
     }
     
     /**
-     * Get restaurant statistics by status
+     * دریافت آمار رستوران‌ها بر اساس وضعیت
+     * 
+     * برای نمایش نمودار توزیع وضعیت رستوران‌ها
+     * 
+     * @return Map حاوی تعداد رستوران‌های هر وضعیت
      */
     public Map<RestaurantStatus, Long> getRestaurantStatsByStatus() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -218,10 +305,24 @@ public class AdminRepository {
         }
     }
 
-    // ==================== ORDER MANAGEMENT ====================
+    // ==================== مدیریت سفارشات (ORDER MANAGEMENT) ====================
     
     /**
-     * Get all orders with filtering
+     * دریافت تمام سفارشات با فیلترهای پیشرفته
+     * 
+     * امکان فیلتر پیچیده سفارشات بر اساس:
+     * - جستجو در آدرس تحویل و شماره تلفن
+     * - وضعیت سفارش
+     * - کاربر مشخص
+     * - رستوران مشخص
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت سفارش
+     * @param customerId شناسه مشتری (اختیاری)
+     * @param restaurantId شناسه رستوران (اختیاری)
+     * @param limit تعداد رکوردها
+     * @param offset شروع از رکورد
+     * @return لیست سفارشات فیلتر شده
      */
     public List<Order> getAllOrders(String searchTerm, OrderStatus status, Long customerId, Long restaurantId, int limit, int offset) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -276,7 +377,13 @@ public class AdminRepository {
     }
     
     /**
-     * Count orders with filtering
+     * شمارش سفارشات با فیلترهای اعمال شده
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت سفارش
+     * @param customerId شناسه مشتری
+     * @param restaurantId شناسه رستوران
+     * @return تعداد کل سفارشات
      */
     public Long countOrders(String searchTerm, OrderStatus status, Long customerId, Long restaurantId) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -322,7 +429,11 @@ public class AdminRepository {
     }
     
     /**
-     * Get order statistics by status
+     * دریافت آمار سفارشات بر اساس وضعیت
+     * 
+     * برای نمایش نمودار وضعیت سفارشات در dashboard
+     * 
+     * @return Map حاوی تعداد سفارشات هر وضعیت
      */
     public Map<OrderStatus, Long> getOrderStatsByStatus() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -342,10 +453,24 @@ public class AdminRepository {
         }
     }
 
-    // ==================== TRANSACTION MANAGEMENT ====================
+    // ==================== مدیریت تراکنش‌ها (TRANSACTION MANAGEMENT) ====================
     
     /**
-     * Get all transactions with filtering
+     * دریافت تمام تراکنش‌ها با فیلترهای پیشرفته
+     * 
+     * امکان جستجو و فیلتر تراکنش‌ها بر اساس:
+     * - شناسه مرجع، توضیحات و روش پرداخت
+     * - وضعیت تراکنش
+     * - نوع تراکنش
+     * - کاربر مشخص
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت تراکنش
+     * @param type نوع تراکنش
+     * @param userId شناسه کاربر
+     * @param limit تعداد رکوردها
+     * @param offset شروع از رکورد
+     * @return لیست تراکنش‌های فیلتر شده
      */
     public List<Transaction> getAllTransactions(String searchTerm, TransactionStatus status, TransactionType type, Long userId, int limit, int offset) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -400,7 +525,13 @@ public class AdminRepository {
     }
     
     /**
-     * Count transactions with filtering
+     * شمارش تراکنش‌ها با فیلترهای اعمال شده
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت تراکنش
+     * @param type نوع تراکنش
+     * @param userId شناسه کاربر
+     * @return تعداد کل تراکنش‌ها
      */
     public Long countTransactions(String searchTerm, TransactionStatus status, TransactionType type, Long userId) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -445,10 +576,17 @@ public class AdminRepository {
         }
     }
 
-    // ==================== DELIVERY MANAGEMENT ====================
+    // ==================== مدیریت تحویل (DELIVERY MANAGEMENT) ====================
     
     /**
-     * Get all deliveries with filtering
+     * دریافت تمام تحویل‌ها با فیلتر و جستجو
+     * 
+     * @param searchTerm عبارت جستجو (در یادداشت‌های تحویل)
+     * @param status وضعیت تحویل
+     * @param courierId شناسه پیک
+     * @param limit تعداد رکوردها
+     * @param offset شروع از رکورد
+     * @return لیست تحویل‌های فیلتر شده
      */
     public List<Delivery> getAllDeliveries(String searchTerm, DeliveryStatus status, Long courierId, int limit, int offset) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -495,7 +633,12 @@ public class AdminRepository {
     }
     
     /**
-     * Count deliveries with filtering
+     * شمارش تحویل‌ها با فیلترهای اعمال شده
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت تحویل
+     * @param courierId شناسه پیک
+     * @return تعداد کل تحویل‌ها
      */
     public Long countDeliveries(String searchTerm, DeliveryStatus status, Long courierId) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -532,10 +675,14 @@ public class AdminRepository {
         }
     }
 
-    // ==================== SYSTEM STATISTICS ====================
+    // ==================== آمار سیستم (SYSTEM STATISTICS) ====================
     
     /**
-     * Get comprehensive system statistics
+     * دریافت آمار کلی سیستم
+     * 
+     * این متد امکان دریافت آمار کلی سیستم را برای مدیریت پنل مدیریت فراهم می‌کند
+     * 
+     * @return آمار کلی سیستم
      */
     public SystemStatistics getSystemStatistics() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -570,7 +717,12 @@ public class AdminRepository {
     }
     
     /**
-     * Get daily statistics for the last N days
+     * دریافت آمار روزانه
+     * 
+     * این متد امکان دریافت آمار روزانه سیستم را برای مدیریت پنل مدیریت فراهم می‌کند
+     * 
+     * @param days تعداد روزهای گذشته برای دریافت آمار
+     * @return آمار روزانه
      */
     public List<DailyStatistics> getDailyStatistics(int days) {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
@@ -597,7 +749,7 @@ public class AdminRepository {
     // ==================== HELPER CLASSES ====================
     
     /**
-     * System statistics data class
+     * کلاس آمار کلی سیستم
      */
     public static class SystemStatistics {
         private final Long totalUsers;
@@ -643,7 +795,7 @@ public class AdminRepository {
     }
     
     /**
-     * Daily statistics data class
+     * کلاس آمار روزانه
      */
     public static class DailyStatistics {
         private final java.sql.Date date;

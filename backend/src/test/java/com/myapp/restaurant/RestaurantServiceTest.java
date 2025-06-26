@@ -18,20 +18,113 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * مجموعه تست‌های جامع RestaurantService
+ * 
+ * این کلاس تست تمام عملکردهای سرویس مدیریت رستوران‌ها را آزمایش می‌کند:
+ * 
+ * Test Categories:
+ * 1. Restaurant Registration Tests
+ *    - ثبت رستوران با پارامترهای مختلف
+ *    - validation ورودی‌ها
+ *    - تنظیم وضعیت پیش‌فرض
+ *    - تمیز کردن whitespace
+ * 
+ * 2. Registration Input Validation Tests
+ *    - اعتبارسنجی owner ID
+ *    - validation نام رستوران
+ *    - validation آدرس
+ *    - validation شماره تلفن
+ *    - محدودیت‌های طول
+ * 
+ * 3. Restaurant Retrieval Tests
+ *    - دریافت رستوران با ID
+ *    - لیست رستوران‌های مالک
+ *    - دریافت همه رستوران‌ها
+ *    - فیلتر بر اساس وضعیت
+ *    - رستوران‌های تأیید شده
+ * 
+ * 4. Status Update Tests
+ *    - تغییر وضعیت رستوران
+ *    - تأیید رستوران
+ *    - رد رستوران
+ *    - تعلیق رستوران
+ * 
+ * 5. Restaurant Update Tests
+ *    - به‌روزرسانی اطلاعات رستوران
+ *    - به‌روزرسانی جزئی
+ *    - validation تغییرات
+ * 
+ * 6. Restaurant Delete Tests
+ *    - حذف رستوران
+ *    - مدیریت رستوران غیرموجود
+ * 
+ * 7. Restaurant Existence Check Tests
+ *    - بررسی وجود رستوران
+ *    - مدیریت ID های نامعتبر
+ * 
+ * 8. Pending Restaurants Tests
+ *    - لیست رستوران‌های در انتظار
+ *    - مدیریت حالت خالی
+ * 
+ * 9. Restaurant Statistics Tests
+ *    - محاسبه آمار رستوران‌ها
+ *    - آمار بر اساس وضعیت
+ * 
+ * 10. Edge Case Tests
+ *     - کاراکترهای خاص
+ *     - Unicode support
+ *     - فرمت‌های مختلف تلفن
+ *     - عملیات متوالی سریع
+ * 
+ * 11. Mock Repository Tests
+ *     - تست با mock repository
+ *     - مدیریت exception ها
+ *     - تأیید فراخوانی‌های صحیح
+ * 
+ * Database Integration:
+ * - Real Hibernate operations
+ * - Transaction management
+ * - Data cleanup
+ * - Isolation between tests
+ * 
+ * Business Logic:
+ * - Restaurant lifecycle management
+ * - Status transitions
+ * - Ownership validation
+ * - Multi-tenant support
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RestaurantServiceTest {
 
+    /** Service instance تحت تست */
     private RestaurantService restaurantService;
+    
+    /** Real repository برای integration tests */
     private RestaurantRepository restaurantRepository;
     
+    /** Mock repository برای unit tests */
     @Mock
     private RestaurantRepository mockRepository;
 
+    /**
+     * راه‌اندازی قبل از هر تست
+     * 
+     * Operations:
+     * - initialize mock objects
+     * - clean database state
+     * - setup service with real repository
+     * - ensure test isolation
+     */
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         
-        // Clean up database before each test
+        // پاک‌سازی پایگاه داده قبل از هر تست
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();
             session.createQuery("delete from Restaurant").executeUpdate();
@@ -42,9 +135,16 @@ public class RestaurantServiceTest {
         restaurantService = new RestaurantService(restaurantRepository);
     }
 
+    /**
+     * پاک‌سازی بعد از هر تست
+     * 
+     * Operations:
+     * - clean database state
+     * - ensure no data leakage between tests
+     */
     @AfterEach
     void tearDown() {
-        // Clean up database after each test
+        // پاک‌سازی پایگاه داده بعد از هر تست
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();
             session.createQuery("delete from Restaurant").executeUpdate();
@@ -52,26 +152,44 @@ public class RestaurantServiceTest {
         }
     }
 
-    // ==================== REGISTRATION TESTS ====================
+    // ==================== تست‌های ثبت رستوران ====================
 
+    /**
+     * تست‌های ثبت رستوران
+     * 
+     * این دسته شامل تمام عملیات مربوط به ثبت رستوران جدید:
+     * - ثبت با پارامترهای جداگانه
+     * - ثبت با آبجکت Restaurant
+     * - پردازش whitespace
+     * - تنظیم وضعیت پیش‌فرض
+     */
     @Nested
     @DisplayName("Restaurant Registration Tests")
     class RestaurantRegistrationTests {
 
+        /**
+         * تست موفق ثبت رستوران با پارامترهای معتبر
+         * 
+         * Scenario: ثبت رستوران جدید با تمام اطلاعات ضروری
+         * Expected:
+         * - رستوران با ID منحصر به فرد ایجاد شود
+         * - تمام فیلدها صحیح ذخیره شوند
+         * - وضعیت پیش‌فرض PENDING تنظیم شود
+         */
         @Test
         @Order(1)
         @DisplayName("Should register restaurant with valid parameters")
         void shouldRegisterRestaurantWithValidParameters() {
-            // Given
+            // Given - آماده‌سازی داده‌های ورودی
             Long ownerId = 1L;
             String name = "Test Restaurant";
             String address = "123 Test Street";
             String phone = "123-456-7890";
 
-            // When
+            // When - ثبت رستوران
             Restaurant result = restaurantService.registerRestaurant(ownerId, name, address, phone);
 
-            // Then
+            // Then - بررسی نتایج
             assertNotNull(result);
             assertNotNull(result.getId());
             assertEquals(ownerId, result.getOwnerId());
@@ -81,6 +199,12 @@ public class RestaurantServiceTest {
             assertEquals(RestaurantStatus.PENDING, result.getStatus());
         }
 
+        /**
+         * تست ثبت رستوران با آبجکت Restaurant
+         * 
+         * Scenario: ارسال آبجکت Restaurant کامل برای ثبت
+         * Expected: رستوران با همان اطلاعات ذخیره شود
+         */
         @Test
         @Order(2)
         @DisplayName("Should register restaurant with Restaurant object")
@@ -101,6 +225,12 @@ public class RestaurantServiceTest {
             assertEquals(RestaurantStatus.PENDING, result.getStatus());
         }
 
+        /**
+         * تست تمیز کردن whitespace در هنگام ثبت
+         * 
+         * Scenario: ورودی با فاصله‌های اضافی
+         * Expected: فاصله‌های ابتدا و انتها حذف شوند
+         */
         @Test
         @Order(3)
         @DisplayName("Should trim whitespace during registration")
@@ -120,6 +250,12 @@ public class RestaurantServiceTest {
             assertEquals("123-456-7890", result.getPhone());
         }
 
+        /**
+         * تست تنظیم وضعیت پیش‌فرض
+         * 
+         * Scenario: ثبت رستوران بدون مشخص کردن وضعیت
+         * Expected: وضعیت پیش‌فرض PENDING تنظیم شود
+         */
         @Test
         @Order(4)
         @DisplayName("Should set default status to PENDING")
@@ -136,12 +272,29 @@ public class RestaurantServiceTest {
         }
     }
 
-    // ==================== REGISTRATION VALIDATION TESTS ====================
+    // ==================== تست‌های اعتبارسنجی ثبت ====================
 
+    /**
+     * تست‌های اعتبارسنجی ورودی ثبت
+     * 
+     * این دسته شامل تمام validation های مربوط به ثبت رستوران:
+     * - validation owner ID
+     * - validation نام رستوران
+     * - validation آدرس
+     * - validation شماره تلفن
+     * - محدودیت‌های طول
+     * - مدیریت null و empty values
+     */
     @Nested
     @DisplayName("Registration Input Validation Tests")
     class RegistrationValidationTests {
 
+        /**
+         * تست خطا برای owner ID null
+         * 
+         * Scenario: تلاش ثبت رستوران بدون مالک
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for null owner ID")
         void shouldThrowExceptionForNullOwnerId() {
@@ -149,6 +302,12 @@ public class RestaurantServiceTest {
                 restaurantService.registerRestaurant(null, "Test", "Address", "Phone"));
         }
 
+        /**
+         * تست خطا برای owner ID صفر
+         * 
+         * Scenario: ارسال صفر به عنوان ID مالک
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for zero owner ID")
         void shouldThrowExceptionForZeroOwnerId() {
@@ -156,6 +315,12 @@ public class RestaurantServiceTest {
                 restaurantService.registerRestaurant(0L, "Test", "Address", "Phone"));
         }
 
+        /**
+         * تست خطا برای owner ID منفی
+         * 
+         * Scenario: ارسال عدد منفی به عنوان ID مالک
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for negative owner ID")
         void shouldThrowExceptionForNegativeOwnerId() {
@@ -163,6 +328,12 @@ public class RestaurantServiceTest {
                 restaurantService.registerRestaurant(-1L, "Test", "Address", "Phone"));
         }
 
+        /**
+         * تست خطا برای نام رستوران null
+         * 
+         * Scenario: عدم ارسال نام رستوران
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for null restaurant name")
         void shouldThrowExceptionForNullRestaurantName() {
@@ -170,6 +341,12 @@ public class RestaurantServiceTest {
                 restaurantService.registerRestaurant(1L, null, "Address", "Phone"));
         }
 
+        /**
+         * تست خطا برای نام رستوران خالی
+         * 
+         * Scenario: ارسال رشته خالی به عنوان نام
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for empty restaurant name")
         void shouldThrowExceptionForEmptyRestaurantName() {
@@ -177,6 +354,12 @@ public class RestaurantServiceTest {
                 restaurantService.registerRestaurant(1L, "", "Address", "Phone"));
         }
 
+        /**
+         * تست خطا برای نام شامل فقط فاصله
+         * 
+         * Scenario: نام رستوران شامل فقط whitespace
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for whitespace-only restaurant name")
         void shouldThrowExceptionForWhitespaceOnlyRestaurantName() {
@@ -184,6 +367,12 @@ public class RestaurantServiceTest {
                 restaurantService.registerRestaurant(1L, "   ", "Address", "Phone"));
         }
 
+        /**
+         * تست خطا برای نام بیش از 100 کاراکتر
+         * 
+         * Scenario: نام رستوران بیش از حد مجاز
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for restaurant name exceeding 100 characters")
         void shouldThrowExceptionForLongRestaurantName() {
@@ -192,6 +381,12 @@ public class RestaurantServiceTest {
                 restaurantService.registerRestaurant(1L, longName, "Address", "Phone"));
         }
 
+        /**
+         * تست پذیرش نام با دقیقاً 100 کاراکتر
+         * 
+         * Scenario: نام رستوران در حد مجاز
+         * Expected: عملیات موفق باشد
+         */
         @Test
         @DisplayName("Should accept restaurant name with exactly 100 characters")
         void shouldAcceptRestaurantNameWith100Characters() {
@@ -200,6 +395,12 @@ public class RestaurantServiceTest {
                 restaurantService.registerRestaurant(1L, name100, "Address", "Phone"));
         }
 
+        /**
+         * تست خطا برای آدرس null
+         * 
+         * Scenario: عدم ارسال آدرس رستوران
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for null address")
         void shouldThrowExceptionForNullAddress() {
@@ -207,6 +408,12 @@ public class RestaurantServiceTest {
                 restaurantService.registerRestaurant(1L, "Test", null, "Phone"));
         }
 
+        /**
+         * تست خطا برای آدرس خالی
+         * 
+         * Scenario: ارسال رشته خالی به عنوان آدرس
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for empty address")
         void shouldThrowExceptionForEmptyAddress() {
@@ -214,6 +421,12 @@ public class RestaurantServiceTest {
                 restaurantService.registerRestaurant(1L, "Test", "", "Phone"));
         }
 
+        /**
+         * تست خطا برای آدرس بیش از 200 کاراکتر
+         * 
+         * Scenario: آدرس رستوران بیش از حد مجاز
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for address exceeding 200 characters")
         void shouldThrowExceptionForLongAddress() {
@@ -222,6 +435,12 @@ public class RestaurantServiceTest {
                 restaurantService.registerRestaurant(1L, "Test", longAddress, "Phone"));
         }
 
+        /**
+         * تست پذیرش آدرس با دقیقاً 200 کاراکتر
+         * 
+         * Scenario: آدرس رستوران در حد مجاز
+         * Expected: عملیات موفق باشد
+         */
         @Test
         @DisplayName("Should accept address with exactly 200 characters")
         void shouldAcceptAddressWith200Characters() {
@@ -230,6 +449,12 @@ public class RestaurantServiceTest {
                 restaurantService.registerRestaurant(1L, "Test", address200, "Phone"));
         }
 
+        /**
+         * تست خطا برای تلفن null
+         * 
+         * Scenario: عدم ارسال شماره تلفن
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for null phone")
         void shouldThrowExceptionForNullPhone() {
@@ -237,6 +462,12 @@ public class RestaurantServiceTest {
                 restaurantService.registerRestaurant(1L, "Test", "Address", null));
         }
 
+        /**
+         * تست خطا برای تلفن خالی
+         * 
+         * Scenario: ارسال رشته خالی به عنوان تلفن
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for empty phone")
         void shouldThrowExceptionForEmptyPhone() {
@@ -244,6 +475,12 @@ public class RestaurantServiceTest {
                 restaurantService.registerRestaurant(1L, "Test", "Address", ""));
         }
 
+        /**
+         * تست خطا برای تلفن بیش از 20 کاراکتر
+         * 
+         * Scenario: شماره تلفن بیش از حد مجاز
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for phone exceeding 20 characters")
         void shouldThrowExceptionForLongPhone() {
@@ -252,6 +489,12 @@ public class RestaurantServiceTest {
                 restaurantService.registerRestaurant(1L, "Test", "Address", longPhone));
         }
 
+        /**
+         * تست پذیرش تلفن با دقیقاً 20 کاراکتر
+         * 
+         * Scenario: شماره تلفن در حد مجاز
+         * Expected: عملیات موفق باشد
+         */
         @Test
         @DisplayName("Should accept phone with exactly 20 characters")
         void shouldAcceptPhoneWith20Characters() {
@@ -260,6 +503,12 @@ public class RestaurantServiceTest {
                 restaurantService.registerRestaurant(1L, "Test", "Address", phone20));
         }
 
+        /**
+         * تست خطا برای آبجکت رستوران null
+         * 
+         * Scenario: ارسال null به جای آبجکت Restaurant
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("Should throw exception for null restaurant object")
         void shouldThrowExceptionForNullRestaurantObject() {

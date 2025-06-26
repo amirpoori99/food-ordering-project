@@ -19,7 +19,62 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Comprehensive test suite for AdminController
+ * مجموعه تست‌های جامع AdminController
+ * 
+ * این کلاس تست تمام endpoint های کنترلر مدیریت سیستم را آزمایش می‌کند:
+ * 
+ * Test Categories:
+ * 1. Dashboard & Statistics Tests
+ *    - آمار کلی سیستم
+ *    - آمار روزانه
+ *    - آمار تفکیکی کاربران، رستوران‌ها و سفارش‌ها
+ * 
+ * 2. User Management Tests
+ *    - لیست‌گیری کاربران با pagination
+ *    - جزئیات کاربر
+ *    - تغییر وضعیت کاربر
+ * 
+ * 3. Restaurant Management Tests
+ *    - لیست‌گیری رستوران‌ها
+ *    - تأیید/رد رستوران‌ها
+ *    - تغییر وضعیت رستوران
+ * 
+ * 4. Order Management Tests
+ *    - لیست‌گیری سفارش‌ها
+ *    - تغییر وضعیت سفارش
+ *    - فیلتر سفارش‌ها
+ * 
+ * 5. Transaction Management Tests
+ *    - لیست‌گیری تراکنش‌ها
+ *    - جزئیات تراکنش
+ *    - فیلتر تراکنش‌ها
+ * 
+ * 6. Delivery Management Tests
+ *    - لیست‌گیری تحویل‌ها
+ *    - جزئیات تحویل
+ *    - مانیتورینگ delivery status
+ * 
+ * 7. Error Handling Tests
+ *    - مدیریت 404 Not Found
+ *    - مدیریت 400 Bad Request
+ *    - مدیریت 500 Internal Server Error
+ * 
+ * HTTP REST API Testing:
+ * - GET, PUT request handling
+ * - JSON request/response processing
+ * - HTTP status codes
+ * - Error responses
+ * - Query parameters
+ * - Path parameters
+ * 
+ * Mocking Strategy:
+ * - AdminService mocking
+ * - HttpExchange mocking
+ * - Request/Response stream handling
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 class AdminControllerTest {
 

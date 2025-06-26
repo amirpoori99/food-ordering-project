@@ -9,41 +9,70 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
+/**
+ * سرویس مدیریت رستوران‌ها - لایه منطق کسب‌وکار
+ * این کلاس مسئول پردازش منطق کسب‌وکار مربوط به رستوران‌هاست
+ * شامل ثبت، به‌روزرسانی، مدیریت وضعیت و عملکرد بهینه با caching
+ */
 public class RestaurantService {
     
+    // repository برای دسترسی به داده‌های رستوران
     private final RestaurantRepository restaurantRepository;
     
+    /**
+     * سازنده پیش‌فرض - ایجاد نمونه repository
+     */
     public RestaurantService() {
         this.restaurantRepository = new RestaurantRepository();
     }
     
-    // Constructor for dependency injection (testing)
+    /**
+     * سازنده برای تزریق وابستگی (استفاده در تست)
+     * 
+     * @param restaurantRepository repository رستوران
+     */
     public RestaurantService(RestaurantRepository restaurantRepository) {
         this.restaurantRepository = restaurantRepository;
     }
     
     /**
-     * Register a new restaurant
+     * ثبت رستوران جدید در سیستم
+     * رستوران با وضعیت PENDING ثبت می‌شود و منتظر تأیید مدیر است
+     * 
+     * @param ownerId شناسه مالک رستوران
+     * @param name نام رستوران
+     * @param address آدرس رستوران
+     * @param phone شماره تلفن رستوران
+     * @return رستوران ثبت شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن ورودی‌ها
      */
     public Restaurant registerRestaurant(Long ownerId, String name, String address, String phone) {
+        // اعتبارسنجی ورودی‌ها
         validateRegistrationInput(ownerId, name, address, phone);
         
+        // ایجاد رستوران جدید با trim کردن رشته‌ها
         Restaurant restaurant = new Restaurant(ownerId, name.trim(), address.trim(), phone.trim());
         return restaurantRepository.saveNew(restaurant);
     }
     
     /**
-     * Register restaurant with Restaurant object
+     * ثبت رستوران با شیء Restaurant
+     * این متد overload شده برای راحتی استفاده است
+     * 
+     * @param restaurant شیء رستوران
+     * @return رستوران ثبت شده
+     * @throws IllegalArgumentException در صورت null بودن رستوران یا نامعتبر بودن اطلاعات
      */
     public Restaurant registerRestaurant(Restaurant restaurant) {
         if (restaurant == null) {
             throw new IllegalArgumentException("Restaurant cannot be null");
         }
         
+        // اعتبارسنجی اطلاعات رستوران
         validateRegistrationInput(restaurant.getOwnerId(), restaurant.getName(), 
                                 restaurant.getAddress(), restaurant.getPhone());
         
-        // Ensure default status for new restaurants
+        // تنظیم وضعیت پیش‌فرض برای رستوران‌های جدید
         if (restaurant.getStatus() == null) {
             restaurant.setStatus(RestaurantStatus.PENDING);
         }
@@ -52,7 +81,12 @@ public class RestaurantService {
     }
     
     /**
-     * Get restaurant by ID
+     * دریافت رستوران با شناسه
+     * 
+     * @param id شناسه رستوران
+     * @return رستوران یافت شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه
+     * @throws NotFoundException در صورت یافت نشدن رستوران
      */
     public Restaurant getRestaurantById(Long id) {
         if (id == null || id <= 0) {
@@ -68,7 +102,11 @@ public class RestaurantService {
     }
     
     /**
-     * Get all restaurants owned by a specific user
+     * دریافت همه رستوران‌های متعلق به یک مالک
+     * 
+     * @param ownerId شناسه مالک
+     * @return لیست رستوران‌های مالک
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه مالک
      */
     public List<Restaurant> getRestaurantsByOwner(Long ownerId) {
         if (ownerId == null || ownerId <= 0) {
@@ -79,7 +117,10 @@ public class RestaurantService {
     }
     
     /**
-     * Get all approved restaurants (public listing) - Optimized with caching
+     * دریافت همه رستوران‌های تأیید شده (نمایش عمومی) - بهینه‌سازی شده با caching
+     * این متد برای نمایش رستوران‌ها در صفحه اصلی استفاده می‌شود
+     * 
+     * @return لیست رستوران‌های تأیید شده
      */
     public List<Restaurant> getApprovedRestaurants() {
         String cacheKey = PerformanceUtil.createQueryCacheKey("approved_restaurants");
@@ -87,27 +128,35 @@ public class RestaurantService {
         return PerformanceUtil.executeWithCache(
             cacheKey,
             () -> {
+                // اندازه‌گیری عملکرد عملیات دیتابیس
                 PerformanceUtil.PerformanceResult<List<Restaurant>> result = 
                     PerformanceUtil.measurePerformance("getApprovedRestaurants", 
                         () -> restaurantRepository.listApproved());
                 
+                // نمایش نتیجه عملکرد با emoji
                 System.out.println("🏪 " + result.toString());
                 return result.getResult();
             },
             List.class,
-            15 // Cache for 15 minutes
+            15 // Cache برای 15 دقیقه
         );
     }
     
     /**
-     * Get all restaurants
+     * دریافت همه رستوران‌ها (برای مدیران)
+     * 
+     * @return لیست همه رستوران‌ها
      */
     public List<Restaurant> getAllRestaurants() {
         return restaurantRepository.findAll();
     }
     
     /**
-     * Get restaurants by status
+     * دریافت رستوران‌ها بر اساس وضعیت
+     * 
+     * @param status وضعیت مورد نظر (PENDING, APPROVED, REJECTED, SUSPENDED)
+     * @return لیست رستوران‌ها با وضعیت مشخص
+     * @throws IllegalArgumentException در صورت null بودن وضعیت
      */
     public List<Restaurant> getRestaurantsByStatus(RestaurantStatus status) {
         if (status == null) {
@@ -118,7 +167,13 @@ public class RestaurantService {
     }
     
     /**
-     * Update restaurant status (admin function)
+     * به‌روزرسانی وضعیت رستوران (عملکرد مدیریتی)
+     * فقط مدیران اجازه تغییر وضعیت رستوران‌ها را دارند
+     * 
+     * @param id شناسه رستوران
+     * @param status وضعیت جدید
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     * @throws NotFoundException در صورت یافت نشدن رستوران
      */
     public void updateRestaurantStatus(Long id, RestaurantStatus status) {
         if (id == null || id <= 0) {
@@ -128,9 +183,10 @@ public class RestaurantService {
             throw new IllegalArgumentException("Status cannot be null");
         }
         
-        // Verify restaurant exists
+        // بررسی وجود رستوران
         getRestaurantById(id);
         
+        // به‌روزرسانی وضعیت در دیتابیس
         restaurantRepository.updateStatus(id, status);
     }
     
@@ -226,7 +282,10 @@ public class RestaurantService {
     }
     
     /**
-     * Check if restaurant exists
+     * بررسی وجود رستوران با شناسه
+     * 
+     * @param id شناسه رستوران
+     * @return true اگر رستوران وجود داشته باشد
      */
     public boolean existsById(Long id) {
         if (id == null || id <= 0) {
@@ -237,28 +296,42 @@ public class RestaurantService {
     }
     
     /**
-     * Get pending restaurants (for admin approval)
+     * دریافت رستوران‌های در انتظار تأیید (برای مدیران)
+     * 
+     * @return لیست رستوران‌های PENDING
      */
     public List<Restaurant> getPendingRestaurants() {
         return restaurantRepository.findByStatus(RestaurantStatus.PENDING);
     }
     
     /**
-     * Approve restaurant
+     * تأیید رستوران - تغییر وضعیت به APPROVED
+     * 
+     * @param id شناسه رستوران
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه
+     * @throws NotFoundException در صورت یافت نشدن رستوران
      */
     public void approveRestaurant(Long id) {
         updateRestaurantStatus(id, RestaurantStatus.APPROVED);
     }
     
     /**
-     * Reject restaurant
+     * رد رستوران - تغییر وضعیت به REJECTED
+     * 
+     * @param id شناسه رستوران
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه
+     * @throws NotFoundException در صورت یافت نشدن رستوران
      */
     public void rejectRestaurant(Long id) {
         updateRestaurantStatus(id, RestaurantStatus.REJECTED);
     }
     
     /**
-     * Suspend restaurant
+     * تعلیق رستوران - تغییر وضعیت به SUSPENDED
+     * 
+     * @param id شناسه رستوران
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه
+     * @throws NotFoundException در صورت یافت نشدن رستوران
      */
     public void suspendRestaurant(Long id) {
         updateRestaurantStatus(id, RestaurantStatus.SUSPENDED);
@@ -355,12 +428,25 @@ public class RestaurantService {
         );
     }
     
-    // Private validation methods
+    // متدهای خصوصی برای اعتبارسنجی
+    
+    /**
+     * اعتبارسنجی اطلاعات ورودی برای ثبت رستوران
+     * بررسی تمام محدودیت‌های کسب‌وکار برای اطلاعات رستوران
+     * 
+     * @param ownerId شناسه مالک رستوران
+     * @param name نام رستوران
+     * @param address آدرس رستوران
+     * @param phone شماره تلفن رستوران
+     * @throws IllegalArgumentException در صورت نامعتبر بودن هر کدام از ورودی‌ها
+     */
     private void validateRegistrationInput(Long ownerId, String name, String address, String phone) {
+        // بررسی شناسه مالک
         if (ownerId == null || ownerId <= 0) {
             throw new IllegalArgumentException("Owner ID must be positive");
         }
         
+        // بررسی نام رستوران
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Restaurant name cannot be empty");
         }
@@ -369,6 +455,7 @@ public class RestaurantService {
             throw new IllegalArgumentException("Restaurant name cannot exceed 100 characters");
         }
         
+        // بررسی آدرس رستوران
         if (address == null || address.trim().isEmpty()) {
             throw new IllegalArgumentException("Restaurant address cannot be empty");
         }
@@ -377,6 +464,7 @@ public class RestaurantService {
             throw new IllegalArgumentException("Restaurant address cannot exceed 200 characters");
         }
         
+        // بررسی شماره تلفن
         if (phone == null || phone.trim().isEmpty()) {
             throw new IllegalArgumentException("Restaurant phone cannot be empty");
         }
@@ -386,14 +474,28 @@ public class RestaurantService {
         }
     }
     
-    // Inner class for statistics
+    // کلاس داخلی برای آمار رستوران‌ها
+    
+    /**
+     * کلاس آمار رستوران‌ها
+     * حاوی اطلاعات خلاصه از وضعیت رستوران‌ها در سیستم
+     */
     public static class RestaurantStatistics {
-        private final long totalCount;
-        private final long approvedCount;
-        private final long pendingCount;
-        private final long rejectedCount;
-        private final long suspendedCount;
+        private final long totalCount;      // تعداد کل رستوران‌ها
+        private final long approvedCount;   // تعداد رستوران‌های تأیید شده
+        private final long pendingCount;    // تعداد رستوران‌های در انتظار
+        private final long rejectedCount;   // تعداد رستوران‌های رد شده
+        private final long suspendedCount;  // تعداد رستوران‌های تعلیق شده
         
+        /**
+         * سازنده آمار رستوران‌ها
+         * 
+         * @param totalCount تعداد کل
+         * @param approvedCount تعداد تأیید شده
+         * @param pendingCount تعداد در انتظار
+         * @param rejectedCount تعداد رد شده
+         * @param suspendedCount تعداد تعلیق شده
+         */
         public RestaurantStatistics(long totalCount, long approvedCount, long pendingCount,
                                   long rejectedCount, long suspendedCount) {
             this.totalCount = totalCount;
@@ -403,7 +505,7 @@ public class RestaurantService {
             this.suspendedCount = suspendedCount;
         }
         
-        // Getters
+        // Getter methods برای دسترسی به آمار
         public long getTotalCount() { return totalCount; }
         public long getApprovedCount() { return approvedCount; }
         public long getPendingCount() { return pendingCount; }

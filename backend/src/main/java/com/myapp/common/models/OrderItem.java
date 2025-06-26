@@ -1,10 +1,11 @@
- package com.myapp.common.models;
+package com.myapp.common.models;
 
 import jakarta.persistence.*;
 
 /**
- * OrderItem Entity - Represents individual items within an order
- * Junction table between Order and FoodItem with quantity and price
+ * مدل آیتم سفارش - نماینده آیتم‌های فردی درون یک سفارش
+ * جدول اتصال (junction table) بین سفارش و آیتم غذایی همراه با تعداد و قیمت
+ * این کلاس رابطه many-to-many بین Order و FoodItem را مدیریت می‌کند
  */
 @Entity
 @Table(name = "order_items")
@@ -29,8 +30,20 @@ public class OrderItem {
     private Double price; // Price at time of order (for historical accuracy)
     
     // Constructors
+    /**
+     * سازنده پیش‌فرض - برای JPA و فرمورک‌ها
+     * JPA نیاز به سازنده بدون پارامتر دارد
+     */
     public OrderItem() {}
     
+    /**
+     * سازنده اصلی - برای ایجاد آیتم سفارش جدید
+     * 
+     * @param order سفارش مربوطه
+     * @param foodItem آیتم غذایی
+     * @param quantity تعداد سفارش
+     * @param price قیمت در زمان سفارش
+     */
     public OrderItem(Order order, FoodItem foodItem, Integer quantity, Double price) {
         this.order = order;
         this.foodItem = foodItem;
@@ -39,6 +52,11 @@ public class OrderItem {
     }
     
     // Business methods
+    /**
+     * محاسبه جمع جزء (قیمت × تعداد)
+     * 
+     * @return مبلغ کل این آیتم در سفارش
+     */
     public Double getSubtotal() {
         return price * quantity;
     }

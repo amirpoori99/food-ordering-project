@@ -1,31 +1,60 @@
 package com.myapp.common.models;
 
 /**
- * Enumeration representing the status of a delivery
+ * enum نمایندگی وضعیت‌های مختلف تحویل سفارش
+ * 
+ * این enum مراحل مختلف فرآیند تحویل را مدل می‌کند:
+ * - از زمان ایجاد درخواست تا تحویل نهایی
+ * - امکان ردیابی دقیق مرحله تحویل
+ * - پشتیبانی از لغو در هر مرحله
+ * 
+ * الگوی State Machine:
+ * PENDING → ASSIGNED → PICKED_UP → DELIVERED
+ *     ↓        ↓          ↓
+ * CANCELLED CANCELLED CANCELLED
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public enum DeliveryStatus {
     /**
-     * Delivery request has been created but no courier assigned yet
+     * درخواست تحویل ایجاد شده ولی هنوز پیک اختصاص نیافته
+     * 
+     * اولین وضعیت یک تحویل پس از ایجاد
+     * در این حالت سیستم منتظر پیک مناسب است
      */
     PENDING,
     
     /**
-     * A courier has been assigned to the delivery
+     * پیک به تحویل اختصاص داده شده
+     * 
+     * پیک انتخاب شده و باید به رستوران برود
+     * زمان تخمینی تحویل گرفتن محاسبه می‌شود
      */
     ASSIGNED,
     
     /**
-     * Courier has picked up the order from restaurant
+     * پیک سفارش را از رستوران تحویل گرفته
+     * 
+     * سفارش در حال انتقال به مشتری است
+     * زمان تخمینی رسیدن به مقصد محاسبه می‌شود
      */
     PICKED_UP,
     
     /**
-     * Order has been delivered to customer
+     * سفارش به موفقیت به مشتری تحویل داده شده
+     * 
+     * وضعیت نهایی موفق تحویل
+     * زمان دقیق تحویل ثبت می‌شود
      */
     DELIVERED,
     
     /**
-     * Delivery has been cancelled
+     * تحویل لغو شده
+     * 
+     * امکان لغو در هر مرحله وجود دارد
+     * دلیل لغو در notes ذخیره می‌شود
      */
     CANCELLED
 }
