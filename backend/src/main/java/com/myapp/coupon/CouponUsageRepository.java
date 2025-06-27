@@ -10,22 +10,75 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Repository for CouponUsage operations
- * Handles per-user coupon usage tracking and validation
+ * Repository لایه دسترسی داده برای entity های CouponUsage
+ * 
+ * این کلاس تمام عملیات پایگاه داده مربوط به ردیابی استفاده از کوپن‌ها را ارائه می‌دهد:
+ * 
+ * === عملیات CRUD پایه ===
+ * - save(): ذخیره استفاده جدید از کوپن
+ * - update(): به‌روزرسانی استفاده موجود
+ * - findById(): جستجو بر اساس شناسه
+ * - delete(): حذف رکورد استفاده
+ * - deleteAll(): پاکسازی کامل (تست)
+ * 
+ * === جستجوهای تخصصی ===
+ * - findByCouponIdAndUserId(): تمام استفاده‌های کاربر از کوپن خاص
+ * - findActiveByCouponIdAndUserId(): استفاده‌های فعال کاربر از کوپن
+ * - countActiveByCouponIdAndUserId(): شمارش استفاده‌های فعال
+ * - findByCouponId(): تمام استفاده‌ها از کوپن خاص
+ * - findByUserId(): تمام استفاده‌های کاربر
+ * - findByOrderId(): استفاده کوپن در سفارش خاص
+ * 
+ * === عملیات آماری ===
+ * - countTotalUsage(): تعداد کل استفاده‌ها
+ * - countActiveUsage(): تعداد استفاده‌های فعال
+ * - getTotalDiscountAmount(): مجموع مبلغ تخفیف‌های اعمال شده
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Usage Tracking: ردیابی دقیق استفاده از کوپن‌ها
+ * - Per-User Limitations: محدودیت‌های per-user
+ * - Active Status Management: مدیریت وضعیت فعال/غیرفعال
+ * - Order Linking: اتصال با سفارشات
+ * - Revert Support: پشتیبانی از بازگشت استفاده
+ * - Statistical Queries: queries آماری پیچیده
+ * - Transaction Management: مدیریت تراکنش‌ها
+ * - SessionFactory Injection: تزریق وابستگی برای تست
+ * - HQL Queries: استفاده از Hibernate Query Language
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class CouponUsageRepository {
     
+    /** SessionFactory برای مدیریت ارتباط با دیتابیس */
     private final SessionFactory sessionFactory;
     
+    /**
+     * سازنده پیش‌فرض - دریافت SessionFactory از DatabaseUtil
+     */
     public CouponUsageRepository() {
         this.sessionFactory = DatabaseUtil.getSessionFactory();
     }
     
-    // Constructor for dependency injection (testing)
+    /**
+     * سازنده برای تزریق وابستگی (Dependency Injection)
+     * برای تست‌ها و configuration سفارشی استفاده می‌شود
+     * 
+     * @param sessionFactory SessionFactory سفارشی
+     */
     public CouponUsageRepository(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
     
+    // ==================== BASIC CRUD OPERATIONS ====================
+    
+    /**
+     * ذخیره استفاده جدید از کوپن در دیتابیس
+     * 
+     * @param couponUsage استفاده از کوپن برای ذخیره
+     * @return استفاده ذخیره شده با ID تولید شده
+     */
     public CouponUsage save(CouponUsage couponUsage) {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
@@ -35,6 +88,12 @@ public class CouponUsageRepository {
         }
     }
     
+    /**
+     * به‌روزرسانی استفاده موجود از کوپن
+     * 
+     * @param couponUsage استفاده از کوپن برای به‌روزرسانی
+     * @return استفاده به‌روزرسانی شده
+     */
     public CouponUsage update(CouponUsage couponUsage) {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
@@ -44,6 +103,12 @@ public class CouponUsageRepository {
         }
     }
     
+    /**
+     * جستجوی استفاده از کوپن بر اساس شناسه
+     * 
+     * @param id شناسه استفاده از کوپن
+     * @return Optional حاوی استفاده یا empty در صورت عدم وجود
+     */
     public Optional<CouponUsage> findById(Long id) {
         try (Session session = sessionFactory.openSession()) {
             CouponUsage usage = session.get(CouponUsage.class, id);
@@ -51,6 +116,17 @@ public class CouponUsageRepository {
         }
     }
     
+    // ==================== SPECIALIZED QUERIES ====================
+    
+    /**
+     * یافتن تمام استفاده‌های کاربر از کوپن خاص
+     * 
+     * مرتب شده بر اساس تاریخ استفاده (جدیدترین اول)
+     * 
+     * @param couponId شناسه کوپن
+     * @param userId شناسه کاربر
+     * @return لیست استفاده‌های کاربر از کوپن
+     */
     public List<CouponUsage> findByCouponIdAndUserId(Long couponId, Long userId) {
         try (Session session = sessionFactory.openSession()) {
             Query<CouponUsage> query = session.createQuery(
@@ -62,6 +138,15 @@ public class CouponUsageRepository {
         }
     }
     
+    /**
+     * یافتن استفاده‌های فعال کاربر از کوپن خاص
+     * 
+     * فقط استفاده‌هایی که هنوز بازگشت داده نشده‌اند (isActive = true)
+     * 
+     * @param couponId شناسه کوپن
+     * @param userId شناسه کاربر
+     * @return لیست استفاده‌های فعال کاربر
+     */
     public List<CouponUsage> findActiveByCouponIdAndUserId(Long couponId, Long userId) {
         try (Session session = sessionFactory.openSession()) {
             Query<CouponUsage> query = session.createQuery(
@@ -73,6 +158,15 @@ public class CouponUsageRepository {
         }
     }
     
+    /**
+     * شمارش استفاده‌های فعال کاربر از کوپن خاص
+     * 
+     * برای بررسی محدودیت per-user استفاده می‌شود
+     * 
+     * @param couponId شناسه کوپن
+     * @param userId شناسه کاربر
+     * @return تعداد استفاده‌های فعال
+     */
     public Long countActiveByCouponIdAndUserId(Long couponId, Long userId) {
         try (Session session = sessionFactory.openSession()) {
             Query<Long> query = session.createQuery(
@@ -84,6 +178,15 @@ public class CouponUsageRepository {
         }
     }
     
+    /**
+     * یافتن تمام استفاده‌ها از کوپن خاص
+     * 
+     * مرتب شده بر اساس تاریخ استفاده (جدیدترین اول)
+     * برای آمارگیری و گزارش‌گیری استفاده می‌شود
+     * 
+     * @param couponId شناسه کوپن
+     * @return لیست تمام استفاده‌ها از کوپن
+     */
     public List<CouponUsage> findByCouponId(Long couponId) {
         try (Session session = sessionFactory.openSession()) {
             Query<CouponUsage> query = session.createQuery(
@@ -94,6 +197,15 @@ public class CouponUsageRepository {
         }
     }
     
+    /**
+     * یافتن تمام استفاده‌های کاربر از کوپن‌ها
+     * 
+     * مرتب شده بر اساس تاریخ استفاده (جدیدترین اول)
+     * برای نمایش تاریخچه استفاده کاربر استفاده می‌شود
+     * 
+     * @param userId شناسه کاربر
+     * @return لیست تمام استفاده‌های کاربر
+     */
     public List<CouponUsage> findByUserId(Long userId) {
         try (Session session = sessionFactory.openSession()) {
             Query<CouponUsage> query = session.createQuery(
@@ -104,6 +216,14 @@ public class CouponUsageRepository {
         }
     }
     
+    /**
+     * یافتن استفاده از کوپن در سفارش خاص
+     * 
+     * هر سفارش حداکثر یک کوپن می‌تواند داشته باشد
+     * 
+     * @param orderId شناسه سفارش
+     * @return Optional حاوی استفاده از کوپن یا empty
+     */
     public Optional<CouponUsage> findByOrderId(Long orderId) {
         try (Session session = sessionFactory.openSession()) {
             Query<CouponUsage> query = session.createQuery(
@@ -114,6 +234,13 @@ public class CouponUsageRepository {
         }
     }
     
+    // ==================== DELETE OPERATIONS ====================
+    
+    /**
+     * حذف استفاده از کوپن با شناسه
+     * 
+     * @param id شناسه استفاده برای حذف
+     */
     public void delete(Long id) {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
@@ -125,6 +252,10 @@ public class CouponUsageRepository {
         }
     }
     
+    /**
+     * حذف تمام استفاده‌ها از کوپن‌ها (متد کمکی برای تست‌ها)
+     * ⚠️ هشدار: این متد فقط برای محیط تست استفاده شود
+     */
     public void deleteAll() {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
@@ -133,7 +264,15 @@ public class CouponUsageRepository {
         }
     }
     
-    // Statistics methods
+    // ==================== STATISTICAL OPERATIONS ====================
+    
+    /**
+     * شمارش تعداد کل استفاده‌ها از کوپن‌ها
+     * 
+     * شامل استفاده‌های فعال و غیرفعال
+     * 
+     * @return تعداد کل استفاده‌ها
+     */
     public Long countTotalUsage() {
         try (Session session = sessionFactory.openSession()) {
             Query<Long> query = session.createQuery("SELECT COUNT(cu) FROM CouponUsage cu", Long.class);
@@ -141,6 +280,13 @@ public class CouponUsageRepository {
         }
     }
     
+    /**
+     * شمارش تعداد استفاده‌های فعال از کوپن‌ها
+     * 
+     * فقط استفاده‌هایی که بازگشت داده نشده‌اند
+     * 
+     * @return تعداد استفاده‌های فعال
+     */
     public Long countActiveUsage() {
         try (Session session = sessionFactory.openSession()) {
             Query<Long> query = session.createQuery("SELECT COUNT(cu) FROM CouponUsage cu WHERE cu.isActive = true", Long.class);
@@ -148,6 +294,13 @@ public class CouponUsageRepository {
         }
     }
     
+    /**
+     * محاسبه مجموع مبلغ تخفیف‌های اعمال شده
+     * 
+     * فقط تخفیف‌های فعال (بازگشت داده نشده) محاسبه می‌شوند
+     * 
+     * @return مجموع مبلغ تخفیف‌ها
+     */
     public Double getTotalDiscountAmount() {
         try (Session session = sessionFactory.openSession()) {
             Query<Double> query = session.createQuery(

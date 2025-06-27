@@ -692,19 +692,25 @@ public class AdminRepository {
             Long totalOrders = session.createQuery("SELECT COUNT(o) FROM Order o", Long.class).uniqueResult();
             Long totalDeliveries = session.createQuery("SELECT COUNT(d) FROM Delivery d", Long.class).uniqueResult();
             
-            // Revenue statistics
-            Double totalRevenue = session.createQuery("SELECT COALESCE(SUM(t.amount), 0.0) FROM Transaction t WHERE t.type = 'PAYMENT' AND t.status = 'COMPLETED'", Double.class).uniqueResult();
-            Double totalRefunds = session.createQuery("SELECT COALESCE(SUM(t.amount), 0.0) FROM Transaction t WHERE t.type = 'REFUND' AND t.status = 'COMPLETED'", Double.class).uniqueResult();
+            // Revenue statistics  
+            Double totalRevenue = session.createQuery("SELECT COALESCE(SUM(t.amount), 0.0) FROM Transaction t WHERE t.type = :paymentType AND t.status = :completedStatus", Double.class)
+                .setParameter("paymentType", TransactionType.PAYMENT)
+                .setParameter("completedStatus", TransactionStatus.COMPLETED).uniqueResult();
+            Double totalRefunds = session.createQuery("SELECT COALESCE(SUM(t.amount), 0.0) FROM Transaction t WHERE t.type = :refundType AND t.status = :completedStatus", Double.class)
+                .setParameter("refundType", TransactionType.REFUND)
+                .setParameter("completedStatus", TransactionStatus.COMPLETED).uniqueResult();
             
             // Today's statistics
             LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
             Long todayOrders = session.createQuery("SELECT COUNT(o) FROM Order o WHERE o.orderDate >= :startOfDay", Long.class)
                 .setParameter("startOfDay", startOfDay).uniqueResult();
-            Double todayRevenue = session.createQuery("SELECT COALESCE(SUM(t.amount), 0.0) FROM Transaction t WHERE t.type = 'PAYMENT' AND t.status = 'COMPLETED' AND t.createdAt >= :startOfDay", Double.class)
+            Double todayRevenue = session.createQuery("SELECT COALESCE(SUM(t.amount), 0.0) FROM Transaction t WHERE t.type = :paymentType AND t.status = :completedStatus AND t.createdAt >= :startOfDay", Double.class)
+                .setParameter("paymentType", TransactionType.PAYMENT)
+                .setParameter("completedStatus", TransactionStatus.COMPLETED)
                 .setParameter("startOfDay", startOfDay).uniqueResult();
             
             // Active counts
-            Long activeRestaurants = session.createQuery("SELECT COUNT(r) FROM Restaurant r WHERE r.status = 'ACTIVE'", Long.class).uniqueResult();
+            Long activeRestaurants = session.createQuery("SELECT COUNT(r) FROM Restaurant r WHERE r.status = 'APPROVED'", Long.class).uniqueResult();
             Long pendingOrders = session.createQuery("SELECT COUNT(o) FROM Order o WHERE o.status = 'PENDING'", Long.class).uniqueResult();
             Long activeDeliveries = session.createQuery("SELECT COUNT(d) FROM Delivery d WHERE d.status IN ('PENDING', 'ASSIGNED', 'PICKED_UP')", Long.class).uniqueResult();
             

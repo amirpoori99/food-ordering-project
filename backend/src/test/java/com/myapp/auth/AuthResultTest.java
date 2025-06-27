@@ -37,7 +37,7 @@ class AuthResultTest {
     private final String testPhone = "09123456789";
     
     /** نقش کاربری تستی */
-    private final String testRole = "customer";
+    private final String testRole = "BUYER";
     
     /** Access token تستی */
     private final String testAccessToken = "access.token.here";
@@ -145,8 +145,8 @@ class AuthResultTest {
         
         // Act & Assert - تست نقش‌های مختلف
         assertTrue(result.hasRole(testRole)); // نقش اصلی کاربر
-        assertFalse(result.hasRole("admin")); // نقش‌های دیگر
-        assertFalse(result.hasRole("seller"));
+        assertFalse(result.hasRole("ADMIN")); // نقش‌های دیگر
+        assertFalse(result.hasRole("SELLER"));
     }
     
     /**
@@ -154,15 +154,15 @@ class AuthResultTest {
      * 
      * Scenario: بررسی متد کمکی isCustomer
      * Expected:
-     * - برای کاربر با نقش "customer" true برگرداند
+     * - برای کاربر با نقش "BUYER" true برگرداند
      * - برای سایر نقش‌ها false برگرداند
      */
     @Test
     @DisplayName("Should identify customer role")
     void testIsCustomer() {
         // Arrange - ایجاد کاربران با نقش‌های مختلف
-        AuthResult customerResult = AuthResult.authenticated(testUserId, testPhone, "customer", testAccessToken);
-        AuthResult sellerResult = AuthResult.authenticated(testUserId, testPhone, "seller", testAccessToken);
+        AuthResult customerResult = AuthResult.authenticated(testUserId, testPhone, "BUYER", testAccessToken);
+        AuthResult sellerResult = AuthResult.authenticated(testUserId, testPhone, "SELLER", testAccessToken);
         
         // Act & Assert
         assertTrue(customerResult.isCustomer());
@@ -184,11 +184,102 @@ class AuthResultTest {
         AuthResult result = AuthResult.unauthenticated(testErrorMessage);
         
         // Act & Assert - همه role checks باید false باشند
-        assertFalse(result.hasRole("customer"));
-        assertFalse(result.hasAnyRole("customer", "admin"));
+        assertFalse(result.hasRole("BUYER"));
+        assertFalse(result.hasAnyRole("BUYER", "ADMIN"));
         assertFalse(result.isCustomer());
         assertFalse(result.isSeller());
         assertFalse(result.isDelivery());
         assertFalse(result.isAdmin());
+    }
+    
+    /**
+     * تست شناسایی تمام نقش‌های مختلف
+     * 
+     * Scenario: بررسی تمام متدهای کمکی نقش
+     * Expected: هر متد فقط برای نقش مربوطه true برگرداند
+     */
+    @Test
+    @DisplayName("Should identify all user roles correctly")
+    void testAllUserRoles() {
+        // Arrange - ایجاد AuthResult برای هر نقش
+        AuthResult buyerResult = AuthResult.authenticated(testUserId, testPhone, "BUYER", testAccessToken);
+        AuthResult sellerResult = AuthResult.authenticated(testUserId, testPhone, "SELLER", testAccessToken);
+        AuthResult courierResult = AuthResult.authenticated(testUserId, testPhone, "COURIER", testAccessToken);
+        AuthResult adminResult = AuthResult.authenticated(testUserId, testPhone, "ADMIN", testAccessToken);
+        
+        // Test BUYER role
+        assertTrue(buyerResult.isCustomer());
+        assertFalse(buyerResult.isSeller());
+        assertFalse(buyerResult.isDelivery());
+        assertFalse(buyerResult.isAdmin());
+        
+        // Test SELLER role
+        assertFalse(sellerResult.isCustomer());
+        assertTrue(sellerResult.isSeller());
+        assertFalse(sellerResult.isDelivery());
+        assertFalse(sellerResult.isAdmin());
+        
+        // Test COURIER role
+        assertFalse(courierResult.isCustomer());
+        assertFalse(courierResult.isSeller());
+        assertTrue(courierResult.isDelivery());
+        assertFalse(courierResult.isAdmin());
+        
+        // Test ADMIN role
+        assertFalse(adminResult.isCustomer());
+        assertFalse(adminResult.isSeller());
+        assertFalse(adminResult.isDelivery());
+        assertTrue(adminResult.isAdmin());
+    }
+    
+    /**
+     * تست hasAnyRole با نقش‌های مختلف
+     * 
+     * Scenario: بررسی متد hasAnyRole با آرایه نقش‌ها
+     * Expected: اگر کاربر یکی از نقش‌ها را داشته باشد true برگرداند
+     */
+    @Test
+    @DisplayName("Should check hasAnyRole correctly")
+    void testHasAnyRole() {
+        // Arrange
+        AuthResult buyerResult = AuthResult.authenticated(testUserId, testPhone, "BUYER", testAccessToken);
+        AuthResult unauthenticatedResult = AuthResult.unauthenticated("Error");
+        
+        // Act & Assert - BUYER role
+        assertTrue(buyerResult.hasAnyRole("BUYER", "SELLER"));
+        assertTrue(buyerResult.hasAnyRole("ADMIN", "BUYER"));
+        assertFalse(buyerResult.hasAnyRole("SELLER", "ADMIN"));
+        
+        // Act & Assert - Unauthenticated
+        assertFalse(unauthenticatedResult.hasAnyRole("BUYER", "SELLER", "ADMIN"));
+    }
+    
+    /**
+     * تست toString method
+     * 
+     * Scenario: بررسی خروجی رشته‌ای AuthResult
+     * Expected: فرمت صحیح برای authenticated و unauthenticated
+     */
+    @Test
+    @DisplayName("Should format toString correctly")
+    void testToString() {
+        // Arrange & Act
+        AuthResult authenticatedResult = AuthResult.authenticated(testUserId, testPhone, testRole, testAccessToken);
+        AuthResult unauthenticatedResult = AuthResult.unauthenticated(testErrorMessage);
+        AuthResult refreshedResult = AuthResult.refreshed(testUserId, testPhone, testRole, testAccessToken, testRefreshToken);
+        
+        // Assert - بررسی شامل بودن اطلاعات کلیدی
+        String authString = authenticatedResult.toString();
+        assertTrue(authString.contains("authenticated=true"));
+        assertTrue(authString.contains("userId=" + testUserId));
+        assertTrue(authString.contains("phone='" + testPhone + "'"));
+        assertTrue(authString.contains("role='" + testRole + "'"));
+        
+        String unauthString = unauthenticatedResult.toString();
+        assertTrue(unauthString.contains("authenticated=false"));
+        assertTrue(unauthString.contains("errorMessage='" + testErrorMessage + "'"));
+        
+        String refreshString = refreshedResult.toString();
+        assertTrue(refreshString.contains("isRefresh=true"));
     }
 }

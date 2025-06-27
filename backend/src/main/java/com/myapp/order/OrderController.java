@@ -16,28 +16,55 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * REST API Controller for Order and Shopping Cart Management
+ * کنترلر REST API مدیریت سفارشات و سبد خرید
  * 
- * Endpoints:
- * POST   /api/orders                           - Create new order (shopping cart)
- * GET    /api/orders/{orderId}                 - Get order details
- * POST   /api/orders/{orderId}/items           - Add item to cart
- * PUT    /api/orders/{orderId}/items/{itemId}  - Update item quantity in cart
- * DELETE /api/orders/{orderId}/items/{itemId}  - Remove item from cart
- * POST   /api/orders/{orderId}/place           - Place order (checkout)
- * PUT    /api/orders/{orderId}/cancel          - Cancel order
- * PUT    /api/orders/{orderId}/status          - Update order status
- * GET    /api/orders/customer/{customerId}     - Get customer orders
- * GET    /api/orders/restaurant/{restaurantId} - Get restaurant orders
- * GET    /api/orders/status/{status}           - Get orders by status
- * GET    /api/orders/active                    - Get active orders
- * GET    /api/orders/pending                   - Get pending orders
- * GET    /api/orders/customer/{customerId}/statistics - Get customer order statistics
+ * این کلاس تمام عملیات HTTP مربوط به مدیریت سفارشات را پیاده‌سازی می‌کند:
+ * 
+ * === عملیات سبد خرید ===
+ * POST   /api/orders                           - ایجاد سفارش جدید (سبد خرید)
+ * POST   /api/orders/{orderId}/items           - افزودن آیتم به سبد
+ * PUT    /api/orders/{orderId}/items/{itemId}  - به‌روزرسانی مقدار آیتم در سبد
+ * DELETE /api/orders/{orderId}/items/{itemId}  - حذف آیتم از سبد
+ * 
+ * === مدیریت سفارش ===
+ * GET    /api/orders/{orderId}                 - دریافت جزئیات سفارش
+ * POST   /api/orders/{orderId}/place           - ثبت نهایی سفارش (پرداخت)
+ * PUT    /api/orders/{orderId}/cancel          - لغو سفارش
+ * PUT    /api/orders/{orderId}/status          - به‌روزرسانی وضعیت سفارش
+ * 
+ * === جستجو و فیلتر ===
+ * GET    /api/orders/customer/{customerId}     - سفارشات مشتری
+ * GET    /api/orders/restaurant/{restaurantId} - سفارشات رستوران
+ * GET    /api/orders/status/{status}           - سفارشات بر اساس وضعیت
+ * GET    /api/orders/active                    - سفارشات فعال
+ * GET    /api/orders/pending                   - سفارشات در انتظار
+ * 
+ * === گزارش و آمار ===
+ * GET    /api/orders/customer/{customerId}/statistics - آمار سفارشات مشتری
+ * 
+ * ویژگی‌های کلیدی:
+ * - RESTful Design: طراحی REST استاندارد
+ * - Shopping Cart: مدیریت کامل سبد خرید
+ * - Order Lifecycle: مدیریت چرخه حیات سفارش
+ * - Status Management: مدیریت وضعیت‌های مختلف
+ * - Error Handling: مدیریت جامع خطاها
+ * - JSON Processing: پردازش کامل JSON
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class OrderController implements HttpHandler {
     
+    /** سرویس اصلی مدیریت سفارشات */
     private final OrderService orderService;
     
+    /**
+     * سازنده پیش‌فرض کنترلر
+     * 
+     * تمام dependency ها را به صورت خودکار ایجاد می‌کند
+     * برای استفاده در محیط production
+     */
     public OrderController() {
         this.orderService = new OrderService(
             new OrderRepository(), 
@@ -46,17 +73,39 @@ public class OrderController implements HttpHandler {
         );
     }
     
-    // Constructor for dependency injection (testing)
+    /**
+     * سازنده برای تزریق وابستگی
+     * 
+     * برای تست‌ها و dependency injection استفاده می‌شود
+     * 
+     * @param orderService سرویس سفارشات از خارج تزریق شده
+     */
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
     
+    /**
+     * متد اصلی مدیریت درخواست‌های HTTP
+     * 
+     * تمام درخواست‌های HTTP را دریافت و بر اساس method و path آن‌ها
+     * را به متدهای مناسب هدایت می‌کند.
+     * 
+     * شامل مدیریت جامع خطاها:
+     * - 400 Bad Request: برای پارامترهای نامعتبر
+     * - 404 Not Found: برای منابع یافت نشده
+     * - 405 Method Not Allowed: برای HTTP method های غیرمجاز
+     * - 500 Internal Server Error: برای خطاهای سرور
+     * 
+     * @param exchange شیء HttpExchange شامل request و response
+     * @throws IOException در صورت خطا در ارتباط HTTP
+     */
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
         String path = exchange.getRequestURI().getPath();
         
         try {
+            // مسیریابی بر اساس HTTP method
             switch (method) {
                 case "GET":
                     handleGet(exchange, path);
@@ -74,16 +123,29 @@ public class OrderController implements HttpHandler {
                     sendErrorResponse(exchange, 405, "Method not allowed");
             }
         } catch (IllegalArgumentException e) {
+            // خطای پارامتر نامعتبر - 400 Bad Request
             sendErrorResponse(exchange, 400, e.getMessage());
         } catch (NotFoundException e) {
+            // خطای یافت نشدن منبع - 404 Not Found
             sendErrorResponse(exchange, 404, e.getMessage());
         } catch (Exception e) {
+            // خطای سرور - 500 Internal Server Error
             sendErrorResponse(exchange, 500, "Internal server error: " + e.getMessage());
         }
     }
     
     // ==================== GET ENDPOINTS ====================
     
+    /**
+     * مدیریت تمام درخواست‌های GET
+     * 
+     * بر اساس pattern های مختلف URL، درخواست‌ها را به متدهای مناسب هدایت می‌کند.
+     * از regex pattern matching برای شناسایی مسیرها استفاده می‌کند.
+     * 
+     * @param exchange HttpExchange شامل request و response
+     * @param path مسیر URL درخواست
+     * @throws IOException در صورت خطا در ارسال پاسخ
+     */
     private void handleGet(HttpExchange exchange, String path) throws IOException {
         if (path.matches("/api/orders/\\d+")) {
             // GET /api/orders/{orderId} - Get order details
@@ -116,16 +178,37 @@ public class OrderController implements HttpHandler {
         }
     }
     
+    /**
+     * دریافت جزئیات کامل یک سفارش
+     * 
+     * @param exchange HttpExchange object
+     * @param orderId شناسه سفارش
+     * @throws IOException در صورت خطا در ارسال پاسخ
+     */
     private void getOrderDetails(HttpExchange exchange, Long orderId) throws IOException {
         Order order = orderService.getOrder(orderId);
         sendJsonResponse(exchange, 200, order);
     }
     
+    /**
+     * دریافت تمام سفارشات یک مشتری
+     * 
+     * @param exchange HttpExchange object
+     * @param customerId شناسه مشتری
+     * @throws IOException در صورت خطا در ارسال پاسخ
+     */
     private void getCustomerOrders(HttpExchange exchange, Long customerId) throws IOException {
         List<Order> orders = orderService.getCustomerOrders(customerId);
         sendJsonResponse(exchange, 200, orders);
     }
     
+    /**
+     * دریافت تمام سفارشات یک رستوران
+     * 
+     * @param exchange HttpExchange object
+     * @param restaurantId شناسه رستوران
+     * @throws IOException در صورت خطا در ارسال پاسخ
+     */
     private void getRestaurantOrders(HttpExchange exchange, Long restaurantId) throws IOException {
         List<Order> orders = orderService.getRestaurantOrders(restaurantId);
         sendJsonResponse(exchange, 200, orders);
@@ -158,6 +241,18 @@ public class OrderController implements HttpHandler {
     
     // ==================== POST ENDPOINTS ====================
     
+    /**
+     * مدیریت تمام درخواست‌های POST
+     * 
+     * شامل عملیات ایجاد و افزودن:
+     * - ایجاد سفارش جدید (سبد خرید)
+     * - افزودن آیتم به سبد خرید
+     * - ثبت نهایی سفارش (checkout)
+     * 
+     * @param exchange HttpExchange object
+     * @param path مسیر URL درخواست
+     * @throws IOException در صورت خطا در پردازش
+     */
     private void handlePost(HttpExchange exchange, String path) throws IOException {
         if (path.equals("/api/orders")) {
             // POST /api/orders - Create new order (shopping cart)
@@ -175,14 +270,30 @@ public class OrderController implements HttpHandler {
         }
     }
     
+    /**
+     * ایجاد سفارش جدید (سبد خرید خالی)
+     * 
+     * JSON Request Body:
+     * {
+     *   "customerId": number,
+     *   "restaurantId": number,
+     *   "deliveryAddress": string,
+     *   "phone": string
+     * }
+     * 
+     * @param exchange HttpExchange object
+     * @throws IOException در صورت خطا در پردازش
+     */
     private void createOrder(HttpExchange exchange) throws IOException {
         Map<String, Object> requestData = parseJsonRequest(exchange);
         
+        // استخراج اطلاعات مورد نیاز از JSON
         Long customerId = getLongFromMap(requestData, "customerId");
         Long restaurantId = getLongFromMap(requestData, "restaurantId");
         String deliveryAddress = getStringFromMap(requestData, "deliveryAddress");
         String phone = getStringFromMap(requestData, "phone");
         
+        // ایجاد سفارش جدید و ارسال پاسخ
         Order order = orderService.createOrder(customerId, restaurantId, deliveryAddress, phone);
         sendJsonResponse(exchange, 201, order);
     }
@@ -282,8 +393,16 @@ public class OrderController implements HttpHandler {
     
     // ==================== UTILITY METHODS ====================
     
+    /**
+     * استخراج شناسه سفارش از مسیر URL
+     * 
+     * برای مسیرهای با فرمت /api/orders/{orderId}
+     * 
+     * @param path مسیر URL کامل
+     * @return شناسه سفارش
+     */
     private Long extractOrderIdFromPath(String path) {
-        // Extract from /api/orders/{orderId}
+        // استخراج از /api/orders/{orderId}
         String[] parts = path.split("/");
         return Long.parseLong(parts[3]); // /api/orders/{orderId}
     }
@@ -317,17 +436,32 @@ public class OrderController implements HttpHandler {
         return parts[parts.length - 1];
     }
     
+    /**
+     * پارس کردن درخواست JSON از HTTP request body
+     * 
+     * این متد ساده JSON parsing انجام می‌دهد. در محیط production
+     * بهتر است از کتابخانه‌هایی مثل Jackson یا Gson استفاده کرد.
+     * 
+     * ویژگی‌ها:
+     * - پشتیبانی از String، Number، Boolean
+     * - تشخیص خودکار نوع داده
+     * - مدیریت فیلدهای خالی
+     * 
+     * @param exchange HttpExchange حاوی request body
+     * @return Map شامل key-value های JSON
+     * @throws IOException در صورت خطا در خواندن request body
+     */
     private Map<String, Object> parseJsonRequest(HttpExchange exchange) throws IOException {
-        // Simple JSON parsing - in production, use Jackson or Gson
+        // JSON parsing ساده - در production از Jackson یا Gson استفاده کنید
         String requestBody = new String(exchange.getRequestBody().readAllBytes());
         Map<String, Object> result = new HashMap<>();
         
-        // Basic JSON parsing (simplified for this implementation)
+        // پارسینگ JSON ساده (پیاده‌سازی ساده شده)
         if (requestBody.trim().isEmpty()) {
             return result;
         }
         
-        // Remove curly braces and split by comma
+        // حذف آکولاد و تقسیم بر اساس کاما
         String content = requestBody.trim().replaceAll("[{}]", "");
         String[] pairs = content.split(",");
         
@@ -337,7 +471,7 @@ public class OrderController implements HttpHandler {
                 String key = keyValue[0].trim().replaceAll("\"", "");
                 String value = keyValue[1].trim().replaceAll("\"", "");
                 
-                // Try to parse as number or boolean
+                // تلاش برای پارس کردن به عنوان عدد یا boolean
                 try {
                     if (value.equals("true") || value.equals("false")) {
                         result.put(key, Boolean.parseBoolean(value));

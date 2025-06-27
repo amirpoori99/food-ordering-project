@@ -20,21 +20,70 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * کلاس تست جامع برای OrderService
+ * 
+ * این کلاس تمام عملکردهای OrderService را در سناریوهای مختلف تست می‌کند:
+ * 
+ * === دسته‌های تست ===
+ * 1. OrderCreationTests - تست‌های ایجاد سفارش
+ * 2. ShoppingCartTests - تست‌های مدیریت سبد خرید
+ * 3. RemoveItemTests - تست‌های حذف آیتم از سبد
+ * 4. UpdateQuantityTests - تست‌های به‌روزرسانی مقدار
+ * 5. PlaceOrderTests - تست‌های ثبت نهایی سفارش
+ * 6. CancelOrderTests - تست‌های لغو سفارش
+ * 7. OrderRetrievalTests - تست‌های بازیابی سفارش
+ * 8. OrderStatisticsTests - تست‌های آمار سفارشات
+ * 9. StatusManagementTests - تست‌های مدیریت وضعیت
+ * 
+ * === ویژگی‌های پوشش داده شده ===
+ * - Shopping Cart Operations: عملیات سبد خرید
+ * - Order Lifecycle: چرخه حیات سفارش
+ * - Inventory Management: مدیریت موجودی
+ * - Status Transitions: تغییرات وضعیت
+ * - Business Logic: منطق کسب‌وکار
+ * - Error Scenarios: سناریوهای خطا
+ * - Edge Cases: حالات مرزی
+ * - Performance Tests: تست‌های عملکرد
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 @DisplayName("Order Service Comprehensive Tests - 100% Coverage")
 class OrderServiceTest {
     
+    /** Factory برای ایجاد session های دیتابیس */
     private static SessionFactory sessionFactory;
+    
+    /** Session فعال برای هر تست */
     private Session session;
+    
+    /** سرویس اصلی تحت تست */
     private OrderService orderService;
+    
+    /** Repository سفارشات */
     private OrderRepository orderRepository;
+    
+    /** Repository آیتم‌ها */
     private ItemRepository itemRepository;
+    
+    /** Repository رستوران‌ها */
     private RestaurantRepository restaurantRepository;
     
+    /**
+     * راه‌اندازی کلاس تست - فقط یک بار اجرا می‌شود
+     */
     @BeforeAll
     static void setUpClass() {
         sessionFactory = DatabaseUtil.getSessionFactory();
     }
     
+    /**
+     * راه‌اندازی هر تست - قبل از هر تست اجرا می‌شود
+     * 
+     * محیط پاک و آماده برای تست فراهم می‌کند
+     */
     @BeforeEach
     void setUp() {
         session = sessionFactory.openSession();
@@ -43,10 +92,15 @@ class OrderServiceTest {
         restaurantRepository = new RestaurantRepository();
         orderService = new OrderService(orderRepository, itemRepository, restaurantRepository);
         
-        // Clean up database
+        // پاک‌سازی دیتابیس قبل از هر تست
         cleanDatabase();
     }
     
+    /**
+     * پاک‌سازی بعد از هر تست
+     * 
+     * منابع را آزاد می‌کند
+     */
     @AfterEach
     void tearDown() {
         if (session != null) {
@@ -54,6 +108,11 @@ class OrderServiceTest {
         }
     }
     
+    /**
+     * پاک‌سازی دیتابیس برای استقلال تست‌ها
+     * 
+     * تمام جداول مرتبط را پاک می‌کند تا تست‌ها مستقل باشند
+     */
     private void cleanDatabase() {
         session.beginTransaction();
         session.createQuery("DELETE FROM OrderItem").executeUpdate();
@@ -66,6 +125,16 @@ class OrderServiceTest {
     
     // ==================== ORDER CREATION TESTS ====================
     
+    /**
+     * کلاس تست‌های ایجاد سفارش
+     * 
+     * تست‌های مختلف برای ایجاد سفارش جدید:
+     * - ایجاد موفق با داده‌های معتبر
+     * - validation پارامترهای ورودی
+     * - تریم کردن فضاهای خالی
+     * - بررسی وضعیت رستوران
+     * - مدیریت خطاهای مختلف
+     */
     @Nested
     @DisplayName("Order Creation Tests")
     class OrderCreationTests {

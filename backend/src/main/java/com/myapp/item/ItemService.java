@@ -213,8 +213,14 @@ public class ItemService {
         return itemRepository.searchByKeyword(keyword.trim());
     }
     
-    /**
-     * Search food items by category
+        /**
+     * دریافت آیتم‌های غذایی بر اساس دسته‌بندی
+     * 
+     * فقط آیتم‌های در دسترس (available=true) برگردانده می‌شوند
+     * 
+     * @param category نام دسته‌بندی برای جستجو
+     * @return لیست آیتم‌های موجود در دسته‌بندی
+     * @throws IllegalArgumentException اگر دسته‌بندی خالی باشد
      */
     public List<FoodItem> getItemsByCategory(String category) {
         if (category == null || category.trim().isEmpty()) {
@@ -222,9 +228,15 @@ public class ItemService {
         }
         return itemRepository.findByCategory(category.trim());
     }
-    
+
     /**
-     * Update item availability status
+     * به‌روزرسانی وضعیت در دسترس بودن آیتم
+     * 
+     * این متد برای فعال/غیرفعال کردن آیتم‌ها استفاده می‌شود
+     * 
+     * @param itemId شناسه آیتم
+     * @param available وضعیت جدید در دسترس بودن (true/false)
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
      */
     public void updateAvailability(Long itemId, boolean available) {
         FoodItem item = itemRepository.findById(itemId)
@@ -232,9 +244,14 @@ public class ItemService {
         
         itemRepository.updateAvailability(itemId, available);
     }
-    
+
     /**
-     * Update item quantity (for inventory management)
+     * به‌روزرسانی موجودی آیتم (برای مدیریت انبار)
+     * 
+     * @param itemId شناسه آیتم
+     * @param newQuantity موجودی جدید (باید غیرمنفی باشد)
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
+     * @throws IllegalArgumentException اگر موجودی منفی باشد
      */
     public void updateQuantity(Long itemId, int newQuantity) {
         if (newQuantity < 0) {
@@ -246,10 +263,17 @@ public class ItemService {
         
         itemRepository.updateQuantity(itemId, newQuantity);
     }
-    
+
     /**
-     * Decrease item quantity (when ordered)
-     * Returns true if successful, false if insufficient stock
+     * کاهش موجودی آیتم (هنگام سفارش)
+     * 
+     * اگر موجودی کافی نباشد، false برمی‌گرداند
+     * 
+     * @param itemId شناسه آیتم
+     * @param amount مقدار کاهش موجودی
+     * @return true اگر موفق، false اگر موجودی ناکافی
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
+     * @throws IllegalArgumentException اگر مقدار غیرمثبت باشد
      */
     public boolean decreaseQuantity(Long itemId, int amount) {
         if (amount <= 0) {
@@ -260,16 +284,21 @@ public class ItemService {
             .orElseThrow(() -> new NotFoundException("Food item", itemId));
         
         if (item.getQuantity() < amount) {
-            return false; // Insufficient stock
+            return false; // موجودی ناکافی
         }
         
         item.decreaseQuantity(amount);
         itemRepository.save(item);
         return true;
     }
-    
+
     /**
-     * Increase item quantity (when restocking)
+     * افزایش موجودی آیتم (هنگام تأمین مجدد)
+     * 
+     * @param itemId شناسه آیتم
+     * @param amount مقدار افزایش موجودی
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
+     * @throws IllegalArgumentException اگر مقدار غیرمثبت باشد
      */
     public void increaseQuantity(Long itemId, int amount) {
         if (amount <= 0) {
@@ -282,9 +311,13 @@ public class ItemService {
         item.increaseQuantity(amount);
         itemRepository.save(item);
     }
-    
+
     /**
-     * Check if item is in stock
+     * بررسی موجود بودن آیتم در انبار
+     * 
+     * @param itemId شناسه آیتم
+     * @return true اگر موجود باشد (quantity > 0)
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
      */
     public boolean isInStock(Long itemId) {
         FoodItem item = itemRepository.findById(itemId)
@@ -292,12 +325,16 @@ public class ItemService {
         
         return item.isInStock();
     }
-    
+
     /**
-     * Get low stock items for a restaurant (quantity < 5)
+     * دریافت آیتم‌های کم موجودی رستوران (موجودی < 5)
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست آیتم‌های کم موجودی
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
      */
     public List<FoodItem> getLowStockItems(Long restaurantId) {
-        // Validate restaurant exists
+        // بررسی وجود رستوران
         restaurantRepository.findById(restaurantId)
             .orElseThrow(() -> new NotFoundException("Restaurant", restaurantId));
         
@@ -305,9 +342,12 @@ public class ItemService {
             .filter(item -> item.getQuantity() < 5)
             .toList();
     }
-    
+
     /**
-     * Delete a food item
+     * حذف آیتم غذایی از منو
+     * 
+     * @param itemId شناسه آیتم برای حذف
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
      */
     public void deleteItem(Long itemId) {
         FoodItem item = itemRepository.findById(itemId)
@@ -317,7 +357,16 @@ public class ItemService {
     }
     
     /**
-     * Validate item data for creation/update
+     * اعتبارسنجی داده‌های آیتم برای ایجاد/به‌روزرسانی
+     * 
+     * بررسی محدودیت‌های طول، قیمت و موجودی
+     * 
+     * @param name نام آیتم
+     * @param description توضیحات آیتم
+     * @param price قیمت آیتم
+     * @param category دسته‌بندی آیتم
+     * @param quantity موجودی آیتم
+     * @throws IllegalArgumentException اگر داده‌ها نامعتبر باشند
      */
     private void validateItemData(String name, String description, double price, String category, int quantity) {
         if (name == null || name.trim().isEmpty()) {
@@ -350,10 +399,17 @@ public class ItemService {
     }
     
     /**
-     * Get restaurant menu statistics
+     * دریافت آمار منوی رستوران
+     * 
+     * شامل تعداد کل آیتم‌ها، آیتم‌های در دسترس، موجود در انبار، 
+     * کم موجودی و میانگین قیمت
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return آمار کامل منوی رستوران
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
      */
     public MenuStatistics getMenuStatistics(Long restaurantId) {
-        // Validate restaurant exists
+        // بررسی وجود رستوران
         restaurantRepository.findById(restaurantId)
             .orElseThrow(() -> new NotFoundException("Restaurant", restaurantId));
         
@@ -369,7 +425,9 @@ public class ItemService {
     }
     
     /**
-     * Menu statistics data class
+     * کلاس داده‌ای آمار منو
+     * 
+     * شامل اطلاعات کامل آماری منوی رستوران برای نمایش در dashboard
      */
     public static class MenuStatistics {
         private final long totalItems;
@@ -402,10 +460,14 @@ public class ItemService {
     }
     
     /**
-     * Get distinct categories for a restaurant
+     * دریافت دسته‌بندی‌های متمایز رستوران
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست دسته‌بندی‌های موجود در منوی رستوران
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
      */
     public List<String> getRestaurantCategories(Long restaurantId) {
-        // Validate restaurant exists
+        // بررسی وجود رستوران
         restaurantRepository.findById(restaurantId)
             .orElseThrow(() -> new NotFoundException("Restaurant", restaurantId));
         
@@ -413,17 +475,18 @@ public class ItemService {
     }
 
     /**
-     * Get low stock items for a restaurant
+     * دریافت آیتم‌های کم موجودی رستوران با آستانه مشخص
+     * 
+     * @param restaurantId شناسه رستوران
+     * @param threshold آستانه کم موجودی (پیش‌فرض 5)
+     * @return لیست آیتم‌های کم موجودی
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
      */
     public List<FoodItem> getLowStockItems(Long restaurantId, int threshold) {
-        // Validate restaurant exists
+        // بررسی وجود رستوران
         restaurantRepository.findById(restaurantId)
             .orElseThrow(() -> new NotFoundException("Restaurant", restaurantId));
         
         return itemRepository.findLowStockByRestaurant(restaurantId, threshold);
     }
-
-    /**
-     * Get low stock items with default threshold
-     */
 }

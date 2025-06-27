@@ -18,40 +18,85 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
+/**
+ * کلاس تست‌های جامع ItemRepository
+ * 
+ * این کلاس تمامی عملکردهای مربوط به لایه دسترسی به داده (Repository) برای آیتم‌های غذایی را تست می‌کند.
+ * تست‌ها شامل عملیات CRUD، جستجو، فیلترینگ و سناریوهای پیچیده می‌باشند.
+ * 
+ * دسته‌های تست:
+ * - SaveOperationsTests: عملیات ذخیره‌سازی
+ * - FindOperationsTests: عملیات جستجو و دریافت
+ * - UpdateOperationsTests: عملیات به‌روزرسانی
+ * - DeleteOperationsTests: عملیات حذف
+ * - EdgeCasesAndErrorHandling: حالات خاص و مدیریت خطا
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ */
 @DisplayName("ItemRepository Comprehensive Tests")
 class ItemRepositoryTest {
 
+    /** ریپازیتوری آیتم‌های غذایی برای تست */
     private ItemRepository repository;
+    
+    /** رستوران اصلی برای تست‌ها */
     private Restaurant testRestaurant;
+    
+    /** رستوران دوم برای تست‌های چند رستورانی */
     private Restaurant secondRestaurant;
 
+    /**
+     * راه‌اندازی محیط تست قبل از هر تست
+     * 
+     * این متد:
+     * - Repository جدید ایجاد می‌کند
+     * - دیتابیس را پاک می‌کند
+     * - دو رستوران نمونه برای تست‌ها ایجاد می‌کند
+     */
     @BeforeEach
     void setUp() {
         repository = new ItemRepository();
-        // Clean database before each test
+        // پاک‌سازی دیتابیس قبل از هر تست
         repository.deleteAll();
         cleanRestaurants();
         
-        // Create and save test restaurants
+        // ایجاد و ذخیره رستوران‌های تست
         testRestaurant = createAndSaveRestaurant("Test Restaurant", "Tehran");
         secondRestaurant = createAndSaveRestaurant("Second Restaurant", "Isfahan");
     }
 
+    /**
+     * کلاس تست‌های عملیات ذخیره‌سازی
+     * 
+     * این کلاس تمام عملیات مربوط به ذخیره و به‌روزرسانی آیتم‌های غذایی را تست می‌کند:
+     * - ذخیره آیتم جدید با تمام فیلدها
+     * - ذخیره آیتم با استفاده از factory method
+     * - به‌روزرسانی آیتم موجود
+     * - رفتار صحیح با ID های null
+     */
     @Nested
     @DisplayName("Save Operations Tests")
     class SaveOperationsTests {
         
+        /**
+         * تست ذخیره آیتم غذایی جدید با تمام فیلدها
+         * 
+         * Given: آیتم غذایی کامل با تمام فیلدها
+         * When: ذخیره آیتم جدید
+         * Then: آیتم با ID مثبت ذخیره شده و تمام فیلدها صحیح باشند
+         */
         @Test
         @DisplayName("Save new food item with all fields succeeds")
         void saveNew_validFoodItemWithAllFields_success() {
-            // Given
+            // Given - آیتم غذایی کامل برای تست
             FoodItem foodItem = new FoodItem("Pizza Margherita", "Classic Italian pizza with tomato and mozzarella", 
                     25000.0, "Italian", "https://example.com/pizza.jpg", 10, "pizza italian cheese", testRestaurant);
             
-            // When
+            // When - ذخیره آیتم جدید
             FoodItem saved = repository.saveNew(foodItem);
             
-            // Then
+            // Then - بررسی صحت تمام فیلدها
             assertThat(saved.getId()).isNotNull().isPositive();
             assertThat(saved.getName()).isEqualTo("Pizza Margherita");
             assertThat(saved.getDescription()).isEqualTo("Classic Italian pizza with tomato and mozzarella");
@@ -64,21 +109,28 @@ class ItemRepositoryTest {
             assertThat(saved.getRestaurant().getId()).isEqualTo(testRestaurant.getId());
         }
 
+        /**
+         * تست ذخیره آیتم جدید با استفاده از factory method
+         * 
+         * Given: آیتم ایجاد شده با factory method forMenu
+         * When: ذخیره آیتم با repository
+         * Then: آیتم با مقادیر پیش‌فرض factory ذخیره شود
+         */
         @Test
         @DisplayName("Save new food item using factory method succeeds")
         void saveNew_usingFactoryMethod_success() {
-            // Given
+            // Given - آیتم ایجاد شده با factory method
             FoodItem foodItem = FoodItem.forMenu("Burger", "Beef burger with cheese", 20000.0, "Fast Food", testRestaurant);
             
-            // When
+            // When - ذخیره آیتم در دیتابیس
             FoodItem saved = repository.saveNew(foodItem);
             
-            // Then
+            // Then - بررسی صحت ذخیره‌سازی و مقادیر پیش‌فرض
             assertThat(saved.getId()).isNotNull().isPositive();
             assertThat(saved.getName()).isEqualTo("Burger");
             assertThat(saved.getPrice()).isEqualTo(20000.0);
             assertThat(saved.getCategory()).isEqualTo("Fast Food");
-            assertThat(saved.getQuantity()).isEqualTo(1); // Default from factory
+            assertThat(saved.getQuantity()).isEqualTo(1); // مقدار پیش‌فرض از factory
             assertThat(saved.getAvailable()).isTrue();
         }
 
@@ -137,23 +189,41 @@ class ItemRepositoryTest {
         }
     }
 
+    /**
+     * کلاس تست‌های عملیات جستجو و بازیابی
+     * 
+     * این کلاس شامل تست‌های مختلف برای عملیات بازیابی داده است:
+     * - جستجو بر اساس ID
+     * - جستجو بر اساس رستوران
+     * - فیلتر آیتم‌های در دسترس
+     * - جستجو بر اساس دسته‌بندی
+     * - جستجو با کلیدواژه
+     * - بازیابی تمام آیتم‌ها
+     */
     @Nested
     @DisplayName("Find Operations Tests")
     class FindOperationsTests {
         
+        /**
+         * تست جستجوی آیتم بر اساس شناسه
+         * 
+         * Given: چندین آیتم در دیتابیس ذخیره شده
+         * When: جستجو با شناسه مشخص
+         * Then: آیتم صحیح با تمام اطلاعات برگردانده شود
+         */
         @Test
         @DisplayName("Find by ID returns correct item")
         void findById_existingItem_returnsCorrectItem() {
-            // Given
+            // Given - ذخیره چندین آیتم مختلف
             FoodItem pizza = FoodItem.forMenu("Pizza", "Cheese pizza", 25000.0, "Italian", testRestaurant);
             FoodItem burger = FoodItem.forMenu("Burger", "Beef burger", 20000.0, "Fast Food", testRestaurant);
             FoodItem savedPizza = repository.saveNew(pizza);
             repository.saveNew(burger);
             
-            // When
+            // When - جستجو با شناسه پیتزا
             Optional<FoodItem> found = repository.findById(savedPizza.getId());
             
-            // Then
+            // Then - بررسی صحت آیتم یافت شده
             assertThat(found).isPresent();
             assertThat(found.get().getId()).isEqualTo(savedPizza.getId());
             assertThat(found.get().getName()).isEqualTo("Pizza");
@@ -334,6 +404,14 @@ class ItemRepositoryTest {
         }
     }
 
+    /**
+     * کلاس تست‌های عملیات به‌روزرسانی
+     * 
+     * تست‌های مربوط به به‌روزرسانی فیلدهای خاص آیتم‌ها:
+     * - به‌روزرسانی وضعیت در دسترس بودن
+     * - به‌روزرسانی موجودی
+     * - مدیریت خطا در به‌روزرسانی
+     */
     @Nested
     @DisplayName("Update Operations Tests")
     class UpdateOperationsTests {
@@ -413,6 +491,14 @@ class ItemRepositoryTest {
         }
     }
 
+    /**
+     * کلاس تست‌های عملیات حذف
+     * 
+     * تست‌های مربوط به حذف آیتم‌ها:
+     * - حذف آیتم مشخص
+     * - حذف کل آیتم‌ها
+     * - مدیریت خطا در حذف
+     */
     @Nested
     @DisplayName("Delete Operations Tests")
     class DeleteOperationsTests {
@@ -462,6 +548,15 @@ class ItemRepositoryTest {
         }
     }
 
+    /**
+     * کلاس تست‌های حالات مرزی و مدیریت خطا
+     * 
+     * تست‌های خاص برای حالات استثنایی:
+     * - جستجو با کلیدواژه خالی
+     * - جستجو با شناسه غیرموجود
+     * - مدیریت کاراکترهای خاص
+     * - تست مقاومت در برابر خطا
+     */
     @Nested
     @DisplayName("Edge Cases and Error Handling")
     class EdgeCasesAndErrorHandling {
@@ -508,7 +603,17 @@ class ItemRepositoryTest {
         }
     }
 
-    // Helper methods
+    /**
+     * متدهای کمکی برای تست‌ها
+     */
+    
+    /**
+     * ایجاد و ذخیره رستوران برای تست
+     * 
+     * @param name نام رستوران
+     * @param address آدرس رستوران
+     * @return رستوران ذخیره شده
+     */
     private Restaurant createAndSaveRestaurant(String name, String address) {
         Restaurant restaurant = Restaurant.forRegistration(1L, name, address, "021-123");
         restaurant.setStatus(RestaurantStatus.APPROVED);
@@ -520,6 +625,11 @@ class ItemRepositoryTest {
         return restaurant;
     }
 
+    /**
+     * پاک‌سازی تمام رستوران‌ها از دیتابیس
+     * 
+     * این متد برای تمیز کردن دیتابیس قبل از تست‌ها استفاده می‌شود.
+     */
     private void cleanRestaurants() {
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();

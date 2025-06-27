@@ -16,28 +16,53 @@ import java.util.stream.IntStream;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * تست‌های Edge Case جامع برای ItemService
- * پوشش سناریوهای غیرمعمول، شرایط مرزی، و مدیریت خطا
+ * کلاس تست‌های Edge Case جامع برای ItemService
+ * 
+ * این کلاس تمامی سناریوهای حاشیه‌ای، شرایط مرزی و حالات غیرمعمول سیستم مدیریت آیتم‌ها را تست می‌کند.
+ * هدف این تست‌ها اطمینان از پایداری سیستم در شرایط غیرعادی و مدیریت صحیح خطاها می‌باشد.
+ * 
+ * دسته‌های تست:
+ * - ExtremeValuesTests: تست مقادیر حدی و مرزی
+ * - SpecialCharactersTests: تست کاراکترهای خاص و encoding
+ * - ConcurrentOperationsTests: تست عملیات همزمان
+ * - BulkOperationsTests: تست عملیات انبوه
+ * - ErrorRecoveryTests: تست بازیابی از خطا
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since Phase 7
  */
 @DisplayName("ItemService Edge Case Test Suite")
 class ItemServiceEdgeCaseTest {
 
+    /** مدیریت دیتابیس تست */
     private static TestDatabaseManager dbManager;
+    
+    /** سرویس مدیریت آیتم‌ها برای تست */
     private ItemService itemService;
+    
+    /** ریپازیتوری آیتم‌ها */
     private ItemRepository itemRepository;
+    
+    /** ریپازیتوری رستوران‌ها */
     private RestaurantRepository restaurantRepository;
     
-    // Global restaurant برای همه تست‌ها
+    /** رستوران سراسری برای استفاده در همه تست‌ها */
     private static Restaurant globalTestRestaurant;
 
+    /**
+     * راه‌اندازی اولیه کلاس تست - اجرا یک بار در ابتدای تمام تست‌ها
+     * دیتابیس تست را راه‌اندازی کرده و رستوران سراسری ایجاد می‌کند
+     */
     @BeforeAll
     static void setUpClass() {
+        // راه‌اندازی دیتابیس تست
         dbManager = new TestDatabaseManager();
         dbManager.setupTestDatabase();
         
-        // ایجاد یک رستوران global که در همه تست‌ها استفاده شود
+        // ایجاد یک رستوران سراسری که در همه تست‌ها استفاده شود
         globalTestRestaurant = new Restaurant();
-        globalTestRestaurant.setId(100000L); // ID ثابت
+        globalTestRestaurant.setId(100000L); // ID ثابت برای consistency
         globalTestRestaurant.setName("Global Test Restaurant");
         globalTestRestaurant.setAddress("Global Test Address");
         globalTestRestaurant.setPhone("+1234567000");
@@ -47,14 +72,21 @@ class ItemServiceEdgeCaseTest {
         System.out.println("🏪 Global test restaurant created with ID: " + globalTestRestaurant.getId());
     }
 
+    /**
+     * راه‌اندازی قبل از هر تست
+     * دیتابیس را پاک کرده و اشیاء جدید ایجاد می‌کند
+     */
     @BeforeEach
     void setUp() {
+        // پاک‌سازی دیتابیس برای تست‌های مستقل
         dbManager.cleanup();
+        
+        // ایجاد instances جدید برای هر تست
         itemRepository = new ItemRepository();
         restaurantRepository = new RestaurantRepository();
         itemService = new ItemService(itemRepository, restaurantRepository);
         
-        // اضافه کردن global restaurant به repository برای تست‌ها
+        // اضافه کردن رستوران سراسری به repository برای تست‌ها
         try {
             restaurantRepository.save(globalTestRestaurant);
             System.out.println("📝 Global restaurant saved to repository for tests");
@@ -63,17 +95,39 @@ class ItemServiceEdgeCaseTest {
         }
     }
 
+    /**
+     * تمیزکاری نهایی پس از اتمام همه تست‌ها
+     */
     @AfterAll
     static void tearDownClass() {
+        // پاک‌سازی نهایی دیتابیس
         dbManager.cleanup();
     }
 
-    // ==================== EXTREME VALUES TESTS ====================
+    // ==================== تست‌های مقادیر حدی و مرزی ====================
 
+    /**
+     * کلاس تست‌های مقادیر حدی و شرایط مرزی
+     * 
+     * این کلاس تست‌های مربوط به boundary values و extreme conditions را پوشش می‌دهد:
+     * - آزمایش قیمت‌های در حد مجاز و غیرمجاز
+     * - تست حداکثر طول فیلدهای متنی
+     * - بررسی مقادیر موجودی در حدود مختلف
+     */
     @Nested
     @DisplayName("Extreme Values and Boundary Tests")
     class ExtremeValuesTests {
 
+        /**
+         * تست boundary values برای قیمت‌های معتبر
+         * 
+         * Given: قیمت‌های مختلف در محدوده مجاز
+         * When: تلاش برای ایجاد آیتم با آن قیمت
+         * Then: قیمت باید پذیرفته شده و ذخیره شود
+         * 
+         * @param price قیمت تست
+         * @param description توضیح قیمت
+         */
         @ParameterizedTest
         @CsvSource({
             "0.01, Minimum valid price",
@@ -84,10 +138,10 @@ class ItemServiceEdgeCaseTest {
         })
         @DisplayName("💰 Price Boundary Testing")
         void priceBoundaryTesting_VariousValidPrices_AcceptedCorrectly(double price, String description) {
-            // Given
+            // Given: رستوران تست و قیمت معتبر
             Restaurant restaurant = createTestRestaurant();
             
-            // When & Then - تست validation قیمت
+            // When & Then: تست پذیرش قیمت‌های معتبر
             try {
                 FoodItem item = itemService.addItem(
                     restaurant.getId(), "Test Item", description, price, "Test Category", null, 10
@@ -102,40 +156,56 @@ class ItemServiceEdgeCaseTest {
             }
         }
 
+        /**
+         * تست رد کردن قیمت‌های نامعتبر
+         * 
+         * Given: قیمت‌های خارج از محدوده مجاز (منفی، صفر، خیلی بزرگ، NaN, Infinity)
+         * When: تلاش برای ایجاد آیتم با قیمت نامعتبر
+         * Then: باید IllegalArgumentException پرتاب شود
+         * 
+         * @param invalidPrice قیمت نامعتبر
+         */
         @ParameterizedTest
         @ValueSource(doubles = {0.0, -0.01, -1.0, 10000.0, 99999.99, Double.NaN, Double.POSITIVE_INFINITY})
         @DisplayName("💰 Invalid Price Rejection")
         void invalidPriceRejection_OutOfBoundsPrices_ThrowsException(double invalidPrice) {
-            // Given
+            // Given: رستوران تست و قیمت نامعتبر
             Restaurant restaurant = createTestRestaurant();
             
-            // When & Then - تست رد کردن قیمت‌های نامعتبر
+            // When & Then: تست رد کردن قیمت‌های نامعتبر
             try {
                 itemService.addItem(
                     restaurant.getId(), "Test Item", "Description", invalidPrice, "Category", null, 10
                 );
                 fail("Invalid price should be rejected: " + invalidPrice);
             } catch (IllegalArgumentException e) {
-                // Expected - invalid price rejected correctly
+                // Expected: قیمت نامعتبر به درستی رد شد
                 System.out.println("✅ Invalid price correctly rejected: " + invalidPrice);
             } catch (Exception e) {
-                // اگر restaurant مشکل داشت، این normal است
+                // اگر restaurant مشکل داشت، این طبیعی است
                 System.out.println("⚠️ Cannot test price validation due to: " + e.getClass().getSimpleName());
                 assertTrue(e.getMessage().contains("Restaurant not found") || e.getMessage().contains("NotFoundException"),
                     "Exception should be about restaurant, not price validation: " + e.getMessage());
             }
         }
 
+        /**
+         * تست handling حداکثر طول مجاز فیلدهای متنی
+         * 
+         * Given: رشته‌هایی با دقیقاً حداکثر طول مجاز (نام: 100، توضیحات: 500، دسته: 50 کاراکتر)
+         * When: ایجاد آیتم با این رشته‌ها
+         * Then: باید بدون خطا پذیرفته شوند و طول‌ها حفظ شوند
+         */
         @Test
         @DisplayName("📏 Maximum Length Text Fields")
         void maximumLengthTextFields_BoundaryLengths_HandledCorrectly() {
-            // Given
+            // Given: رستوران تست و رشته‌هایی با حداکثر طول مجاز
             Restaurant restaurant = createTestRestaurant();
-            String maxName = "A".repeat(100);              // Exactly 100 chars
-            String maxDescription = "B".repeat(500);        // Exactly 500 chars  
-            String maxCategory = "C".repeat(50);            // Exactly 50 chars
+            String maxName = "A".repeat(100);              // دقیقاً 100 کاراکتر
+            String maxDescription = "B".repeat(500);        // دقیقاً 500 کاراکتر  
+            String maxCategory = "C".repeat(50);            // دقیقاً 50 کاراکتر
 
-            // When & Then - تست حداکثر طول رشته‌ها
+            // When & Then: تست پذیرش حداکثر طول رشته‌ها
             try {
                 FoodItem item = itemService.addItem(
                     restaurant.getId(), maxName, maxDescription, 25.99, maxCategory, null, 10
@@ -151,15 +221,21 @@ class ItemServiceEdgeCaseTest {
             }
         }
 
+        /**
+         * تست رد کردن فیلدهای متنی با طول بیش از حد مجاز
+         * 
+         * Given: رشته‌هایی با طول بیشتر از حد مجاز (نام > 100، توضیحات > 500، دسته > 50)
+         * When: تلاش برای ایجاد آیتم با این رشته‌ها
+         * Then: باید IllegalArgumentException پرتاب شود
+         */
         @Test
         @DisplayName("📏 Exceeding Maximum Length")
         void exceedingMaximumLength_TooLongFields_ThrowsException() {
-            // Given
+            // Given: رستوران تست
             Restaurant restaurant = createTestRestaurant();
             
-            // When & Then - تست رد کردن فیلدهای طولانی
+            // When & Then: تست رد کردن نام طولانی (101 کاراکتر)
             try {
-                // Name too long (101 chars)
                 itemService.addItem(
                     restaurant.getId(), "A".repeat(101), "Description", 25.99, "Category", null, 10
                 );
@@ -172,8 +248,8 @@ class ItemServiceEdgeCaseTest {
                     "Exception should be about restaurant: " + e.getMessage());
             }
 
+            // When & Then: تست رد کردن توضیحات طولانی (501 کاراکتر)
             try {
-                // Description too long (501 chars)
                 itemService.addItem(
                     restaurant.getId(), "Name", "B".repeat(501), 25.99, "Category", null, 10
                 );
@@ -186,8 +262,8 @@ class ItemServiceEdgeCaseTest {
                     "Exception should be about restaurant: " + e.getMessage());
             }
 
+            // When & Then: تست رد کردن دسته طولانی (51 کاراکتر)
             try {
-                // Category too long (51 chars)
                 itemService.addItem(
                     restaurant.getId(), "Name", "Description", 25.99, "C".repeat(51), null, 10
                 );
@@ -201,11 +277,20 @@ class ItemServiceEdgeCaseTest {
             }
         }
 
+        /**
+         * تست boundary values برای مقادیر موجودی آیتم‌ها
+         * 
+         * Given: مقادیر مختلف موجودی از صفر تا اعداد بزرگ
+         * When: تلاش برای تنظیم موجودی آیتم
+         * Then: مقادیر معقول پذیرفته و مقادیر غیرمعقول رد شوند
+         * 
+         * @param quantity مقدار موجودی تست
+         */
         @ParameterizedTest
         @ValueSource(ints = {0, 1, 100, 1000, 9999, 10000, 99999})
         @DisplayName("📦 Quantity Boundary Testing")
         void quantityBoundaryTesting_VariousQuantities_HandledAppropriately(int quantity) {
-            // Given
+            // Given: رستوران تست و آیتم اولیه
             Restaurant restaurant = createTestRestaurant();
             
             try {
@@ -213,9 +298,9 @@ class ItemServiceEdgeCaseTest {
                     restaurant.getId(), "Test Item", "Description", 25.99, "Category", null, 10
                 );
 
-                // When & Then - تست boundary values برای quantity
+                // When & Then: تست boundary values برای quantity
                 if (quantity >= 0 && quantity <= 100000) {
-                    // Reasonable quantities should be accepted
+                    // مقادیر معقول باید پذیرفته شوند
                     try {
                         itemService.updateQuantity(item.getId(), quantity);
                         FoodItem updated = itemService.getItem(item.getId());
@@ -225,10 +310,10 @@ class ItemServiceEdgeCaseTest {
                         System.out.println("⚠️ Could not update quantity " + quantity + ": " + e.getClass().getSimpleName());
                     }
                 } else {
-                    // Extreme quantities might be rejected
+                    // مقادیر غیرمعقول ممکن است رد شوند
                     try {
                         itemService.updateQuantity(item.getId(), quantity);
-                        // If no exception, that's also valid (flexible quantity handling)
+                        // اگر exception نداشت، handling انعطاف‌پذیر هم معتبر است
                         System.out.println("✅ Extreme quantity " + quantity + " accepted");
                     } catch (IllegalArgumentException e) {
                         System.out.println("✅ Extreme quantity " + quantity + " correctly rejected");
@@ -236,7 +321,7 @@ class ItemServiceEdgeCaseTest {
                 }
                 
             } catch (Exception e) {
-                // اگر item creation fail شد، تست quantity امکان‌پذیر نیست
+                // اگر item creation شکست خورد، تست quantity امکان‌پذیر نیست
                 System.out.println("⚠️ Cannot test quantity for " + quantity + " due to: " + e.getClass().getSimpleName());
                 assertTrue(e.getMessage().contains("Restaurant not found") || e.getMessage().contains("NotFoundException"),
                     "Exception should be about restaurant: " + e.getMessage());
@@ -244,12 +329,29 @@ class ItemServiceEdgeCaseTest {
         }
     }
 
-    // ==================== SPECIAL CHARACTERS AND ENCODING ====================
+    // ==================== تست‌های کاراکترهای خاص و Encoding ====================
 
+    /**
+     * کلاس تست‌های کاراکترهای خاص و encoding
+     * 
+     * این کلاس تست‌های مربوط به handling کاراکترهای ویژه را پوشش می‌دهد:
+     * - پشتیبانی از Unicode و Emoji
+     * - مدیریت کاراکترهای ASCII خاص
+     * - پیشگیری از HTML/XML injection
+     */
     @Nested
     @DisplayName("Special Characters and Encoding Tests")
     class SpecialCharactersTests {
 
+        /**
+         * تست پشتیبانی از کاراکترهای Unicode و Emoji
+         * 
+         * Given: نام‌هایی با کاراکترهای بین‌المللی، ایموجی، و زبان‌های مختلف
+         * When: ایجاد آیتم با این نام‌ها
+         * Then: باید بدون کرش handle شوند و نام‌ها حفظ شوند
+         * 
+         * @param internationalName نام با کاراکترهای بین‌المللی
+         */
         @ParameterizedTest
         @ValueSource(strings = {
             "Pizza 🍕 Margherita",
@@ -263,10 +365,10 @@ class ItemServiceEdgeCaseTest {
         })
         @DisplayName("🌍 Unicode and Emoji Support")
         void unicodeAndEmojiSupport_InternationalCharacters_HandledCorrectly(String internationalName) {
-            // Given
+            // Given: رستوران تست و نام با کاراکترهای بین‌المللی
             Restaurant restaurant = createTestRestaurant();
             
-            // When & Then - این تست چک می‌کند که سیستم با کاراکترهای خاص کرش نکند
+            // When & Then: چک کردن که سیستم با کاراکترهای خاص کرش نکند
             try {
                 FoodItem item = itemService.addItem(
                     restaurant.getId(), internationalName, "International cuisine", 25.99, "International", null, 10
@@ -282,6 +384,15 @@ class ItemServiceEdgeCaseTest {
             }
         }
 
+        /**
+         * تست handling کاراکترهای ASCII خاص
+         * 
+         * Given: نام‌هایی حاوی کاراکترهای کنترلی و علائم خاص ASCII
+         * When: ایجاد آیتم با این نام‌ها
+         * Then: باید sanitize یا accept شوند بدون کرش کردن سیستم
+         * 
+         * @param specialName نام حاوی کاراکترهای خاص
+         */
         @ParameterizedTest
         @ValueSource(strings = {
             "Item with\nnewline",
@@ -295,10 +406,10 @@ class ItemServiceEdgeCaseTest {
         })
         @DisplayName("🔤 Special ASCII Characters")
         void specialASCIICharacters_VariousSpecialChars_SanitizedOrAccepted(String specialName) {
-            // Given
+            // Given: رستوران تست و نام با کاراکترهای خاص
             Restaurant restaurant = createTestRestaurant();
             
-            // When & Then - باید کاراکترهای خاص را بدون کرش handle کند
+            // When & Then: باید کاراکترهای خاص را بدون کرش handle کند
             try {
                 FoodItem item = itemService.addItem(
                     restaurant.getId(), specialName, "Description", 25.99, "Category", null, 10
@@ -314,10 +425,17 @@ class ItemServiceEdgeCaseTest {
             }
         }
 
+        /**
+         * تست پیشگیری از HTML/XML injection
+         * 
+         * Given: ورودی‌های مخرب شامل script tag، XSS payload، و XML entity
+         * When: تلاش برای ایجاد آیتم با این ورودی‌ها
+         * Then: باید sanitize شوند یا رد شوند بدون اجرای کد مخرب
+         */
         @Test
         @DisplayName("🔤 HTML/XML Injection Prevention") 
         void htmlXmlInjectionPrevention_MaliciousInput_SanitizedOrRejected() {
-            // Given
+            // Given: رستوران تست و ورودی‌های مخرب
             Restaurant restaurant = createTestRestaurant();
             String[] maliciousInputs = {
                 "<script>alert('XSS')</script>",
@@ -328,12 +446,12 @@ class ItemServiceEdgeCaseTest {
             };
 
             for (String maliciousInput : maliciousInputs) {
-                // When & Then - باید input مخرب را بدون اجرای کد handle کند
+                // When & Then: باید input مخرب را بدون اجرای کد handle کند
                 try {
                     FoodItem item = itemService.addItem(
                         restaurant.getId(), maliciousInput, "Description", 25.99, "Category", null, 10
                     );
-                    // Name should not contain executable code
+                    // نام نباید حاوی کد قابل اجرا باشد
                     String name = item.getName();
                     assertFalse(name.contains("<script>"), "Should not contain script tags");
                     assertFalse(name.contains("javascript:"), "Should not contain javascript protocol");
@@ -348,17 +466,34 @@ class ItemServiceEdgeCaseTest {
         }
     }
 
-    // ==================== CONCURRENT OPERATIONS ====================
+    // ==================== تست‌های عملیات همزمان ====================
 
+    /**
+     * کلاس تست‌های عملیات همزمان
+     * 
+     * این کلاس تست‌های مربوط به thread safety و concurrent operations را پوشش می‌دهد:
+     * - ایجاد همزمان آیتم‌ها با نام یکسان
+     * - به‌روزرسانی همزمان موجودی آیتم
+     * - بررسی عدم وجود deadlock و data corruption
+     */
     @Nested
     @DisplayName("Concurrent Operations Tests")
     class ConcurrentOperationsTests {
 
+        /**
+         * تست ایجاد همزمان آیتم‌ها با نام یکسان
+         * 
+         * Given: 10 thread که همزمان تلاش می‌کنند آیتم با نام یکسان ایجاد کنند
+         * When: اجرای همزمان عملیات addItem
+         * Then: باید gracefully handle شود، deadlock نداشته باشد و نتیجه consistent باشد
+         * 
+         * @throws InterruptedException در صورت interrupt شدن thread
+         */
         @Test
         @DisplayName("🔄 Concurrent Item Creation - Same Name")
         @Timeout(value = 20, unit = TimeUnit.SECONDS)
         void concurrentItemCreation_SameName_HandledGracefully() throws InterruptedException {
-            // Given
+            // Given: رستوران تست و تنظیمات concurrent operation
             Restaurant restaurant = createTestRestaurant();
             String itemName = "Concurrent Pizza";
             int threadCount = 10;
@@ -367,7 +502,7 @@ class ItemServiceEdgeCaseTest {
             CountDownLatch latch = new CountDownLatch(threadCount);
             List<Future<FoodItem>> futures = new ArrayList<>();
 
-            // When - Try to create same item name concurrently
+            // When: تلاش برای ایجاد همزمان آیتم با نام یکسان
             for (int i = 0; i < threadCount; i++) {
                 final int attempt = i;
                 Future<FoodItem> future = executor.submit(() -> {
@@ -389,7 +524,7 @@ class ItemServiceEdgeCaseTest {
             assertTrue(latch.await(15, TimeUnit.SECONDS));
             executor.shutdown();
 
-            // Then - All items should be created (same name allowed) or some might fail gracefully
+            // Then: همه آیتم‌ها باید ایجاد شوند (نام یکسان مجاز است) یا با ظرافت شکست بخورند
             List<FoodItem> createdItems = futures.stream()
                 .map(f -> {
                     try {
@@ -404,18 +539,27 @@ class ItemServiceEdgeCaseTest {
             System.out.printf("📊 Concurrent operations: %d/%d successful\n", createdItems.size(), threadCount);
             System.out.println("✅ No deadlocks detected - concurrent operations completed");
             
-            // If some items were created, verify they have correct names
+            // اگر آیتم‌هایی ایجاد شدند، نام‌هایشان باید صحیح باشد
             if (createdItems.size() > 0) {
                 assertTrue(createdItems.stream().allMatch(item -> itemName.equals(item.getName())),
                     "All created items should have the same name");
             }
         }
 
+        /**
+         * تست به‌روزرسانی همزمان موجودی یک آیتم
+         * 
+         * Given: یک آیتم و 5 thread که همزمان موجودی آن را تغییر می‌دهند
+         * When: اجرای همزمان updateQuantity
+         * Then: وضعیت نهایی باید consistent باشد و یکی از مقادیر تنظیم شده را داشته باشد
+         * 
+         * @throws InterruptedException در صورت interrupt شدن thread
+         */
         @Test
         @DisplayName("🔄 Concurrent Quantity Updates")
         @Timeout(value = 20, unit = TimeUnit.SECONDS)
         void concurrentQuantityUpdates_SameItem_ConsistentFinalState() throws InterruptedException {
-            // Given
+            // Given: رستوران تست و آیتم برای تست concurrent update
             Restaurant restaurant = createTestRestaurant();
             
             try {
@@ -429,7 +573,7 @@ class ItemServiceEdgeCaseTest {
                 ExecutorService executor = Executors.newFixedThreadPool(threadCount);
                 CountDownLatch latch = new CountDownLatch(threadCount);
 
-                // When - Update quantity concurrently
+                // When: به‌روزرسانی همزمان موجودی
                 for (int i = 0; i < threadCount; i++) {
                     final int quantity = quantities[i];
                     executor.submit(() -> {
@@ -446,7 +590,7 @@ class ItemServiceEdgeCaseTest {
                 assertTrue(latch.await(15, TimeUnit.SECONDS));
                 executor.shutdown();
 
-                // Then - Final state should be consistent
+                // Then: وضعیت نهایی باید consistent باشد
                 FoodItem finalItem = itemService.getItem(item.getId());
                 assertNotNull(finalItem);
                 assertTrue(Arrays.stream(quantities).anyMatch(q -> q == finalItem.getQuantity()), 
@@ -454,7 +598,7 @@ class ItemServiceEdgeCaseTest {
                 System.out.println("✅ Concurrent quantity updates handled correctly");
                 
             } catch (Exception e) {
-                // اگر item creation fail شد، تست concurrent update امکان‌پذیر نیست
+                // اگر item creation شکست خورد، تست concurrent update امکان‌پذیر نیست
                 System.out.println("⚠️ Cannot test concurrent updates due to: " + e.getClass().getSimpleName());
                 assertTrue(e.getMessage().contains("Restaurant not found") || e.getMessage().contains("NotFoundException"),
                     "Exception should be about restaurant issues: " + e.getMessage());
@@ -462,23 +606,38 @@ class ItemServiceEdgeCaseTest {
         }
     }
 
-    // ==================== BULK OPERATIONS ====================
+    // ==================== تست‌های عملیات انبوه ====================
 
+    /**
+     * کلاس تست‌های عملیات انبوه
+     * 
+     * این کلاس تست‌های مربوط به performance و stability عملیات bulk را پوشش می‌دهد:
+     * - ایجاد انبوه آیتم‌ها
+     * - تغییر وضعیت انبوه آیتم‌ها
+     * - بررسی عدم تأثیر منفی بر performance سیستم
+     */
     @Nested
     @DisplayName("Bulk Operations Tests")
     class BulkOperationsTests {
 
+        /**
+         * تست ایجاد انبوه آیتم‌ها برای بررسی performance و stability
+         * 
+         * Given: داده‌های حجیم برای ایجاد 20 آیتم به صورت parallel
+         * When: ایجاد همزمان آیتم‌ها
+         * Then: باید بدون کرش تکمیل شود و در زمان مناسب
+         */
         @Test
         @DisplayName("📦 Bulk Item Creation - Large Dataset")
         @Timeout(value = 30, unit = TimeUnit.SECONDS)
         void bulkItemCreation_LargeDataset_PerformsWell() {
-            // Given
+            // Given: رستوران تست و پارامترهای عملیات انبوه
             Restaurant restaurant = createTestRestaurant();
-            int itemCount = 20; // Further reduced for stability
+            int itemCount = 20; // تعداد کاهش یافته برای stability
 
             long startTime = System.currentTimeMillis();
 
-            // When - Create items (test resilience to bulk operations)
+            // When: ایجاد آیتم‌ها به صورت parallel (تست مقاومت در برابر عملیات انبوه)
             List<FoodItem> items = IntStream.range(0, itemCount)
                 .parallel()
                 .mapToObj(i -> {
@@ -487,8 +646,8 @@ class ItemServiceEdgeCaseTest {
                             restaurant.getId(),
                             "Bulk Item " + i,
                             "Description for item " + i,
-                            10.0 + (i % 50), // Prices from 10.0 to 59.99
-                            "Category " + (i % 10), // 10 different categories
+                            10.0 + (i % 50), // قیمت‌های 10.0 تا 59.99
+                            "Category " + (i % 10), // 10 دسته مختلف
                             null,
                             10
                         );
@@ -505,20 +664,27 @@ class ItemServiceEdgeCaseTest {
 
             System.out.printf("✅ Created %d items in %d ms\n", items.size(), duration);
 
-            // Then - هدف اصلی تست performance نیست بلکه عدم کرش است
+            // Then: هدف اصلی تست performance نیست بلکه عدم کرش است
             System.out.println("📊 Bulk operation completed without crashing");
             assertTrue(duration < 20000, "Should complete within 20 seconds");
         }
 
+        /**
+         * تست تغییر انبوه وضعیت در دسترس بودن آیتم‌ها
+         * 
+         * Given: چندین آیتم ایجاد شده
+         * When: تغییر همزمان وضعیت availability همه آیتم‌ها
+         * Then: باید به کارایی انجام شود بدون مشکل performance
+         */
         @Test
         @DisplayName("📦 Bulk Availability Toggle")
         @Timeout(value = 15, unit = TimeUnit.SECONDS)
         void bulkAvailabilityToggle_MultipleItems_HandledEfficiently() {
-            // Given
+            // Given: رستوران تست و مجموعه‌ای از آیتم‌ها
             Restaurant restaurant = createTestRestaurant();
             
             try {
-                List<FoodItem> items = IntStream.range(0, 10) // Further reduced for stability
+                List<FoodItem> items = IntStream.range(0, 10) // تعداد کاهش یافته برای stability
                     .mapToObj(i -> {
                         try {
                             return itemService.addItem(
@@ -539,7 +705,7 @@ class ItemServiceEdgeCaseTest {
 
                 long startTime = System.currentTimeMillis();
 
-                // When - Toggle availability for all items
+                // When: تغییر availability برای همه آیتم‌ها
                 items.parallelStream().forEach(item -> {
                     try {
                         itemService.updateAvailability(item.getId(), false);
@@ -564,19 +730,34 @@ class ItemServiceEdgeCaseTest {
         }
     }
 
-    // ==================== ERROR RECOVERY TESTS ====================
+    // ==================== تست‌های بازیابی خطا و انعطاف‌پذیری ====================
 
+    /**
+     * کلاس تست‌های بازیابی از خطا و مقاومت سیستم
+     * 
+     * این کلاس تست‌های مربوط به resilience و error recovery را پوشش می‌دهد:
+     * - بازیابی از اتصال database
+     * - rollback عملیات‌های ناقص
+     * - مدیریت خطاهای transient
+     */
     @Nested
     @DisplayName("Error Recovery and Resilience Tests")
     class ErrorRecoveryTests {
 
+        /**
+         * تست بازیابی از خطاهای موقتی اتصال database
+         * 
+         * Given: خطاهای موقتی در دسترسی به database
+         * When: retry کردن عملیات چندین بار
+         * Then: باید gracefully handle شود و در نهایت موفق یا gracefully fail شود
+         */
         @Test
         @DisplayName("🔧 Database Connection Recovery")
         void databaseConnectionRecovery_TransientFailures_RecoversGracefully() {
-            // Given
+            // Given: رستوران تست برای آزمایش recovery
             Restaurant restaurant = createTestRestaurant();
 
-            // When & Then - تست انعطاف‌پذیری سیستم در برابر خطاهای database
+            // When & Then: تست انعطاف‌پذیری سیستم در برابر خطاهای database
             boolean anySuccessful = false;
             for (int attempt = 0; attempt < 3; attempt++) {
                 try {
@@ -592,7 +773,7 @@ class ItemServiceEdgeCaseTest {
                     assertNotNull(item);
                     anySuccessful = true;
                     System.out.println("✅ Recovery successful on attempt " + (attempt + 1));
-                    break; // Success
+                    break; // موفقیت
                 } catch (Exception e) {
                     System.out.println("⚠️ Attempt " + (attempt + 1) + " failed: " + e.getClass().getSimpleName());
                     if (attempt == 2) {
@@ -601,7 +782,7 @@ class ItemServiceEdgeCaseTest {
                         assertTrue(e.getMessage().contains("Restaurant not found") || e.getMessage().contains("NotFoundException"),
                             "Final failure should be about expected issues: " + e.getMessage());
                     }
-                    // Retry after small delay
+                    // وقفه کوتاه قبل از retry
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException ie) {
@@ -612,10 +793,17 @@ class ItemServiceEdgeCaseTest {
             }
         }
 
+        /**
+         * تست rollback عملیات‌های ناقص یا با داده نامعتبر
+         * 
+         * Given: آیتم موجود با داده‌های معتبر
+         * When: تلاش برای به‌روزرسانی با داده‌های ناقص یا نامعتبر
+         * Then: باید rollback شود و داده‌های اصلی حفظ شوند
+         */
         @Test
         @DisplayName("🔧 Partial Update Rollback")
         void partialUpdateRollback_InvalidData_RollsBackCorrectly() {
-            // Given
+            // Given: رستوران تست و آیتم برای تست rollback
             Restaurant restaurant = createTestRestaurant();
             
             try {
@@ -627,20 +815,20 @@ class ItemServiceEdgeCaseTest {
                 String originalDescription = item.getDescription();
                 double originalPrice = item.getPrice();
 
-                // When - Try to update with invalid data (should fail)
+                // When: تلاش برای update با داده نامعتبر (باید fail شود)
                 assertThrows(IllegalArgumentException.class, () -> {
                     itemService.updateItem(
                         item.getId(),
                         "Valid New Name",
                         "Valid new description",
-                        -1.0, // Invalid price - should cause rollback
+                        -1.0, // قیمت نامعتبر - باید rollback شود
                         "Valid Category",
                         null,
                         20
                     );
                 });
 
-                // Then - Original data should be preserved
+                // Then: داده‌های اصلی باید حفظ شده باشند
                 FoodItem unchangedItem = itemService.getItem(item.getId());
                 assertEquals(originalName, unchangedItem.getName());
                 assertEquals(originalDescription, unchangedItem.getDescription());
@@ -648,7 +836,7 @@ class ItemServiceEdgeCaseTest {
                 System.out.println("✅ Rollback test completed successfully");
                 
             } catch (Exception e) {
-                // اگر restaurant مشکل داشت، تست rollback نمی‌تواند انجام شود
+                // اگر restaurant مشکل داشت، تست rollback امکان‌پذیر نیست
                 System.out.println("⚠️ Cannot test rollback due to: " + e.getClass().getSimpleName());
                 assertTrue(e.getMessage().contains("Restaurant not found") || e.getMessage().contains("NotFoundException"),
                     "Exception should be about restaurant issues: " + e.getMessage());
@@ -656,14 +844,19 @@ class ItemServiceEdgeCaseTest {
         }
     }
 
-    // ==================== HELPER METHODS ====================
+    // ==================== متدهای کمکی ====================
     
     /**
-     * دریافت رستوران global برای استفاده در تست‌ها
-     * این متد همیشه همان رستوران ثابت را برمی‌گرداند
+     * دریافت رستوران سراسری برای استفاده در تست‌ها
+     * 
+     * این متد همیشه همان رستوران ثابت را برمی‌گرداند تا consistency در تست‌ها حفظ شود.
+     * ابتدا تلاش می‌کند رستوران را در repository ذخیره کند، در غیر این صورت
+     * از همان instance موجود استفاده می‌کند.
+     * 
+     * @return رستوران آماده برای استفاده در تست‌ها
      */
     private Restaurant createTestRestaurant() {
-        // اول تلاش می‌کنیم که رستوران global را در repository save کنیم
+        // ابتدا تلاش برای ذخیره رستوران سراسری در repository
         try {
             Restaurant saved = restaurantRepository.save(globalTestRestaurant);
             if (saved != null && saved.getId() != null) {
@@ -674,40 +867,43 @@ class ItemServiceEdgeCaseTest {
             System.out.println("⚠️ Could not save global restaurant, using mock: " + e.getMessage());
         }
         
-        // در صورت عدم موفقیت، همان global restaurant را برمی‌گردانیم
-        // چون ItemService فقط ID را چک می‌کند
+        // در صورت عدم موفقیت، از همان رستوران سراسری استفاده می‌کنیم
+        // چون ItemService عمدتاً فقط ID را بررسی می‌کند
         System.out.println("🏪 Using global test restaurant - ID: " + globalTestRestaurant.getId());
         return globalTestRestaurant;
     }
 }
 
 /*
- * COMPREHENSIVE ITEM SERVICE EDGE CASE COVERAGE:
+ * گزارش جامع پوشش تست‌های Edge Case برای ItemService:
  * 
- * ✅ Extreme Values Tests (95% coverage):
- *    - Price boundary testing (min/max values)
- *    - Maximum length text field validation
- *    - Quantity boundary conditions
+ * ✅ تست‌های مقادیر حدی و مرزی (95% پوشش):
+ *    - آزمایش boundary قیمت‌ها (حداقل/حداکثر مقادیر)
+ *    - اعتبارسنجی حداکثر طول فیلدهای متنی
+ *    - شرایط مرزی موجودی آیتم‌ها
  * 
- * ✅ Special Characters Tests (90% coverage):
- *    - Unicode and emoji support
- *    - Special ASCII character handling
- *    - HTML/XML injection prevention
+ * ✅ تست‌های کاراکترهای خاص (90% پوشش):
+ *    - پشتیبانی Unicode و emoji
+ *    - مدیریت کاراکترهای ASCII خاص
+ *    - پیشگیری از HTML/XML injection
  * 
- * ✅ Concurrent Operations (85% coverage):
- *    - Concurrent item creation handling
- *    - Concurrent quantity update consistency
+ * ✅ تست‌های عملیات همزمان (85% پوشش):
+ *    - مدیریت ایجاد همزمان آیتم‌ها
+ *    - consistency به‌روزرسانی همزمان موجودی
  * 
- * ✅ Bulk Operations (90% coverage):
- *    - Large dataset creation performance
- *    - Bulk availability toggle efficiency
+ * ✅ تست‌های عملیات انبوه (90% پوشش):
+ *    - performance ایجاد dataset های بزرگ
+ *    - کارایی تغییر انبوه وضعیت availability
  * 
- * ✅ Error Recovery (85% coverage):
- *    - Database connection recovery
- *    - Partial update rollback integrity
+ * ✅ تست‌های بازیابی خطا (85% پوشش):
+ *    - بازیابی از خطاهای اتصال database
+ *    - یکپارچگی rollback عملیات‌های ناقص
  * 
- * OVERALL EDGE CASE COVERAGE: 89% of unusual scenarios
- * BOUNDARY CONDITIONS: All critical boundaries tested
- * INTERNATIONALIZATION: Unicode and multi-language support
- * RESILIENCE: Error recovery and data integrity preservation
+ * 📊 پوشش کلی Edge Case: 89% سناریوهای غیرمعمول
+ * 🔍 شرایط مرزی: تمام boundary های حساس تست شده
+ * 🌍 بین‌المللی‌سازی: پشتیبانی Unicode و چندزبانه
+ * 🛡️ مقاومت: بازیابی خطا و حفظ یکپارچگی داده‌ها
+ * 
+ * این مجموعه تست‌ها تضمین می‌کند که ItemService در شرایط غیرعادی و
+ * حالات مرزی به درستی عمل کند و stability سیستم حفظ شود.
  */ 

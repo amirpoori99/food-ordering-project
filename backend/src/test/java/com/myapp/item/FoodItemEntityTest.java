@@ -12,12 +12,42 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.*;
 
+/**
+ * کلاس تست جامع برای Entity FoodItem
+ * 
+ * این کلاس تمام جنبه‌های entity FoodItem را تست می‌کند:
+ * 
+ * === دسته‌های تست ===
+ * - EntityCreationTests: تست‌های ایجاد entity
+ * - BusinessLogicTests: تست‌های منطق تجاری
+ * - PersistenceTests: تست‌های ماندگاری در دیتابیس
+ * - EdgeCasesAndErrorHandling: تست‌های حالات مرزی
+ * 
+ * === ویژگی‌های پوشش داده شده ===
+ * - Factory Methods: تست‌های forMenu و forMenuWithImage
+ * - Validation Logic: تست‌های اعتبارسنجی ورودی
+ * - Business Operations: تست‌های عملیات موجودی
+ * - Database Persistence: تست‌های ذخیره‌سازی
+ * - Unicode Support: پشتیبانی از کاراکترهای فارسی
+ * - Edge Cases: حالات استثنایی و خطاها
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ * @see FoodItem
+ * @see Restaurant
+ */
 @DisplayName("FoodItem Entity Tests")
 class FoodItemEntityTest {
 
+    /**
+     * راه‌اندازی محیط تست قبل از هر تست
+     * 
+     * پاک‌سازی دیتابیس برای اطمینان از استقلال تست‌ها
+     */
     @BeforeEach
     void setup() {
-        // Clean database before each test
+        // پاک‌سازی دیتابیس قبل از هر تست
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             Transaction tx = session.beginTransaction();
             session.createQuery("delete from FoodItem").executeUpdate();
@@ -26,30 +56,46 @@ class FoodItemEntityTest {
         }
     }
 
+    /**
+     * کلاس تست‌های ایجاد Entity
+     * 
+     * تست‌های مربوط به ایجاد صحیح FoodItem entity:
+     * - استفاده از factory methods
+     * - اعتبارسنجی پارامترهای ورودی
+     * - مدیریت مقادیر پیش‌فرض
+     * - پشتیبانی از انواع داده مختلف
+     */
     @Nested
     @DisplayName("Entity Creation Tests")
     class EntityCreationTests {
         
+        /**
+         * تست ایجاد موفق FoodItem با داده‌های معتبر
+         * 
+         * Given: رستوران معتبر و اطلاعات کامل آیتم
+         * When: ایجاد آیتم با factory method forMenu
+         * Then: آیتم با تمام مقادیر صحیح و پیش‌فرض ایجاد شود
+         */
         @Test
         @DisplayName("FoodItem creation with valid data succeeds")
         void foodItem_entityCreation_success() {
-            // Given
+            // Given - رستوران تست و داده‌های معتبر
             Restaurant restaurant = Restaurant.forRegistration(1L, "Test Restaurant", "Tehran", "021-123");
             
-            // When
+            // When - ایجاد آیتم غذایی با factory method
             FoodItem foodItem = FoodItem.forMenu("Pizza Margherita", "Delicious pizza", 25000.0, "Italian", restaurant);
             
-            // Then
+            // Then - بررسی صحت تمام فیلدهای آیتم ایجاد شده
             assertThat(foodItem.getName()).isEqualTo("Pizza Margherita");
             assertThat(foodItem.getDescription()).isEqualTo("Delicious pizza");
             assertThat(foodItem.getPrice()).isEqualTo(25000.0);
             assertThat(foodItem.getCategory()).isEqualTo("Italian");
             assertThat(foodItem.getRestaurant()).isEqualTo(restaurant);
-            assertThat(foodItem.getQuantity()).isEqualTo(1);
-            assertThat(foodItem.getAvailable()).isTrue();
-            assertThat(foodItem.getImageUrl()).isNull();
-            assertThat(foodItem.getKeywords()).isEqualTo("Pizza Margherita");
-            assertThat(foodItem.getId()).isNull(); // Not persisted yet
+            assertThat(foodItem.getQuantity()).isEqualTo(1); // مقدار پیش‌فرض
+            assertThat(foodItem.getAvailable()).isTrue(); // وضعیت پیش‌فرض
+            assertThat(foodItem.getImageUrl()).isNull(); // بدون تصویر
+            assertThat(foodItem.getKeywords()).isEqualTo("Pizza Margherita"); // keywords خودکار
+            assertThat(foodItem.getId()).isNull(); // هنوز persist نشده
         }
 
         @Test
@@ -201,33 +247,49 @@ class FoodItemEntityTest {
         }
     }
 
+    /**
+     * کلاس تست‌های منطق تجاری
+     * 
+     * تست‌های مربوط به عملیات تجاری FoodItem:
+     * - بررسی وضعیت موجودی (isInStock)
+     * - عملیات افزایش و کاهش موجودی
+     * - مدیریت وضعیت در دسترس بودن
+     * - مدیریت خطاهای تجاری
+     */
     @Nested
     @DisplayName("Business Logic Tests")
     class BusinessLogicTests {
         
+        /**
+         * تست عملکرد صحیح بررسی موجودی آیتم
+         * 
+         * Given: آیتم غذایی در حالات مختلف
+         * When: بررسی وضعیت موجودی با isInStock
+         * Then: نتیجه بر اساس ترکیب available و quantity صحیح باشد
+         */
         @Test
         @DisplayName("Stock availability check works correctly")
         void foodItem_isInStock_success() {
-            // Given
+            // Given - آیتم تست برای بررسی حالات مختلف
             Restaurant restaurant = Restaurant.forRegistration(1L, "Test Restaurant", "Tehran", "021-123");
             FoodItem foodItem = FoodItem.forMenu("Pasta", "Italian pasta", 15000.0, "Italian", restaurant);
             
-            // When & Then - Available with quantity
+            // When & Then - حالت 1: فعال و موجود
             foodItem.setQuantity(5);
             foodItem.setAvailable(true);
             assertThat(foodItem.isInStock()).isTrue();
             
-            // When & Then - Available but no quantity
+            // When & Then - حالت 2: فعال اما بدون موجودی
             foodItem.setQuantity(0);
             foodItem.setAvailable(true);
             assertThat(foodItem.isInStock()).isFalse();
             
-            // When & Then - Quantity available but not available
+            // When & Then - حالت 3: موجودی دارد اما غیرفعال
             foodItem.setQuantity(5);
             foodItem.setAvailable(false);
             assertThat(foodItem.isInStock()).isFalse();
             
-            // When & Then - Neither available nor quantity
+            // When & Then - حالت 4: غیرفعال و بدون موجودی
             foodItem.setQuantity(0);
             foodItem.setAvailable(false);
             assertThat(foodItem.isInStock()).isFalse();
@@ -362,6 +424,15 @@ class FoodItemEntityTest {
         }
     }
 
+    /**
+     * کلاس تست‌های ماندگاری در دیتابیس
+     * 
+     * تست‌های مربوط به ذخیره‌سازی و بازیابی از دیتابیس:
+     * - ذخیره‌سازی صحیح در دیتابیس
+     * - بازیابی داده‌های ذخیره شده
+     * - مدیریت روابط با Restaurant
+     * - پشتیبانی از کاراکترهای Unicode
+     */
     @Nested
     @DisplayName("Persistence Tests")
     class PersistenceTests {
@@ -506,6 +577,15 @@ class FoodItemEntityTest {
         }
     }
 
+    /**
+     * کلاس تست‌های حالات مرزی و مدیریت خطا
+     * 
+     * تست‌های خاص برای حالات استثنایی و مرزی:
+     * - مقادیر بسیار بزرگ و کوچک
+     * - رشته‌های فقط فضای خالی
+     * - تولید خودکار keywords
+     * - مدیریت URL های null و خالی
+     */
     @Nested
     @DisplayName("Edge Cases and Error Handling")
     class EdgeCasesAndErrorHandling {
@@ -573,6 +653,11 @@ class FoodItemEntityTest {
         }
     }
 
+    /**
+     * متد کمکی برای ایجاد و ذخیره رستوران تست
+     * 
+     * @return رستوران ذخیره شده برای استفاده در تست‌ها
+     */
     private Restaurant createAndSaveRestaurant() {
         Restaurant restaurant = Restaurant.forRegistration(1L, "Test Restaurant", "Tehran", "021-123");
         restaurant.setStatus(RestaurantStatus.APPROVED);

@@ -176,7 +176,7 @@ public class AuthResult {
      * @return true اگر کاربر مشتری باشد، در غیر اینصورت false
      */
     public boolean isCustomer() {
-        return hasRole("customer");
+        return hasRole("BUYER");
     }
     
     /**
@@ -185,7 +185,7 @@ public class AuthResult {
      * @return true اگر کاربر فروشنده باشد، در غیر اینصورت false
      */
     public boolean isSeller() {
-        return hasRole("seller");
+        return hasRole("SELLER");
     }
     
     /**
@@ -194,7 +194,7 @@ public class AuthResult {
      * @return true اگر کاربر پیک باشد، در غیر اینصورت false
      */
     public boolean isDelivery() {
-        return hasRole("delivery");
+        return hasRole("COURIER");
     }
     
     /**
@@ -203,7 +203,7 @@ public class AuthResult {
      * @return true اگر کاربر مدیر باشد، در غیر اینصورت false
      */
     public boolean isAdmin() {
-        return hasRole("admin");
+        return hasRole("ADMIN");
     }
     
     /**

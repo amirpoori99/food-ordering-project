@@ -12,50 +12,78 @@ import java.time.LocalDateTime;
 import java.time.Duration;
 
 /**
- * Performance optimization utility for the food ordering system
- * Provides caching, connection pooling, and memory management utilities
+ * کلاس ابزاری بهینه‌سازی عملکرد برای سیستم سفارش غذا
+ * شامل سیستم cache، پردازش ناهمزمان، مدیریت حافظه و نظارت بر عملکرد
+ * این کلاس ابزارهای پیشرفته‌ای برای بهبود سرعت و کارایی سیستم فراهم می‌کند
  */
 public class PerformanceUtil {
     
-    // ==================== CACHING SYSTEM ====================
+    // ==================== سیستم کش (CACHING SYSTEM) ====================
     
+    // نقشه thread-safe برای ذخیره‌سازی داده‌های کش شده
     private static final Map<String, CacheEntry> cache = new ConcurrentHashMap<>();
+    // مدت زمان پیش‌فرض انقضای کش (30 دقیقه)
     private static final long DEFAULT_CACHE_TTL_MINUTES = 30;
+    // حداکثر تعداد آیتم‌های قابل ذخیره در کش
     private static final int MAX_CACHE_SIZE = 1000;
     
     /**
-     * Cache entry with TTL support
+     * کلاس داخلی برای ذخیره‌سازی آیتم‌های کش با پشتیبانی از TTL
+     * هر آیتم شامل مقدار و زمان انقضا می‌باشد
      */
     private static class CacheEntry {
-        private final Object value;
-        private final LocalDateTime expiryTime;
+        private final Object value;         // مقدار ذخیره شده
+        private final LocalDateTime expiryTime;  // زمان انقضا
         
+        /**
+         * سازنده آیتم کش
+         * 
+         * @param value مقدار برای ذخیره‌سازی
+         * @param ttlMinutes مدت زمان زنده بودن به دقیقه
+         */
         public CacheEntry(Object value, long ttlMinutes) {
             this.value = value;
             this.expiryTime = LocalDateTime.now().plusMinutes(ttlMinutes);
         }
         
+        /**
+         * بررسی انقضای آیتم کش
+         * 
+         * @return true اگر آیتم منقضی شده باشد
+         */
         public boolean isExpired() {
             return LocalDateTime.now().isAfter(expiryTime);
         }
         
+        /**
+         * دریافت مقدار ذخیره شده
+         * 
+         * @return مقدار آیتم کش
+         */
         public Object getValue() {
             return value;
         }
     }
     
     /**
-     * Store data in cache with default TTL
+     * ذخیره‌سازی داده در کش با TTL پیش‌فرض
+     * 
+     * @param key کلید منحصر به فرد برای داده
+     * @param data داده برای ذخیره‌سازی
      */
     public static void cacheData(String key, Object data) {
         cacheData(key, data, DEFAULT_CACHE_TTL_MINUTES);
     }
     
     /**
-     * Store data in cache with custom TTL
+     * ذخیره‌سازی داده در کش با TTL سفارشی
+     * 
+     * @param key کلید منحصر به فرد برای داده
+     * @param data داده برای ذخیره‌سازی
+     * @param ttlMinutes مدت زمان زنده بودن به دقیقه
      */
     public static void cacheData(String key, Object data, long ttlMinutes) {
-        // Prevent cache from growing too large
+        // جلوگیری از رشد بیش از حد کش
         if (cache.size() >= MAX_CACHE_SIZE) {
             cleanExpiredEntries();
         }
@@ -64,7 +92,12 @@ public class PerformanceUtil {
     }
     
     /**
-     * Retrieve data from cache
+     * دریافت داده از کش
+     * 
+     * @param key کلید داده
+     * @param type نوع کلاس داده
+     * @param <T> نوع generic داده
+     * @return داده کش شده یا null در صورت عدم وجود یا انقضا
      */
     @SuppressWarnings("unchecked")
     public static <T> T getCachedData(String key, Class<T> type) {
@@ -77,13 +110,16 @@ public class PerformanceUtil {
         try {
             return type.cast(entry.getValue());
         } catch (ClassCastException e) {
-            cache.remove(key); // Remove invalid entry
+            cache.remove(key); // حذف آیتم نامعتبر
             return null;
         }
     }
     
     /**
-     * Check if data exists in cache and is not expired
+     * بررسی وجود داده در کش و معتبر بودن آن
+     * 
+     * @param key کلید داده
+     * @return true اگر داده در کش موجود و معتبر باشد
      */
     public static boolean isCached(String key) {
         CacheEntry entry = cache.get(key);
@@ -95,21 +131,23 @@ public class PerformanceUtil {
     }
     
     /**
-     * Clear all cache entries
+     * پاک کردن تمام آیتم‌های کش
      */
     public static void clearCache() {
         cache.clear();
     }
     
     /**
-     * Clean expired cache entries
+     * پاک کردن آیتم‌های منقضی شده از کش
      */
     public static void cleanExpiredEntries() {
         cache.entrySet().removeIf(entry -> entry.getValue().isExpired());
     }
     
     /**
-     * Get cache statistics
+     * دریافت آمار کش
+     * 
+     * @return نقشه شامل آمار کش (تعداد کل، حداکثر اندازه، آیتم‌های فعال و منقضی)
      */
     public static Map<String, Object> getCacheStats() {
         Map<String, Object> stats = new ConcurrentHashMap<>();

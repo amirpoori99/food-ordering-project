@@ -34,6 +34,12 @@ public class RegisterRequest {
         this.address = address;           // تنظیم آدرس
     }
 
+    /**
+     * سازنده پیش‌فرض - برای framework های serialization
+     */
+    public RegisterRequest() {
+    }
+
     // متدهای Getter برای دسترسی به داده‌ها
     public String getFullName() { return fullName; }        // دریافت نام کامل
     public String getPhone() { return phone; }              // دریافت شماره تلفن
@@ -41,4 +47,71 @@ public class RegisterRequest {
     public String getPasswordHash() { return passwordHash; } // دریافت رمز عبور hash شده
     public User.Role getRole() { return role; }             // دریافت نقش کاربر
     public String getAddress() { return address; }          // دریافت آدرس
+
+    // متدهای Setter برای تنظیم داده‌ها (برای framework های serialization)
+    /**
+     * تنظیم نام کامل کاربر
+     * 
+     * @param fullName نام و نام خانوادگی کاربر
+     */
+    public void setFullName(String fullName) { 
+        this.fullName = fullName; 
+    }
+
+    /**
+     * تنظیم شماره تلفن کاربر
+     * 
+     * @param phone شماره تلفن کاربر
+     */
+    public void setPhone(String phone) { 
+        this.phone = phone; 
+    }
+
+    /**
+     * تنظیم آدرس ایمیل کاربر
+     * 
+     * @param email آدرس ایمیل کاربر
+     */
+    public void setEmail(String email) { 
+        this.email = email; 
+    }
+
+    /**
+     * تنظیم رمز عبور hash شده
+     * 
+     * @param passwordHash رمز عبور hash شده
+     */
+    public void setPasswordHash(String passwordHash) { 
+        this.passwordHash = passwordHash; 
+    }
+
+    /**
+     * تنظیم نقش کاربر در سیستم
+     * 
+     * @param role نقش کاربر
+     */
+    public void setRole(User.Role role) { 
+        this.role = role; 
+    }
+
+    /**
+     * تنظیم آدرس کاربر
+     * 
+     * @param address آدرس کاربر
+     */
+    public void setAddress(String address) { 
+        this.address = address; 
+    }
+
+    /**
+     * نمایش رشته‌ای از درخواست ثبت نام
+     * برای debugging مفید است (بدون نمایش رمز عبور)
+     * 
+     * @return نمایش رشته‌ای از RegisterRequest
+     */
+    @Override
+    public String toString() {
+        return String.format("RegisterRequest{fullName='%s', phone='%s', email='%s', role='%s', address='%s'}", 
+                fullName, phone, email, role, address);
+    }
 } 

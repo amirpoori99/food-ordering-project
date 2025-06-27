@@ -33,4 +33,44 @@ public class UpdateProfileRequest {
     public String getFullName() { return fullName; } // دریافت نام کامل جدید
     public String getEmail() { return email; }       // دریافت ایمیل جدید
     public String getAddress() { return address; }   // دریافت آدرس جدید
+
+    // متدهای Setter برای تنظیم داده‌ها (برای framework های serialization)
+    /**
+     * تنظیم نام کامل جدید
+     * 
+     * @param fullName نام و نام خانوادگی جدید
+     */
+    public void setFullName(String fullName) { 
+        this.fullName = fullName; 
+    }
+
+    /**
+     * تنظیم آدرس ایمیل جدید
+     * 
+     * @param email آدرس ایمیل جدید
+     */
+    public void setEmail(String email) { 
+        this.email = email; 
+    }
+
+    /**
+     * تنظیم آدرس جدید
+     * 
+     * @param address آدرس جدید
+     */
+    public void setAddress(String address) { 
+        this.address = address; 
+    }
+
+    /**
+     * نمایش رشته‌ای از درخواست به‌روزرسانی پروفایل
+     * برای debugging مفید است
+     * 
+     * @return نمایش رشته‌ای از UpdateProfileRequest
+     */
+    @Override
+    public String toString() {
+        return String.format("UpdateProfileRequest{fullName='%s', email='%s', address='%s'}", 
+                fullName, email, address);
+    }
 } 

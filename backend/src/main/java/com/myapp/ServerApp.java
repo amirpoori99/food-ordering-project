@@ -28,7 +28,9 @@ import com.myapp.notification.NotificationRepository;
 import com.myapp.notification.NotificationService;
 import com.myapp.notification.NotificationController;
 import com.myapp.common.utils.DatabaseUtil;
+import com.myapp.common.utils.PasswordUtil;
 import com.myapp.common.models.User;
+import com.myapp.common.constants.ApplicationConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.net.httpserver.HttpServer;
@@ -122,8 +124,9 @@ public class ServerApp {
             return; // خروج از برنامه در صورت عدم اتصال به دیتابیس
         }
         
-        // مرحله 8: ایجاد سرور HTTP روی پورت 8081
-        HttpServer server = HttpServer.create(new InetSocketAddress(8081), 0);
+        // مرحله 8: ایجاد سرور HTTP روی پورت پیکربندی شده
+        int serverPort = Integer.parseInt(System.getProperty("server.port", "8081"));
+        HttpServer server = HttpServer.create(new InetSocketAddress(serverPort), 0);
         
         // مرحله 9: اضافه کردن endpoint های اصلی (Authentication & Health)
         server.createContext("/api/test", new TestHandler());              // endpoint تست
@@ -154,7 +157,7 @@ public class ServerApp {
         
         // مرحله 12: شروع سرور و نمایش اطلاعات
         server.start();
-        System.out.println("🚀 Server started on http://localhost:8081");
+        System.out.println("🚀 Server started on http://localhost:" + serverPort);
         System.out.println("📋 Available endpoints:");
         
         // نمایش لیست تمام endpoint های موجود برای راهنمایی توسعه‌دهندگان
@@ -244,9 +247,40 @@ public class ServerApp {
     
     /**
      * کلاس Handler برای endpoint بررسی سلامت سرور (/health)
-     * این endpoint برای monitoring و health check استفاده می‌شود
+     * این endpoint برای monitoring، health check و load balancer استفاده می‌شود
+     * 
+     * عملکرد این Handler:
+     * - بازگشت وضعیت سرور (UP/DOWN)
+     * - اطلاعات نام سرویس
+     * - بدون نیاز به احراز هویت
+     * 
+     * این endpoint معمولاً توسط:
+     * - Load balancers برای تشخیص سرورهای سالم
+     * - Monitoring systems برای نظارت بر سرور
+     * - CI/CD pipelines برای تست deployment
+     * استفاده می‌شود
+     * 
+     * فرمت پاسخ:
+     * <pre>
+     * {
+     *   "status": "UP",
+     *   "service": "food-ordering-backend"
+     * }
+     * </pre>
+     * 
+     * @author Food Ordering System Team
+     * @version 1.0
+     * @since 2024
      */
     static class HealthHandler implements HttpHandler {
+        
+        /**
+         * پردازش درخواست health check
+         * همیشه وضعیت UP برمی‌گرداند مگر اینکه سرور خراب باشد
+         * 
+         * @param exchange شیء HttpExchange شامل اطلاعات درخواست
+         * @throws IOException در صورت خطا در ارسال پاسخ
+         */
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             // پاسخ JSON ساده برای نشان دادن سلامت سرور
@@ -257,9 +291,41 @@ public class ServerApp {
     
     /**
      * کلاس Handler برای endpoint تست (/api/test)
-     * این endpoint برای تست اولیه کارکرد سرور استفاده می‌شود
+     * این endpoint برای تست اولیه کارکرد سرور و API استفاده می‌شود
+     * 
+     * عملکرد این Handler:
+     * - تست اتصال به API
+     * - نمایش زمان فعلی سرور
+     * - بررسی عملکرد JSON response
+     * - بدون نیاز به احراز هویت
+     * 
+     * این endpoint مفید است برای:
+     * - تست اولیه پس از راه‌اندازی سرور
+     * - بررسی connectivity کلاینت به سرور
+     * - Debug مشکلات اتصال
+     * - مثال ساده برای توسعه‌دهندگان
+     * 
+     * فرمت پاسخ:
+     * <pre>
+     * {
+     *   "message": "Hello from Food Ordering Backend!",
+     *   "timestamp": "2024-01-01T12:00:00.000Z"
+     * }
+     * </pre>
+     * 
+     * @author Food Ordering System Team
+     * @version 1.0
+     * @since 2024
      */
     static class TestHandler implements HttpHandler {
+        
+        /**
+         * پردازش درخواست تست
+         * پیام خوش‌آمدگویی به همراه timestamp فعلی برمی‌گرداند
+         * 
+         * @param exchange شیء HttpExchange شامل اطلاعات درخواست
+         * @throws IOException در صورت خطا در ارسال پاسخ
+         */
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             // پاسخ JSON شامل پیام تست و زمان فعلی
@@ -271,10 +337,35 @@ public class ServerApp {
     
     /**
      * کلاس Handler برای ثبت نام کاربران (/api/auth/register)
-     * مسئول پردازش درخواست‌های ثبت نام کاربران جدید
+     * مسئول پردازش درخواست‌های ثبت نام کاربران جدید در سیستم
+     * 
+     * عملکرد این Handler:
+     * 1. دریافت و اعتبارسنجی داده‌های ثبت نام (fullName, phone, password)
+     * 2. هش کردن رمز عبور با BCrypt برای امنیت
+     * 3. ایجاد و ذخیره کاربر جدید در پایگاه داده
+     * 4. بازگشت اطلاعات کاربر ثبت نام شده
+     * 
+     * فرمت درخواست JSON:
+     * <pre>
+     * {
+     *   "fullName": "نام کامل کاربر",
+     *   "phone": "09123456789",
+     *   "password": "رمز عبور قوی",
+     *   "email": "user@example.com",     // اختیاری
+     *   "address": "آدرس کاربر"          // اختیاری
+     * }
+     * </pre>
+     * 
+     * @author Food Ordering System Team
+     * @version 1.0
+     * @since 2024
      */
     static class RegisterHandler implements HttpHandler {
-        // ObjectMapper برای پردازش JSON
+        
+        /**
+         * ObjectMapper برای تبدیل JSON به Java objects و برعکس
+         * استفاده از Jackson library برای پردازش سریع و دقیق JSON
+         */
         private final ObjectMapper objectMapper = new ObjectMapper();
         
         @Override
@@ -308,8 +399,8 @@ public class ServerApp {
                         return;
                     }
                     
-                    // هش کردن رمز عبور (در محیط production باید از روش‌های امن‌تر استفاده شود)
-                    String passwordHash = "hashed_" + password;
+                    // هش کردن رمز عبور با BCrypt
+                    String passwordHash = com.myapp.common.utils.PasswordUtil.hashPassword(password);
                     
                     // ایجاد شیء کاربر جدید
                     User user = User.forRegistration(fullName, phone, email, passwordHash, address);
@@ -341,10 +432,48 @@ public class ServerApp {
     
     /**
      * کلاس Handler برای ورود کاربران (/api/auth/login)
-     * مسئول پردازش درخواست‌های ورود و ایجاد JWT token
+     * مسئول پردازش درخواست‌های ورود و ایجاد JWT token برای احراز هویت
+     * 
+     * عملکرد این Handler:
+     * 1. دریافت اطلاعات ورود (شماره تلفن و رمز عبور)
+     * 2. احراز هویت کاربر با بررسی رمز عبور
+     * 3. ایجاد Access Token و Refresh Token
+     * 4. بازگشت token ها به همراه اطلاعات کاربر
+     * 
+     * فرمت درخواست JSON:
+     * <pre>
+     * {
+     *   "phone": "09123456789",
+     *   "password": "رمز عبور کاربر"
+     * }
+     * </pre>
+     * 
+     * فرمت پاسخ موفق:
+     * <pre>
+     * {
+     *   "message": "Login successful!",
+     *   "status": "success",
+     *   "userId": 123,
+     *   "fullName": "نام کاربر",
+     *   "phone": "09123456789",
+     *   "role": "BUYER",
+     *   "accessToken": "eyJ0eXAi...",
+     *   "refreshToken": "eyJ0eXAi...",
+     *   "tokenType": "Bearer",
+     *   "expiresIn": 900
+     * }
+     * </pre>
+     * 
+     * @author Food Ordering System Team
+     * @version 1.0
+     * @since 2024
      */
     static class LoginHandler implements HttpHandler {
-        // ObjectMapper برای پردازش JSON
+        
+        /**
+         * ObjectMapper برای تبدیل JSON به Java objects و برعکس
+         * استفاده از Jackson library برای پردازش دقیق JSON
+         */
         private final ObjectMapper objectMapper = new ObjectMapper();
         
         @Override
@@ -375,11 +504,11 @@ public class ServerApp {
                         return;
                     }
                     
-                    // هش کردن رمز عبور (باید با منطق ثبت نام مطابقت داشته باشد)
-                    String passwordHash = "hashed_" + password;
+                    // هش کردن رمز عبور برای مقایسه (در واقع باید از verify استفاده شود)
+                    // String passwordHash = "hashed_" + password;
                     
                     // احراز هویت کاربر و دریافت JWT token
-                    AuthResult authResult = authService.loginWithTokens(phone, passwordHash);
+                    AuthResult authResult = authService.loginWithTokens(phone, password);
                     
                     // بررسی موفقیت احراز هویت
                     if (!authResult.isAuthenticated()) {
@@ -425,10 +554,33 @@ public class ServerApp {
     
     /**
      * کلاس Handler برای تجدید JWT token (/api/auth/refresh)
-     * مسئول تجدید Access Token با استفاده از Refresh Token
+     * مسئول تجدید Access Token با استفاده از Refresh Token معتبر
+     * 
+     * عملکرد این Handler:
+     * 1. دریافت Refresh Token از کلاینت
+     * 2. اعتبارسنجی Refresh Token
+     * 3. ایجاد Access Token و Refresh Token جدید
+     * 4. بازگشت token های جدید
+     * 
+     * این endpoint زمانی استفاده می‌شود که Access Token منقضی شده
+     * ولی Refresh Token هنوز معتبر است
+     * 
+     * فرمت درخواست JSON:
+     * <pre>
+     * {
+     *   "refreshToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+     * }
+     * </pre>
+     * 
+     * @author Food Ordering System Team
+     * @version 1.0
+     * @since 2024
      */
     static class RefreshTokenHandler implements HttpHandler {
-        // ObjectMapper برای پردازش JSON
+        
+        /**
+         * ObjectMapper برای پردازش JSON درخواست‌ها
+         */
         private final ObjectMapper objectMapper = new ObjectMapper();
         
         @Override
@@ -483,7 +635,33 @@ public class ServerApp {
     
     /**
      * کلاس Handler برای اعتبارسنجی JWT token (/api/auth/validate)
-     * مسئول بررسی معتبر بودن Access Token
+     * مسئول بررسی معتبر بودن Access Token و بازگشت اطلاعات کاربر
+     * 
+     * عملکرد این Handler:
+     * 1. دریافت Access Token از header Authorization
+     * 2. اعتبارسنجی token (امضا، انقضا، ساختار)
+     * 3. استخراج اطلاعات کاربر از token
+     * 4. بازگشت اطلاعات کاربر در صورت معتبر بودن
+     * 
+     * این endpoint برای بررسی وضعیت احراز هویت کاربر
+     * بدون نیاز به ورود مجدد استفاده می‌شود
+     * 
+     * Header مورد نیاز:
+     * Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+     * 
+     * فرمت پاسخ موفق:
+     * <pre>
+     * {
+     *   "valid": true,
+     *   "userId": 123,
+     *   "phone": "09123456789",
+     *   "role": "BUYER"
+     * }
+     * </pre>
+     * 
+     * @author Food Ordering System Team
+     * @version 1.0
+     * @since 2024
      */
     static class ValidateTokenHandler implements HttpHandler {
         @Override
@@ -523,7 +701,31 @@ public class ServerApp {
     
     /**
      * کلاس Handler برای خروج کاربران (/api/auth/logout)
-     * مسئول پردازش درخواست‌های خروج و invalidate کردن token
+     * مسئول پردازش درخواست‌های خروج و invalidate کردن token های کاربر
+     * 
+     * عملکرد این Handler:
+     * 1. احراز هویت کاربر از طریق Access Token
+     * 2. invalidate کردن تمام token های کاربر
+     * 3. پاک کردن session کاربر از سرور
+     * 4. بازگشت تأیید خروج موفق
+     * 
+     * پس از خروج، کاربر باید مجدداً وارد شود تا بتواند
+     * از سرویس‌های محافظت شده استفاده کند
+     * 
+     * Header مورد نیاز:
+     * Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+     * 
+     * فرمت پاسخ موفق:
+     * <pre>
+     * {
+     *   "message": "Logged out successfully",
+     *   "status": "success"
+     * }
+     * </pre>
+     * 
+     * @author Food Ordering System Team
+     * @version 1.0
+     * @since 2024
      */
     static class LogoutHandler implements HttpHandler {
         @Override
@@ -561,12 +763,32 @@ public class ServerApp {
     }
     
     /**
-     * متد کمکی برای ارسال پاسخ HTTP
+     * متد کمکی برای ارسال پاسخ HTTP استاندارد
      * این متد header های مناسب را تنظیم کرده و پاسخ را به کلاینت ارسال می‌کند
      * 
-     * @param exchange شیء HttpExchange برای مدیریت درخواست/پاسخ
-     * @param statusCode کد وضعیت HTTP (مثل 200, 404, 500)
-     * @param response محتوای پاسخ (معمولاً JSON)
+     * ویژگی‌های این متد:
+     * - تنظیم Content-Type به application/json
+     * - تنظیم CORS headers برای دسترسی cross-origin
+     * - مدیریت صحیح طول محتوا
+     * - بستن خودکار streams
+     * 
+     * کدهای وضعیت متداول:
+     * - 200: OK - درخواست موفق
+     * - 201: Created - منبع جدید ایجاد شد
+     * - 400: Bad Request - درخواست نامعتبر
+     * - 401: Unauthorized - احراز هویت لازم
+     * - 404: Not Found - منبع یافت نشد
+     * - 405: Method Not Allowed - HTTP method پشتیبانی نمی‌شود
+     * - 500: Internal Server Error - خطای سرور
+     * 
+     * @param exchange شیء HttpExchange برای مدیریت درخواست/پاسخ HTTP
+     * @param statusCode کد وضعیت HTTP (200, 400, 401, 404, 500, etc.)
+     * @param response محتوای پاسخ (معمولاً JSON string)
+     * @throws IOException در صورت خطا در نوشتن پاسخ به کلاینت
+     * 
+     * @author Food Ordering System Team
+     * @version 1.0
+     * @since 2024
      */
     private static void sendResponse(HttpExchange exchange, int statusCode, String response) throws IOException {
         // تنظیم header Content-Type برای JSON

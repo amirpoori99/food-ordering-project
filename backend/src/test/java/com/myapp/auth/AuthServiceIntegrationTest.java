@@ -4,9 +4,11 @@ import com.myapp.common.models.User;
 import com.myapp.common.exceptions.DuplicatePhoneException;
 import com.myapp.auth.dto.LoginRequest;
 import com.myapp.auth.dto.RegisterRequest;
+import com.myapp.auth.dto.UpdateProfileRequest;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -405,5 +407,139 @@ class AuthServiceIntegrationTest {
             assertThat(duration).isLessThan(5000);
             System.out.println("✅ عملکرد: 20 عملیات در " + duration + " میلی‌ثانیه");
         }
+    }
+
+    /**
+     * تست کامل جریان احراز هویت با JWT
+     */
+    @Test
+    @DisplayName("Complete authentication flow with JWT tokens")
+    void completeAuthenticationFlow_withJWTTokens_success() {
+        // Given - ثبت نام کاربر
+        RegisterRequest registerRequest = new RegisterRequest(
+            "محمد علیزاده", "09123456701", "mohammad@example.com", "securePass123", 
+            User.Role.SELLER, "تهران، خیابان ولیعصر"
+        );
+        User registeredUser = authService.register(registerRequest);
+        assertThat(registeredUser.getId()).isNotNull();
+        
+        // When - ورود با JWT
+        AuthResult loginResult = authService.loginWithTokens("09123456701", "securePass123");
+        
+        // Then - بررسی موفقیت ورود
+        assertThat(loginResult.isAuthenticated()).isTrue();
+        assertThat(loginResult.getUserId()).isEqualTo(registeredUser.getId());
+        assertThat(loginResult.getPhone()).isEqualTo("09123456701");
+        assertThat(loginResult.getRole()).isEqualTo("SELLER");
+        assertThat(loginResult.getAccessToken()).isNotNull();
+        assertThat(loginResult.getRefreshToken()).isNotNull();
+        
+        // بررسی role helper methods
+        assertThat(loginResult.isSeller()).isTrue();
+        assertThat(loginResult.isCustomer()).isFalse();
+        assertThat(loginResult.isDelivery()).isFalse();
+        assertThat(loginResult.isAdmin()).isFalse();
+        
+        // When - اعتبارسنجی token
+        AuthResult validateResult = authService.validateToken(loginResult.getAccessToken());
+        
+        // Then - بررسی اعتبارسنجی
+        assertThat(validateResult.isAuthenticated()).isTrue();
+        assertThat(validateResult.getUserId()).isEqualTo(registeredUser.getId());
+        assertThat(validateResult.getPhone()).isEqualTo("09123456701");
+        
+        // When - تجدید token
+        AuthResult refreshResult = authService.refreshToken(loginResult.getRefreshToken());
+        
+        // Then - بررسی تجدید
+        assertThat(refreshResult.isAuthenticated()).isTrue();
+        assertThat(refreshResult.getAccessToken()).isNotNull();
+        assertThat(refreshResult.getRefreshToken()).isNotNull();
+        assertThat(refreshResult.isRefresh()).isTrue();
+    }
+
+    /**
+     * تست تمام نقش‌های مختلف کاربران
+     */
+    @ParameterizedTest
+    @EnumSource(User.Role.class)
+    @DisplayName("Authentication works for all user roles")
+    void authentication_allUserRoles_success(User.Role role) {
+        // Given - ثبت نام کاربر با نقش مشخص
+        String phone = "091234567" + String.format("%02d", role.ordinal());
+        RegisterRequest request = new RegisterRequest(
+            "Test " + role.name(), phone, "test@example.com", "testPass", role, "Test Address"
+        );
+        User user = authService.register(request);
+        
+        // When - ورود
+        AuthResult result = authService.loginWithTokens(phone, "testPass");
+        
+        // Then - بررسی نقش
+        assertThat(result.isAuthenticated()).isTrue();
+        assertThat(result.getRole()).isEqualTo(role.toString());
+        
+        // بررسی helper methods بر اساس نقش
+        switch (role) {
+            case BUYER:
+                assertThat(result.isCustomer()).isTrue();
+                assertThat(result.isSeller()).isFalse();
+                assertThat(result.isDelivery()).isFalse();
+                assertThat(result.isAdmin()).isFalse();
+                break;
+            case SELLER:
+                assertThat(result.isCustomer()).isFalse();
+                assertThat(result.isSeller()).isTrue();
+                assertThat(result.isDelivery()).isFalse();
+                assertThat(result.isAdmin()).isFalse();
+                break;
+            case COURIER:
+                assertThat(result.isCustomer()).isFalse();
+                assertThat(result.isSeller()).isFalse();
+                assertThat(result.isDelivery()).isTrue();
+                assertThat(result.isAdmin()).isFalse();
+                break;
+            case ADMIN:
+                assertThat(result.isCustomer()).isFalse();
+                assertThat(result.isSeller()).isFalse();
+                assertThat(result.isDelivery()).isFalse();
+                assertThat(result.isAdmin()).isTrue();
+                break;
+        }
+    }
+
+    /**
+     * تست profile management کامل
+     */
+    @Test
+    @DisplayName("Profile management end-to-end test")
+    void profileManagement_endToEnd_success() {
+        // Given - ثبت نام کاربر
+        RegisterRequest request = new RegisterRequest(
+            "فاطمه محمدی", "09123456702", "fateme@example.com", "password123", 
+            User.Role.BUYER, "شیراز، خیابان حافظ"
+        );
+        User user = authService.register(request);
+        
+        // When - دریافت پروفایل
+        User profile = authService.getProfile(user.getId());
+        
+        // Then - بررسی پروفایل اولیه
+        assertThat(profile.getFullName()).isEqualTo("فاطمه محمدی");
+        assertThat(profile.getEmail()).isEqualTo("fateme@example.com");
+        assertThat(profile.getAddress()).isEqualTo("شیراز، خیابان حافظ");
+        
+        // When - به‌روزرسانی پروفایل
+        UpdateProfileRequest updateRequest = new UpdateProfileRequest(
+            "فاطمه احمدی", "fateme.ahmadi@example.com", "شیراز، خیابان سعدی"
+        );
+        User updatedProfile = authService.updateProfile(user.getId(), updateRequest);
+        
+        // Then - بررسی تغییرات
+        assertThat(updatedProfile.getFullName()).isEqualTo("فاطمه احمدی");
+        assertThat(updatedProfile.getEmail()).isEqualTo("fateme.ahmadi@example.com");
+        assertThat(updatedProfile.getAddress()).isEqualTo("شیراز، خیابان سعدی");
+        assertThat(updatedProfile.getPhone()).isEqualTo("09123456702"); // شماره تلفن نباید تغییر کند
+        assertThat(updatedProfile.getId()).isEqualTo(user.getId()); // ID نباید تغییر کند
     }
 } 

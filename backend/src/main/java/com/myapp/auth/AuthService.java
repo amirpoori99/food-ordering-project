@@ -39,10 +39,9 @@ public class AuthService {
     public User register(RegisterRequest req) {
         Objects.requireNonNull(req, "request must not be null");  // اعتبارسنجی ورودی
         
-        // ایجاد شیء کاربر از اطلاعات درخواست
-        User user = new User(null,
-        req.getFullName(), req.getPhone(), req.getEmail(),
-        req.getPasswordHash(), req.getRole(), req.getAddress());
+        // ایجاد شیء کاربر از اطلاعات درخواست - بدون ID تا Hibernate خودش تولید کند
+        User user = new User(req.getFullName(), req.getPhone(), req.getEmail(),
+                req.getPasswordHash(), req.getRole(), req.getAddress());
         
         return repository.saveNew(user);  // ذخیره کاربر در دیتابیس
     }
