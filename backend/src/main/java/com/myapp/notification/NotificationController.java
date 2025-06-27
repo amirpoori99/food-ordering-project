@@ -1197,7 +1197,8 @@ public class NotificationController implements HttpHandler {
             OrderStatus newStatus = OrderStatus.valueOf(newStatusStr.toUpperCase());
             OrderStatus oldStatus = oldStatusStr != null ? OrderStatus.valueOf(oldStatusStr.toUpperCase()) : null;
             
-            Notification notification = notificationService.notifyOrderStatusChanged(userId, orderId, newStatus, oldStatus);
+            // حذف پارامتر oldStatus چون متد NotificationService فقط 3 پارامتر می‌گیرد
+            Notification notification = notificationService.notifyOrderStatusChanged(userId, orderId, newStatus);
             sendSuccessResponse(exchange, notification, 201);
         } catch (Exception e) {
             sendErrorResponse(exchange, 400, e.getMessage());
@@ -1210,6 +1211,7 @@ public class NotificationController implements HttpHandler {
      * JSON Request Body:
      * {
      *   "userId": number,
+     *   "orderId": number,
      *   "deliveryId": number,
      *   "courierName": string,
      *   "estimatedDeliveryTime": string (اختیاری)
@@ -1225,6 +1227,7 @@ public class NotificationController implements HttpHandler {
             Map<String, Object> data = JsonUtil.fromJson(requestBody, Map.class);
             
             Long userId = ((Number) data.get("userId")).longValue();
+            Long orderId = ((Number) data.get("orderId")).longValue();
             Long deliveryId = ((Number) data.get("deliveryId")).longValue();
             String courierName = (String) data.get("courierName");
             String estimatedDeliveryTimeStr = (String) data.get("estimatedDeliveryTime");
@@ -1234,7 +1237,8 @@ public class NotificationController implements HttpHandler {
                 estimatedDeliveryTime = LocalDateTime.parse(estimatedDeliveryTimeStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             }
             
-            Notification notification = notificationService.notifyDeliveryAssigned(userId, deliveryId, courierName, estimatedDeliveryTime);
+            // استفاده از orderId و deliveryId جداگانه از JSON request
+            Notification notification = notificationService.notifyDeliveryAssigned(userId, orderId, deliveryId, courierName);
             sendSuccessResponse(exchange, notification, 201);
         } catch (Exception e) {
             sendErrorResponse(exchange, 400, e.getMessage());

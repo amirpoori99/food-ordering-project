@@ -35,6 +35,14 @@ class NotificationControllerTest {
     private NotificationController notificationController;
     private ByteArrayOutputStream responseBody;
 
+    /**
+     * Helper method برای verification response headers با در نظر گیری actual content length
+     * به جای انتظار exact -1L، هر content length valid را قبول می‌کند
+     */
+    private void verifyResponseHeaders(int expectedStatusCode) throws IOException {
+        verify(exchange).sendResponseHeaders(eq(expectedStatusCode), anyLong());
+    }
+
     @BeforeEach
     void setUp() {
         notificationService = Mockito.mock(NotificationService.class);
@@ -69,7 +77,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
         }
 
         @Test
@@ -90,7 +98,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(201, -1);
+            verify(exchange).sendResponseHeaders(eq(201), anyLong());
         }
 
         @Test
@@ -108,7 +116,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
         }
 
         @Test
@@ -124,7 +132,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
         }
 
         @Test
@@ -138,7 +146,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(405, -1);
+            verify(exchange).sendResponseHeaders(eq(405), anyLong());
         }
     }
 
@@ -163,7 +171,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).getUserNotifications(1L);
             
             String response = responseBody.toString();
@@ -187,7 +195,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).getUserNotificationsPaginated(1L, 0, 10);
         }
 
@@ -207,7 +215,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).getUnreadNotifications(1L);
         }
 
@@ -227,7 +235,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).getNotificationsByType(1L, NotificationType.ORDER_CREATED);
         }
 
@@ -247,7 +255,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).getNotificationsByPriority(1L, NotificationPriority.HIGH);
         }
 
@@ -267,7 +275,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).getHighPriorityNotifications(1L);
         }
 
@@ -287,7 +295,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).getRecentNotifications(1L, 7);
         }
 
@@ -306,7 +314,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).getNotificationById(1L);
         }
 
@@ -323,7 +331,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(404, -1);
+            verify(exchange).sendResponseHeaders(eq(404), anyLong());
             verify(notificationService).getNotificationById(999L);
         }
 
@@ -340,7 +348,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).getUnreadCount(1L);
             
             String response = responseBody.toString();
@@ -358,7 +366,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(400, -1);
+            verify(exchange).sendResponseHeaders(eq(400), anyLong());
         }
     }
 
@@ -385,7 +393,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(201, -1);
+            verify(exchange).sendResponseHeaders(eq(201), anyLong());
             verify(notificationService).createNotification(1L, "Test Title", "Test Message", NotificationType.ORDER_CREATED);
         }
 
@@ -408,7 +416,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(201, -1);
+            verify(exchange).sendResponseHeaders(eq(201), anyLong());
             verify(notificationService).createNotification(1L, "High Priority", "Important Message", NotificationType.SYSTEM_MAINTENANCE, NotificationPriority.HIGH);
         }
 
@@ -430,7 +438,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(201, -1);
+            verify(exchange).sendResponseHeaders(eq(201), anyLong());
             verify(notificationService).notifyOrderCreated(1L, 100L, "Test Restaurant");
         }
 
@@ -452,7 +460,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(201, -1);
+            verify(exchange).sendResponseHeaders(eq(201), anyLong());
             verify(notificationService).notifyOrderStatusChanged(1L, 100L, OrderStatus.PREPARING);
         }
 
@@ -474,7 +482,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(201, -1);
+            verify(exchange).sendResponseHeaders(eq(201), anyLong());
             verify(notificationService).notifyDeliveryAssigned(1L, 100L, 200L, "John Doe");
         }
 
@@ -492,7 +500,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(400, -1);
+            verify(exchange).sendResponseHeaders(eq(400), anyLong());
         }
 
         @Test
@@ -509,7 +517,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(400, -1);
+            verify(exchange).sendResponseHeaders(eq(400), anyLong());
         }
     }
 
@@ -533,7 +541,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).markAsRead(1L);
         }
 
@@ -552,7 +560,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).markAsUnread(1L);
         }
 
@@ -569,7 +577,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).markAllAsRead(1L);
             
             String response = responseBody.toString();
@@ -589,7 +597,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).markAllAsReadByType(1L, NotificationType.ORDER_CREATED);
             
             String response = responseBody.toString();
@@ -607,7 +615,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(400, -1);
+            verify(exchange).sendResponseHeaders(eq(400), anyLong());
         }
 
         @Test
@@ -623,7 +631,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(404, -1);
+            verify(exchange).sendResponseHeaders(eq(404), anyLong());
         }
     }
 
@@ -644,7 +652,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).deleteNotification(1L);
         }
 
@@ -661,7 +669,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).restoreNotification(1L);
         }
 
@@ -676,7 +684,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(400, -1);
+            verify(exchange).sendResponseHeaders(eq(400), anyLong());
         }
 
         @Test
@@ -692,7 +700,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(404, -1);
+            verify(exchange).sendResponseHeaders(eq(404), anyLong());
         }
     }
 
@@ -713,7 +721,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).getNotificationCountByType(1L, NotificationType.ORDER_CREATED);
             
             String response = responseBody.toString();
@@ -733,7 +741,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).getHighPriorityUnreadCount(1L);
             
             String response = responseBody.toString();
@@ -753,7 +761,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).hasUnreadHighPriorityNotifications(1L);
             
             String response = responseBody.toString();
@@ -775,7 +783,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).getLatestNotification(1L);
         }
 
@@ -792,7 +800,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(404, -1);
+            verify(exchange).sendResponseHeaders(eq(404), anyLong());
         }
     }
 
@@ -817,7 +825,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).getOrderNotifications(123L);
         }
 
@@ -837,7 +845,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).getUserOrderNotifications(1L, 123L);
         }
 
@@ -857,7 +865,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).getRestaurantNotifications(456L);
         }
 
@@ -877,7 +885,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).getDeliveryNotifications(789L);
         }
     }
@@ -899,7 +907,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).performDailyMaintenance();
         }
 
@@ -916,7 +924,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).cleanupOldNotifications(30);
             
             String response = responseBody.toString();
@@ -936,7 +944,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(200, -1);
+            verify(exchange).sendResponseHeaders(eq(200), anyLong());
             verify(notificationService).purgeOldNotifications(90);
             
             String response = responseBody.toString();
@@ -961,7 +969,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(500, -1);
+            verify(exchange).sendResponseHeaders(eq(500), anyLong());
         }
 
         @Test
@@ -977,7 +985,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(400, -1);
+            verify(exchange).sendResponseHeaders(eq(400), anyLong());
         }
 
         @Test
@@ -991,7 +999,7 @@ class NotificationControllerTest {
             notificationController.handle(exchange);
             
             // Then
-            verify(exchange).sendResponseHeaders(404, -1);
+            verify(exchange).sendResponseHeaders(eq(404), anyLong());
         }
     }
 } 

@@ -11,8 +11,42 @@ import java.util.Optional;
 
 /**
  * سرویس مدیریت سفارشات و عملیات سبد خرید
- * این کلاس مسئول پردازش تمام منطق کسب‌وکار مربوط به سفارشات است
- * شامل ثبت سفارش، اعتبارسنجی، مدیریت چرخه حیات سفارش و سبد خرید
+ * 
+ * این کلاس مسئول پردازش تمام منطق کسب‌وکار مربوط به سفارشات است:
+ * 
+ * === عملیات سبد خرید ===
+ * - ایجاد سفارش جدید (سبد خرید خالی)
+ * - افزودن/حذف آیتم‌ها از سبد
+ * - به‌روزرسانی تعداد آیتم‌ها
+ * - محاسبه قیمت کل سفارش
+ * 
+ * === مدیریت چرخه حیات سفارش ===
+ * - ثبت نهایی سفارش (از PENDING به CONFIRMED)
+ * - پیگیری مراحل آماده‌سازی (PREPARING → READY)
+ * - مدیریت تحویل (OUT_FOR_DELIVERY → DELIVERED)
+ * - لغو سفارش در مراحل مجاز
+ * 
+ * === اعتبارسنجی کسب‌وکار ===
+ * - بررسی موجودی آیتم‌ها
+ * - اعتبارسنجی تعلق آیتم به رستوران
+ * - چک کردن وضعیت رستوران
+ * - مدیریت تبدیل وضعیت‌های مجاز
+ * 
+ * === آمار و گزارش‌گیری ===
+ * - آمار سفارش‌های مشتری
+ * - محاسبه مبلغ کل خرید
+ * - تعداد سفارش‌های موفق/ناموفق
+ * 
+ * ویژگی‌های کلیدی:
+ * - Inventory Management: مدیریت موجودی در زمان ثبت سفارش
+ * - Business Rules: اعمال قوانین کسب‌وکار پیچیده
+ * - Data Integrity: حفظ یکپارچگی داده‌ها
+ * - Error Handling: مدیریت خطاهای مختلف
+ * - Status Validation: بررسی صحت تغییر وضعیت‌ها
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class OrderService {
     
@@ -147,7 +181,13 @@ public class OrderService {
     }
     
     /**
-     * Removes an item from the shopping cart.
+     * حذف آیتم از سبد خرید
+     * 
+     * @param orderId شناسه سفارش
+     * @param itemId شناسه آیتم غذایی
+     * @return سفارش به‌روزرسانی شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     * @throws NotFoundException در صورت یافت نشدن سفارش یا آیتم
      */
     public Order removeItemFromCart(Long orderId, Long itemId) {
         if (orderId == null) {
@@ -180,7 +220,16 @@ public class OrderService {
     }
     
     /**
-     * Updates the quantity of an item in the shopping cart.
+     * به‌روزرسانی تعداد آیتم در سبد خرید
+     * 
+     * اگر تعداد جدید صفر یا منفی باشد، آیتم از سبد حذف می‌شود
+     * 
+     * @param orderId شناسه سفارش
+     * @param itemId شناسه آیتم غذایی
+     * @param newQuantity تعداد جدید
+     * @return سفارش به‌روزرسانی شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     * @throws NotFoundException در صورت یافت نشدن سفارش یا آیتم
      */
     public Order updateItemQuantity(Long orderId, Long itemId, int newQuantity) {
         if (orderId == null) {
@@ -231,8 +280,15 @@ public class OrderService {
     }
     
     /**
-     * Places the order (confirms the shopping cart).
-     * This transitions the order from PENDING to CONFIRMED.
+     * ثبت نهایی سفارش (تأیید سبد خرید)
+     * 
+     * این عملیات سفارش را از وضعیت PENDING به CONFIRMED منتقل می‌کند
+     * موجودی آیتم‌ها کاهش یافته و سفارش قابل تغییر نخواهد بود
+     * 
+     * @param orderId شناسه سفارش
+     * @return سفارش تأیید شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن وضعیت یا خالی بودن سبد
+     * @throws NotFoundException در صورت یافت نشدن سفارش
      */
     public Order placeOrder(Long orderId) {
         if (orderId == null) {
@@ -294,7 +350,16 @@ public class OrderService {
     }
     
     /**
-     * Cancels an order if it's in a cancellable state.
+     * لغو سفارش در صورت امکان‌پذیر بودن
+     * 
+     * سفارش‌هایی که در وضعیت‌های PENDING، CONFIRMED، یا PREPARING هستند قابل لغو هستند
+     * در صورت لغو، موجودی آیتم‌ها (در صورت نیاز) بازگردانده می‌شود
+     * 
+     * @param orderId شناسه سفارش
+     * @param reason دلیل لغو (اختیاری)
+     * @return سفارش لغو شده
+     * @throws IllegalArgumentException در صورت عدم امکان لغو
+     * @throws NotFoundException در صورت یافت نشدن سفارش
      */
     public Order cancelOrder(Long orderId, String reason) {
         if (orderId == null) {
@@ -330,7 +395,12 @@ public class OrderService {
     }
     
     /**
-     * Gets order details by ID.
+     * دریافت جزئیات سفارش بر اساس شناسه
+     * 
+     * @param orderId شناسه سفارش
+     * @return جزئیات کامل سفارش
+     * @throws IllegalArgumentException در صورت null بودن شناسه
+     * @throws NotFoundException در صورت یافت نشدن سفارش
      */
     public Order getOrder(Long orderId) {
         if (orderId == null) {
@@ -346,7 +416,11 @@ public class OrderService {
     }
     
     /**
-     * Gets all orders for a customer.
+     * دریافت تمام سفارش‌های یک مشتری
+     * 
+     * @param customerId شناسه مشتری
+     * @return لیست سفارش‌های مشتری مرتب شده بر اساس تاریخ (جدیدترین ابتدا)
+     * @throws IllegalArgumentException در صورت null بودن شناسه
      */
     public List<Order> getCustomerOrders(Long customerId) {
         if (customerId == null) {
@@ -357,7 +431,11 @@ public class OrderService {
     }
     
     /**
-     * Gets all orders for a restaurant.
+     * دریافت تمام سفارش‌های یک رستوران
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست سفارش‌های رستوران مرتب شده بر اساس تاریخ
+     * @throws IllegalArgumentException در صورت null بودن شناسه
      */
     public List<Order> getRestaurantOrders(Long restaurantId) {
         if (restaurantId == null) {
@@ -368,7 +446,11 @@ public class OrderService {
     }
     
     /**
-     * Gets orders by status.
+     * دریافت سفارش‌ها بر اساس وضعیت
+     * 
+     * @param status وضعیت سفارش (PENDING, CONFIRMED, PREPARING, ...)
+     * @return لیست سفارش‌های با وضعیت مشخص
+     * @throws IllegalArgumentException در صورت null بودن وضعیت
      */
     public List<Order> getOrdersByStatus(OrderStatus status) {
         if (status == null) {
@@ -379,7 +461,15 @@ public class OrderService {
     }
     
     /**
-     * Updates order status (for restaurant/admin use).
+     * به‌روزرسانی وضعیت سفارش (برای رستوران/ادمین)
+     * 
+     * تنها تغییرات مجاز بین وضعیت‌ها امکان‌پذیر است
+     * 
+     * @param orderId شناسه سفارش
+     * @param newStatus وضعیت جدید
+     * @return سفارش به‌روزرسانی شده
+     * @throws IllegalArgumentException در صورت تغییر غیرمجاز وضعیت
+     * @throws NotFoundException در صورت یافت نشدن سفارش
      */
     public Order updateOrderStatus(Long orderId, OrderStatus newStatus) {
         if (orderId == null) {
@@ -472,7 +562,12 @@ public class OrderService {
     }
     
     /**
-     * Simple statistics class for order data.
+     * کلاس آماری برای اطلاعات سفارش‌ها
+     * 
+     * حاوی آمار کلی فعالیت سفارش‌گیری یک مشتری شامل:
+     * - تعداد کل سفارش‌ها
+     * - تعداد سفارش‌های تکمیل شده و لغو شده
+     * - مبلغ کل خرید و میانگین ارزش سفارش
      */
     public static class OrderStatistics {
         private final int totalOrders;

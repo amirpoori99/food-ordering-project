@@ -1,6 +1,7 @@
 package com.myapp.auth;
 
 import com.myapp.auth.dto.RegisterRequest;
+import com.myapp.auth.dto.LoginRequest;
 import com.myapp.auth.dto.UpdateProfileRequest;
 import com.myapp.common.exceptions.InvalidCredentialsException;
 import com.myapp.common.models.User;
@@ -59,6 +60,33 @@ public class AuthService {
         return repository.findByPhone(phone)                            // یافتن کاربر با شماره تلفن
                 .filter(u -> u.getPasswordHash().equals(passwordHash))  // فیلتر بر اساس رمز عبور
                 .orElseThrow(InvalidCredentialsException::new);         // پرتاب استثنا در صورت عدم مطابقت
+    }
+
+    /**
+     * ورود کاربر با استفاده از درخواست ورود (LoginRequest)
+     * این متد wrapper برای متد login اصلی است
+     * 
+     * @param req درخواست ورود حاوی اطلاعات کاربر
+     * @return AuthResult حاوی اطلاعات کاربر یا خطا
+     */
+    public AuthResult login(LoginRequest req) {
+        Objects.requireNonNull(req, "login request must not be null");  // اعتبارسنجی ورودی
+        
+        try {
+            // تلاش برای ورود کاربر
+            User user = login(req.getPhone(), req.getPasswordHash());
+            
+            // تولید جفت token (Access + Refresh)
+            String[] tokens = JWTUtil.generateTokenPair(user.getId(), user.getPhone(), user.getRole().toString());
+            
+            // بازگشت AuthResult با هر دو token
+            return AuthResult.refreshed(user.getId(), user.getPhone(), user.getRole().toString(), tokens[0], tokens[1]);
+            
+        } catch (InvalidCredentialsException e) {
+            return AuthResult.unauthenticated("Invalid phone or password");
+        } catch (Exception e) {
+            return AuthResult.unauthenticated("Login failed: " + e.getMessage());
+        }
     }
     
     /**

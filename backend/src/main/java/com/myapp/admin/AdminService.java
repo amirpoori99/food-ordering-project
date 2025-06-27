@@ -643,12 +643,12 @@ public class AdminService {
     /**
      * دریافت آمار روزانه برای چند روز گذشته
      * 
-     * @param days تعداد روزهای گذشته (حداکثر 365 روز)
+     * @param days تعداد روزهای گذشته (حداکثر 90 روز)
      * @return لیست آمار روزانه
      */
     public List<AdminRepository.DailyStatistics> getDailyStatistics(int days) {
         if (days <= 0) days = 7;
-        if (days > 365) days = 365; // محدودیت به یک سال
+        if (days > 90) days = 90; // محدودیت به 90 روز
         
         return adminRepository.getDailyStatistics(days);
     }

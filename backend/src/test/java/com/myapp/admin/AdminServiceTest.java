@@ -1111,8 +1111,10 @@ class AdminServiceTest {
         @DisplayName("Should throw exception for non-admin user")
         void testVerifyAdminPermissions_NonAdmin() {
             // Arrange
+            User targetUser = new User(2L, "Target", "1111111111", "target@test.com", "hash", User.Role.BUYER, "Address");
             User nonAdmin = new User(1L, "User", "0000000000", "user@test.com", "hash", User.Role.BUYER, "Address");
-            when(authRepository.findById(1L)).thenReturn(Optional.of(nonAdmin));
+            when(authRepository.findById(2L)).thenReturn(Optional.of(targetUser)); // کاربر هدف
+            when(authRepository.findById(1L)).thenReturn(Optional.of(nonAdmin)); // کاربر غیرادمین
             
             // Act & Assert
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 

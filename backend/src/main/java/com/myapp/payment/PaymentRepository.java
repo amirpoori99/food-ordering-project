@@ -60,7 +60,7 @@ public class PaymentRepository {
      * @return تراکنش ذخیره شده با ID تولید شده
      */
     public Transaction save(Transaction transaction) {
-        try (Session session = sessionFactory.getCurrentSession()) {
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             session.persist(transaction); // Hibernate 6+ syntax
             session.getTransaction().commit();
@@ -75,7 +75,7 @@ public class PaymentRepository {
      * @return تراکنش به‌روزرسانی شده
      */
     public Transaction update(Transaction transaction) {
-        try (Session session = sessionFactory.getCurrentSession()) {
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             Transaction updated = session.merge(transaction); // merge برای update
             session.getTransaction().commit();
@@ -90,7 +90,7 @@ public class PaymentRepository {
      * @return Optional حاوی تراکنش یا خالی
      */
     public Optional<Transaction> findById(Long id) {
-        try (Session session = sessionFactory.getCurrentSession()) {
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             Transaction transaction = session.get(Transaction.class, id);
             session.getTransaction().commit();
@@ -108,7 +108,7 @@ public class PaymentRepository {
      * @return Optional حاوی تراکنش یا خالی
      */
     public Optional<Transaction> findByReferenceId(String referenceId) {
-        try (Session session = sessionFactory.getCurrentSession()) {
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             Query<Transaction> query = session.createQuery(
                 "FROM Transaction t WHERE t.referenceId = :referenceId", Transaction.class);
@@ -128,7 +128,7 @@ public class PaymentRepository {
      * @return لیست تراکنش‌های کاربر
      */
     public List<Transaction> findByUserId(Long userId) {
-        try (Session session = sessionFactory.getCurrentSession()) {
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             Query<Transaction> query = session.createQuery(
                 "FROM Transaction t WHERE t.userId = :userId ORDER BY t.createdAt DESC", Transaction.class);
@@ -168,7 +168,7 @@ public class PaymentRepository {
      * @return لیست تراکنش‌های با وضعیت مشخص
      */
     public List<Transaction> findByStatus(TransactionStatus status) {
-        try (Session session = sessionFactory.getCurrentSession()) {
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             Query<Transaction> query = session.createQuery(
                 "FROM Transaction t WHERE t.status = :status ORDER BY t.createdAt DESC", Transaction.class);
@@ -376,7 +376,7 @@ public class PaymentRepository {
      * @return آمار کامل تراکنش‌های کاربر
      */
     public TransactionStatistics getUserTransactionStatistics(Long userId) {
-        try (Session session = sessionFactory.getCurrentSession()) {
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             
             // تعداد کل تراکنش‌ها
@@ -465,12 +465,27 @@ public class PaymentRepository {
      * @param id شناسه تراکنش برای حذف
      */
     public void delete(Long id) {
-        try (Session session = sessionFactory.getCurrentSession()) {
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
             Transaction transaction = session.get(Transaction.class, id);
             if (transaction != null) {
                 session.remove(transaction);
             }
+            session.getTransaction().commit();
+        }
+    }
+    
+    /**
+     * حذف تمام تراکنش‌ها (فقط برای تست‌ها)
+     * 
+     * این متد تمام تراکنش‌ها را حذف می‌کند و باید فقط در محیط تست استفاده شود
+     * در محیط production، تراکنش‌ها هرگز حذف نمی‌شوند
+     */
+    public void deleteAll() {
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            Query<?> query = session.createQuery("DELETE FROM Transaction");
+            query.executeUpdate();
             session.getTransaction().commit();
         }
     }

@@ -5,6 +5,7 @@ import com.myapp.common.models.Restaurant;
 import com.myapp.common.models.RestaurantStatus;
 import com.myapp.common.models.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,9 @@ public class FavoritesRepositoryTest {
     void setUp() {
         favoritesRepository = new FavoritesRepository();
         
+        // پاک‌سازی داده‌های قبلی
+        favoritesRepository.clear();
+        
         // Create test data
         testUser = new User();
         testUser.setId(1L);
@@ -42,6 +46,14 @@ public class FavoritesRepositoryTest {
         
         testFavorite = new Favorite(testUser, testRestaurant, "Great food!");
         testFavorite.setCreatedAt(LocalDateTime.now());
+    }
+    
+    @AfterEach
+    void tearDown() {
+        // پاک‌سازی بعد از هر تست
+        if (favoritesRepository != null) {
+            favoritesRepository.clear();
+        }
     }
 
     @Nested
@@ -71,14 +83,20 @@ public class FavoritesRepositoryTest {
         @Test
         @DisplayName("Should update existing favorite")
         void shouldUpdateExistingFavorite() {
-            // Arrange
-            testFavorite.setId(1L);
+            // Arrange - ابتدا یک favorite ایجاد کنیم
+            Favorite originalFavorite = favoritesRepository.save(testFavorite);
+            assertNotNull(originalFavorite);
+            assertNotNull(originalFavorite.getId());
+            
+            // حالا سعی کنیم آن را update کنیم
+            originalFavorite.setNotes("Updated notes");
             
             // Act & Assert
             assertDoesNotThrow(() -> {
-                Favorite updated = favoritesRepository.save(testFavorite);
+                Favorite updated = favoritesRepository.save(originalFavorite);
                 assertNotNull(updated);
-                assertEquals(1L, updated.getId());
+                assertEquals(originalFavorite.getId(), updated.getId()); // ID باید یکسان باشد
+                assertEquals("Updated notes", updated.getNotes()); // notes باید به‌روزرسانی شده باشد
             });
         }
         

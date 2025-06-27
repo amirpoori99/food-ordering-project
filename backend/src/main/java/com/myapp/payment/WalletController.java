@@ -526,4 +526,61 @@ public class WalletController implements HttpHandler {
             + "\"totalTransactions\":" + stats.getTotalTransactions()
             + "}";
     }
+    
+    // ==================== WRAPPER METHODS FOR TESTING ====================
+    
+    /**
+     * اضافه کردن متدهای wrapper مستقیم برای تست‌ها و فراخوانی‌های internal
+     * این متدها بدون HTTP layer کار می‌کنند
+     */
+    
+    /**
+     * دریافت موجودی کیف پول کاربر
+     */
+    public java.math.BigDecimal getBalance(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+        return walletService.getBalance(userId);
+    }
+    
+    /**
+     * شارژ کیف پول کاربر
+     */
+    public Transaction creditWallet(Long userId, java.math.BigDecimal amount, String description) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+        return walletService.creditWallet(userId, amount, description);
+    }
+    
+    /**
+     * برداشت از کیف پول کاربر
+     */
+    public Transaction debitWallet(Long userId, java.math.BigDecimal amount, String description) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+        return walletService.debitWallet(userId, amount, description);
+    }
+    
+    /**
+     * دریافت تاریخچه تراکنش‌های کیف پول
+     */
+    public List<Transaction> getTransactionHistory(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+        return walletService.getTransactionHistory(userId);
+    }
+    
+    /**
+     * انتقال وجه بین دو کیف پول
+     */
+    public Transaction transfer(Long fromUserId, Long toUserId, java.math.BigDecimal amount, String description) {
+        if (fromUserId == null || toUserId == null) {
+            throw new IllegalArgumentException("User IDs cannot be null");
+        }
+        return walletService.transfer(fromUserId, toUserId, amount, description);
+    }
 }

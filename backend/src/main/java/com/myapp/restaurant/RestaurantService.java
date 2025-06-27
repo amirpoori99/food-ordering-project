@@ -398,34 +398,41 @@ public class RestaurantService {
             cacheKey,
             () -> {
                 return PerformanceUtil.measurePerformance("calculateRestaurantStatistics", () -> {
-                    List<Restaurant> allRestaurants = getAllRestaurants();
-                    
-                    // Check memory usage before processing large dataset
-                    if (PerformanceUtil.isMemoryUsageCritical()) {
-                        PerformanceUtil.forceGarbageCollection();
-                    }
-                    
-                    long totalCount = allRestaurants.size();
-                    long approvedCount = allRestaurants.parallelStream()
-                            .filter(r -> r.getStatus() == RestaurantStatus.APPROVED)
-                            .count();
-                    long pendingCount = allRestaurants.parallelStream()
-                            .filter(r -> r.getStatus() == RestaurantStatus.PENDING)
-                            .count();
-                    long rejectedCount = allRestaurants.parallelStream()
-                            .filter(r -> r.getStatus() == RestaurantStatus.REJECTED)
-                            .count();
-                    long suspendedCount = allRestaurants.parallelStream()
-                            .filter(r -> r.getStatus() == RestaurantStatus.SUSPENDED)
-                            .count();
-                    
-                    return new RestaurantStatistics(totalCount, approvedCount, pendingCount, 
-                                                  rejectedCount, suspendedCount);
+                    return calculateRestaurantStatisticsInternal();
                 }).getResult();
             },
             RestaurantStatistics.class,
             30 // Cache for 30 minutes
         );
+    }
+    
+    /**
+     * Calculate restaurant statistics without caching - for testing and internal use
+     */
+    private RestaurantStatistics calculateRestaurantStatisticsInternal() {
+        List<Restaurant> allRestaurants = getAllRestaurants();
+        
+        // Check memory usage before processing large dataset
+        if (PerformanceUtil.isMemoryUsageCritical()) {
+            PerformanceUtil.forceGarbageCollection();
+        }
+        
+        long totalCount = allRestaurants.size();
+        long approvedCount = allRestaurants.parallelStream()
+                .filter(r -> r.getStatus() == RestaurantStatus.APPROVED)
+                .count();
+        long pendingCount = allRestaurants.parallelStream()
+                .filter(r -> r.getStatus() == RestaurantStatus.PENDING)
+                .count();
+        long rejectedCount = allRestaurants.parallelStream()
+                .filter(r -> r.getStatus() == RestaurantStatus.REJECTED)
+                .count();
+        long suspendedCount = allRestaurants.parallelStream()
+                .filter(r -> r.getStatus() == RestaurantStatus.SUSPENDED)
+                .count();
+        
+        return new RestaurantStatistics(totalCount, approvedCount, pendingCount, 
+                                      rejectedCount, suspendedCount);
     }
     
     // متدهای خصوصی برای اعتبارسنجی

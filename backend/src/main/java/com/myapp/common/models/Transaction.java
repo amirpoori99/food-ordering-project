@@ -1,6 +1,7 @@
 package com.myapp.common.models;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -177,6 +178,19 @@ public class Transaction {
     
     public Double getAmount() { return amount; }
     public void setAmount(Double amount) { this.amount = amount; }
+    
+    /**
+     * تنظیم مبلغ با BigDecimal - برای سازگاری با تست‌ها
+     * 
+     * @param amount مبلغ تراکنش
+     */
+    public void setAmount(BigDecimal amount) {
+        if (amount != null) {
+            this.amount = amount.doubleValue();
+        } else {
+            this.amount = null;
+        }
+    }
     
     public TransactionType getType() { return type; }
     public void setType(TransactionType type) { this.type = type; }
