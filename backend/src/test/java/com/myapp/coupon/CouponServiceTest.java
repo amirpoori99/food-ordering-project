@@ -25,47 +25,131 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
 /**
- * Comprehensive test suite for CouponService
- * Tests all business logic, validation, and edge cases
+ * مجموعه تست‌های جامع CouponService
+ * 
+ * این کلاس تمام منطق کسب‌وکار، اعتبارسنجی‌ها و موارد خاص (edge cases) را آزمایش می‌کند
+ * 
+ * === دسته‌های تست ===
+ * 1. Coupon Creation Tests - تست‌های ایجاد کوپن
+ *    - ایجاد کوپن درصدی
+ *    - ایجاد کوپن مبلغ ثابت
+ *    - ایجاد کوپن اختصاصی رستوران
+ *    - اعتبارسنجی ورودی‌ها
+ *    - مدیریت مجوزها
+ * 
+ * 2. Coupon Application Tests - تست‌های اعمال کوپن
+ *    - اعمال موفق کوپن‌ها
+ *    - محاسبه صحیح تخفیف
+ *    - اعتبارسنجی قوانین کسب‌وکار
+ *    - مدیریت محدودیت‌ها
+ *    - خطاهای اعمال کوپن
+ * 
+ * 3. Coupon Usage Tests - تست‌های استفاده از کوپن
+ *    - افزایش شمارنده استفاده
+ *    - بازگشت استفاده
+ *    - ردیابی کامل استفاده
+ *    - مدیریت کوپن‌های غیرموجود
+ * 
+ * 4. Coupon Management Tests - تست‌های مدیریت کوپن
+ *    - عملیات CRUD
+ *    - فعال‌سازی و غیرفعال‌سازی
+ *    - حذف کوپن
+ *    - مدیریت مجوزها
+ *    - آمارگیری
+ * 
+ * 5. Edge Cases and Error Handling - موارد خاص و مدیریت خطا
+ *    - ورودی‌های null
+ *    - مقادیر مرزی
+ *    - مقادیر بزرگ
+ *    - محدودیت‌های صفر
+ *    - مقادیر تخفیف کوچک
+ * 
+ * === ویژگی‌های تست ===
+ * - Mock-based Testing: استفاده از mock objects برای ایزوله کردن تست‌ها
+ * - Business Logic Validation: اعتبارسنجی کامل منطق کسب‌وکار
+ * - Permission Testing: تست مجوزهای دسترسی
+ * - Edge Case Coverage: پوشش موارد خاص و مرزی
+ * - Error Scenario Testing: تست سناریوهای خطا
+ * - Data Setup: راه‌اندازی داده‌های تست جامع
+ * 
+ * === Mock Objects ===
+ * - CouponRepository: عملیات دیتابیس کوپن‌ها
+ * - AuthRepository: احراز هویت و مجوزها
+ * - RestaurantRepository: مدیریت رستوران‌ها
+ * - CouponUsageRepository: ردیابی استفاده از کوپن‌ها
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 @DisplayName("CouponService Tests")
 public class CouponServiceTest {
     
+    /** Mock repository برای عملیات کوپن‌ها */
     @Mock
     private CouponRepository couponRepository;
     
+    /** Mock repository برای احراز هویت */
     @Mock
     private AuthRepository authRepository;
     
+    /** Mock repository برای رستوران‌ها */
     @Mock
     private RestaurantRepository restaurantRepository;
     
-    private CouponService couponService;
-    
-    // Test data
-    private User adminUser;
-    private User restaurantOwner;
-    private User customer;
-    private Restaurant restaurant;
-    private Coupon percentageCoupon;
-    private Coupon fixedAmountCoupon;
-    private LocalDateTime validFrom;
-    private LocalDateTime validUntil;
-    
+    /** Mock repository برای ردیابی استفاده از کوپن‌ها */
     @Mock
     private CouponUsageRepository couponUsageRepository;
     
+    /** سرویس تحت تست */
+    private CouponService couponService;
+    
+    // داده‌های تست
+    /** کاربر ادمین برای تست‌های مجوز */
+    private User adminUser;
+    /** مالک رستوران برای تست‌های مجوز */
+    private User restaurantOwner;
+    /** مشتری برای تست‌های اعمال کوپن */
+    private User customer;
+    /** رستوران نمونه برای تست‌ها */
+    private Restaurant restaurant;
+    /** کوپن درصدی نمونه */
+    private Coupon percentageCoupon;
+    /** کوپن مبلغ ثابت نمونه */
+    private Coupon fixedAmountCoupon;
+    /** تاریخ شروع اعتبار */
+    private LocalDateTime validFrom;
+    /** تاریخ پایان اعتبار */
+    private LocalDateTime validUntil;
+    
+    /**
+     * راه‌اندازی قبل از هر تست
+     * 
+     * عملیات انجام شده:
+     * - initialize کردن mock objects
+     * - ایجاد instance سرویس با dependency injection
+     * - راه‌اندازی داده‌های تست
+     */
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         couponService = new CouponService(couponRepository, authRepository, restaurantRepository, couponUsageRepository);
         
-        // Setup test data
+        // راه‌اندازی داده‌های تست
         setupTestData();
     }
     
+    /**
+     * راه‌اندازی داده‌های تست
+     * 
+     * این متد تمام objects مورد نیاز برای تست‌ها را ایجاد می‌کند:
+     * - کاربران با نقش‌های مختلف
+     * - رستوران نمونه
+     * - کوپن‌های نمونه
+     * - تاریخ‌های معتبر
+     */
     private void setupTestData() {
-        // Users
+        // ایجاد کاربران
         adminUser = new User();
         adminUser.setId(1L);
         adminUser.setRole(User.Role.ADMIN);
@@ -81,18 +165,18 @@ public class CouponServiceTest {
         customer.setRole(User.Role.BUYER);
         customer.setEmail("customer@test.com");
         
-        // Restaurant
+        // ایجاد رستوران
         restaurant = new Restaurant();
         restaurant.setId(1L);
         restaurant.setName("Test Restaurant");
         restaurant.setOwnerId(2L);
         restaurant.setStatus(RestaurantStatus.APPROVED);
         
-        // Dates
+        // تنظیم تاریخ‌ها
         validFrom = LocalDateTime.now().minusDays(1);
         validUntil = LocalDateTime.now().plusDays(30);
         
-        // Coupons
+        // ایجاد کوپن‌های نمونه
         percentageCoupon = Coupon.createPercentageCoupon("SAVE20", "20% off your order", 20.0, validFrom, validUntil);
         percentageCoupon.setId(1L);
         percentageCoupon.setCreatedBy(1L);
@@ -109,35 +193,63 @@ public class CouponServiceTest {
         fixedAmountCoupon.setUsedCount(0);
     }
     
+    /**
+     * تست‌های ایجاد کوپن
+     * 
+     * این دسته تمام سناریوهای ایجاد کوپن را آزمایش می‌کند:
+     * - ایجاد موفق کوپن‌های درصدی و مبلغ ثابت
+     * - ایجاد کوپن‌های اختصاصی رستوران
+     * - اعتبارسنجی ورودی‌ها
+     * - مدیریت مجوزهای دسترسی
+     * - خطاهای validation
+     */
     @Nested
     @DisplayName("Coupon Creation Tests")
     class CouponCreationTests {
         
+        /**
+         * تست ایجاد موفق کوپن درصدی
+         * 
+         * Scenario: ادمین کوپن درصدی جدید ایجاد می‌کند
+         * Expected:
+         * - کوپن با موفقیت ایجاد شود
+         * - تمام فیلدها صحیح تنظیم شوند
+         * - repository methods صحیح فراخوانی شوند
+         */
         @Test
-        @DisplayName("Should create percentage coupon successfully")
+        @DisplayName("✅ ایجاد موفق کوپن درصدی")
         void shouldCreatePercentageCouponSuccessfully() {
-            // Arrange
+            // Arrange - آماده‌سازی mock ها
             when(authRepository.findById(1L)).thenReturn(Optional.of(adminUser));
             when(couponRepository.existsByCode("SAVE20")).thenReturn(false);
             when(couponRepository.save(any(Coupon.class))).thenReturn(percentageCoupon);
             
-            // Act
+            // Act - فراخوانی متد تحت تست
             Coupon result = couponService.createPercentageCoupon(
                 "SAVE20", "20% off your order", 20.0, validFrom, validUntil, 1L, null);
             
-            // Assert
-            assertNotNull(result);
-            assertEquals("SAVE20", result.getCode());
-            assertEquals(Coupon.CouponType.PERCENTAGE, result.getType());
-            assertEquals(20.0, result.getValue());
-            assertEquals(1L, result.getCreatedBy());
+            // Assert - بررسی نتایج
+            assertNotNull(result, "کوپن ایجاد شده نباید null باشد");
+            assertEquals("SAVE20", result.getCode(), "کد کوپن باید صحیح باشد");
+            assertEquals(Coupon.CouponType.PERCENTAGE, result.getType(), "نوع کوپن باید درصدی باشد");
+            assertEquals(20.0, result.getValue(), "مقدار درصد باید صحیح باشد");
+            assertEquals(1L, result.getCreatedBy(), "شناسه ایجادکننده باید صحیح باشد");
             
+            // بررسی فراخوانی متدهای repository
             verify(couponRepository).existsByCode("SAVE20");
             verify(couponRepository).save(any(Coupon.class));
         }
         
+        /**
+         * تست ایجاد موفق کوپن مبلغ ثابت
+         * 
+         * Scenario: ادمین کوپن مبلغ ثابت جدید ایجاد می‌کند
+         * Expected:
+         * - کوپن با موفقیت ایجاد شود
+         * - نوع کوپن FIXED_AMOUNT باشد
+         */
         @Test
-        @DisplayName("Should create fixed amount coupon successfully")
+        @DisplayName("✅ ایجاد موفق کوپن مبلغ ثابت")
         void shouldCreateFixedAmountCouponSuccessfully() {
             // Arrange
             when(authRepository.findById(1L)).thenReturn(Optional.of(adminUser));
@@ -149,18 +261,26 @@ public class CouponServiceTest {
                 "SAVE10", "10 dollars off", 10.0, validFrom, validUntil, 1L, null);
             
             // Assert
-            assertNotNull(result);
-            assertEquals("SAVE10", result.getCode());
-            assertEquals(Coupon.CouponType.FIXED_AMOUNT, result.getType());
-            assertEquals(10.0, result.getValue());
-            assertEquals(1L, result.getCreatedBy());
+            assertNotNull(result, "کوپن ایجاد شده نباید null باشد");
+            assertEquals("SAVE10", result.getCode(), "کد کوپن باید صحیح باشد");
+            assertEquals(Coupon.CouponType.FIXED_AMOUNT, result.getType(), "نوع کوپن باید مبلغ ثابت باشد");
+            assertEquals(10.0, result.getValue(), "مقدار تخفیف باید صحیح باشد");
+            assertEquals(1L, result.getCreatedBy(), "شناسه ایجادکننده باید صحیح باشد");
             
             verify(couponRepository).existsByCode("SAVE10");
             verify(couponRepository).save(any(Coupon.class));
         }
         
+        /**
+         * تست ایجاد کوپن اختصاصی رستوران
+         * 
+         * Scenario: مالک رستوران کوپن اختصاصی برای رستوران خود ایجاد می‌کند
+         * Expected:
+         * - کوپن با موفقیت ایجاد شود
+         * - رستوران به کوپن اختصاص یابد
+         */
         @Test
-        @DisplayName("Should create restaurant-specific coupon when restaurant owner creates it")
+        @DisplayName("✅ ایجاد کوپن اختصاصی رستوران")
         void shouldCreateRestaurantSpecificCoupon() {
             // Arrange
             when(authRepository.findById(2L)).thenReturn(Optional.of(restaurantOwner));
@@ -173,13 +293,20 @@ public class CouponServiceTest {
                 "RESTAURANT20", "20% off at our restaurant", 20.0, validFrom, validUntil, 2L, 1L);
             
             // Assert
-            assertNotNull(result);
-            verify(restaurantRepository, times(2)).findById(1L); // Called twice: validation + setting restaurant
+            assertNotNull(result, "کوپن رستوران باید ایجاد شود");
+            // بررسی فراخوانی دو بار findById: یکبار برای validation، یکبار برای setting restaurant
+            verify(restaurantRepository, times(2)).findById(1L);
             verify(couponRepository).save(any(Coupon.class));
         }
         
+        /**
+         * تست خطا برای کد تکراری
+         * 
+         * Scenario: تلاش برای ایجاد کوپن با کد موجود
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
-        @DisplayName("Should throw exception when coupon code already exists")
+        @DisplayName("❌ خطا برای کد کوپن تکراری")
         void shouldThrowExceptionWhenCodeExists() {
             // Arrange
             when(authRepository.findById(1L)).thenReturn(Optional.of(adminUser));
@@ -193,8 +320,14 @@ public class CouponServiceTest {
             verify(couponRepository, never()).save(any(Coupon.class));
         }
         
+        /**
+         * تست خطا برای درصد نامعتبر
+         * 
+         * Scenario: تلاش برای ایجاد کوپن با درصد بیش از 100
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
-        @DisplayName("Should throw exception for invalid percentage")
+        @DisplayName("❌ خطا برای درصد نامعتبر")
         void shouldThrowExceptionForInvalidPercentage() {
             // Arrange
             when(authRepository.findById(1L)).thenReturn(Optional.of(adminUser));
@@ -207,8 +340,14 @@ public class CouponServiceTest {
             assertEquals("Percentage must be between 0 and 100", exception.getMessage());
         }
         
+        /**
+         * تست خطا برای مبلغ منفی
+         * 
+         * Scenario: تلاش برای ایجاد کوپن با مبلغ منفی
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
-        @DisplayName("Should throw exception for invalid fixed amount")
+        @DisplayName("❌ خطا برای مبلغ ثابت منفی")
         void shouldThrowExceptionForInvalidFixedAmount() {
             // Arrange
             when(authRepository.findById(1L)).thenReturn(Optional.of(adminUser));
@@ -221,8 +360,14 @@ public class CouponServiceTest {
             assertEquals("Fixed amount must be positive", exception.getMessage());
         }
         
+        /**
+         * تست خطا برای مجوز نامعتبر - کوپن سراسری
+         * 
+         * Scenario: مالک رستوران تلاش می‌کند کوپن سراسری ایجاد کند
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
-        @DisplayName("Should throw exception when restaurant owner tries to create global coupon")
+        @DisplayName("❌ خطا برای ایجاد کوپن سراسری توسط مالک رستوران")
         void shouldThrowExceptionForRestaurantOwnerCreatingGlobalCoupon() {
             // Arrange
             when(authRepository.findById(2L)).thenReturn(Optional.of(restaurantOwner));
@@ -235,13 +380,19 @@ public class CouponServiceTest {
             assertEquals("Restaurant owners cannot create global coupons", exception.getMessage());
         }
         
+        /**
+         * تست خطا برای مجوز نامعتبر - رستوران غیرمتعلق
+         * 
+         * Scenario: مالک رستوران تلاش می‌کند برای رستوران دیگری کوپن ایجاد کند
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
-        @DisplayName("Should throw exception when restaurant owner tries to create coupon for other restaurant")
+        @DisplayName("❌ خطا برای ایجاد کوپن برای رستوران غیرمتعلق")
         void shouldThrowExceptionForUnauthorizedRestaurantCoupon() {
             // Arrange
             Restaurant otherRestaurant = new Restaurant();
             otherRestaurant.setId(2L);
-            otherRestaurant.setOwnerId(99L); // Different owner
+            otherRestaurant.setOwnerId(99L); // مالک متفاوت
             
             when(authRepository.findById(2L)).thenReturn(Optional.of(restaurantOwner));
             when(restaurantRepository.findById(2L)).thenReturn(Optional.of(otherRestaurant));
@@ -254,8 +405,14 @@ public class CouponServiceTest {
             assertEquals("Restaurant owners can only create coupons for their own restaurants", exception.getMessage());
         }
         
+        /**
+         * تست خطا برای مجوز نامعتبر - مشتری
+         * 
+         * Scenario: مشتری تلاش می‌کند کوپن ایجاد کند
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
-        @DisplayName("Should throw exception when customer tries to create coupon")
+        @DisplayName("❌ خطا برای ایجاد کوپن توسط مشتری")
         void shouldThrowExceptionForCustomerCreatingCoupon() {
             // Arrange
             when(authRepository.findById(3L)).thenReturn(Optional.of(customer));
@@ -268,8 +425,14 @@ public class CouponServiceTest {
             assertEquals("Only admins and restaurant owners can create coupons", exception.getMessage());
         }
         
+        /**
+         * تست خطا برای بازه تاریخ نامعتبر
+         * 
+         * Scenario: تاریخ پایان قبل از تاریخ شروع است
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
-        @DisplayName("Should throw exception for invalid date range")
+        @DisplayName("❌ خطا برای بازه تاریخ نامعتبر")
         void shouldThrowExceptionForInvalidDateRange() {
             // Arrange
             LocalDateTime invalidValidUntil = validFrom.minusDays(1);

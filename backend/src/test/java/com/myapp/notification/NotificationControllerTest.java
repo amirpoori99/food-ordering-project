@@ -24,15 +24,47 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * کلاس تست جامع برای NotificationController
+ * 
+ * این کلاس تمام endpoint های HTTP مربوط به اعلان‌ها را تست می‌کند:
+ * 
+ * === دسته‌بندی تست‌ها ===
+ * - HandleMethodRoutingTest: تست مسیریابی HTTP methods
+ * - GetEndpointsTest: تست تمام GET endpoints
+ * - PostEndpointsTest: تست تمام POST endpoints  
+ * - PutEndpointsTest: تست تمام PUT endpoints
+ * - DeleteEndpointsTest: تست تمام DELETE endpoints
+ * - StatisticsEndpointsTest: تست endpoint های آمار
+ * - SpecializedEndpointsTest: تست endpoint های تخصصی
+ * - MaintenanceEndpointsTest: تست endpoint های نگهداری
+ * - ErrorHandlingTest: تست مدیریت خطاها
+ * 
+ * === ویژگی‌های تست ===
+ * - Mock HTTP Exchange: شبیه‌سازی HTTP requests/responses
+ * - JSON Processing: تست پردازش JSON
+ * - URL Pattern Testing: تست الگوهای URL مختلف
+ * - Error Scenario Coverage: پوشش سناریوهای خطا
+ * - Response Validation: تایید صحت responses
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 class NotificationControllerTest {
 
+    /** Mock سرویس اعلان‌ها */
     @Mock
     private NotificationService notificationService;
     
+    /** Mock HTTP Exchange برای شبیه‌سازی requests */
     @Mock
     private HttpExchange exchange;
     
+    /** کنترلر تحت تست */
     private NotificationController notificationController;
+    
+    /** Stream برای capture کردن response body */
     private ByteArrayOutputStream responseBody;
 
     /**

@@ -17,21 +17,123 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * مجموعه تست‌های جامع MenuController
+ * 
+ * این کلاس تست تمام endpoint های REST API مربوط به مدیریت منو را آزمایش می‌کند:
+ * 
+ * Test Categories:
+ * 1. Menu Retrieval Tests
+ *    - GET /api/menus/restaurant/{id} - دریافت منوی کامل
+ *    - GET /api/menus/restaurant/{id}/available - آیتم‌های موجود
+ *    - validation پارامترها
+ *    - error handling
+ * 
+ * 2. Add Item to Menu Tests
+ *    - POST /api/menus/restaurant/{id}/items - اضافه کردن آیتم
+ *    - validation ورودی‌ها
+ *    - business rules
+ *    - error scenarios
+ * 
+ * 3. Update Menu Item Tests
+ *    - PUT /api/menus/items/{id} - به‌روزرسانی کامل
+ *    - PUT /api/menus/items/{id}/availability - تنظیم موجودی
+ *    - PUT /api/menus/items/{id}/quantity - به‌روزرسانی تعداد
+ *    - partial updates
+ * 
+ * 4. Remove Item from Menu Tests
+ *    - DELETE /api/menus/items/{id} - حذف آیتم
+ *    - cascade effects
+ *    - authorization
+ * 
+ * 5. Item Availability Tests
+ *    - مدیریت وضعیت موجودی
+ *    - stock management
+ *    - availability rules
+ * 
+ * 6. Menu Category Tests
+ *    - GET /api/menus/restaurant/{id}/categories - لیست دسته‌ها
+ *    - GET /api/menus/restaurant/{id}/category/{cat} - فیلتر دسته
+ *    - category management
+ * 
+ * 7. Menu Statistics Tests
+ *    - GET /api/menus/restaurant/{id}/statistics - آمار منو
+ *    - metrics calculation
+ *    - performance indicators
+ * 
+ * 8. Restaurant Ownership Tests
+ *    - authorization validation
+ *    - ownership verification
+ *    - access control
+ * 
+ * 9. Low Stock Tests
+ *    - GET /api/menus/restaurant/{id}/low-stock - آیتم‌های کم موجود
+ *    - threshold management
+ *    - inventory alerts
+ * 
+ * HTTP Methods Coverage:
+ * - GET: دریافت منو، آمار، فیلترها
+ * - POST: اضافه کردن آیتم جدید
+ * - PUT: به‌روزرسانی آیتم، موجودی
+ * - DELETE: حذف آیتم از منو
+ * 
+ * Database Integration:
+ * - Hibernate Session management
+ * - Transaction handling
+ * - Data persistence testing
+ * - Real database operations
+ * 
+ * Business Logic Testing:
+ * - Menu management workflow
+ * - Inventory tracking
+ * - Category organization
+ * - Statistics calculation
+ * - Ownership validation
+ * 
+ * Test Coverage: Complete API endpoint coverage
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 @DisplayName("Menu Controller Tests - Complete Coverage")
 class MenuControllerTest {
     
+    /** SessionFactory برای تست‌های پایگاه داده */
     private static SessionFactory sessionFactory;
+    
+    /** Session جاری برای هر تست */
     private Session session;
+    
+    /** Service instance تحت تست */
     private MenuService menuService;
+    
+    /** Repository dependencies */
     private MenuRepository menuRepository;
     private ItemRepository itemRepository;
     private RestaurantRepository restaurantRepository;
     
+    /**
+     * راه‌اندازی کلی قبل از تمام تست‌ها
+     * 
+     * Operations:
+     * - initialize SessionFactory
+     * - setup database connection
+     */
     @BeforeAll
     static void setUpClass() {
         sessionFactory = DatabaseUtil.getSessionFactory();
     }
     
+    /**
+     * راه‌اندازی قبل از هر تست
+     * 
+     * Operations:
+     * - open new database session
+     * - initialize repositories
+     * - setup MenuService with dependencies
+     * - clean database for isolated tests
+     */
     @BeforeEach
     void setUp() {
         session = sessionFactory.openSession();
@@ -40,10 +142,17 @@ class MenuControllerTest {
         restaurantRepository = new RestaurantRepository();
         menuService = new MenuService(menuRepository, itemRepository, restaurantRepository);
         
-        // Clean up database
+        // پاک‌سازی پایگاه داده
         cleanDatabase();
     }
     
+    /**
+     * پاک‌سازی بعد از هر تست
+     * 
+     * Operations:
+     * - close database session
+     * - release resources
+     */
     @AfterEach
     void tearDown() {
         if (session != null) {
@@ -51,6 +160,14 @@ class MenuControllerTest {
         }
     }
     
+    /**
+     * پاک‌سازی پایگاه داده برای تست‌های مستقل
+     * 
+     * Operations:
+     * - delete all FoodItems
+     * - delete all Restaurants
+     * - ensure clean state
+     */
     private void cleanDatabase() {
         session.beginTransaction();
         session.createQuery("DELETE FROM FoodItem").executeUpdate();
@@ -58,16 +175,33 @@ class MenuControllerTest {
         session.getTransaction().commit();
     }
     
-    // ==================== MENU RETRIEVAL TESTS ====================
+    // ==================== تست‌های دریافت منو ====================
     
+    /**
+     * تست‌های دریافت منو
+     * 
+     * این دسته شامل تمام عملیات مربوط به دریافت و نمایش منو:
+     * - دریافت کامل منوی رستوران
+     * - فیلتر آیتم‌های موجود
+     * - مدیریت منوی خالی
+     * - validation و error handling
+     */
     @Nested
     @DisplayName("Menu Retrieval Tests")
     class MenuRetrievalTests {
         
+        /**
+         * تست موفق دریافت منوی رستوران
+         * 
+         * Scenario: درخواست منوی رستوران با آیتم‌های مختلف
+         * Expected:
+         * - تمام آیتم‌های رستوران برگردانده شوند
+         * - هم آیتم‌های موجود و هم ناموجود
+         */
         @Test
         @DisplayName("Should get restaurant menu successfully")
         void getRestaurantMenu_ValidRestaurant_Success() {
-            // Given
+            // Given - آماده‌سازی رستوران و آیتم‌ها
             Restaurant restaurant = createAndSaveRestaurant();
             FoodItem item1 = createAndSaveFoodItem(restaurant, "Pizza", 25.99, true);
             FoodItem item2 = createAndSaveFoodItem(restaurant, "Burger", 18.99, false);

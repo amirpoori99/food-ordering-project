@@ -28,31 +28,76 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * کلاس تست جامع برای RatingController
+ * 
+ * این کلاس تمام endpoints و سناریوهای HTTP مربوط به RatingController را تست می‌کند:
+ * 
+ * === گروه‌های تست اصلی ===
+ * - ConstructorTests: تست سازنده‌ها
+ * - CreateRatingTests: تست POST /api/ratings
+ * - UpdateRatingTests: تست PUT /api/ratings/{id}
+ * - GetRatingTests: تست GET /api/ratings/{id}
+ * - GetAllRatingsTests: تست GET /api/ratings
+ * - GetRestaurantRatingsTests: تست GET /api/ratings/restaurant
+ * - GetRatingStatsTests: تست GET /api/ratings/stats
+ * - MethodNotAllowedTests: تست HTTP methods غیرمجاز
+ * - NotFoundTests: تست endpoints ناموجود
+ * - ErrorHandlingTests: تست مدیریت خطاها
+ * - UrlEncodingTests: تست URL encoding
+ * - PerformanceTests: تست عملکرد
+ * - EdgeCasesTests: تست موارد خاص
+ * 
+ * === استراتژی تست ===
+ * - HTTP Integration Testing: تست کامل HTTP requests/responses
+ * - Mock Service Layer: استفاده از mock RatingService
+ * - JSON Processing Testing: تست پردازش JSON
+ * - Error Response Testing: تست پاسخ‌های خطا
+ * - Status Code Validation: تست کدهای وضعیت HTTP
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 @DisplayName("RatingController HTTP Tests")
 class RatingControllerTest {
 
+    /** Mock service لایه منطق کسب‌وکار */
     @Mock
     private RatingService mockRatingService;
 
+    /** Mock HTTP exchange برای شبیه‌سازی requests */
     @Mock
     private HttpExchange mockExchange;
     
+    /** Mock headers برای HTTP response */
     @Mock
     private Headers responseHeaders;
 
+    /** کنترلر تحت تست */
     private RatingController ratingController;
+    /** کاربر تست */
     private User testUser;
+    /** رستوران تست */
     private Restaurant testRestaurant;
+    /** نظر تست */
     private Rating testRating;
+    /** Stream خروجی برای response body */
     private ByteArrayOutputStream responseBody;
 
+    /**
+     * راه‌اندازی اولیه قبل از هر تست
+     * 
+     * ایجاد mock objects و داده‌های تست
+     */
     @BeforeEach
     void setUp() {
+        // راه‌اندازی Mockito
         MockitoAnnotations.openMocks(this);
         ratingController = new RatingController(mockRatingService);
         responseBody = new ByteArrayOutputStream();
         
-        // Create test data
+        // ایجاد داده‌های تست
         testUser = new User();
         testUser.setId(1L);
         testUser.setFullName("Test User");
@@ -69,42 +114,73 @@ class RatingControllerTest {
         testRating.setId(1L);
         testRating.setCreatedAt(LocalDateTime.now());
         
-        // Setup common mock behavior
+        // تنظیم رفتار پایه mock objects
         try {
             when(mockExchange.getResponseBody()).thenReturn(responseBody);
             when(mockExchange.getResponseHeaders()).thenReturn(responseHeaders);
         } catch (Exception e) {
-            // Handle setup exception
+            // مدیریت خطای راه‌اندازی
         }
     }
 
+    /**
+     * گروه تست‌های سازنده
+     * 
+     * تست صحت عملکرد سازنده‌های مختلف RatingController
+     */
     @Nested
     @DisplayName("Constructor Tests")
     class ConstructorTests {
 
+        /**
+         * تست سازنده پیش‌فرض
+         * 
+         * بررسی ایجاد موفق کنترلر با سازنده پیش‌فرض
+         */
         @Test
         @DisplayName("Should create controller with default constructor")
         void shouldCreateControllerWithDefaultConstructor() {
+            // عمل: ایجاد کنترلر با سازنده پیش‌فرض
             RatingController controller = new RatingController();
+            
+            // بررسی: کنترلر نباید null باشد
             assertNotNull(controller);
         }
 
+        /**
+         * تست سازنده با تزریق سرویس
+         * 
+         * بررسی ایجاد موفق کنترلر با dependency injection
+         */
         @Test
         @DisplayName("Should create controller with service injection")
         void shouldCreateControllerWithServiceInjection() {
+            // عمل: ایجاد کنترلر با service injection
             RatingController controller = new RatingController(mockRatingService);
+            
+            // بررسی: کنترلر نباید null باشد
             assertNotNull(controller);
         }
     }
 
+    /**
+     * گروه تست‌های POST /api/ratings
+     * 
+     * تست تمام سناریوهای ایجاد نظر جدید از طریق HTTP
+     */
     @Nested
     @DisplayName("POST /api/ratings Tests")
     class CreateRatingTests {
 
+        /**
+         * تست ایجاد موفق نظر
+         * 
+         * بررسی پردازش صحیح درخواست ایجاد نظر
+         */
         @Test
         @DisplayName("Should create rating successfully")
         void shouldCreateRatingSuccessfully() throws IOException {
-            // Setup request
+            // آماده‌سازی: ایجاد request body
             String requestBody = JsonUtil.toJson(Map.of(
                 "userId", 1L,
                 "restaurantId", 2L,
@@ -112,37 +188,54 @@ class RatingControllerTest {
                 "reviewText", "Great food!"
             ));
             
+            // تنظیم رفتار mock objects
             when(mockExchange.getRequestMethod()).thenReturn("POST");
             when(mockExchange.getRequestURI()).thenReturn(URI.create("/api/ratings"));
             when(mockExchange.getRequestBody()).thenReturn(new ByteArrayInputStream(requestBody.getBytes()));
             when(mockRatingService.createRating(1L, 2L, 4, "Great food!")).thenReturn(testRating);
 
+            // عمل: پردازش درخواست
             ratingController.handle(mockExchange);
 
+            // بررسی: سرویس فراخوانی شود و status code 201 برگردد
             verify(mockRatingService).createRating(1L, 2L, 4, "Great food!");
             verify(mockExchange).sendResponseHeaders(eq(201), anyLong());
         }
 
+        /**
+         * تست مدیریت پارامترهای ناقص
+         * 
+         * بررسی پاسخ خطای 400 برای پارامترهای ناقص
+         */
         @Test
         @DisplayName("Should handle missing parameters")
         void shouldHandleMissingParameters() throws IOException {
+            // آماده‌سازی: request body ناقص
             String requestBody = JsonUtil.toJson(Map.of(
                 "userId", 1L
-                // Missing restaurantId and score
+                // فاقد restaurantId و score
             ));
             
             when(mockExchange.getRequestMethod()).thenReturn("POST");
             when(mockExchange.getRequestURI()).thenReturn(URI.create("/api/ratings"));
             when(mockExchange.getRequestBody()).thenReturn(new ByteArrayInputStream(requestBody.getBytes()));
 
+            // عمل: پردازش درخواست
             ratingController.handle(mockExchange);
 
+            // بررسی: باید status code 400 برگردد
             verify(mockExchange).sendResponseHeaders(eq(400), anyLong());
         }
 
+        /**
+         * تست مدیریت خطاهای سرویس
+         * 
+         * بررسی پاسخ خطای 400 برای exceptions سرویس
+         */
         @Test
         @DisplayName("Should handle service exceptions")
         void shouldHandleServiceExceptions() throws IOException {
+            // آماده‌سازی: request body معتبر
             String requestBody = JsonUtil.toJson(Map.of(
                 "userId", 1L,
                 "restaurantId", 2L,
@@ -156,14 +249,22 @@ class RatingControllerTest {
             when(mockRatingService.createRating(anyLong(), anyLong(), anyInt(), anyString()))
                 .thenThrow(new IllegalArgumentException("Invalid rating"));
 
+            // عمل: پردازش درخواست
             ratingController.handle(mockExchange);
 
+            // بررسی: باید status code 400 برگردد
             verify(mockExchange).sendResponseHeaders(eq(400), anyLong());
         }
 
+        /**
+         * تست مدیریت exceptions عدم وجود
+         * 
+         * بررسی پاسخ خطای 400 برای NotFoundException
+         */
         @Test
         @DisplayName("Should handle not found exceptions")
         void shouldHandleNotFoundExceptions() throws IOException {
+            // آماده‌سازی: request با ID ناموجود
             String requestBody = JsonUtil.toJson(Map.of(
                 "userId", 1L,
                 "restaurantId", 999L,
@@ -177,22 +278,32 @@ class RatingControllerTest {
             when(mockRatingService.createRating(anyLong(), anyLong(), anyInt(), anyString()))
                 .thenThrow(new NotFoundException("Restaurant", 999L));
 
+            // عمل: پردازش درخواست
             ratingController.handle(mockExchange);
 
+            // بررسی: باید status code 400 برگردد
             verify(mockExchange).sendResponseHeaders(eq(400), anyLong());
         }
 
+        /**
+         * تست مدیریت JSON نامعتبر
+         * 
+         * بررسی پاسخ خطای 400 برای JSON malformed
+         */
         @Test
         @DisplayName("Should handle malformed JSON")
         void shouldHandleMalformedJson() throws IOException {
+            // آماده‌سازی: JSON نامعتبر
             String malformedJson = "{ invalid json }";
             
             when(mockExchange.getRequestMethod()).thenReturn("POST");
             when(mockExchange.getRequestURI()).thenReturn(URI.create("/api/ratings"));
             when(mockExchange.getRequestBody()).thenReturn(new ByteArrayInputStream(malformedJson.getBytes()));
 
+            // عمل: پردازش درخواست
             ratingController.handle(mockExchange);
 
+            // بررسی: باید status code 400 برگردد
             verify(mockExchange).sendResponseHeaders(eq(400), anyLong());
         }
     }

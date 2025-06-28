@@ -21,22 +21,69 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * کلاس تست یکپارچگی جامع برای RatingRepository
+ * 
+ * این کلاس تمام عملیات پایگاه داده مربوط به RatingRepository را تست می‌کند:
+ * 
+ * === گروه‌های تست اصلی ===
+ * - SaveRatingTests: تست ذخیره و به‌روزرسانی نظرات
+ * - FindByIdTests: تست جستجو بر اساس شناسه
+ * - FindByUserAndRestaurantTests: تست جستجو بر اساس کاربر و رستوران
+ * - FindByRestaurantTests: تست جستجو نظرات رستوران
+ * - FindByUserTests: تست جستجو نظرات کاربر
+ * - FindByScoreRangeTests: تست جستجو در بازه امتیاز
+ * - FindVerifiedRatingsTests: تست نظرات تایید شده
+ * - FindRatingsWithReviewsTests: تست نظرات دارای متن
+ * - FindRecentRatingsTests: تست نظرات اخیر
+ * - GetAverageRatingTests: تست محاسبه میانگین امتیاز
+ * - GetRatingCountTests: تست شمارش نظرات
+ * - GetRatingDistributionTests: تست توزیع امتیازات
+ * - GetTopRatedRestaurantsTests: تست رستوران‌های برتر
+ * - DeleteRatingTests: تست حذف نظر
+ * - FindAllTests: تست دریافت تمام نظرات
+ * - FindWithPaginationTests: تست صفحه‌بندی
+ * - CountAllTests: تست شمارش کل
+ * - PerformanceTests: تست عملکرد
+ * - DataIntegrityTests: تست یکپارچگی داده‌ها
+ * - EdgeCasesTests: تست موارد خاص
+ * 
+ * === استراتژی تست ===
+ * - Integration Testing: تست یکپارچگی با پایگاه داده واقعی
+ * - Database Isolation: جداسازی داده‌ها بین تست‌ها
+ * - Transaction Testing: تست تراکنش‌های پایگاه داده
+ * - Query Performance Testing: تست عملکرد queries
+ * - Data Integrity Testing: تست یکپارچگی و قیدهای داده
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 @DisplayName("RatingRepository Integration Tests")
 public class RatingRepositoryTest {
 
+    /** Repository تحت تست */
     private RatingRepository ratingRepository;
+    /** کاربر تست */
     private User testUser;
+    /** رستوران تست */
     private Restaurant testRestaurant;
+    /** نظر تست */
     private Rating testRating;
 
+    /**
+     * راه‌اندازی اولیه قبل از هر تست
+     * 
+     * پاک‌سازی پایگاه داده و ایجاد داده‌های تست
+     */
     @BeforeEach
     void setUp() {
-        // Clean database before each test to ensure isolation
+        // پاک‌سازی پایگاه داده برای جداسازی تست‌ها
         TestDatabaseManager.cleanRatingData();
         
         ratingRepository = new RatingRepository();
         
-        // Create test data
+        // ایجاد داده‌های تست
         testUser = new User();
         testUser.setId(1L);
         testUser.setFullName("Test User");
@@ -53,15 +100,27 @@ public class RatingRepositoryTest {
         testRating.setCreatedAt(LocalDateTime.now());
     }
 
+    /**
+     * گروه تست‌های ذخیره نظر
+     * 
+     * تست عملیات ذخیره و به‌روزرسانی نظرات در پایگاه داده
+     */
     @Nested
     @DisplayName("Save Rating Tests")
     class SaveRatingTests {
 
+        /**
+         * تست ذخیره موفق نظر جدید
+         * 
+         * بررسی ذخیره نظر جدید و تولید ID خودکار
+         */
         @Test
         @DisplayName("Should save new rating successfully")
         void shouldSaveNewRatingSuccessfully() {
+            // عمل: ذخیره نظر جدید
             Rating savedRating = ratingRepository.save(testRating);
 
+            // بررسی: نظر ذخیره شود و ID تولید شود
             assertNotNull(savedRating);
             assertNotNull(savedRating.getId());
             assertEquals(4, savedRating.getRatingScore());
@@ -70,111 +129,185 @@ public class RatingRepositoryTest {
             assertEquals(testRestaurant.getId(), savedRating.getRestaurant().getId());
         }
 
+        /**
+         * تست به‌روزرسانی نظر موجود
+         * 
+         * بررسی به‌روزرسانی نظر با ID موجود
+         */
         @Test
         @DisplayName("Should update existing rating")
         void shouldUpdateExistingRating() {
-            // First save the rating
+            // آماده‌سازی: ابتدا نظر را ذخیره کنیم
             Rating savedRating = ratingRepository.save(testRating);
             
-            // Update the rating
+            // عمل: به‌روزرسانی نظر
             savedRating.setRatingScore(5);
             savedRating.setReviewText("Updated review text");
             
             Rating updatedRating = ratingRepository.save(savedRating);
 
+            // بررسی: نظر به‌روزرسانی شود
             assertNotNull(updatedRating);
             assertEquals(savedRating.getId(), updatedRating.getId());
             assertEquals(5, updatedRating.getRatingScore());
             assertEquals("Updated review text", updatedRating.getReviewText());
         }
 
+        /**
+         * تست ذخیره نظر با متن null
+         * 
+         * بررسی ذخیره نظر بدون متن توضیحی
+         */
         @Test
         @DisplayName("Should handle rating with null review text")
         void shouldHandleRatingWithNullReviewText() {
+            // آماده‌سازی: متن نظر null باشد
             testRating.setReviewText(null);
             
+            // عمل: ذخیره نظر
             Rating savedRating = ratingRepository.save(testRating);
 
+            // بررسی: نظر ذخیره شود با متن null
             assertNotNull(savedRating);
             assertNull(savedRating.getReviewText());
         }
 
+        /**
+         * تست مدیریت خطای ذخیره
+         * 
+         * بررسی پرتاب exception برای داده‌های نامعتبر
+         */
         @Test
         @DisplayName("Should handle save exception gracefully")
         void shouldHandleSaveExceptionGracefully() {
-            // Create invalid rating (null user)
+            // آماده‌سازی: ایجاد نظر نامعتبر (کاربر null)
             Rating invalidRating = new Rating();
             invalidRating.setRatingScore(4);
             invalidRating.setReviewText("Test");
 
+            // عمل و بررسی: باید RuntimeException پرتاب شود
             assertThrows(RuntimeException.class, () -> 
                 ratingRepository.save(invalidRating));
         }
     }
 
+    /**
+     * گروه تست‌های جستجو بر اساس شناسه
+     * 
+     * تست عملیات findById در سناریوهای مختلف
+     */
     @Nested
     @DisplayName("Find By ID Tests")
     class FindByIdTests {
 
+        /**
+         * تست یافتن نظر بر اساس شناسه
+         * 
+         * بررسی جستجوی موفق نظر با ID معتبر
+         */
         @Test
         @DisplayName("Should find rating by ID")
         void shouldFindRatingById() {
+            // آماده‌سازی: ذخیره نظر
             Rating savedRating = ratingRepository.save(testRating);
 
+            // عمل: جستجو بر اساس ID
             Optional<Rating> found = ratingRepository.findById(savedRating.getId());
 
+            // بررسی: نظر یافت شود
             assertTrue(found.isPresent());
             assertEquals(savedRating.getId(), found.get().getId());
             assertEquals(4, found.get().getRatingScore());
         }
 
+        /**
+         * تست عدم یافتن نظر با ID ناموجود
+         * 
+         * بررسی برگشت Optional.empty برای ID ناموجود
+         */
         @Test
         @DisplayName("Should return empty for non-existent ID")
         void shouldReturnEmptyForNonExistentId() {
+            // عمل: جستجو با ID ناموجود
             Optional<Rating> found = ratingRepository.findById(999L);
 
+            // بررسی: نتیجه empty باشد
             assertFalse(found.isPresent());
         }
 
+        /**
+         * تست مدیریت ID null
+         * 
+         * بررسی برگشت Optional.empty برای ID null
+         */
         @Test
         @DisplayName("Should return empty for null ID")
         void shouldReturnEmptyForNullId() {
+            // عمل: جستجو با ID null
             Optional<Rating> found = ratingRepository.findById(null);
 
+            // بررسی: نتیجه empty باشد
             assertFalse(found.isPresent());
         }
     }
 
+    /**
+     * گروه تست‌های جستجو بر اساس کاربر و رستوران
+     * 
+     * تست عملیات findByUserAndRestaurant (محدودیت یکتایی)
+     */
     @Nested
     @DisplayName("Find By User And Restaurant Tests")
     class FindByUserAndRestaurantTests {
 
+        /**
+         * تست یافتن نظر بر اساس کاربر و رستوران
+         * 
+         * بررسی جستجوی موفق نظر کاربر برای رستوران خاص
+         */
         @Test
         @DisplayName("Should find rating by user and restaurant")
         void shouldFindRatingByUserAndRestaurant() {
+            // آماده‌سازی: ذخیره نظر
             ratingRepository.save(testRating);
 
+            // عمل: جستجو بر اساس کاربر و رستوران
             Optional<Rating> found = ratingRepository.findByUserAndRestaurant(testUser, testRestaurant);
 
+            // بررسی: نظر یافت شود
             assertTrue(found.isPresent());
             assertEquals(testUser.getId(), found.get().getUser().getId());
             assertEquals(testRestaurant.getId(), found.get().getRestaurant().getId());
         }
 
+        /**
+         * تست عدم وجود نظر
+         * 
+         * بررسی برگشت Optional.empty زمانی که نظری وجود ندارد
+         */
         @Test
         @DisplayName("Should return empty when no rating exists")
         void shouldReturnEmptyWhenNoRatingExists() {
+            // عمل: جستجو بدون ذخیره نظر قبلی
             Optional<Rating> found = ratingRepository.findByUserAndRestaurant(testUser, testRestaurant);
 
+            // بررسی: نتیجه empty باشد
             assertFalse(found.isPresent());
         }
 
+        /**
+         * تست مدیریت پارامترهای null
+         * 
+         * بررسی برگشت Optional.empty برای پارامترهای null
+         */
         @Test
         @DisplayName("Should handle null parameters gracefully")
         void shouldHandleNullParametersGracefully() {
+            // عمل: جستجو با پارامترهای null
             Optional<Rating> found1 = ratingRepository.findByUserAndRestaurant(null, testRestaurant);
             Optional<Rating> found2 = ratingRepository.findByUserAndRestaurant(testUser, null);
 
+            // بررسی: هر دو نتیجه empty باشند
             assertFalse(found1.isPresent());
             assertFalse(found2.isPresent());
         }

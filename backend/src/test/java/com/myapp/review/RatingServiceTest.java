@@ -24,29 +24,76 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * کلاس تست جامع برای RatingService
+ * 
+ * این کلاس تمام سناریوهای مختلف عملیات RatingService را تست می‌کند:
+ * 
+ * === گروه‌های تست اصلی ===
+ * - ConstructorTests: تست سازنده‌ها
+ * - CreateRatingTests: تست ایجاد نظر جدید
+ * - UpdateRatingTests: تست به‌روزرسانی نظر
+ * - GetRatingTests: تست دریافت نظر بر اساس شناسه
+ * - GetRestaurantRatingsTests: تست دریافت نظرات رستوران
+ * - GetUserRatingsTests: تست دریافت نظرات کاربر
+ * - GetRatingStatsTests: تست آمار امتیازات
+ * - CheckUserRatingTests: تست بررسی نظردهی کاربر
+ * - GetUserRatingForRestaurantTests: تست نظر کاربر برای رستوران
+ * - DeleteRatingTests: تست حذف نظر
+ * - HelpfulMarkTests: تست علامت‌گذاری مفید
+ * - AdminOperationsTests: تست عملیات مدیریتی
+ * - QueryOperationsTests: تست جستجوهای پیشرفته
+ * - RatingStatsTests: تست کلاس آمار
+ * - PerformanceTests: تست عملکرد
+ * - EdgeCasesTests: تست موارد خاص
+ * 
+ * === استراتژی تست ===
+ * - Unit Testing: تست واحد با Mock objects
+ * - Business Logic Testing: تست منطق کسب‌وکار
+ * - Exception Testing: تست مدیریت خطاها
+ * - Edge Case Testing: تست موارد مرزی
+ * - Performance Testing: تست عملکرد
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 @DisplayName("RatingService Tests")
 class RatingServiceTest {
 
+    /** Mock repository برای نظرات */
     @Mock
     private RatingRepository mockRatingRepository;
     
+    /** Mock repository برای کاربران */
     @Mock
     private AuthRepository mockAuthRepository;
     
+    /** Mock repository برای رستوران‌ها */
     @Mock
     private RestaurantRepository mockRestaurantRepository;
 
+    /** سرویس تحت تست */
     private RatingService ratingService;
+    /** کاربر تست */
     private User testUser;
+    /** رستوران تست */
     private Restaurant testRestaurant;
+    /** نظر تست */
     private Rating testRating;
 
+    /**
+     * راه‌اندازی اولیه قبل از هر تست
+     * 
+     * ایجاد mock objects و داده‌های تست
+     */
     @BeforeEach
     void setUp() {
+        // راه‌اندازی Mockito
         MockitoAnnotations.openMocks(this);
         ratingService = new RatingService(mockRatingRepository, mockAuthRepository, mockRestaurantRepository);
         
-        // Create test data
+        // ایجاد داده‌های تست
         testUser = new User();
         testUser.setId(1L);
         testUser.setFullName("Test User");
@@ -64,190 +111,325 @@ class RatingServiceTest {
         testRating.setCreatedAt(LocalDateTime.now());
     }
 
+    /**
+     * گروه تست‌های سازنده
+     * 
+     * تست صحت عملکرد سازنده‌های مختلف RatingService
+     */
     @Nested
     @DisplayName("Constructor Tests")
     class ConstructorTests {
         
+        /**
+         * تست سازنده پیش‌فرض
+         * 
+         * بررسی ایجاد موفق سرویس با سازنده پیش‌فرض
+         */
         @Test
         @DisplayName("Should create service with default constructor")
         void shouldCreateServiceWithDefaultConstructor() {
+            // عمل: ایجاد سرویس با سازنده پیش‌فرض
             RatingService service = new RatingService();
+            
+            // بررسی: سرویس نباید null باشد
             assertNotNull(service);
         }
         
+        /**
+         * تست سازنده با تزریق وابستگی
+         * 
+         * بررسی ایجاد موفق سرویس با تزریق dependencies
+         */
         @Test
         @DisplayName("Should create service with dependency injection")
         void shouldCreateServiceWithDependencyInjection() {
+            // عمل: ایجاد سرویس با dependency injection
             RatingService service = new RatingService(mockRatingRepository, mockAuthRepository, mockRestaurantRepository);
+            
+            // بررسی: سرویس نباید null باشد
             assertNotNull(service);
         }
     }
 
+    /**
+     * گروه تست‌های ایجاد نظر
+     * 
+     * تست تمام سناریوهای ایجاد نظر جدید
+     */
     @Nested
     @DisplayName("Create Rating Tests")
     class CreateRatingTests {
 
+        /**
+         * تست ایجاد موفق نظر
+         * 
+         * بررسی ایجاد نظر در شرایط عادی
+         */
         @Test
         @DisplayName("Should create rating successfully")
         void shouldCreateRatingSuccessfully() {
+            // آماده‌سازی: تنظیم رفتار mock objects
             when(mockAuthRepository.findById(1L)).thenReturn(Optional.of(testUser));
             when(mockRestaurantRepository.findById(2L)).thenReturn(Optional.of(testRestaurant));
             when(mockRatingRepository.findByUserAndRestaurant(testUser, testRestaurant)).thenReturn(Optional.empty());
             when(mockRatingRepository.save(any(Rating.class))).thenReturn(testRating);
 
+            // عمل: ایجاد نظر
             Rating result = ratingService.createRating(1L, 2L, 4, "Great food!");
 
+            // بررسی: نتیجه صحیح باشد
             assertNotNull(result);
             assertEquals(4, result.getRatingScore());
             assertEquals("Great food!", result.getReviewText());
             verify(mockRatingRepository).save(any(Rating.class));
         }
 
+        /**
+         * تست ایجاد نظر با متن null
+         * 
+         * بررسی ایجاد نظر بدون متن توضیحی
+         */
         @Test
         @DisplayName("Should create rating with null review text")
         void shouldCreateRatingWithNullReviewText() {
+            // آماده‌سازی
             when(mockAuthRepository.findById(1L)).thenReturn(Optional.of(testUser));
             when(mockRestaurantRepository.findById(2L)).thenReturn(Optional.of(testRestaurant));
             when(mockRatingRepository.findByUserAndRestaurant(testUser, testRestaurant)).thenReturn(Optional.empty());
             when(mockRatingRepository.save(any(Rating.class))).thenReturn(testRating);
 
+            // عمل: ایجاد نظر بدون متن
             Rating result = ratingService.createRating(1L, 2L, 4, null);
 
+            // بررسی: نظر ایجاد شود
             assertNotNull(result);
             verify(mockRatingRepository).save(any(Rating.class));
         }
 
+        /**
+         * تست خطای عدم وجود کاربر
+         * 
+         * بررسی پرتاب exception زمانی که کاربر وجود ندارد
+         */
         @Test
         @DisplayName("Should throw exception when user not found")
         void shouldThrowExceptionWhenUserNotFound() {
+            // آماده‌سازی: کاربر یافت نشود
             when(mockAuthRepository.findById(1L)).thenReturn(Optional.empty());
 
+            // عمل و بررسی: باید NotFoundException پرتاب شود
             assertThrows(NotFoundException.class, () -> 
                 ratingService.createRating(1L, 2L, 4, "Great food!"));
         }
 
+        /**
+         * تست خطای عدم وجود رستوران
+         * 
+         * بررسی پرتاب exception زمانی که رستوران وجود ندارد
+         */
         @Test
         @DisplayName("Should throw exception when restaurant not found")
         void shouldThrowExceptionWhenRestaurantNotFound() {
+            // آماده‌سازی: کاربر یافت شود اما رستوران نه
             when(mockAuthRepository.findById(1L)).thenReturn(Optional.of(testUser));
             when(mockRestaurantRepository.findById(2L)).thenReturn(Optional.empty());
 
+            // عمل و بررسی: باید NotFoundException پرتاب شود
             assertThrows(NotFoundException.class, () -> 
                 ratingService.createRating(1L, 2L, 4, "Great food!"));
         }
 
+        /**
+         * تست خطای نظر تکراری
+         * 
+         * بررسی منع ایجاد نظر دوم توسط همان کاربر
+         */
         @Test
         @DisplayName("Should throw exception when user already rated restaurant")
         void shouldThrowExceptionWhenUserAlreadyRatedRestaurant() {
+            // آماده‌سازی: نظر قبلی وجود دارد
             when(mockAuthRepository.findById(1L)).thenReturn(Optional.of(testUser));
             when(mockRestaurantRepository.findById(2L)).thenReturn(Optional.of(testRestaurant));
             when(mockRatingRepository.findByUserAndRestaurant(testUser, testRestaurant)).thenReturn(Optional.of(testRating));
 
+            // عمل و بررسی: باید IllegalArgumentException پرتاب شود
             assertThrows(IllegalArgumentException.class, () -> 
                 ratingService.createRating(1L, 2L, 4, "Great food!"));
         }
 
+        /**
+         * تست منع نظردهی مالک به رستوران خود
+         * 
+         * بررسی منع نظردهی مالک رستوران به رستوران خودش
+         */
         @Test
         @DisplayName("Should throw exception when owner rates own restaurant")
         void shouldThrowExceptionWhenOwnerRatesOwnRestaurant() {
-            testRestaurant.setOwnerId(1L); // Same as user ID
+            // آماده‌سازی: مالک رستوران همان کاربر باشد
+            testRestaurant.setOwnerId(1L); // همان ID کاربر
             when(mockAuthRepository.findById(1L)).thenReturn(Optional.of(testUser));
             when(mockRestaurantRepository.findById(2L)).thenReturn(Optional.of(testRestaurant));
             when(mockRatingRepository.findByUserAndRestaurant(testUser, testRestaurant)).thenReturn(Optional.empty());
 
+            // عمل و بررسی: باید IllegalArgumentException پرتاب شود
             assertThrows(IllegalArgumentException.class, () -> 
                 ratingService.createRating(1L, 2L, 4, "Great food!"));
         }
 
+        /**
+         * تست اعتبارسنجی امتیاز نامعتبر
+         * 
+         * بررسی پرتاب exception برای امتیازهای خارج از بازه 1-5
+         */
         @Test
         @DisplayName("Should throw exception for invalid rating values")
         void shouldThrowExceptionForInvalidRatingValues() {
+            // بررسی امتیاز صفر
             assertThrows(IllegalArgumentException.class, () -> 
                 ratingService.createRating(1L, 2L, 0, "Comment"));
             
+            // بررسی امتیاز بیشتر از 5
             assertThrows(IllegalArgumentException.class, () -> 
                 ratingService.createRating(1L, 2L, 6, "Comment"));
             
+            // بررسی امتیاز منفی
             assertThrows(IllegalArgumentException.class, () -> 
                 ratingService.createRating(1L, 2L, -1, "Comment"));
         }
 
+        /**
+         * تست اعتبارسنجی پارامترهای null
+         * 
+         * بررسی پرتاب exception برای پارامترهای اجباری null
+         */
         @Test
         @DisplayName("Should throw exception for null parameters")
         void shouldThrowExceptionForNullParameters() {
+            // بررسی userId null
             assertThrows(IllegalArgumentException.class, () -> 
                 ratingService.createRating(null, 2L, 4, "Comment"));
             
+            // بررسی restaurantId null
             assertThrows(IllegalArgumentException.class, () -> 
                 ratingService.createRating(1L, null, 4, "Comment"));
             
+            // بررسی score null
             assertThrows(IllegalArgumentException.class, () -> 
                 ratingService.createRating(1L, 2L, null, "Comment"));
         }
     }
 
+    /**
+     * گروه تست‌های به‌روزرسانی نظر
+     * 
+     * تست تمام سناریوهای به‌روزرسانی نظر موجود
+     */
     @Nested
     @DisplayName("Update Rating Tests")
     class UpdateRatingTests {
 
+        /**
+         * تست به‌روزرسانی موفق نظر
+         * 
+         * بررسی به‌روزرسانی امتیاز و متن نظر
+         */
         @Test
         @DisplayName("Should update rating successfully")
         void shouldUpdateRatingSuccessfully() {
+            // آماده‌سازی: نظر موجود باشد
             when(mockRatingRepository.findById(1L)).thenReturn(Optional.of(testRating));
             when(mockRatingRepository.save(any(Rating.class))).thenReturn(testRating);
 
+            // عمل: به‌روزرسانی نظر
             Rating result = ratingService.updateRating(1L, 5, "Updated review");
 
+            // بررسی: نظر به‌روزرسانی شود
             assertNotNull(result);
             verify(mockRatingRepository).save(any(Rating.class));
         }
 
+        /**
+         * تست به‌روزرسانی فقط امتیاز
+         * 
+         * بررسی به‌روزرسانی امتیاز بدون تغییر متن
+         */
         @Test
         @DisplayName("Should update only score")
         void shouldUpdateOnlyScore() {
+            // آماده‌سازی
             when(mockRatingRepository.findById(1L)).thenReturn(Optional.of(testRating));
             when(mockRatingRepository.save(any(Rating.class))).thenReturn(testRating);
 
+            // عمل: به‌روزرسانی فقط امتیاز
             Rating result = ratingService.updateRating(1L, 5, null);
 
+            // بررسی: نظر به‌روزرسانی شود
             assertNotNull(result);
             verify(mockRatingRepository).save(any(Rating.class));
         }
 
+        /**
+         * تست به‌روزرسانی فقط متن نظر
+         * 
+         * بررسی به‌روزرسانی متن بدون تغییر امتیاز
+         */
         @Test
         @DisplayName("Should update only review text")
         void shouldUpdateOnlyReviewText() {
+            // آماده‌سازی
             when(mockRatingRepository.findById(1L)).thenReturn(Optional.of(testRating));
             when(mockRatingRepository.save(any(Rating.class))).thenReturn(testRating);
 
+            // عمل: به‌روزرسانی فقط متن
             Rating result = ratingService.updateRating(1L, null, "Updated review");
 
+            // بررسی: نظر به‌روزرسانی شود
             assertNotNull(result);
             verify(mockRatingRepository).save(any(Rating.class));
         }
 
+        /**
+         * تست خطای عدم وجود نظر
+         * 
+         * بررسی پرتاب exception زمانی که نظر یافت نشود
+         */
         @Test
         @DisplayName("Should throw exception when rating not found")
         void shouldThrowExceptionWhenRatingNotFound() {
+            // آماده‌سازی: نظر یافت نشود
             when(mockRatingRepository.findById(1L)).thenReturn(Optional.empty());
 
+            // عمل و بررسی: باید NotFoundException پرتاب شود
             assertThrows(NotFoundException.class, () -> 
                 ratingService.updateRating(1L, 5, "Updated review"));
         }
 
+        /**
+         * تست اعتبارسنجی امتیاز نامعتبر
+         * 
+         * بررسی پرتاب exception برای امتیازهای خارج از بازه
+         */
         @Test
         @DisplayName("Should throw exception for invalid score")
         void shouldThrowExceptionForInvalidScore() {
+            // بررسی امتیاز صفر
             assertThrows(IllegalArgumentException.class, () -> 
                 ratingService.updateRating(1L, 0, "Review"));
             
+            // بررسی امتیاز بیشتر از 5
             assertThrows(IllegalArgumentException.class, () -> 
                 ratingService.updateRating(1L, 6, "Review"));
         }
 
+        /**
+         * تست اعتبارسنجی شناسه null
+         * 
+         * بررسی پرتاب exception برای شناسه نظر null
+         */
         @Test
         @DisplayName("Should throw exception for null rating ID")
         void shouldThrowExceptionForNullRatingId() {
+            // عمل و بررسی: باید IllegalArgumentException پرتاب شود
             assertThrows(IllegalArgumentException.class, () -> 
                 ratingService.updateRating(null, 5, "Review"));
         }

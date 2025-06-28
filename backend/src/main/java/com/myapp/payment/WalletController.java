@@ -13,8 +13,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * REST API Controller for wallet operations
- * Handles wallet balance, charging, withdrawal, and transaction history
+ * کنترلر REST API برای عملیات کیف پول
+ * 
+ * این کلاس مسئول مدیریت تمام درخواست‌های HTTP مربوط به:
+ * - مشاهده موجودی کیف پول
+ * - شارژ کیف پول از طریق روش‌های مختلف
+ * - برداشت از کیف پول
+ * - تاریخچه تراکنش‌های کیف پول
+ * - آمار و گزارش‌گیری کیف پول
+ * - عملیات مدیریتی توسط ادمین
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class WalletController implements HttpHandler {
     
@@ -71,7 +82,13 @@ public class WalletController implements HttpHandler {
     }
     
     /**
-     * GET /api/wallet/{userId}/balance - Get user wallet balance
+     * GET /api/wallet/{userId}/balance - دریافت موجودی کیف پول کاربر
+     * 
+     * این endpoint موجودی فعلی کیف پول کاربر را برمی‌گرداند
+     * 
+     * @param exchange شیء HttpExchange
+     * @param path مسیر درخواست حاوی userId
+     * @throws IOException در صورت خطا در ورودی/خروجی
      */
     private void getWalletBalance(HttpExchange exchange, String path) throws IOException {
         try {

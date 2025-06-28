@@ -14,41 +14,70 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * REST API Controller for Restaurant Management
+ * کنترلر REST API برای مدیریت رستوران‌ها
+ * 
+ * این کلاس مسئول مدیریت تمام درخواست‌های HTTP مربوط به:
+ * - ثبت رستوران جدید توسط فروشندگان
+ * - مشاهده لیست رستوران‌های تأیید شده (عمومی)
+ * - مدیریت اطلاعات رستوران‌ها
+ * - تغییر وضعیت رستوران‌ها (مدیریتی)
+ * - آمار و گزارش‌گیری رستوران‌ها
  * 
  * Endpoints:
- * POST   /api/restaurants                    - Register new restaurant
- * GET    /api/restaurants                    - Get all approved restaurants (public)
- * GET    /api/restaurants/{id}               - Get restaurant by ID
- * PUT    /api/restaurants/{id}               - Update restaurant information
- * DELETE /api/restaurants/{id}               - Delete restaurant
- * GET    /api/restaurants/owner/{ownerId}    - Get restaurants by owner
- * GET    /api/restaurants/status/{status}    - Get restaurants by status
- * PUT    /api/restaurants/{id}/status        - Update restaurant status (admin)
- * GET    /api/restaurants/statistics         - Get restaurant statistics (admin)
- * POST   /api/restaurants/{id}/approve       - Approve restaurant (admin)
- * POST   /api/restaurants/{id}/reject        - Reject restaurant (admin)
- * POST   /api/restaurants/{id}/suspend       - Suspend restaurant (admin)
+ * POST   /api/restaurants                    - ثبت رستوران جدید
+ * GET    /api/restaurants                    - دریافت رستوران‌های تأیید شده (عمومی)
+ * GET    /api/restaurants/{id}               - دریافت رستوران با شناسه
+ * PUT    /api/restaurants/{id}               - به‌روزرسانی اطلاعات رستوران
+ * DELETE /api/restaurants/{id}               - حذف رستوران
+ * GET    /api/restaurants/owner/{ownerId}    - دریافت رستوران‌های یک مالک
+ * GET    /api/restaurants/status/{status}    - دریافت رستوران‌ها بر اساس وضعیت
+ * PUT    /api/restaurants/{id}/status        - به‌روزرسانی وضعیت رستوران (مدیر)
+ * GET    /api/restaurants/statistics         - دریافت آمار رستوران‌ها (مدیر)
+ * POST   /api/restaurants/{id}/approve       - تأیید رستوران (مدیر)
+ * POST   /api/restaurants/{id}/reject        - رد رستوران (مدیر)
+ * POST   /api/restaurants/{id}/suspend       - تعلیق رستوران (مدیر)
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class RestaurantController implements HttpHandler {
     
+    /** سرویس مدیریت رستوران‌ها برای پردازش منطق کسب‌وکار */
     private final RestaurantService restaurantService;
     
+    /**
+     * سازنده پیش‌فرض - ایجاد instance جدید از RestaurantService
+     */
     public RestaurantController() {
         this.restaurantService = new RestaurantService();
     }
     
-    // Constructor for dependency injection (testing)
+    /**
+     * سازنده برای تزریق وابستگی (Dependency Injection)
+     * برای تست‌ها و configuration سفارشی استفاده می‌شود
+     * 
+     * @param restaurantService سرویس رستوران از بیرون تزریق شده
+     */
     public RestaurantController(RestaurantService restaurantService) {
         this.restaurantService = restaurantService;
     }
     
+    /**
+     * متد اصلی پردازش درخواست‌های HTTP
+     * تمام درخواست‌ها را بر اساس method و path مسیریابی می‌کند
+     * 
+     * @param exchange شیء HttpExchange حاوی اطلاعات درخواست و پاسخ
+     * @throws IOException در صورت خطا در پردازش I/O
+     */
     @Override
     public void handle(HttpExchange exchange) throws IOException {
+        // دریافت method (GET, POST, PUT, DELETE) و path درخواست
         String method = exchange.getRequestMethod();
         String path = exchange.getRequestURI().getPath();
         
         try {
+            // مسیریابی درخواست بر اساس HTTP method
             switch (method) {
                 case "GET":
                     handleGet(exchange, path);
@@ -63,13 +92,17 @@ public class RestaurantController implements HttpHandler {
                     handleDelete(exchange, path);
                     break;
                 default:
+                    // HTTP method پشتیبانی نشده
                     sendErrorResponse(exchange, 405, "Method not allowed");
             }
         } catch (IllegalArgumentException e) {
+            // خطای validation ورودی‌ها
             sendErrorResponse(exchange, 400, e.getMessage());
         } catch (NotFoundException e) {
+            // خطای عدم وجود رستوران
             sendErrorResponse(exchange, 404, e.getMessage());
         } catch (Exception e) {
+            // خطاهای غیرمنتظره سرور
             sendErrorResponse(exchange, 500, "Internal server error: " + e.getMessage());
         }
     }

@@ -22,36 +22,136 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * مجموعه تست‌های جامع DeliveryController
+ * 
+ * این کلاس تمام REST API endpoint های کنترلر مدیریت تحویل سفارشات را آزمایش می‌کند:
+ * 
+ * === دسته‌های تست ===
+ * 1. GET Endpoints Tests - تست‌های endpoint های GET
+ *    - دریافت جزئیات تحویل
+ *    - تحویل بر اساس سفارش
+ *    - تحویل‌های پیک (فعال/تاریخچه)
+ *    - فیلتر بر اساس وضعیت
+ *    - آمار پیک
+ *    - بررسی در دسترس بودن
+ *    - مدیریت خطاها
+ * 
+ * 2. POST Endpoints Tests - تست‌های endpoint های POST
+ *    - ایجاد تحویل جدید
+ *    - validation ورودی‌ها
+ *    - JSON parsing
+ *    - exception handling
+ * 
+ * 3. PUT Endpoints Tests - تست‌های endpoint های PUT
+ *    - تخصیص پیک
+ *    - علامت‌گذاری pickup
+ *    - علامت‌گذاری delivery
+ *    - لغو تحویل
+ *    - به‌روزرسانی وضعیت
+ *    - validation درخواست‌ها
+ * 
+ * 4. DELETE Endpoints Tests - تست‌های endpoint های DELETE
+ *    - حذف تحویل
+ *    - authorization
+ *    - exception handling
+ * 
+ * 5. Error Handling Tests - تست‌های مدیریت خطا
+ *    - HTTP method غیرمجاز
+ *    - endpoint یافت نشده
+ *    - JSON malformed
+ *    - exception propagation
+ * 
+ * === ویژگی‌های تست ===
+ * - HTTP Testing: آزمایش کامل HTTP protocol
+ * - Mock-based Testing: استفاده از mock objects
+ * - JSON Request/Response: تست پردازش JSON
+ * - Path Parameter Extraction: تست استخراج پارامترها
+ * - Error Response Testing: تست پاسخ‌های خطا
+ * - Status Code Validation: اعتبارسنجی کدهای HTTP
+ * 
+ * === Controller Layer Testing ===
+ * - HTTP request routing
+ * - Parameter extraction
+ * - Response formatting
+ * - Exception handling
+ * - Business logic delegation
+ * 
+ * Integration with Service Layer:
+ * - Service method calls verification
+ * - Business logic validation
+ * - Error propagation testing
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 @DisplayName("DeliveryController Tests")
 class DeliveryControllerTest {
 
+    /** Mock service برای تست‌ها */
     @Mock
     private DeliveryService deliveryService;
 
+    /** Mock HTTP exchange برای شبیه‌سازی درخواست */
     @Mock
     private HttpExchange exchange;
 
+    /** Controller instance تحت تست */
     private DeliveryController controller;
+    
+    /** OutputStream برای capture کردن response */
     private ByteArrayOutputStream responseBody;
 
+    /**
+     * راه‌اندازی قبل از هر تست
+     * 
+     * Operations:
+     * - initialize mock objects
+     * - setup controller instance
+     * - prepare response stream
+     * - configure common mock behaviors
+     */
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         controller = new DeliveryController(deliveryService);
         responseBody = new ByteArrayOutputStream();
         
+        // راه‌اندازی mock response
         when(exchange.getResponseBody()).thenReturn(responseBody);
         when(exchange.getResponseHeaders()).thenReturn(new com.sun.net.httpserver.Headers());
     }
 
+    /**
+     * تست‌های GET endpoint
+     * 
+     * این دسته شامل تمام عملیات HTTP GET:
+     * - دریافت جزئیات تحویل
+     * - تحویل بر اساس سفارش
+     * - تحویل‌های پیک (فعال/تاریخچه)
+     * - فیلتر بر اساس وضعیت
+     * - آمار پیک
+     * - بررسی در دسترس بودن
+     * - مدیریت خطاها
+     */
     @Nested
     @DisplayName("GET Endpoints Tests")
     class GetEndpointsTests {
 
+        /**
+         * تست موفق دریافت جزئیات تحویل
+         * 
+         * Scenario: درخواست GET /api/deliveries/{id}
+         * Expected:
+         * - جزئیات تحویل برگردانده شود
+         * - HTTP 200 status code
+         * - service method صحیح فراخوانی شود
+         */
         @Test
-        @DisplayName("Should get delivery details successfully")
+        @DisplayName("✅ دریافت موفق جزئیات تحویل")
         void shouldGetDeliveryDetailsSuccessfully() throws IOException {
-            // Arrange
+            // Arrange - آماده‌سازی داده‌ها و mock ها
             Long deliveryId = 1L;
             Delivery delivery = createTestDelivery(deliveryId);
             
@@ -59,16 +159,24 @@ class DeliveryControllerTest {
             when(exchange.getRequestURI()).thenReturn(URI.create("/api/deliveries/" + deliveryId));
             when(deliveryService.getDelivery(deliveryId)).thenReturn(delivery);
 
-            // Act
+            // Act - فراخوانی controller
             controller.handle(exchange);
 
-            // Assert
+            // Assert - بررسی نتایج
             verify(deliveryService).getDelivery(deliveryId);
             verify(exchange, times(1)).sendResponseHeaders(200, responseBody.toByteArray().length);
         }
 
+        /**
+         * تست موفق دریافت تحویل بر اساس سفارش
+         * 
+         * Scenario: درخواست GET /api/deliveries/order/{orderId}
+         * Expected:
+         * - تحویل مربوط به سفارش برگردانده شود
+         * - HTTP 200 status code
+         */
         @Test
-        @DisplayName("Should get delivery by order successfully")
+        @DisplayName("✅ دریافت موفق تحویل بر اساس سفارش")
         void shouldGetDeliveryByOrderSuccessfully() throws IOException {
             // Arrange
             Long orderId = 1L;
@@ -86,8 +194,16 @@ class DeliveryControllerTest {
             verify(exchange, times(1)).sendResponseHeaders(200, responseBody.toByteArray().length);
         }
 
+        /**
+         * تست موفق دریافت تحویل‌های پیک
+         * 
+         * Scenario: درخواست GET /api/deliveries/courier/{courierId}
+         * Expected:
+         * - تاریخچه تحویل‌های پیک برگردانده شود
+         * - HTTP 200 status code
+         */
         @Test
-        @DisplayName("Should get courier deliveries successfully")
+        @DisplayName("✅ دریافت موفق تحویل‌های پیک")
         void shouldGetCourierDeliveriesSuccessfully() throws IOException {
             // Arrange
             Long courierId = 1L;
@@ -105,8 +221,16 @@ class DeliveryControllerTest {
             verify(exchange, times(1)).sendResponseHeaders(200, responseBody.toByteArray().length);
         }
 
+        /**
+         * تست موفق دریافت تحویل‌های فعال پیک
+         * 
+         * Scenario: درخواست GET /api/deliveries/courier/{courierId}/active
+         * Expected:
+         * - تحویل‌های فعال پیک برگردانده شوند
+         * - HTTP 200 status code
+         */
         @Test
-        @DisplayName("Should get courier active deliveries successfully")
+        @DisplayName("✅ دریافت موفق تحویل‌های فعال پیک")
         void shouldGetCourierActiveDeliveriesSuccessfully() throws IOException {
             // Arrange
             Long courierId = 1L;
@@ -124,8 +248,16 @@ class DeliveryControllerTest {
             verify(exchange, times(1)).sendResponseHeaders(200, responseBody.toByteArray().length);
         }
 
+        /**
+         * تست موفق دریافت تحویل‌ها بر اساس وضعیت
+         * 
+         * Scenario: درخواست GET /api/deliveries/status/{status}
+         * Expected:
+         * - تحویل‌های با وضعیت مشخص برگردانده شوند
+         * - HTTP 200 status code
+         */
         @Test
-        @DisplayName("Should get deliveries by status successfully")
+        @DisplayName("✅ دریافت موفق تحویل‌ها بر اساس وضعیت")
         void shouldGetDeliveriesByStatusSuccessfully() throws IOException {
             // Arrange
             DeliveryStatus status = DeliveryStatus.PENDING;
@@ -143,8 +275,16 @@ class DeliveryControllerTest {
             verify(exchange, times(1)).sendResponseHeaders(200, responseBody.toByteArray().length);
         }
 
+        /**
+         * تست موفق دریافت تحویل‌های فعال
+         * 
+         * Scenario: درخواست GET /api/deliveries/active
+         * Expected:
+         * - تمام تحویل‌های فعال برگردانده شوند
+         * - HTTP 200 status code
+         */
         @Test
-        @DisplayName("Should get active deliveries successfully")
+        @DisplayName("✅ دریافت موفق تحویل‌های فعال")
         void shouldGetActiveDeliveriesSuccessfully() throws IOException {
             // Arrange
             List<Delivery> deliveries = Arrays.asList(createTestDelivery(1L));
@@ -161,8 +301,16 @@ class DeliveryControllerTest {
             verify(exchange, times(1)).sendResponseHeaders(200, responseBody.toByteArray().length);
         }
 
+        /**
+         * تست موفق دریافت تحویل‌های در انتظار
+         * 
+         * Scenario: درخواست GET /api/deliveries/pending
+         * Expected:
+         * - تحویل‌های در انتظار برگردانده شوند
+         * - HTTP 200 status code
+         */
         @Test
-        @DisplayName("Should get pending deliveries successfully")
+        @DisplayName("✅ دریافت موفق تحویل‌های در انتظار")
         void shouldGetPendingDeliveriesSuccessfully() throws IOException {
             // Arrange
             List<Delivery> deliveries = Arrays.asList(createTestDelivery(1L));
@@ -179,8 +327,17 @@ class DeliveryControllerTest {
             verify(exchange, times(1)).sendResponseHeaders(200, responseBody.toByteArray().length);
         }
 
+        /**
+         * تست موفق بررسی در دسترس بودن پیک
+         * 
+         * Scenario: درخواست GET /api/deliveries/courier/{courierId}/available
+         * Expected:
+         * - وضعیت در دسترس بودن برگردانده شود
+         * - HTTP 200 status code
+         * - JSON response شامل available field
+         */
         @Test
-        @DisplayName("Should check courier availability successfully")
+        @DisplayName("✅ بررسی موفق در دسترس بودن پیک")
         void shouldCheckCourierAvailabilitySuccessfully() throws IOException {
             // Arrange
             Long courierId = 1L;
@@ -198,8 +355,16 @@ class DeliveryControllerTest {
             assertTrue(responseBody.toString().contains("available"));
         }
 
+        /**
+         * تست موفق دریافت آمار پیک
+         * 
+         * Scenario: درخواست GET /api/deliveries/courier/{courierId}/statistics
+         * Expected:
+         * - آمار کامل پیک برگردانده شود
+         * - HTTP 200 status code
+         */
         @Test
-        @DisplayName("Should get courier statistics successfully")
+        @DisplayName("✅ دریافت موفق آمار پیک")
         void shouldGetCourierStatisticsSuccessfully() throws IOException {
             // Arrange
             Long courierId = 1L;
@@ -219,8 +384,14 @@ class DeliveryControllerTest {
             verify(exchange, times(1)).sendResponseHeaders(200, responseBody.toByteArray().length);
         }
 
+        /**
+         * تست بازگشت 400 برای وضعیت نامعتبر
+         * 
+         * Scenario: درخواست GET /api/deliveries/status/invalid
+         * Expected: HTTP 400 Bad Request
+         */
         @Test
-        @DisplayName("Should return 400 for invalid status")
+        @DisplayName("❌ بازگشت 400 برای وضعیت نامعتبر")
         void shouldReturn400ForInvalidStatus() throws IOException {
             // Arrange
             when(exchange.getRequestMethod()).thenReturn("GET");
@@ -234,8 +405,14 @@ class DeliveryControllerTest {
             assertTrue(responseBody.toString().contains("Invalid status: invalid"));
         }
 
+        /**
+         * تست بازگشت 404 برای تحویل یافت نشده
+         * 
+         * Scenario: درخواست تحویل با ID غیرموجود
+         * Expected: HTTP 404 Not Found
+         */
         @Test
-        @DisplayName("Should return 404 for delivery not found")
+        @DisplayName("❌ بازگشت 404 برای تحویل یافت نشده")
         void shouldReturn404ForDeliveryNotFound() throws IOException {
             // Arrange
             Long deliveryId = 999L;
@@ -251,8 +428,14 @@ class DeliveryControllerTest {
             verify(exchange, times(1)).sendResponseHeaders(404, responseBody.toByteArray().length);
         }
 
+        /**
+         * تست بازگشت 404 برای endpoint ناشناخته
+         * 
+         * Scenario: درخواست به endpoint غیرموجود
+         * Expected: HTTP 404 Not Found
+         */
         @Test
-        @DisplayName("Should return 404 for unknown endpoint")
+        @DisplayName("❌ بازگشت 404 برای endpoint ناشناخته")
         void shouldReturn404ForUnknownEndpoint() throws IOException {
             // Arrange
             when(exchange.getRequestMethod()).thenReturn("GET");
@@ -266,8 +449,16 @@ class DeliveryControllerTest {
             assertTrue(responseBody.toString().contains("Endpoint not found"));
         }
 
+        /**
+         * تست مدیریت لیست خالی تحویل‌ها
+         * 
+         * Scenario: درخواست لیست تحویل‌ها که نتیجه خالی دارد
+         * Expected:
+         * - آرایه خالی JSON برگردانده شود
+         * - HTTP 200 status code
+         */
         @Test
-        @DisplayName("Should handle empty delivery list responses")
+        @DisplayName("✅ مدیریت لیست خالی تحویل‌ها")
         void shouldHandleEmptyDeliveryListResponses() throws IOException {
             // Arrange
             List<Delivery> emptyList = Arrays.asList();
@@ -285,8 +476,16 @@ class DeliveryControllerTest {
             assertTrue(responseBody.toString().contains("[]"));
         }
 
+        /**
+         * تست مدیریت پاسخ عدم در دسترس بودن پیک
+         * 
+         * Scenario: بررسی پیکی که در دسترس نیست
+         * Expected:
+         * - available: false در JSON
+         * - HTTP 200 status code
+         */
         @Test
-        @DisplayName("Should handle null courier availability response")
+        @DisplayName("✅ مدیریت پاسخ عدم در دسترس بودن پیک")
         void shouldHandleNullCourierAvailabilityResponse() throws IOException {
             // Arrange
             Long courierId = 1L;

@@ -18,11 +18,41 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * کلاس تست جامع برای NotificationRepository
+ * 
+ * این کلاس تمام عملیات‌های لایه دسترسی به داده‌های اعلان‌ها را تست می‌کند:
+ * 
+ * === دسته‌بندی تست‌ها ===
+ * - BasicCrudOperationsTest: تست عملیات CRUD پایه
+ * - FindOperationsTest: تست جستجوهای مختلف
+ * - BulkOperationsTest: تست عملیات گروهی
+ * - StatisticsAndCountsTest: تست آمار و شمارش
+ * - SpecializedFindOperationsTest: تست جستجوهای تخصصی
+ * - BroadcastOperationsTest: تست عملیات broadcast
+ * - EdgeCasesAndErrorHandlingTest: تست موارد خاص و خطاها
+ * 
+ * === ویژگی‌های تست ===
+ * - Real Database Integration: استفاده از دیتابیس واقعی
+ * - Transaction Management: مدیریت تراکنش‌ها
+ * - Data Integrity: تست یکپارچگی داده‌ها
+ * - Performance Testing: تست کارایی عملیات
+ * - Pagination Testing: تست صفحه‌بندی
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class NotificationRepositoryTest {
 
+    /** Repository تحت تست */
     private static NotificationRepository notificationRepository;
+    
+    /** مدیر دیتابیس تست */
     private static TestDatabaseManager testDatabaseManager;
+    
+    /** کاربران تستی برای استفاده در تست‌ها */
     private static User testUser1, testUser2;
 
     @BeforeAll

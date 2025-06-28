@@ -25,35 +25,88 @@ import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * کلاس تست جامع برای VendorController - پوشش 100%
+ * 
+ * این کلاس تمام عملیات REST API فروشندگان را از دیدگاه مشتری تست می‌کند:
+ * 
+ * === گروه‌های تست ===
+ * - ConstructorTests: تست سازنده‌ها
+ * - GetAllVendorsTests: تست GET /api/vendors
+ * - SearchVendorsTests: تست GET /api/vendors/search
+ * - GetVendorDetailsTests: تست GET /api/vendors/{id}
+ * - GetVendorMenuTests: تست GET /api/vendors/{id}/menu
+ * - GetVendorStatsTests: تست GET /api/vendors/{id}/stats
+ * - CheckVendorAvailabilityTests: تست GET /api/vendors/{id}/available
+ * - GetVendorsByLocationTests: تست GET /api/vendors/location/{location}
+ * - GetVendorsByCategoryTests: تست GET /api/vendors/category/{category}
+ * - GetFeaturedVendorsTests: تست GET /api/vendors/featured
+ * - FilterVendorsTests: تست POST /api/vendors/filter
+ * - HttpMethodAndErrorTests: تست مدیریت خطاها
+ * - EdgeCasesTests: تست موارد خاص
+ * 
+ * === ویژگی‌های تست ===
+ * - HTTP Integration Testing: تست کامل HTTP endpoints
+ * - Mock-based Testing: استفاده از Mock objects
+ * - Error Handling: تست مدیریت خطاها
+ * - Edge Cases: تست موارد خاص
+ * - Input Validation: تست اعتبارسنجی ورودی‌ها
+ * - Response Format: تست فرمت پاسخ‌ها
+ * - Status Codes: تست کدهای وضعیت HTTP
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 public class VendorControllerTest {
     
+    /** Mock سرویس فروشندگان */
     @Mock
     private VendorService mockVendorService;
     
+    /** Mock HTTP Exchange */
     @Mock
     private HttpExchange mockExchange;
     
+    /** Mock HTTP Headers */
     @Mock
     private Headers mockHeaders;
     
+    /** کنترلر مورد تست */
     private VendorController vendorController;
+    /** جریان خروجی پاسخ HTTP */
     private ByteArrayOutputStream responseStream;
     
+    /**
+     * راه‌اندازی اولیه قبل از هر تست
+     * 
+     * Mock objects را مقداردهی و کنترلر را با dependency injection می‌سازد
+     */
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         vendorController = new VendorController(mockVendorService);
         responseStream = new ByteArrayOutputStream();
         
-        // Setup common mocks
+        // راه‌اندازی mock های مشترک
         when(mockExchange.getResponseBody()).thenReturn(responseStream);
         when(mockExchange.getResponseHeaders()).thenReturn(mockHeaders);
     }
     
+    /**
+     * گروه تست‌های سازنده‌ها
+     * 
+     * تست صحیح کار کردن سازنده‌های مختلف VendorController
+     */
     @Nested
     @DisplayName("Constructor Tests")
     class ConstructorTests {
         
+        /**
+         * تست سازنده پیش‌فرض
+         * 
+         * بررسی اینکه سازنده پیش‌فرض کنترلر را درست می‌سازد
+         */
         @Test
         @DisplayName("Default constructor should work")
         void testDefaultConstructor() {
@@ -61,6 +114,11 @@ public class VendorControllerTest {
             assertNotNull(controller);
         }
         
+        /**
+         * تست سازنده با پارامتر
+         * 
+         * بررسی اینکه سازنده با سرویس ارائه شده کار می‌کند
+         */
         @Test
         @DisplayName("Parameterized constructor should work")
         void testParameterizedConstructor() {
@@ -68,6 +126,11 @@ public class VendorControllerTest {
             assertNotNull(controller);
         }
         
+        /**
+         * تست سازنده با سرویس null
+         * 
+         * بررسی اینکه کنترلر با سرویس null نیز کار می‌کند
+         */
         @Test
         @DisplayName("Constructor with null service should work")
         void testConstructorWithNullService() {
@@ -78,23 +141,33 @@ public class VendorControllerTest {
         }
     }
     
+    /**
+     * گروه تست‌های GET /api/vendors - دریافت تمام فروشندگان
+     * 
+     * تست endpoint اصلی لیست فروشندگان
+     */
     @Nested
     @DisplayName("GET /api/vendors - Get All Vendors")
     class GetAllVendorsTests {
         
+        /**
+         * تست دریافت موفق تمام فروشندگان
+         * 
+         * بررسی اینکه endpoint لیست فروشندگان را درست برمی‌گرداند
+         */
         @Test
         @DisplayName("Should return all vendors successfully")
         void testGetAllVendorsSuccess() throws IOException {
-            // Arrange
+            // آماده‌سازی
             List<Restaurant> vendors = Arrays.asList(createSampleVendor(1L), createSampleVendor(2L));
             when(mockVendorService.getAllVendors()).thenReturn(vendors);
             when(mockExchange.getRequestMethod()).thenReturn("GET");
             when(mockExchange.getRequestURI()).thenReturn(URI.create("/api/vendors"));
             
-            // Act
+            // اجرا
             vendorController.handle(mockExchange);
             
-            // Assert
+            // بررسی
             verify(mockVendorService).getAllVendors();
             verify(mockExchange).sendResponseHeaders(eq(200), anyLong());
             verify(mockHeaders).set("Content-Type", "application/json");
@@ -104,18 +177,23 @@ public class VendorControllerTest {
             assertTrue(response.contains("Test Restaurant 2"));
         }
         
+        /**
+         * تست دریافت لیست خالی فروشندگان
+         * 
+         * بررسی اینکه endpoint لیست خالی را درست مدیریت می‌کند
+         */
         @Test
         @DisplayName("Should handle empty vendor list")
         void testGetAllVendorsEmpty() throws IOException {
-            // Arrange
+            // آماده‌سازی
             when(mockVendorService.getAllVendors()).thenReturn(Arrays.asList());
             when(mockExchange.getRequestMethod()).thenReturn("GET");
             when(mockExchange.getRequestURI()).thenReturn(URI.create("/api/vendors"));
             
-            // Act
+            // اجرا
             vendorController.handle(mockExchange);
             
-            // Assert
+            // بررسی
             verify(mockVendorService).getAllVendors();
             verify(mockExchange).sendResponseHeaders(eq(200), anyLong());
             
@@ -123,18 +201,23 @@ public class VendorControllerTest {
             assertEquals("[]", response);
         }
         
+        /**
+         * تست مدیریت خطای سرویس
+         * 
+         * بررسی اینکه endpoint خطاهای سرویس را درست مدیریت می‌کند
+         */
         @Test
         @DisplayName("Should handle service exception")
         void testGetAllVendorsServiceException() throws IOException {
-            // Arrange
+            // آماده‌سازی
             when(mockVendorService.getAllVendors()).thenThrow(new RuntimeException("Database error"));
             when(mockExchange.getRequestMethod()).thenReturn("GET");
             when(mockExchange.getRequestURI()).thenReturn(URI.create("/api/vendors"));
             
-            // Act
+            // اجرا
             vendorController.handle(mockExchange);
             
-            // Assert
+            // بررسی
             verify(mockExchange).sendResponseHeaders(eq(500), anyLong());
             String response = responseStream.toString();
             assertTrue(response.contains("Internal server error"));

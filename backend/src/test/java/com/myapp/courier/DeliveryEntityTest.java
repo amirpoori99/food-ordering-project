@@ -10,171 +10,345 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * مجموعه تست‌های جامع Delivery Entity
+ * 
+ * این کلاس تمام رفتارهای entity تحویل را آزمایش می‌کند:
+ * 
+ * === دسته‌های تست ===
+ * 1. Delivery Creation Tests - تست‌های ایجاد تحویل
+ *    - ایجاد با پارامترهای معتبر
+ *    - ایجاد با مسافت
+ *    - validation ورودی‌ها
+ *    - مدیریت خطاها
+ * 
+ * 2. Courier Assignment Tests - تست‌های تخصیص پیک
+ *    - تخصیص موفق پیک
+ *    - validation نقش کاربر
+ *    - مدیریت وضعیت
+ *    - تخصیص مجدد
+ * 
+ * 3. Pickup Process Tests - تست‌های فرآیند pickup
+ *    - علامت‌گذاری pickup موفق
+ *    - validation وضعیت
+ *    - به‌روزرسانی order status
+ * 
+ * 4. Delivery Completion Tests - تست‌های تکمیل تحویل
+ *    - علامت‌گذاری delivery موفق
+ *    - validation workflow
+ *    - به‌روزرسانی timestamps
+ * 
+ * 5. Cancellation Tests - تست‌های لغو تحویل
+ *    - لغو در وضعیت‌های مختلف
+ *    - مدیریت دلیل لغو
+ *    - unassign کردن پیک
+ * 
+ * 6. State Check Tests - تست‌های بررسی وضعیت
+ *    - canBeAssigned
+ *    - canBePickedUp
+ *    - canBeDelivered
+ *    - isActive
+ * 
+ * 7. Time Estimation Tests - تست‌های محاسبه زمان
+ *    - estimated pickup time
+ *    - estimated delivery time
+ *    - محاسبه دقیقه‌ها
+ * 
+ * 8. Getters/Setters Tests - تست‌های properties
+ *    - encapsulation
+ *    - property access
+ * 
+ * === ویژگی‌های تست ===
+ * - Entity Behavior Testing: آزمایش رفتار entity
+ * - Business Logic Validation: اعتبارسنجی منطق کسب‌وکار
+ * - State Transition Testing: تست انتقال وضعیت‌ها
+ * - Parameterized Testing: تست با enum values
+ * - Edge Case Coverage: پوشش موارد خاص
+ * 
+ * === Business Rules Testing ===
+ * - Delivery workflow enforcement
+ * - Courier role validation
+ * - Status transition rules
+ * - Time management
+ * - Order integration
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 @DisplayName("Delivery Entity Tests")
 class DeliveryEntityTest {
 
+    /** کاربر مشتری نمونه */
     private User customer;
+    
+    /** کاربر پیک نمونه */
     private User courier;
+    
+    /** رستوران نمونه */
     private Restaurant restaurant;
+    
+    /** سفارش نمونه */
     private com.myapp.common.models.Order order; // Fully qualified to avoid ambiguity
+    
+    /** آیتم غذایی نمونه */
     private FoodItem foodItem;
 
+    /**
+     * راه‌اندازی قبل از هر تست
+     * 
+     * Operations:
+     * - ایجاد کاربران تست (مشتری، پیک)
+     * - ایجاد رستوران نمونه
+     * - ایجاد آیتم غذایی
+     * - ایجاد سفارش تست
+     */
     @BeforeEach
     void setUp() {
-        // Create test customer - Constructor: (id, fullName, phone, email, passwordHash, role, address)
+        // ایجاد مشتری تست - Constructor: (id, fullName, phone, email, passwordHash, role, address)
         customer = new User(1L, "John Doe", "1234567890", "john@example.com", 
                            "hashedpass", User.Role.BUYER, "123 Main St");
         
-        // Create test courier - Constructor: (id, fullName, phone, email, passwordHash, role, address)  
+        // ایجاد پیک تست - Constructor: (id, fullName, phone, email, passwordHash, role, address)  
         courier = new User(2L, "Mike Wilson", "0987654321", "mike@example.com", 
                           "hashedpass", User.Role.COURIER, "456 Oak Ave");
         
-        // Create test restaurant - Constructor: (id, ownerId, name, address, phone, status)
+        // ایجاد رستوران تست - Constructor: (id, ownerId, name, address, phone, status)
         restaurant = new Restaurant(1L, 3L, "Test Restaurant", "789 Food St", "5551234567", RestaurantStatus.APPROVED);
         
-        // Create test food item - Constructor: (id, name, description, price, category, imageUrl, quantity, keywords, restaurant)
+        // ایجاد آیتم غذایی تست - Constructor: (id, name, description, price, category, imageUrl, quantity, keywords, restaurant)
         foodItem = new FoodItem(1L, "Test Burger", "Delicious test burger", 
                                15.99, "Main Course", "burger.jpg", 10, "burger delicious", restaurant);
         
-        // Create test order
+        // ایجاد سفارش تست
         order = com.myapp.common.models.Order.createNew(customer, restaurant, "123 Main St", "1234567890");
         order.setId(1L);
         order.addItem(foodItem, 2);
         order.setStatus(OrderStatus.READY);
     }
 
+    /**
+     * تست‌های ایجاد تحویل
+     * 
+     * این دسته شامل تمام عملیات مربوط به ایجاد entity تحویل:
+     * - ایجاد با پارامترهای معتبر
+     * - ایجاد با مسافت
+     * - validation ورودی‌ها
+     * - مدیریت خطاها
+     */
     @Nested
     @DisplayName("Delivery Creation Tests")
     class DeliveryCreationTests {
 
+        /**
+         * تست ایجاد موفق تحویل با پارامترهای معتبر
+         * 
+         * Scenario: ایجاد تحویل جدید با سفارش و هزینه
+         * Expected:
+         * - تحویل با موفقیت ایجاد شود
+         * - تمام فیلدها صحیح تنظیم شوند
+         * - وضعیت اولیه PENDING باشد
+         */
         @Test
-        @DisplayName("Should create delivery with valid parameters")
+        @DisplayName("✅ ایجاد موفق تحویل با پارامترهای معتبر")
         void createDelivery_ValidParameters_Success() {
-            // Act
+            // Act - فراخوانی متد ایجاد
             Delivery delivery = Delivery.createNew(order, 5.99);
 
-            // Assert
-            assertNotNull(delivery);
-            assertEquals(order, delivery.getOrder());
-            assertEquals(5.99, delivery.getDeliveryFee());
-            assertEquals(DeliveryStatus.PENDING, delivery.getStatus());
-            assertNull(delivery.getCourier());
-            assertNotNull(delivery.getEstimatedPickupTime());
-            assertNotNull(delivery.getEstimatedDeliveryTime());
+            // Assert - بررسی نتایج
+            assertNotNull(delivery, "تحویل ایجاد شده نباید null باشد");
+            assertEquals(order, delivery.getOrder(), "سفارش باید صحیح تنظیم شود");
+            assertEquals(5.99, delivery.getDeliveryFee(), "هزینه تحویل باید صحیح باشد");
+            assertEquals(DeliveryStatus.PENDING, delivery.getStatus(), "وضعیت اولیه باید PENDING باشد");
+            assertNull(delivery.getCourier(), "پیک در ابتدا نباید تنظیم شود");
+            assertNotNull(delivery.getEstimatedPickupTime(), "زمان تخمینی pickup باید تنظیم شود");
+            assertNotNull(delivery.getEstimatedDeliveryTime(), "زمان تخمینی delivery باید تنظیم شود");
         }
 
+        /**
+         * تست ایجاد تحویل با مسافت
+         * 
+         * Scenario: ایجاد تحویل شامل مسافت مشخص
+         * Expected:
+         * - تحویل با موفقیت ایجاد شود
+         * - مسافت صحیح ثبت شود
+         */
         @Test
-        @DisplayName("Should create delivery with distance")
+        @DisplayName("✅ ایجاد موفق تحویل با مسافت")
         void createDeliveryWithDistance_ValidParameters_Success() {
             // Act
             Delivery delivery = Delivery.createWithDistance(order, 7.50, 5.2);
 
             // Assert
-            assertNotNull(delivery);
-            assertEquals(order, delivery.getOrder());
-            assertEquals(7.50, delivery.getDeliveryFee());
-            assertEquals(5.2, delivery.getDistanceKm());
-            assertEquals(DeliveryStatus.PENDING, delivery.getStatus());
+            assertNotNull(delivery, "تحویل ایجاد شده نباید null باشد");
+            assertEquals(order, delivery.getOrder(), "سفارش باید صحیح تنظیم شود");
+            assertEquals(7.50, delivery.getDeliveryFee(), "هزینه تحویل باید صحیح باشد");
+            assertEquals(5.2, delivery.getDistanceKm(), "مسافت باید صحیح ثبت شود");
+            assertEquals(DeliveryStatus.PENDING, delivery.getStatus(), "وضعیت اولیه باید PENDING باشد");
         }
 
+        /**
+         * تست خطا برای سفارش null
+         * 
+         * Scenario: تلاش ایجاد تحویل بدون سفارش
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
-        @DisplayName("Should throw exception when order is null")
+        @DisplayName("❌ خطا برای سفارش null")
         void createDelivery_NullOrder_ThrowsException() {
             // Act & Assert
             IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> Delivery.createNew(null, 5.99)
+                () -> Delivery.createNew(null, 5.99),
+                "باید exception پرتاب شود برای سفارش null"
             );
             assertEquals("Order is required", exception.getMessage());
         }
 
+        /**
+         * تست خطا برای هزینه منفی
+         * 
+         * Scenario: تلاش ایجاد تحویل با هزینه منفی
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
-        @DisplayName("Should throw exception when delivery fee is negative")
+        @DisplayName("❌ خطا برای هزینه تحویل منفی")
         void createDelivery_NegativeFee_ThrowsException() {
             // Act & Assert
             IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> Delivery.createNew(order, -1.0)
+                () -> Delivery.createNew(order, -1.0),
+                "باید exception پرتاب شود برای هزینه منفی"
             );
             assertEquals("Delivery fee must be non-negative", exception.getMessage());
         }
 
+        /**
+         * تست خطا برای هزینه null
+         * 
+         * Scenario: تلاش ایجاد تحویل بدون مشخص کردن هزینه
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
-        @DisplayName("Should throw exception when delivery fee is null")
+        @DisplayName("❌ خطا برای هزینه تحویل null")
         void createDelivery_NullFee_ThrowsException() {
             // Act & Assert
             IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> Delivery.createNew(order, null)
+                () -> Delivery.createNew(order, null),
+                "باید exception پرتاب شود برای هزینه null"
             );
             assertEquals("Delivery fee must be non-negative", exception.getMessage());
         }
     }
 
+    /**
+     * تست‌های تخصیص پیک
+     * 
+     * این دسته شامل تمام عملیات مربوط به تخصیص پیک:
+     * - تخصیص موفق پیک
+     * - validation نقش کاربر
+     * - مدیریت وضعیت
+     * - تخصیص مجدد
+     */
     @Nested
     @DisplayName("Courier Assignment Tests")
     class CourierAssignmentTests {
 
+        /** تحویل نمونه برای تست‌ها */
         private Delivery delivery;
 
+        /**
+         * راه‌اندازی خاص این دسته تست
+         */
         @BeforeEach
         void setUp() {
             delivery = Delivery.createNew(order, 5.99);
         }
 
+        /**
+         * تست موفق تخصیص پیک
+         * 
+         * Scenario: تخصیص پیک معتبر به تحویل PENDING
+         * Expected:
+         * - پیک با موفقیت تخصیص یابد
+         * - وضعیت به ASSIGNED تغییر کند
+         * - timestamp های مربوطه تنظیم شوند
+         */
         @Test
-        @DisplayName("Should assign courier successfully")
+        @DisplayName("✅ تخصیص موفق پیک")
         void assignToCourier_ValidCourier_Success() {
-            // Act
+            // Act - تخصیص پیک
             delivery.assignToCourier(courier);
 
-            // Assert
-            assertEquals(courier, delivery.getCourier());
-            assertEquals(DeliveryStatus.ASSIGNED, delivery.getStatus());
-            assertNotNull(delivery.getAssignedAt());
-            assertNotNull(delivery.getEstimatedPickupTime());
+            // Assert - بررسی نتایج
+            assertEquals(courier, delivery.getCourier(), "پیک باید صحیح تخصیص یابد");
+            assertEquals(DeliveryStatus.ASSIGNED, delivery.getStatus(), "وضعیت باید به ASSIGNED تغییر کند");
+            assertNotNull(delivery.getAssignedAt(), "زمان تخصیص باید ثبت شود");
+            assertNotNull(delivery.getEstimatedPickupTime(), "زمان تخمینی pickup باید به‌روزرسانی شود");
         }
 
+        /**
+         * تست خطا برای پیک null
+         * 
+         * Scenario: تلاش تخصیص پیک null
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
-        @DisplayName("Should throw exception when courier is null")
+        @DisplayName("❌ خطا برای پیک null")
         void assignToCourier_NullCourier_ThrowsException() {
             // Act & Assert
             IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> delivery.assignToCourier(null)
+                () -> delivery.assignToCourier(null),
+                "باید exception پرتاب شود برای پیک null"
             );
             assertEquals("Courier cannot be null", exception.getMessage());
         }
 
+        /**
+         * تست خطا برای کاربر غیرپیک
+         * 
+         * Scenario: تلاش تخصیص کاربری که نقش COURIER ندارد
+         * Expected: IllegalArgumentException پرتاب شود
+         */
         @Test
-        @DisplayName("Should throw exception when user is not courier")
+        @DisplayName("❌ خطا برای کاربر غیرپیک")
         void assignToCourier_NotCourierRole_ThrowsException() {
-            // Arrange - Constructor: (id, fullName, phone, email, passwordHash, role, address)
+            // Arrange - ایجاد کاربر غیرپیک
             User nonCourier = new User(3L, "Not Courier", "1111111111", "not@courier.com", 
                                      "pass", User.Role.BUYER, "Not Courier St");
 
             // Act & Assert
             IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> delivery.assignToCourier(nonCourier)
+                () -> delivery.assignToCourier(nonCourier),
+                "باید exception پرتاب شود برای کاربر غیرپیک"
             );
             assertEquals("User must have COURIER role", exception.getMessage());
         }
 
+        /**
+         * تست خطا برای تخصیص مجدد
+         * 
+         * Scenario: تلاش تخصیص پیک دوم به تحویل قبلاً تخصیص یافته
+         * Expected: IllegalStateException پرتاب شود
+         */
         @Test
-        @DisplayName("Should throw exception when delivery is not pending")
+        @DisplayName("❌ خطا برای تخصیص مجدد پیک")
         void assignToCourier_NotPendingStatus_ThrowsException() {
-            // Arrange
+            // Arrange - تخصیص اول
             delivery.assignToCourier(courier); // Status becomes ASSIGNED
 
-            // Constructor: (id, fullName, phone, email, passwordHash, role, address)
+            // ایجاد پیک دوم
             User anotherCourier = new User(4L, "Another Courier", "2222222222", "another@courier.com", 
                                          "pass", User.Role.COURIER, "Another St");
 
             // Act & Assert
             IllegalStateException exception = assertThrows(
                 IllegalStateException.class,
-                () -> delivery.assignToCourier(anotherCourier)
+                () -> delivery.assignToCourier(anotherCourier),
+                "باید exception پرتاب شود برای تخصیص مجدد"
             );
             assertEquals("Can only assign courier to pending deliveries", exception.getMessage());
         }

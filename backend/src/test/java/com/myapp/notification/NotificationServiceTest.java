@@ -21,16 +21,51 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * کلاس تست جامع برای NotificationService
+ * 
+ * این کلاس تمام عملیات‌های لایه منطق کسب‌وکار سیستم اعلان‌ها را تست می‌کند:
+ * 
+ * === دسته‌بندی تست‌ها ===
+ * - BasicNotificationOperationsTest: تست عملیات پایه ایجاد اعلان
+ * - NotificationRetrievalTest: تست دریافت اعلان‌ها با فیلترهای مختلف  
+ * - NotificationStateManagementTest: تست مدیریت وضعیت اعلان‌ها
+ * - BulkOperationsTest: تست عملیات گروهی
+ * - FactoryMethodsTest: تست factory methods اعلان‌های خاص
+ * - StatisticsAndCountsTest: تست آمار و شمارش
+ * - BroadcastOperationsTest: تست عملیات broadcast
+ * - DailyMaintenanceTest: تست نگهداری روزانه
+ * - ValidationTest: تست اعتبارسنجی ورودی‌ها
+ * 
+ * === ویژگی‌های تست ===
+ * - Mock Dependencies: استفاده از Mockito برای repository ها
+ * - Comprehensive Coverage: پوشش کامل تمام سناریوها
+ * - Edge Cases Testing: تست موارد خاص و حالات استثنا
+ * - Business Logic Validation: تایید منطق کسب‌وکار
+ * - Error Scenarios: تست مدیریت خطاها
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 class NotificationServiceTest {
 
+    /** Mock repository برای عملیات دیتابیس اعلان‌ها */
     @Mock
     private NotificationRepository notificationRepository;
     
+    /** Mock repository برای عملیات احراز هویت */
     @Mock
     private AuthRepository authRepository;
     
+    /** instance سرویس تحت تست */
     private NotificationService notificationService;
     
+    /**
+     * راه‌اندازی اولیه قبل از هر تست
+     * 
+     * Mock کردن dependencies و ایجاد instance سرویس
+     */
     @BeforeEach
     void setUp() {
         notificationRepository = Mockito.mock(NotificationRepository.class);
@@ -38,12 +73,23 @@ class NotificationServiceTest {
         notificationService = new NotificationService(notificationRepository, authRepository);
     }
 
+    /**
+     * دسته تست‌های عملیات پایه اعلان‌ها
+     * 
+     * شامل تست‌های ایجاد اعلان، validation ورودی‌ها و مدیریت خطاها
+     */
     @Nested
-    @DisplayName("Basic Notification Operations")
+    @DisplayName("تست‌های عملیات پایه اعلان‌ها")
     class BasicNotificationOperationsTest {
 
+        /**
+         * تست ایجاد موفق اعلان ساده
+         * 
+         * سناریو: ایجاد اعلان با پارامترهای معتبر
+         * انتظار: اعلان با موفقیت ایجاد شود
+         */
         @Test
-        @DisplayName("Should create notification successfully")
+        @DisplayName("باید اعلان را با موفقیت ایجاد کند")
         void shouldCreateNotificationSuccessfully() {
             // Given
             Long userId = 1L;

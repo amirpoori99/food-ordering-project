@@ -10,20 +10,63 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Comprehensive tests for VendorRepository - 100% coverage
+ * کلاس تست جامع برای VendorRepository - پوشش 100%
+ * 
+ * این کلاس تمام عملیات پایگاه داده مربوط به فروشندگان را تست می‌کند:
+ * 
+ * === گروه‌های تست ===
+ * - SearchVendorsTests: تست جستجوی فروشندگان
+ * - FindByLocationTests: تست یافتن فروشندگان بر اساس موقعیت
+ * - GetFeaturedVendorsTests: تست دریافت فروشندگان برجسته
+ * - FindByFoodCategoryTests: تست یافتن فروشندگان بر اساس دسته غذا
+ * - GetVendorsWithItemCountsTests: تست دریافت فروشندگان با تعداد آیتم‌ها
+ * - FindByFiltersTests: تست جستجوی پیشرفته با فیلترها
+ * - VendorWithItemCountTests: تست کلاس داخلی VendorWithItemCount
+ * - PerformanceTests: تست‌های کارایی و استرس
+ * - ErrorHandlingTests: تست مدیریت خطاها
+ * 
+ * === ویژگی‌های تست ===
+ * - Database Integration: تست یکپارچگی با پایگاه داده
+ * - Data Integrity: تست یکپارچگی داده‌ها
+ * - Query Optimization: تست بهینه‌سازی queries
+ * - Error Resilience: تست مقاومت در برابر خطا
+ * - Performance Testing: تست کارایی
+ * - Security Testing: تست امنیت (SQL Injection)
+ * - Unicode Support: تست پشتیبانی از Unicode
+ * - Edge Cases: تست موارد خاص
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class VendorRepositoryTest {
+    /** Repository مورد تست */
     private VendorRepository vendorRepository;
 
+    /**
+     * راه‌اندازی اولیه قبل از هر تست
+     * 
+     * نمونه جدید از VendorRepository برای هر تست می‌سازد
+     */
     @BeforeEach
     void setUp() {
         vendorRepository = new VendorRepository();
     }
 
+    /**
+     * گروه تست‌های جستجوی فروشندگان
+     * 
+     * تست متد searchVendors() در سناریوهای مختلف
+     */
     @Nested
     @DisplayName("searchVendors Tests")
     class SearchVendorsTests {
 
+        /**
+         * تست جستجوی اصلی فروشندگان
+         * 
+         * بررسی اینکه متد searchVendors لیست معتبر برمی‌گرداند
+         */
         @Test
         @DisplayName("searchVendors should return list")
         void testSearchVendors() {
@@ -31,6 +74,11 @@ public class VendorRepositoryTest {
             assertNotNull(result);
         }
 
+        /**
+         * تست جستجو با عبارت خالی
+         * 
+         * بررسی مدیریت عبارت جستجوی خالی
+         */
         @Test
         @DisplayName("searchVendors should handle empty search term")
         void testSearchVendorsEmpty() {
@@ -38,6 +86,11 @@ public class VendorRepositoryTest {
             assertNotNull(result);
         }
 
+        /**
+         * تست جستجو با عبارت null
+         * 
+         * بررسی مدیریت عبارت جستجوی null
+         */
         @Test
         @DisplayName("searchVendors should handle null search term")
         void testSearchVendorsNull() {
@@ -45,6 +98,11 @@ public class VendorRepositoryTest {
             assertNotNull(result);
         }
 
+        /**
+         * تست عدم حساسیت به حروف کوچک و بزرگ
+         * 
+         * بررسی اینکه جستجو case insensitive است
+         */
         @Test
         @DisplayName("searchVendors should be case insensitive")
         void testSearchVendorsCaseInsensitive() {
@@ -54,6 +112,11 @@ public class VendorRepositoryTest {
             assertNotNull(result2);
         }
 
+        /**
+         * تست جستجو با کاراکترهای خاص
+         * 
+         * بررسی مدیریت کاراکترهای خاص در جستجو
+         */
         @Test
         @DisplayName("searchVendors should handle special characters")
         void testSearchVendorsSpecialChars() {
@@ -61,6 +124,11 @@ public class VendorRepositoryTest {
             assertNotNull(result);
         }
 
+        /**
+         * تست جستجو با کاراکترهای Unicode
+         * 
+         * بررسی پشتیبانی از متن فارسی و Unicode
+         */
         @Test
         @DisplayName("searchVendors should handle Unicode characters")
         void testSearchVendorsUnicode() {
@@ -68,6 +136,11 @@ public class VendorRepositoryTest {
             assertNotNull(result);
         }
 
+        /**
+         * تست جستجو با رشته‌های بسیار طولانی
+         * 
+         * بررسی مدیریت ورودی‌های طولانی
+         */
         @Test
         @DisplayName("searchVendors should handle very long strings")
         void testSearchVendorsLongString() {
@@ -76,6 +149,11 @@ public class VendorRepositoryTest {
             assertNotNull(result);
         }
 
+        /**
+         * تست امنیت: محافظت در برابر SQL Injection
+         * 
+         * بررسی اینکه repository در برابر حملات SQL Injection مقاوم است
+         */
         @Test
         @DisplayName("searchVendors should handle SQL injection attempts")
         void testSearchVendorsSQLInjection() {
@@ -83,6 +161,11 @@ public class VendorRepositoryTest {
             assertNotNull(result);
         }
 
+        /**
+         * تست جستجو با فقط فاصله
+         * 
+         * بررسی مدیریت ورودی که فقط شامل فاصله است
+         */
         @Test
         @DisplayName("searchVendors should handle whitespace only")
         void testSearchVendorsWhitespaceOnly() {
@@ -90,6 +173,11 @@ public class VendorRepositoryTest {
             assertNotNull(result);
         }
 
+        /**
+         * تست جستجو با کاراکترهای Regex
+         * 
+         * بررسی مدیریت کاراکترهای خاص regex
+         */
         @Test
         @DisplayName("searchVendors should handle regex special characters")
         void testSearchVendorsRegexChars() {

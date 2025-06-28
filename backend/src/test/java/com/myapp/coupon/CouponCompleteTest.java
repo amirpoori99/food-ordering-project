@@ -23,9 +23,37 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Complete test suite covering all missing scenarios for 100% coupon system coverage
+ * کلاس تست یکپارچگی کامل برای سیستم کوپن‌های تخفیف
+ * 
+ * این کلاس تست‌های end-to-end و یکپارچگی کامل سیستم کوپن را انجام می‌دهد:
+ * 
+ * === گروه‌های تست ===
+ * - CouponCreationWithSettingsTests: تست ایجاد کوپن با تنظیمات پیشرفته
+ * - PerUserLimitTests: تست محدودیت‌های هر کاربر
+ * - ComplexBusinessScenarioTests: تست سناریوهای پیچیده کسب‌وکار
+ * 
+ * === ویژگی‌های تست ===
+ * - End-to-End Testing: تست کامل از ابتدا تا انتها
+ * - Database Integration: تست یکپارچگی با پایگاه داده
+ * - Real Data Testing: تست با داده‌های واقعی
+ * - Complex Scenarios: تست سناریوهای پیچیده کسب‌وکار
+ * - Business Rules Validation: اعتبارسنجی قوانین کسب‌وکار
+ * - Multi-User Testing: تست چند کاربره
+ * - Usage Tracking: تست ردیابی استفاده
+ * 
+ * === تست‌های کامل ===
+ * - ایجاد کوپن با تمام تنظیمات
+ * - اعمال کوپن در سناریوهای مختلف
+ * - محدودیت‌های استفاده
+ * - ردیابی کامل استفاده
+ * - مدیریت چندین کاربر
+ * - سناریوهای کسب‌وکار پیچیده
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
-@DisplayName("Complete Coupon System Tests")
+@DisplayName("Complete Coupon System Integration Tests")
 public class CouponCompleteTest {
     
     @Mock

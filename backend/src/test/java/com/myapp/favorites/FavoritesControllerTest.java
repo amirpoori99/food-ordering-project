@@ -28,19 +28,39 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * تست‌های جامع برای کلاس FavoritesController
+ * 
+ * پوشش کامل تمام HTTP endpoints مربوط به مدیریت علاقه‌مندی‌ها:
+ * - GET endpoints: دریافت، بررسی، آمارگیری
+ * - POST endpoints: اضافه کردن علاقه‌مندی
+ * - PUT endpoints: به‌روزرسانی یادداشت
+ * - DELETE endpoints: حذف علاقه‌مندی
+ * - Error handling: مدیریت خطاها و validation
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 @DisplayName("FavoritesController Tests")
 public class FavoritesControllerTest {
 
+    /** Mock سرویس علاقه‌مندی‌ها */
     @Mock
     private FavoritesService mockFavoritesService;
     
+    /** Mock HTTP exchange object */
     @Mock
     private HttpExchange mockExchange;
     
+    /** Mock HTTP headers */
     @Mock
     private Headers mockHeaders;
     
+    /** کنترلر تحت تست */
     private FavoritesController favoritesController;
+    
+    /** Stream برای capture کردن response */
     private ByteArrayOutputStream responseStream;
 
     @BeforeEach

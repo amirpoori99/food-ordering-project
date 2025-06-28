@@ -1,5 +1,6 @@
 package com.myapp.coupon;
 
+import com.myapp.common.exceptions.NotFoundException;
 import com.myapp.common.models.Coupon;
 import com.myapp.common.utils.JsonUtil;
 import com.sun.net.httpserver.HttpExchange;
@@ -25,58 +26,30 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * مجموعه تست‌های جامع CouponController
+ * کلاس تست جامع برای CouponController - پوشش 100%
  * 
- * این کلاس تست تمام REST API endpoint های کنترلر مدیریت کوپن‌ها را آزمایش می‌کند:
+ * این کلاس تمام عملیات REST API کوپن‌ها را تست می‌کند:
  * 
- * Test Categories:
- * 1. GET Endpoint Tests
- *    - دریافت کوپن با ID
- *    - دریافت کوپن با کد
- *    - لیست کوپن‌های معتبر
- *    - کوپن‌های رستوران
- *    - کوپن‌های قابل اعمال
- *    - آمار کوپن‌ها
+ * === گروه‌های تست ===
+ * - GetEndpointTests: تست تمام GET endpoints
+ * - PostEndpointTests: تست تمام POST endpoints  
+ * - PutEndpointTests: تست تمام PUT endpoints
+ * - DeleteEndpointTests: تست تمام DELETE endpoints
+ * - ErrorHandlingTests: تست مدیریت خطاها
  * 
- * 2. POST Endpoint Tests
- *    - ایجاد کوپن جدید
- *    - فعال‌سازی کوپن
- *    - غیرفعال‌سازی کوپن
- *    - اعمال کوپن
+ * === ویژگی‌های تست ===
+ * - HTTP Integration Testing: تست کامل HTTP endpoints
+ * - JSON Processing: تست پردازش JSON request/response
+ * - Error Handling: تست مدیریت خطاها
+ * - Status Codes: تست کدهای وضعیت HTTP
+ * - Parameter Validation: تست اعتبارسنجی پارامترها
+ * - Path Parsing: تست تجزیه URL paths
+ * - Query Parameters: تست پارامترهای query string
  * 
- * 3. PUT Endpoint Tests
- *    - به‌روزرسانی کوپن
- *    - تغییر اطلاعات کوپن
- * 
- * 4. DELETE Endpoint Tests
- *    - حذف کوپن
- *    - validation حذف
- * 
- * 5. Error Handling Tests
- *    - مدیریت HTTP method نامعتبر
- *    - endpoint یافت نشده
- *    - JSON نامعتبر
- *    - HTTP status codes
- * 
- * HTTP Testing Features:
- * - RESTful API testing
- * - HTTP status code validation
- * - Request/Response body testing
- * - Query parameter handling
- * - JSON serialization/deserialization
- * - Error response testing
- * 
- * Controller Layer Testing:
- * - HTTP request routing
- * - Parameter extraction
- * - Response formatting
- * - Exception handling
- * - Business logic delegation
- * 
- * Integration with Service Layer:
- * - Service method calls verification
- * - Business logic validation
- * - Error propagation testing
+ * === Mock Objects ===
+ * - CouponService: سرویس منطق کسب‌وکار
+ * - HttpExchange: شیء HTTP request/response
+ * - Headers: HTTP headers
  * 
  * @author Food Ordering System Team
  * @version 1.0
@@ -85,42 +58,37 @@ import static org.mockito.Mockito.*;
 @DisplayName("CouponController Tests")
 public class CouponControllerTest {
     
-    /** Mock service برای تست‌ها */
+    /** Mock سرویس کوپن‌ها */
     @Mock
     private CouponService couponService;
     
-    /** Mock HTTP exchange برای شبیه‌سازی درخواست */
+    /** Mock HTTP Exchange */
     @Mock
-    private HttpExchange exchange;
+    private HttpExchange httpExchange;
     
-    /** Mock response headers */
+    /** Mock HTTP Headers */
     @Mock
-    private Headers responseHeaders;
+    private Headers headers;
     
-    /** Controller instance تحت تست */
-    private CouponController controller;
-    
-    /** OutputStream برای capture کردن response */
-    private ByteArrayOutputStream responseStream;
+    /** کنترلر مورد تست */
+    private CouponController couponController;
+    /** جریان خروجی پاسخ HTTP */
+    private ByteArrayOutputStream responseOutputStream;
     
     /**
-     * راه‌اندازی قبل از هر تست
+     * راه‌اندازی اولیه قبل از هر تست
      * 
-     * Operations:
-     * - initialize mock objects
-     * - setup controller instance
-     * - prepare response stream
-     * - configure common mock behaviors
+     * Mock objects را مقداردهی و کنترلر را با dependency injection می‌سازد
      */
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        controller = new CouponController(couponService);
-        responseStream = new ByteArrayOutputStream();
+        couponController = new CouponController(couponService);
+        responseOutputStream = new ByteArrayOutputStream();
         
-        // راه‌اندازی mock response headers
-        when(exchange.getResponseHeaders()).thenReturn(responseHeaders);
-        when(exchange.getResponseBody()).thenReturn(responseStream);
+        // راه‌اندازی mock های مشترک
+        when(httpExchange.getResponseHeaders()).thenReturn(headers);
+        when(httpExchange.getResponseBody()).thenReturn(responseOutputStream);
     }
     
     // ==================== تست‌های GET Endpoint ====================
@@ -157,16 +125,16 @@ public class CouponControllerTest {
             Long couponId = 1L;
             Coupon coupon = createTestCoupon();
             when(couponService.getCoupon(couponId)).thenReturn(coupon);
-            when(exchange.getRequestMethod()).thenReturn("GET");
-            when(exchange.getRequestURI()).thenReturn(URI.create("/api/coupons/1"));
-            when(exchange.getResponseBody()).thenReturn(responseStream);
+            when(httpExchange.getRequestMethod()).thenReturn("GET");
+            when(httpExchange.getRequestURI()).thenReturn(URI.create("/api/coupons/1"));
+            when(httpExchange.getResponseBody()).thenReturn(responseOutputStream);
             
             // Act - فراخوانی controller
-            controller.handle(exchange);
+            couponController.handle(httpExchange);
             
             // Assert - بررسی نتایج
             verify(couponService).getCoupon(couponId);
-            verify(exchange).sendResponseHeaders(eq(200), anyLong());
+            verify(httpExchange).sendResponseHeaders(eq(200), anyLong());
         }
         
         /**
@@ -181,15 +149,15 @@ public class CouponControllerTest {
             // Arrange
             Long couponId = 999L;
             when(couponService.getCoupon(couponId)).thenThrow(new RuntimeException("Coupon not found"));
-            when(exchange.getRequestMethod()).thenReturn("GET");
-            when(exchange.getRequestURI()).thenReturn(URI.create("/api/coupons/999"));
-            when(exchange.getResponseBody()).thenReturn(responseStream);
+            when(httpExchange.getRequestMethod()).thenReturn("GET");
+            when(httpExchange.getRequestURI()).thenReturn(URI.create("/api/coupons/999"));
+            when(httpExchange.getResponseBody()).thenReturn(responseOutputStream);
             
             // Act
-            controller.handle(exchange);
+            couponController.handle(httpExchange);
             
             // Assert
-            verify(exchange).sendResponseHeaders(eq(500), anyLong());
+            verify(httpExchange).sendResponseHeaders(eq(500), anyLong());
         }
         
         /**
@@ -207,16 +175,16 @@ public class CouponControllerTest {
             String code = "SAVE20";
             Coupon coupon = createTestCoupon();
             when(couponService.getCouponByCode(code)).thenReturn(coupon);
-            when(exchange.getRequestMethod()).thenReturn("GET");
-            when(exchange.getRequestURI()).thenReturn(URI.create("/api/coupons/code/SAVE20"));
-            when(exchange.getResponseBody()).thenReturn(responseStream);
+            when(httpExchange.getRequestMethod()).thenReturn("GET");
+            when(httpExchange.getRequestURI()).thenReturn(URI.create("/api/coupons/code/SAVE20"));
+            when(httpExchange.getResponseBody()).thenReturn(responseOutputStream);
             
             // Act
-            controller.handle(exchange);
+            couponController.handle(httpExchange);
             
             // Assert
             verify(couponService).getCouponByCode(code);
-            verify(exchange).sendResponseHeaders(eq(200), anyLong());
+            verify(httpExchange).sendResponseHeaders(eq(200), anyLong());
         }
         
         /**
@@ -233,16 +201,16 @@ public class CouponControllerTest {
             // Arrange
             List<Coupon> coupons = Arrays.asList(createTestCoupon(), createTestCoupon());
             when(couponService.getValidCoupons()).thenReturn(coupons);
-            when(exchange.getRequestMethod()).thenReturn("GET");
-            when(exchange.getRequestURI()).thenReturn(URI.create("/api/coupons/valid"));
-            when(exchange.getResponseBody()).thenReturn(responseStream);
+            when(httpExchange.getRequestMethod()).thenReturn("GET");
+            when(httpExchange.getRequestURI()).thenReturn(URI.create("/api/coupons/valid"));
+            when(httpExchange.getResponseBody()).thenReturn(responseOutputStream);
             
             // Act
-            controller.handle(exchange);
+            couponController.handle(httpExchange);
             
             // Assert
             verify(couponService).getValidCoupons();
-            verify(exchange).sendResponseHeaders(eq(200), anyLong());
+            verify(httpExchange).sendResponseHeaders(eq(200), anyLong());
         }
         
         /**
@@ -260,16 +228,16 @@ public class CouponControllerTest {
             Long restaurantId = 1L;
             List<Coupon> coupons = Arrays.asList(createTestCoupon());
             when(couponService.getRestaurantCoupons(restaurantId)).thenReturn(coupons);
-            when(exchange.getRequestMethod()).thenReturn("GET");
-            when(exchange.getRequestURI()).thenReturn(URI.create("/api/coupons/restaurant/1"));
-            when(exchange.getResponseBody()).thenReturn(responseStream);
+            when(httpExchange.getRequestMethod()).thenReturn("GET");
+            when(httpExchange.getRequestURI()).thenReturn(URI.create("/api/coupons/restaurant/1"));
+            when(httpExchange.getResponseBody()).thenReturn(responseOutputStream);
             
             // Act
-            controller.handle(exchange);
+            couponController.handle(httpExchange);
             
             // Assert
             verify(couponService).getRestaurantCoupons(restaurantId);
-            verify(exchange).sendResponseHeaders(eq(200), anyLong());
+            verify(httpExchange).sendResponseHeaders(eq(200), anyLong());
         }
         
         /**
@@ -288,16 +256,16 @@ public class CouponControllerTest {
             Long restaurantId = 1L;
             List<Coupon> coupons = Arrays.asList(createTestCoupon());
             when(couponService.getApplicableCoupons(orderAmount, restaurantId)).thenReturn(coupons);
-            when(exchange.getRequestMethod()).thenReturn("GET");
-            when(exchange.getRequestURI()).thenReturn(URI.create("/api/coupons/applicable?orderAmount=100.0&restaurantId=1"));
-            when(exchange.getResponseBody()).thenReturn(responseStream);
+            when(httpExchange.getRequestMethod()).thenReturn("GET");
+            when(httpExchange.getRequestURI()).thenReturn(URI.create("/api/coupons/applicable?orderAmount=100.0&restaurantId=1"));
+            when(httpExchange.getResponseBody()).thenReturn(responseOutputStream);
             
             // Act
-            controller.handle(exchange);
+            couponController.handle(httpExchange);
             
             // Assert
             verify(couponService).getApplicableCoupons(orderAmount, restaurantId);
-            verify(exchange).sendResponseHeaders(eq(200), anyLong());
+            verify(httpExchange).sendResponseHeaders(eq(200), anyLong());
         }
         
         /**
@@ -310,15 +278,15 @@ public class CouponControllerTest {
         @DisplayName("Should return 400 for missing orderAmount parameter")
         void shouldReturn400ForMissingOrderAmount() throws IOException {
             // Arrange
-            when(exchange.getRequestMethod()).thenReturn("GET");
-            when(exchange.getRequestURI()).thenReturn(URI.create("/api/coupons/applicable"));
-            when(exchange.getResponseBody()).thenReturn(responseStream);
+            when(httpExchange.getRequestMethod()).thenReturn("GET");
+            when(httpExchange.getRequestURI()).thenReturn(URI.create("/api/coupons/applicable"));
+            when(httpExchange.getResponseBody()).thenReturn(responseOutputStream);
             
             // Act
-            controller.handle(exchange);
+            couponController.handle(httpExchange);
             
             // Assert
-            verify(exchange).sendResponseHeaders(eq(400), anyLong());
+            verify(httpExchange).sendResponseHeaders(eq(400), anyLong());
         }
         
         /**
@@ -335,16 +303,16 @@ public class CouponControllerTest {
             // Arrange
             CouponService.CouponStatistics stats = new CouponService.CouponStatistics(10L, 8L, 2L, 1L);
             when(couponService.getCouponStatistics()).thenReturn(stats);
-            when(exchange.getRequestMethod()).thenReturn("GET");
-            when(exchange.getRequestURI()).thenReturn(URI.create("/api/coupons/statistics"));
-            when(exchange.getResponseBody()).thenReturn(responseStream);
+            when(httpExchange.getRequestMethod()).thenReturn("GET");
+            when(httpExchange.getRequestURI()).thenReturn(URI.create("/api/coupons/statistics"));
+            when(httpExchange.getResponseBody()).thenReturn(responseOutputStream);
             
             // Act
-            controller.handle(exchange);
+            couponController.handle(httpExchange);
             
             // Assert
             verify(couponService).getCouponStatistics();
-            verify(exchange).sendResponseHeaders(eq(200), anyLong());
+            verify(httpExchange).sendResponseHeaders(eq(200), anyLong());
         }
     }
     
@@ -393,16 +361,16 @@ public class CouponControllerTest {
                 any(LocalDateTime.class), any(LocalDateTime.class), anyLong(), any()))
                 .thenReturn(coupon);
             
-            when(exchange.getRequestMethod()).thenReturn("POST");
-            when(exchange.getRequestURI()).thenReturn(URI.create("/api/coupons"));
-            when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream(requestBody.getBytes()));
-            when(exchange.getResponseBody()).thenReturn(responseStream);
+            when(httpExchange.getRequestMethod()).thenReturn("POST");
+            when(httpExchange.getRequestURI()).thenReturn(URI.create("/api/coupons"));
+            when(httpExchange.getRequestBody()).thenReturn(new ByteArrayInputStream(requestBody.getBytes()));
+            when(httpExchange.getResponseBody()).thenReturn(responseOutputStream);
             
             // Act
-            controller.handle(exchange);
+            couponController.handle(httpExchange);
             
             // Assert
-            verify(exchange).sendResponseHeaders(eq(201), anyLong());
+            verify(httpExchange).sendResponseHeaders(eq(201), anyLong());
         }
         
         /**
@@ -421,17 +389,17 @@ public class CouponControllerTest {
             Map<String, Object> requestData = Map.of("activatedBy", 1L);
             String requestBody = JsonUtil.toJson(requestData);
             
-            when(exchange.getRequestMethod()).thenReturn("POST");
-            when(exchange.getRequestURI()).thenReturn(URI.create("/api/coupons/1/activate"));
-            when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream(requestBody.getBytes()));
-            when(exchange.getResponseBody()).thenReturn(responseStream);
+            when(httpExchange.getRequestMethod()).thenReturn("POST");
+            when(httpExchange.getRequestURI()).thenReturn(URI.create("/api/coupons/1/activate"));
+            when(httpExchange.getRequestBody()).thenReturn(new ByteArrayInputStream(requestBody.getBytes()));
+            when(httpExchange.getResponseBody()).thenReturn(responseOutputStream);
             
             // Act
-            controller.handle(exchange);
+            couponController.handle(httpExchange);
             
             // Assert
             verify(couponService).activateCoupon(couponId, 1L);
-            verify(exchange).sendResponseHeaders(eq(200), anyLong());
+            verify(httpExchange).sendResponseHeaders(eq(200), anyLong());
         }
         
         /**
@@ -450,17 +418,17 @@ public class CouponControllerTest {
             Map<String, Object> requestData = Map.of("deactivatedBy", 1L);
             String requestBody = JsonUtil.toJson(requestData);
             
-            when(exchange.getRequestMethod()).thenReturn("POST");
-            when(exchange.getRequestURI()).thenReturn(URI.create("/api/coupons/1/deactivate"));
-            when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream(requestBody.getBytes()));
-            when(exchange.getResponseBody()).thenReturn(responseStream);
+            when(httpExchange.getRequestMethod()).thenReturn("POST");
+            when(httpExchange.getRequestURI()).thenReturn(URI.create("/api/coupons/1/deactivate"));
+            when(httpExchange.getRequestBody()).thenReturn(new ByteArrayInputStream(requestBody.getBytes()));
+            when(httpExchange.getResponseBody()).thenReturn(responseOutputStream);
             
             // Act
-            controller.handle(exchange);
+            couponController.handle(httpExchange);
             
             // Assert
             verify(couponService).deactivateCoupon(couponId, 1L);
-            verify(exchange).sendResponseHeaders(eq(200), anyLong());
+            verify(httpExchange).sendResponseHeaders(eq(200), anyLong());
         }
         
         /**
@@ -486,17 +454,17 @@ public class CouponControllerTest {
             String requestBody = JsonUtil.toJson(requestData);
             
             when(couponService.applyCoupon("SAVE20", 100.0, 1L, 1L)).thenReturn(result);
-            when(exchange.getRequestMethod()).thenReturn("POST");
-            when(exchange.getRequestURI()).thenReturn(URI.create("/api/coupons/apply"));
-            when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream(requestBody.getBytes()));
-            when(exchange.getResponseBody()).thenReturn(responseStream);
+            when(httpExchange.getRequestMethod()).thenReturn("POST");
+            when(httpExchange.getRequestURI()).thenReturn(URI.create("/api/coupons/apply"));
+            when(httpExchange.getRequestBody()).thenReturn(new ByteArrayInputStream(requestBody.getBytes()));
+            when(httpExchange.getResponseBody()).thenReturn(responseOutputStream);
             
             // Act
-            controller.handle(exchange);
+            couponController.handle(httpExchange);
             
             // Assert
             verify(couponService).applyCoupon("SAVE20", 100.0, 1L, 1L);
-            verify(exchange).sendResponseHeaders(eq(200), anyLong());
+            verify(httpExchange).sendResponseHeaders(eq(200), anyLong());
         }
     }
     
@@ -537,16 +505,16 @@ public class CouponControllerTest {
             
             when(couponService.updateCoupon(eq(couponId), anyString(), anyDouble(), any(), any(), any(), any(), anyLong()))
                 .thenReturn(updatedCoupon);
-            when(exchange.getRequestMethod()).thenReturn("PUT");
-            when(exchange.getRequestURI()).thenReturn(URI.create("/api/coupons/1"));
-            when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream(requestBody.getBytes()));
-            when(exchange.getResponseBody()).thenReturn(responseStream);
+            when(httpExchange.getRequestMethod()).thenReturn("PUT");
+            when(httpExchange.getRequestURI()).thenReturn(URI.create("/api/coupons/1"));
+            when(httpExchange.getRequestBody()).thenReturn(new ByteArrayInputStream(requestBody.getBytes()));
+            when(httpExchange.getResponseBody()).thenReturn(responseOutputStream);
             
             // Act
-            controller.handle(exchange);
+            couponController.handle(httpExchange);
             
             // Assert
-            verify(exchange).sendResponseHeaders(eq(200), anyLong());
+            verify(httpExchange).sendResponseHeaders(eq(200), anyLong());
         }
     }
     
@@ -580,17 +548,17 @@ public class CouponControllerTest {
             Map<String, Object> requestData = Map.of("deletedBy", 1L);
             String requestBody = JsonUtil.toJson(requestData);
             
-            when(exchange.getRequestMethod()).thenReturn("DELETE");
-            when(exchange.getRequestURI()).thenReturn(URI.create("/api/coupons/1"));
-            when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream(requestBody.getBytes()));
-            when(exchange.getResponseBody()).thenReturn(responseStream);
+            when(httpExchange.getRequestMethod()).thenReturn("DELETE");
+            when(httpExchange.getRequestURI()).thenReturn(URI.create("/api/coupons/1"));
+            when(httpExchange.getRequestBody()).thenReturn(new ByteArrayInputStream(requestBody.getBytes()));
+            when(httpExchange.getResponseBody()).thenReturn(responseOutputStream);
             
             // Act
-            controller.handle(exchange);
+            couponController.handle(httpExchange);
             
             // Assert
             verify(couponService).deleteCoupon(couponId, 1L);
-            verify(exchange).sendResponseHeaders(eq(200), anyLong());
+            verify(httpExchange).sendResponseHeaders(eq(200), anyLong());
         }
     }
     
@@ -619,15 +587,15 @@ public class CouponControllerTest {
         @DisplayName("Should return 405 for unsupported method")
         void shouldReturn405ForUnsupportedMethod() throws IOException {
             // Arrange
-            when(exchange.getRequestMethod()).thenReturn("PATCH");
-            when(exchange.getRequestURI()).thenReturn(URI.create("/api/coupons"));
-            when(exchange.getResponseBody()).thenReturn(responseStream);
+            when(httpExchange.getRequestMethod()).thenReturn("PATCH");
+            when(httpExchange.getRequestURI()).thenReturn(URI.create("/api/coupons"));
+            when(httpExchange.getResponseBody()).thenReturn(responseOutputStream);
             
             // Act
-            controller.handle(exchange);
+            couponController.handle(httpExchange);
             
             // Assert
-            verify(exchange).sendResponseHeaders(eq(405), anyLong());
+            verify(httpExchange).sendResponseHeaders(eq(405), anyLong());
         }
         
         /**
@@ -640,15 +608,15 @@ public class CouponControllerTest {
         @DisplayName("Should return 404 for unknown endpoint")
         void shouldReturn404ForUnknownEndpoint() throws IOException {
             // Arrange
-            when(exchange.getRequestMethod()).thenReturn("GET");
-            when(exchange.getRequestURI()).thenReturn(URI.create("/api/unknown"));
-            when(exchange.getResponseBody()).thenReturn(responseStream);
+            when(httpExchange.getRequestMethod()).thenReturn("GET");
+            when(httpExchange.getRequestURI()).thenReturn(URI.create("/api/unknown"));
+            when(httpExchange.getResponseBody()).thenReturn(responseOutputStream);
             
             // Act
-            controller.handle(exchange);
+            couponController.handle(httpExchange);
             
             // Assert
-            verify(exchange).sendResponseHeaders(eq(404), anyLong());
+            verify(httpExchange).sendResponseHeaders(eq(404), anyLong());
         }
         
         /**
@@ -662,16 +630,16 @@ public class CouponControllerTest {
         void shouldHandleMalformedJson() throws IOException {
             // Arrange
             String malformedJson = "{ invalid json }";
-            when(exchange.getRequestMethod()).thenReturn("POST");
-            when(exchange.getRequestURI()).thenReturn(URI.create("/api/coupons"));
-            when(exchange.getRequestBody()).thenReturn(new ByteArrayInputStream(malformedJson.getBytes()));
-            when(exchange.getResponseBody()).thenReturn(responseStream);
+            when(httpExchange.getRequestMethod()).thenReturn("POST");
+            when(httpExchange.getRequestURI()).thenReturn(URI.create("/api/coupons"));
+            when(httpExchange.getRequestBody()).thenReturn(new ByteArrayInputStream(malformedJson.getBytes()));
+            when(httpExchange.getResponseBody()).thenReturn(responseOutputStream);
             
             // Act
-            controller.handle(exchange);
+            couponController.handle(httpExchange);
             
             // Assert - JSON نامعتبر منجر به 500 internal server error می‌شود
-            verify(exchange).sendResponseHeaders(eq(500), anyLong());
+            verify(httpExchange).sendResponseHeaders(eq(500), anyLong());
         }
     }
     

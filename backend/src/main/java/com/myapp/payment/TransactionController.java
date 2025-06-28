@@ -15,8 +15,18 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Transaction Controller - Handles transaction history and management APIs
- * Provides REST endpoints for transaction queries and reporting
+ * کنترلر تراکنش‌ها - مدیریت تاریخچه و API های مدیریت تراکنش
+ * 
+ * این کلاس REST endpoints برای جستجو و گزارش‌گیری تراکنش‌ها ارائه می‌دهد:
+ * - تاریخچه تراکنش‌های کیف پول
+ * - تاریخچه شارژ و برداشت
+ * - آمار تراکنش‌ها
+ * - جستجوی تراکنش بر اساس ID
+ * - فیلتر کردن بر اساس تاریخ
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class TransactionController implements HttpHandler {
 
@@ -70,7 +80,13 @@ public class TransactionController implements HttpHandler {
 
     /**
      * GET /api/transactions/wallet/history?userId={userId}&startDate={date}&endDate={date}
-     * Get wallet transaction history for a user
+     * دریافت تاریخچه تراکنش‌های کیف پول برای کاربر
+     * 
+     * این endpoint امکان دریافت تاریخچه کامل یا در بازه زمانی مشخص را فراهم می‌کند
+     * 
+     * @param exchange شیء HttpExchange
+     * @param params پارامترهای query شامل userId و تاریخ‌ها
+     * @throws IOException در صورت خطا در ورودی/خروجی
      */
     private void handleGetWalletHistory(HttpExchange exchange, Map<String, String> params) throws IOException {
         try {

@@ -13,15 +13,86 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
+/**
+ * مجموعه تست‌های جامع RestaurantRepository
+ * 
+ * این کلاس تست تمام عملکردهای repository مدیریت رستوران‌ها را آزمایش می‌کند:
+ * 
+ * Test Categories:
+ * 1. Restaurant Creation Tests
+ *    - ایجاد رستوران با داده‌های معتبر
+ *    - ایجاد با حداقل داده‌ها
+ *    - فرمت‌های مختلف تلفن
+ * 
+ * 2. Restaurant Retrieval Tests
+ *    - یافتن رستوران با ID
+ *    - مدیریت رستوران غیرموجود
+ *    - دریافت همه رستوران‌ها
+ * 
+ * 3. Restaurant Status Tests
+ *    - به‌روزرسانی وضعیت رستوران
+ *    - فیلتر بر اساس وضعیت
+ *    - تست همه وضعیت‌ها
+ * 
+ * 4. Restaurant Deletion Tests
+ *    - حذف رستوران موجود
+ *    - حذف رستوران غیرموجود
+ *    - حذف همه رستوران‌ها
+ * 
+ * 5. Restaurant Owner Tests
+ *    - یافتن رستوران‌های مالک
+ *    - مالک بدون رستوران
+ * 
+ * 6. Restaurant Approved List Tests
+ *    - لیست رستوران‌های تأیید شده
+ *    - مدیریت حالت خالی
+ * 
+ * 7. Restaurant Update Tests
+ *    - به‌روزرسانی وضعیت مستقیم
+ *    - به‌روزرسانی اطلاعات رستوران
+ * 
+ * 8. Restaurant Edge Case Tests
+ *    - کاراکترهای خاص و Unicode
+ *    - فرمت‌های مختلف تلفن
+ *    - نام‌های تکراری با مالکان مختلف
+ *    - حداقل داده‌های معتبر
+ * 
+ * 9. Restaurant Concurrency Tests
+ *    - عملیات متوالی سریع
+ *    - ایجاد همزمان چندین رستوران
+ * 
+ * 10. Restaurant Query Performance Tests
+ *     - عملکرد با dataset بزرگ
+ *     - بهینه‌سازی query ها
+ * 
+ * Database Integration:
+ * - Real Hibernate operations
+ * - Transaction management
+ * - Data cleanup
+ * - Isolation between tests
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 @DisplayName("RestaurantRepository Tests")
 class RestaurantRepositoryTest {
 
+    /** Repository instance تحت تست */
     private RestaurantRepository repository;
 
+    /**
+     * راه‌اندازی قبل از هر تست
+     * 
+     * Operations:
+     * - initialize repository
+     * - clean database state
+     * - ensure test isolation
+     */
     @BeforeEach
     void setUp() {
         repository = new RestaurantRepository();
-        // Clean database before each test
+        // پاک‌سازی پایگاه داده قبل از هر تست
         repository.deleteAll();
     }
 

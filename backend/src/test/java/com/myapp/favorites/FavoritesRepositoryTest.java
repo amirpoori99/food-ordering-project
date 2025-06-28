@@ -16,12 +16,33 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * تست‌های یکپارچگی برای کلاس FavoritesRepository
+ * 
+ * پوشش کامل تمام عملیات پایگاه داده:
+ * - CRUD operations: ایجاد، خواندن، به‌روزرسانی، حذف
+ * - Complex queries: جستجوهای پیچیده و فیلترها
+ * - Performance tests: تست عملکرد و بهینه‌سازی
+ * - Error handling: مدیریت خطاها و edge cases
+ * - Data integrity: یکپارچگی داده‌ها
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 @DisplayName("FavoritesRepository Integration Tests")
 public class FavoritesRepositoryTest {
 
+    /** Repository تحت تست */
     private FavoritesRepository favoritesRepository;
+    
+    /** کاربر نمونه برای تست‌ها */
     private User testUser;
+    
+    /** رستوران نمونه برای تست‌ها */
     private Restaurant testRestaurant;
+    
+    /** علاقه‌مندی نمونه برای تست‌ها */
     private Favorite testFavorite;
 
     @BeforeEach

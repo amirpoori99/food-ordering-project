@@ -24,13 +24,47 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * کلاس تست یکپارچگی برای Notification System
+ * 
+ * این کلاس تست‌های integration کامل سیستم اعلان‌ها را انجام می‌دهد:
+ * 
+ * === دسته‌بندی تست‌ها ===
+ * - CompleteNotificationWorkflowTest: تست workflow کامل اعلان‌ها
+ * - PriorityAndFilteringIntegrationTest: تست یکپارچگی اولویت و فیلتر
+ * - BroadcastAndMassOperationsTest: تست عملیات broadcast و گروهی
+ * - StatisticsAndAnalyticsIntegrationTest: تست آمار یکپارچه
+ * - ConcurrencyAndPerformanceTest: تست همزمانی و کارایی
+ * - EdgeCasesAndErrorScenariosTest: تست موارد خاص و خطاها
+ * - DataIntegrityAndConsistencyTest: تست یکپارچگی و consistency
+ * 
+ * === ویژگی‌های تست ===
+ * - End-to-End Testing: تست کامل از Controller تا Database
+ * - Real World Scenarios: سناریوهای واقعی کاربردی
+ * - Multi-User Testing: تست با چندین کاربر همزمان
+ * - Performance Validation: تست کارایی در شرایط واقعی
+ * - Error Recovery: تست بازیابی از خطاها
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class NotificationIntegrationTest {
 
+    /** مدیر دیتابیس تست */
     private static TestDatabaseManager testDatabaseManager;
+    
+    /** سرویس اعلان‌ها تحت تست */
     private static NotificationService notificationService;
+    
+    /** Repository اعلان‌ها */
     private static NotificationRepository notificationRepository;
+    
+    /** Repository احراز هویت */
     private static AuthRepository authRepository;
+    
+    /** کاربران تستی برای تست‌های integration */
     private static User testUser1, testUser2, testUser3;
 
     @BeforeAll

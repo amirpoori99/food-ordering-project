@@ -172,38 +172,42 @@ public class AuthResult {
     
     /**
      * بررسی اینکه آیا کاربر مشتری است
+     * پشتیبانی از هر دو نام: "BUYER" و "customer"
      * 
      * @return true اگر کاربر مشتری باشد، در غیر اینصورت false
      */
     public boolean isCustomer() {
-        return hasRole("BUYER");
+        return hasRole("BUYER") || hasRole("customer");
     }
     
     /**
      * بررسی اینکه آیا کاربر فروشنده است
+     * پشتیبانی از هر دو نام: "SELLER" و "seller"
      * 
      * @return true اگر کاربر فروشنده باشد، در غیر اینصورت false
      */
     public boolean isSeller() {
-        return hasRole("SELLER");
+        return hasRole("SELLER") || hasRole("seller");
     }
     
     /**
      * بررسی اینکه آیا کاربر پیک است
+     * پشتیبانی از نام‌های مختلف: "COURIER", "delivery", "courier"
      * 
      * @return true اگر کاربر پیک باشد، در غیر اینصورت false
      */
     public boolean isDelivery() {
-        return hasRole("COURIER");
+        return hasRole("COURIER") || hasRole("delivery") || hasRole("courier");
     }
     
     /**
      * بررسی اینکه آیا کاربر مدیر است
+     * پشتیبانی از هر دو نام: "ADMIN" و "admin"
      * 
      * @return true اگر کاربر مدیر باشد، در غیر اینصورت false
      */
     public boolean isAdmin() {
-        return hasRole("ADMIN");
+        return hasRole("ADMIN") || hasRole("admin");
     }
     
     /**

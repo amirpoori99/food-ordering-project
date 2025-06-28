@@ -1,5 +1,21 @@
 package com.myapp.payment;
 
+/**
+ * سرویس مدیریت کیف پول دیجیتال کاربران
+ * 
+ * این کلاس مسئول پیاده‌سازی منطق کسب‌وکار مربوط به:
+ * - مدیریت موجودی کیف پول کاربران
+ * - شارژ کیف پول از طریق روش‌های مختلف
+ * - برداشت و انتقال وجه از کیف پول
+ * - تاریخچه تراکنش‌های کیف پول
+ * - آمار و گزارش‌گیری کیف پول
+ * - اعتبارسنجی عملیات مالی
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+
 import com.myapp.common.exceptions.NotFoundException;
 import com.myapp.common.exceptions.InsufficientFundsException;
 import com.myapp.common.models.Transaction;

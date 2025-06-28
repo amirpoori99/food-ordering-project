@@ -24,102 +24,180 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Comprehensive unit tests for VendorService - 100% coverage
+ * کلاس تست جامع برای VendorService - پوشش 100%
+ * 
+ * این کلاس تمام عملیات VendorService را از دیدگاه مشتری تست می‌کند:
+ * 
+ * === گروه‌های تست ===
+ * - ConstructorTests: تست سازنده‌ها
+ * - GetAllVendorsTests: تست دریافت تمام فروشندگان
+ * - SearchVendorsTests: تست جستجوی فروشندگان
+ * - GetVendorTests: تست دریافت فروشنده مشخص
+ * - GetVendorMenuTests: تست دریافت منوی فروشنده
+ * - GetVendorsByLocationTests: تست فروشندگان بر اساس موقعیت
+ * - GetFeaturedVendorsTests: تست فروشندگان برجسته
+ * - GetVendorsByCategoryTests: تست فروشندگان بر اساس دسته
+ * - GetVendorStatsTests: تست آمار فروشندگان
+ * - IsVendorAcceptingOrdersTests: تست پذیرش سفارش
+ * - VendorStatsTests: تست کلاس آمار
+ * - AdditionalEdgeCasesTests: تست موارد خاص
+ * - PerformanceTests: تست‌های کارایی
+ * 
+ * === ویژگی‌های تست ===
+ * - Unit Testing: تست واحد با Mock objects
+ * - Edge Cases: تست موارد خاص و استثنائی
+ * - Error Handling: تست مدیریت خطاها
+ * - Performance: تست کارایی و استرس
+ * - Business Logic: تست منطق کسب‌وکار
+ * - Data Validation: تست اعتبارسنجی داده‌ها
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class VendorServiceTest {
 
+    /** Mock repository عملیات فروشندگان */
     @Mock
     private VendorRepository mockVendorRepository;
     
+    /** Mock repository رستوران‌ها */
     @Mock
     private RestaurantRepository mockRestaurantRepository;
     
+    /** Mock repository آیتم‌های غذایی */
     @Mock
     private ItemRepository mockItemRepository;
     
+    /** سرویس مورد تست */
     private VendorService vendorService;
     
+    /**
+     * راه‌اندازی اولیه قبل از هر تست
+     * 
+     * Mock objects را مقداردهی و سرویس را با dependency injection می‌سازد
+     */
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         vendorService = new VendorService(mockVendorRepository, mockRestaurantRepository, mockItemRepository);
     }
     
+    /**
+     * گروه تست‌های سازنده‌ها
+     * 
+     * تست صحیح کار کردن سازنده‌های مختلف VendorService
+     */
     @Nested
     @DisplayName("Constructor Tests")
     class ConstructorTests {
         
+        /**
+         * تست سازنده پیش‌فرض
+         * 
+         * بررسی اینکه سازنده پیش‌فرض سرویس را با repositories پیش‌فرض می‌سازد
+         */
         @Test
         @DisplayName("Default constructor should create service with default repositories")
         void testDefaultConstructor() {
-            // Act
+            // اجرا
             VendorService defaultService = new VendorService();
             
-            // Assert
+            // بررسی
             assertNotNull(defaultService);
         }
         
+        /**
+         * تست سازنده با پارامتر
+         * 
+         * بررسی اینکه سازنده با پارامتر، سرویس را با repositories ارائه شده می‌سازد
+         */
         @Test
         @DisplayName("Parameterized constructor should create service with provided repositories")
         void testParameterizedConstructor() {
-            // Act
+            // اجرا
             VendorService paramService = new VendorService(mockVendorRepository, mockRestaurantRepository, mockItemRepository);
             
-            // Assert
+            // بررسی
             assertNotNull(paramService);
         }
     }
     
+    /**
+     * گروه تست‌های دریافت تمام فروشندگان
+     * 
+     * تست متد getAllVendors() در سناریوهای مختلف
+     */
     @Nested
     @DisplayName("getAllVendors Tests")
     class GetAllVendorsTests {
         
+        /**
+         * تست دریافت تمام فروشندگان تایید شده
+         * 
+         * بررسی اینکه متد فقط رستوران‌های با وضعیت APPROVED را برمی‌گرداند
+         */
         @Test
         @DisplayName("getAllVendors should return approved restaurants")
         void testGetAllVendors() {
-            // Arrange
+            // آماده‌سازی
             List<Restaurant> approvedRestaurants = createSampleRestaurants();
             when(mockRestaurantRepository.findByStatus(RestaurantStatus.APPROVED)).thenReturn(approvedRestaurants);
             
-            // Act
+            // اجرا
             List<Restaurant> result = vendorService.getAllVendors();
             
-            // Assert
+            // بررسی
             assertEquals(2, result.size());
             verify(mockRestaurantRepository).findByStatus(RestaurantStatus.APPROVED);
         }
         
+        /**
+         * تست دریافت تمام فروشندگان زمانی که هیچ فروشنده تایید شده‌ای وجود ندارد
+         * 
+         * بررسی اینکه متد لیست خالی برمی‌گرداند
+         */
         @Test
         @DisplayName("getAllVendors should return empty list when no approved vendors exist")
         void testGetAllVendorsEmpty() {
-            // Arrange
+            // آماده‌سازی
             when(mockRestaurantRepository.findByStatus(RestaurantStatus.APPROVED)).thenReturn(Collections.emptyList());
             
-            // Act
+            // اجرا
             List<Restaurant> result = vendorService.getAllVendors();
             
-            // Assert
+            // بررسی
             assertTrue(result.isEmpty());
             verify(mockRestaurantRepository).findByStatus(RestaurantStatus.APPROVED);
         }
     }
     
+    /**
+     * گروه تست‌های جستجوی فروشندگان
+     * 
+     * تست متد searchVendors() در حالات مختلف جستجو
+     */
     @Nested
     @DisplayName("searchVendors Tests")
     class SearchVendorsTests {
         
+        /**
+         * تست جستجوی فروشندگان با عبارت مشخص
+         * 
+         * بررسی اینکه متد عبارت جستجو را به repository ارسال می‌کند
+         */
         @Test
         @DisplayName("searchVendors should call repository with search term")
         void testSearchVendors() {
-            // Arrange
+            // آماده‌سازی
             String searchTerm = "pizza";
             List<Restaurant> searchResults = createSampleRestaurants();
             when(mockVendorRepository.searchVendors(searchTerm)).thenReturn(searchResults);
             
-            // Act
+            // اجرا
             List<Restaurant> result = vendorService.searchVendors(searchTerm);
             
-            // Assert
+            // بررسی
             assertEquals(2, result.size());
             verify(mockVendorRepository).searchVendors(searchTerm);
         }
