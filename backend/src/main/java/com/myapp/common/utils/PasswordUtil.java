@@ -155,110 +155,125 @@ public class PasswordUtil {
     }
     
     /**
-     * Generate a secure random password
+     * تولید رمز عبور امن تصادفی
+     * این متد رمز عبور قوی با طول مشخص تولید می‌کند
      * 
-     * @param length The desired password length (minimum 8)
-     * @return A randomly generated password that meets strength requirements
+     * @param length طول رمز عبور مورد نظر (حداقل 8 کاراکتر)
+     * @return رمز عبور تصادفی که الزامات قدرت را برآورده می‌کند
      */
     public static String generateSecurePassword(int length) {
         if (length < 8) {
-            length = 8;
+            length = 8; // حداقل طول 8 کاراکتر
         }
         
-        String upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        String lowerCase = "abcdefghijklmnopqrstuvwxyz";
-        String digits = "0123456789";
-        String specialChars = "@#$%^&+=";
-        String allChars = upperCase + lowerCase + digits + specialChars;
+        // مجموعه کاراکترهای مختلف
+        String upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";    // حروف بزرگ انگلیسی
+        String lowerCase = "abcdefghijklmnopqrstuvwxyz";    // حروف کوچک انگلیسی
+        String digits = "0123456789";                       // اعداد
+        String specialChars = "@#$%^&+=";                   // کاراکترهای خاص
+        String allChars = upperCase + lowerCase + digits + specialChars; // همه کاراکترها
         
         StringBuilder password = new StringBuilder();
         
-        // Ensure at least one character from each required category
+        // اطمینان از وجود حداقل یک کاراکتر از هر دسته الزامی
         password.append(upperCase.charAt(random.nextInt(upperCase.length())));
         password.append(lowerCase.charAt(random.nextInt(lowerCase.length())));
         password.append(digits.charAt(random.nextInt(digits.length())));
         password.append(specialChars.charAt(random.nextInt(specialChars.length())));
         
-        // Fill the rest with random characters
+        // پر کردن بقیه طول با کاراکترهای تصادفی
         for (int i = 4; i < length; i++) {
             password.append(allChars.charAt(random.nextInt(allChars.length())));
         }
         
-        // Shuffle the password to avoid predictable patterns
+        // به هم ریختن ترتیب کاراکترها برای جلوگیری از الگوهای قابل پیش‌بینی
         return shuffleString(password.toString());
     }
     
     /**
-     * Shuffle characters in a string
+     * به هم ریختن کاراکترهای یک رشته
+     * این متد الگوریتم Fisher-Yates برای shuffle استفاده می‌کند
+     * 
+     * @param input رشته ورودی برای به هم ریختن
+     * @return رشته با کاراکترهای به هم ریخته
      */
     private static String shuffleString(String input) {
-        char[] chars = input.toCharArray();
+        char[] chars = input.toCharArray(); // تبدیل رشته به آرایه کاراکتر
         
+        // الگوریتم Fisher-Yates برای shuffle تصادفی
         for (int i = chars.length - 1; i > 0; i--) {
-            int j = random.nextInt(i + 1);
+            int j = random.nextInt(i + 1); // انتخاب ایندکس تصادفی
             
-            // Swap chars[i] and chars[j]
+            // جابجایی chars[i] و chars[j]
             char temp = chars[i];
             chars[i] = chars[j];
             chars[j] = temp;
         }
         
-        return new String(chars);
+        return new String(chars); // تبدیل آرایه به رشته
     }
     
     /**
-     * Check if a password needs to be rehashed (for security upgrades)
-     * Currently always returns false, but can be extended for algorithm changes
+     * بررسی نیاز به hash مجدد رمز عبور (برای ارتقاء امنیتی)
+     * در حال حاضر همیشه false برمی‌گرداند، اما می‌تواند برای تغییرات الگوریتم توسعه یابد
+     * 
+     * @param hashedPassword رمز عبور hash شده برای بررسی
+     * @return true اگر نیاز به hash مجدد باشد، در غیر اینصورت false
      */
     public static boolean needsRehash(String hashedPassword) {
-        // In future versions, this could check if the hash was created with old algorithms
+        // در نسخه‌های آینده، می‌تواند بررسی کند که آیا hash با الگوریتم‌های قدیمی ایجاد شده
         return false;
     }
     
     /**
-     * Get password strength score (0-5)
+     * دریافت امتیاز قدرت رمز عبور (0-5)
+     * این متد قدرت رمز عبور را بر اساس معیارهای مختلف ارزیابی می‌کند
      * 
-     * @param password The password to score
-     * @return Strength score: 0=Very Weak, 1=Weak, 2=Fair, 3=Good, 4=Strong, 5=Very Strong
+     * @param password رمز عبور برای ارزیابی
+     * @return امتیاز قدرت: 0=خیلی ضعیف، 1=ضعیف، 2=متوسط، 3=خوب، 4=قوی، 5=خیلی قوی
      */
     public static int getPasswordStrength(String password) {
         if (password == null || password.isEmpty()) {
-            return 0;
+            return 0; // رمز عبور خالی یا null
         }
         
         int score = 0;
         
-        // Length check
-        if (password.length() >= 8) score++;
-        if (password.length() >= 12) score++;
+        // بررسی طول رمز عبور
+        if (password.length() >= 8) score++;   // امتیاز برای طول حداقل 8
+        if (password.length() >= 12) score++;  // امتیاز اضافی برای طول 12+
         
-        // Character variety checks
-        if (password.matches(".*[a-z].*")) score++; // lowercase
-        if (password.matches(".*[A-Z].*")) score++; // uppercase
-        if (password.matches(".*[0-9].*")) score++; // digits
-        if (password.matches(".*[@#$%^&+=!*].*")) score++; // special chars
+        // بررسی تنوع کاراکترها
+        if (password.matches(".*[a-z].*")) score++; // حروف کوچک
+        if (password.matches(".*[A-Z].*")) score++; // حروف بزرگ
+        if (password.matches(".*[0-9].*")) score++; // اعداد
+        if (password.matches(".*[@#$%^&+=!*].*")) score++; // کاراکترهای خاص
         
-        // Penalty for common patterns
+        // کاهش امتیاز برای الگوهای رایج و ضعیف
         if (password.matches(".*123.*") || password.matches(".*abc.*") || 
             password.toLowerCase().contains("password")) {
-            score = Math.max(0, score - 1);
+            score = Math.max(0, score - 1); // کاهش یک امتیاز (حداقل 0)
         }
         
-        return Math.min(5, score);
+        return Math.min(5, score); // حداکثر امتیاز 5
     }
     
     /**
-     * Get password strength description
+     * دریافت توضیح قدرت رمز عبور به صورت متنی
+     * این متد امتیاز عددی قدرت را به توضیح فارسی تبدیل می‌کند
+     * 
+     * @param strength امتیاز قدرت رمز عبور (0-5)
+     * @return توضیح فارسی قدرت رمز عبور
      */
     public static String getPasswordStrengthDescription(int strength) {
         switch (strength) {
-            case 0: return "Very Weak";
-            case 1: return "Weak";
-            case 2: return "Fair";
-            case 3: return "Good";
-            case 4: return "Strong";
-            case 5: return "Very Strong";
-            default: return "Unknown";
+            case 0: return "خیلی ضعیف";     // Very Weak
+            case 1: return "ضعیف";         // Weak
+            case 2: return "متوسط";        // Fair
+            case 3: return "خوب";          // Good
+            case 4: return "قوی";          // Strong
+            case 5: return "خیلی قوی";     // Very Strong
+            default: return "نامشخص";      // Unknown
         }
     }
 }

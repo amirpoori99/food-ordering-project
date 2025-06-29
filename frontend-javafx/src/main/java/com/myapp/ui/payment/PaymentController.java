@@ -11,602 +11,812 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
- * Controller for Payment screen
- * Handles payment method selection, validation, and processing
+ * کنترلر پردازش پرداخت و تکمیل سفارش
+ * 
+ * این کلاس مسئول:
+ * - مدیریت روش‌های پرداخت مختلف (کارت، کیف پول، نقدی)
+ * - پردازش امن اطلاعات پرداخت
+ * - تأیید نهایی سفارش و ارسال به سرور
+ * - نمایش وضعیت پرداخت و نتیجه تراکنش
+ * - مدیریت کیف پول کاربر و اعتبار
+ * - ایجاد و نمایش رسید پرداخت
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since فاز 25 - Payment Processing
  */
 public class PaymentController implements Initializable {
 
-    // Payment Method Radio Buttons
+    // ==================== UI Components - Order Summary ====================
+    
+    @FXML private VBox orderSummaryContainer;
+    @FXML private Label orderNumberLabel;
+    @FXML private Label orderDateLabel;
+    @FXML private Label restaurantNameLabel;
+    @FXML private TableView<OrderItem> orderItemsTable;
+    @FXML private TableColumn<OrderItem, String> itemNameColumn;
+    @FXML private TableColumn<OrderItem, Integer> itemQuantityColumn;
+    @FXML private TableColumn<OrderItem, Double> itemPriceColumn;
+    @FXML private TableColumn<OrderItem, Double> itemTotalColumn;
+    
+    // ==================== UI Components - Payment Method ====================
+    
+    @FXML private VBox paymentMethodContainer;
     @FXML private ToggleGroup paymentMethodGroup;
-    @FXML private RadioButton cardPaymentRadio;
-    @FXML private RadioButton walletPaymentRadio;
-    @FXML private RadioButton codPaymentRadio;
+    @FXML private RadioButton creditCardRadio;
+    @FXML private RadioButton walletRadio;
+    @FXML private RadioButton cashOnDeliveryRadio;
     
-    // Payment Sections
-    @FXML private VBox cardPaymentSection;
-    @FXML private VBox walletPaymentSection;
-    @FXML private VBox codPaymentSection;
+    // ==================== UI Components - Credit Card ====================
     
-    // Card Payment Fields
+    @FXML private VBox creditCardContainer;
     @FXML private TextField cardNumberField;
-    @FXML private TextField cardHolderNameField;
-    @FXML private TextField cardExpiryMonthField;
-    @FXML private TextField cardExpiryYearField;
-    @FXML private TextField cardCvvField;
+    @FXML private TextField cardHolderField;
+    @FXML private ComboBox<String> expiryMonthComboBox;
+    @FXML private ComboBox<String> expiryYearComboBox;
+    @FXML private PasswordField cvvField;
+    @FXML private CheckBox saveCardCheckBox;
+    @FXML private ComboBox<SavedCard> savedCardsComboBox;
+    @FXML private Button addNewCardButton;
     
-    // Wallet Payment Fields
+    // ==================== UI Components - Wallet ====================
+    
+    @FXML private VBox walletContainer;
     @FXML private Label walletBalanceLabel;
-    @FXML private Button refreshWalletButton;
     @FXML private Label walletStatusLabel;
+    @FXML private Button rechargeWalletButton;
+    @FXML private ProgressBar walletUsageBar;
+    @FXML private Label remainingBalanceLabel;
     
-    // Delivery Information Display
-    @FXML private TextArea deliveryAddressDisplay;
-    @FXML private TextField deliveryPhoneDisplay;
-    @FXML private TextArea orderNotesDisplay;
+    // ==================== UI Components - Cash ====================
     
-    // Order Summary
-    @FXML private ScrollPane orderItemsScrollPane;
-    @FXML private VBox orderItemsContainer;
-    @FXML private Label subtotalLabel;
+    @FXML private VBox cashContainer;
+    @FXML private Label cashInstructionsLabel;
+    @FXML private CheckBox exactChangeCheckBox;
+    @FXML private TextField changeRequiredField;
+    
+    // ==================== UI Components - Payment Summary ====================
+    
+    @FXML private VBox paymentSummaryContainer;
+    @FXML private Label subtotalAmountLabel;
+    @FXML private Label taxAmountLabel;
     @FXML private Label deliveryFeeLabel;
-    @FXML private Label discountLabel;
+    @FXML private Label discountAmountLabel;
     @FXML private Label totalAmountLabel;
+    @FXML private Label paymentMethodLabel;
+    @FXML private Label processingFeeLabel;
+    @FXML private Label finalAmountLabel;
     
-    // Action Buttons
-    @FXML private Button confirmPaymentButton;
+    // ==================== UI Components - Actions ====================
+    
     @FXML private Button backToCartButton;
+    @FXML private Button confirmPaymentButton;
+    @FXML private Button cancelOrderButton;
+    @FXML private ProgressIndicator paymentProgressIndicator;
+    @FXML private Label paymentStatusLabel;
     
-    // Menu Items
-    @FXML private MenuItem backToCartMenuItem;
-    @FXML private MenuItem profileMenuItem;
-    @FXML private MenuItem orderHistoryMenuItem;
-    @FXML private MenuItem logoutMenuItem;
+    // ==================== Data Properties ====================
     
-    // Status Components
-    @FXML private Label statusLabel;
-    @FXML private ProgressIndicator loadingIndicator;
+    private ObservableList<OrderItem> orderItems;
+    private ObservableList<SavedCard> savedCards;
+    private PaymentData paymentData;
+    private OrderSummary orderSummary;
+    private WalletInfo walletInfo;
+    private String currentOrderId;
+    
+    // Constants
+    private static final double CARD_PROCESSING_FEE = 0.029; // 2.9% برای کارت
+    private static final double WALLET_PROCESSING_FEE = 0.0; // رایگان برای کیف پول
+    private static final double CASH_PROCESSING_FEE = 0.0; // رایگان برای نقدی
+    private static final double MIN_WALLET_BALANCE = 10000.0; // حداقل موجودی کیف پول
 
     private NavigationController navigationController;
     private final NumberFormat currencyFormat = NumberFormat.getInstance(new Locale("fa", "IR"));
-    
-    // Order data (in real app, this would come from previous screen)
-    private List<OrderItem> orderItems = new ArrayList<>();
-    private double subtotal = 0.0;
-    private double deliveryFee = 0.0;
-    private double discount = 0.0;
-    private double walletBalance = 75000.0; // Mock wallet balance
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.navigationController = NavigationController.getInstance();
         
-        setupUI();
-        loadOrderData();
-        loadDeliveryInfo();
+        initializeData();
+        
+        setupOrderItemsTable();
+        setupComboBoxes();
+        setupPaymentMethods();
+        setupEventHandlers();
+        loadInitialData();
+        setupValidation();
     }
-
+    
     /**
-     * Setup UI components and event handlers
+     * مقداردهی اولیه داده‌ها
      */
-    private void setupUI() {
-        // Initialize currency format
-        currencyFormat.setGroupingUsed(true);
+    private void initializeData() {
+        orderItems = FXCollections.observableArrayList();
+        savedCards = FXCollections.observableArrayList();
+        paymentData = new PaymentData();
+        orderSummary = new OrderSummary();
+        walletInfo = new WalletInfo();
+        currentOrderId = generateOrderId();
         
-        // Setup payment method listeners
-        setupPaymentMethodListeners();
-        
-        // Setup card number formatting
-        setupCardNumberFormatting();
-        
-        // Setup validation listeners
-        setupValidationListeners();
-        
-        // Initial status
-        setStatus("آماده برای پرداخت");
-        
-        // Initially show COD section
-        updatePaymentSectionVisibility();
+        if (paymentProgressIndicator != null) {
+            paymentProgressIndicator.setVisible(false);
+        }
     }
-
+    
     /**
-     * Setup payment method change listeners
+     * تولید شماره سفارش یکتا
      */
-    private void setupPaymentMethodListeners() {
-        paymentMethodGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
-            updatePaymentSectionVisibility();
-            validatePaymentForm();
-        });
+    private String generateOrderId() {
+        return "ORD-" + System.currentTimeMillis();
     }
-
+    
     /**
-     * Setup card number formatting
+     * تنظیم TableView آیتم‌های سفارش
      */
-    private void setupCardNumberFormatting() {
-        cardNumberField.textProperty().addListener((obs, oldVal, newVal) -> {
-            // Format card number with dashes
-            String formatted = newVal.replaceAll("\\D", ""); // Remove non-digits
-            if (formatted.length() > 16) {
-                formatted = formatted.substring(0, 16);
+    private void setupOrderItemsTable() {
+        if (orderItemsTable != null) {
+            orderItemsTable.setItems(orderItems);
+            
+            if (itemNameColumn != null) {
+                itemNameColumn.setCellValueFactory(cellData -> 
+                    new SimpleStringProperty(cellData.getValue().getItemName()));
             }
             
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < formatted.length(); i++) {
-                if (i > 0 && i % 4 == 0) {
-                    sb.append("-");
+            if (itemQuantityColumn != null) {
+                itemQuantityColumn.setCellValueFactory(cellData -> 
+                    cellData.getValue().quantityProperty().asObject());
+                itemQuantityColumn.setCellFactory(col -> new TableCell<OrderItem, Integer>() {
+                    @Override
+                    protected void updateItem(Integer quantity, boolean empty) {
+                        super.updateItem(quantity, empty);
+                        if (empty || quantity == null) {
+                            setText(null);
+                        } else {
+                            setText(quantity + " عدد");
+                        }
+                    }
+                });
+            }
+            
+            if (itemPriceColumn != null) {
+                itemPriceColumn.setCellValueFactory(cellData -> 
+                    cellData.getValue().priceProperty().asObject());
+                itemPriceColumn.setCellFactory(col -> new TableCell<OrderItem, Double>() {
+                    @Override
+                    protected void updateItem(Double price, boolean empty) {
+                        super.updateItem(price, empty);
+                        if (empty || price == null) {
+                            setText(null);
+                        } else {
+                            setText(String.format("%,.0f تومان", price));
+                        }
+                    }
+                });
+            }
+            
+            if (itemTotalColumn != null) {
+                itemTotalColumn.setCellValueFactory(cellData -> 
+                    new SimpleDoubleProperty(cellData.getValue().getTotalPrice()).asObject());
+                itemTotalColumn.setCellFactory(col -> new TableCell<OrderItem, Double>() {
+                    @Override
+                    protected void updateItem(Double total, boolean empty) {
+                        super.updateItem(total, empty);
+                        if (empty || total == null) {
+                            setText(null);
+                        } else {
+                            setText(String.format("%,.0f تومان", total));
+                        }
+                    }
+                });
+            }
+        }
+    }
+    
+    /**
+     * تنظیم ComboBox ها
+     */
+    private void setupComboBoxes() {
+        if (expiryMonthComboBox != null) {
+            expiryMonthComboBox.setItems(FXCollections.observableArrayList(
+                "01", "02", "03", "04", "05", "06", 
+                "07", "08", "09", "10", "11", "12"
+            ));
+        }
+        
+        if (expiryYearComboBox != null) {
+            ObservableList<String> years = FXCollections.observableArrayList();
+            int currentYear = LocalDateTime.now().getYear();
+            for (int i = 0; i < 10; i++) {
+                years.add(String.valueOf(currentYear + i));
+            }
+            expiryYearComboBox.setItems(years);
+        }
+        
+        if (savedCardsComboBox != null) {
+            savedCardsComboBox.setItems(savedCards);
+            savedCardsComboBox.setCellFactory(listView -> new ListCell<SavedCard>() {
+                @Override
+                protected void updateItem(SavedCard card, boolean empty) {
+                    super.updateItem(card, empty);
+                    if (empty || card == null) {
+                        setText(null);
+                    } else {
+                        setText(card.getMaskedNumber() + " - " + card.getCardHolder());
+                    }
                 }
-                sb.append(formatted.charAt(i));
-            }
-            
-            if (!sb.toString().equals(newVal)) {
-                cardNumberField.setText(sb.toString());
-            }
-        });
-        
-        // Restrict CVV to 3-4 digits
-        cardCvvField.textProperty().addListener((obs, oldVal, newVal) -> {
-            String filtered = newVal.replaceAll("\\D", "");
-            if (filtered.length() > 4) {
-                filtered = filtered.substring(0, 4);
-            }
-            if (!filtered.equals(newVal)) {
-                cardCvvField.setText(filtered);
-            }
-        });
-        
-        // Restrict month/year fields
-        cardExpiryMonthField.textProperty().addListener((obs, oldVal, newVal) -> {
-            String filtered = newVal.replaceAll("\\D", "");
-            if (filtered.length() > 2) {
-                filtered = filtered.substring(0, 2);
-            }
-            if (!filtered.equals(newVal)) {
-                cardExpiryMonthField.setText(filtered);
-            }
-        });
-        
-        cardExpiryYearField.textProperty().addListener((obs, oldVal, newVal) -> {
-            String filtered = newVal.replaceAll("\\D", "");
-            if (filtered.length() > 4) {
-                filtered = filtered.substring(0, 4);
-            }
-            if (!filtered.equals(newVal)) {
-                cardExpiryYearField.setText(filtered);
-            }
-        });
-    }
-
-    /**
-     * Setup validation listeners
-     */
-    private void setupValidationListeners() {
-        // Card payment validation
-        cardNumberField.textProperty().addListener((obs, oldVal, newVal) -> validatePaymentForm());
-        cardHolderNameField.textProperty().addListener((obs, oldVal, newVal) -> validatePaymentForm());
-        cardExpiryMonthField.textProperty().addListener((obs, oldVal, newVal) -> validatePaymentForm());
-        cardExpiryYearField.textProperty().addListener((obs, oldVal, newVal) -> validatePaymentForm());
-        cardCvvField.textProperty().addListener((obs, oldVal, newVal) -> validatePaymentForm());
-    }
-
-    /**
-     * Load order data (mock data for now)
-     */
-    private void loadOrderData() {
-        // Mock order data (in real app, get from previous screen or session)
-        orderItems.clear();
-        orderItems.add(new OrderItem("پیتزا مارگاریتا", 25000.0, 2, "رستوران ایتالیایی"));
-        orderItems.add(new OrderItem("برگر کلاسیک", 18000.0, 1, "فست فود سارا"));
-        
-        // Calculate totals
-        subtotal = orderItems.stream().mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
-        deliveryFee = subtotal >= 50000 ? 0.0 : 5000.0;
-        discount = 5000.0; // Mock discount
-        
-        // Display order items
-        displayOrderItems();
-        updatePricingDisplay();
-    }
-
-    /**
-     * Load delivery information (mock data)
-     */
-    private void loadDeliveryInfo() {
-        // Mock delivery info (in real app, get from cart screen)
-        deliveryAddressDisplay.setText("تهران، خیابان ولیعصر، پلاک 123");
-        deliveryPhoneDisplay.setText("09123456789");
-        orderNotesDisplay.setText("لطفاً زنگ در طبقه دوم را بزنید");
-    }
-
-    /**
-     * Display order items in the summary
-     */
-    private void displayOrderItems() {
-        orderItemsContainer.getChildren().clear();
-        
-        for (OrderItem item : orderItems) {
-            VBox itemBox = createOrderItemDisplay(item);
-            orderItemsContainer.getChildren().add(itemBox);
+            });
+            savedCardsComboBox.setButtonCell(new ListCell<SavedCard>() {
+                @Override
+                protected void updateItem(SavedCard card, boolean empty) {
+                    super.updateItem(card, empty);
+                    if (empty || card == null) {
+                        setText("انتخاب کارت ذخیره شده");
+                    } else {
+                        setText(card.getMaskedNumber());
+                    }
+                }
+            });
         }
     }
-
+    
     /**
-     * Create display for a single order item
+     * تنظیم روش‌های پرداخت
      */
-    private VBox createOrderItemDisplay(OrderItem item) {
-        VBox itemBox = new VBox(5);
-        itemBox.setPadding(new Insets(8));
-        itemBox.setStyle("-fx-border-color: #e9ecef; -fx-border-width: 0 0 1 0;");
-        
-        // Item name and restaurant
-        Label nameLabel = new Label(item.getName());
-        nameLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
-        
-        Label restaurantLabel = new Label(item.getRestaurantName());
-        restaurantLabel.setStyle("-fx-text-fill: #6c757d; -fx-font-size: 12;");
-        
-        // Quantity and price
-        HBox detailsBox = new HBox(10);
-        detailsBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-        
-        Label quantityLabel = new Label("تعداد: " + item.getQuantity());
-        Label priceLabel = new Label(formatCurrency(item.getPrice() * item.getQuantity()) + " تومان");
-        priceLabel.setStyle("-fx-text-fill: #28a745; -fx-font-weight: bold;");
-        
-        detailsBox.getChildren().addAll(quantityLabel, priceLabel);
-        
-        itemBox.getChildren().addAll(nameLabel, restaurantLabel, detailsBox);
-        
-        return itemBox;
-    }
-
-    /**
-     * Update pricing display
-     */
-    private void updatePricingDisplay() {
-        subtotalLabel.setText(formatCurrency(subtotal) + " تومان");
-        deliveryFeeLabel.setText(deliveryFee == 0 ? "رایگان" : formatCurrency(deliveryFee) + " تومان");
-        discountLabel.setText(formatCurrency(discount) + " تومان");
-        
-        double total = subtotal + deliveryFee - discount;
-        totalAmountLabel.setText(formatCurrency(total) + " تومان");
-    }
-
-    /**
-     * Update payment section visibility based on selected method
-     */
-    private void updatePaymentSectionVisibility() {
-        // Hide all sections first
-        cardPaymentSection.setVisible(false);
-        walletPaymentSection.setVisible(false);
-        codPaymentSection.setVisible(true); // Default visible
-        
-        RadioButton selected = (RadioButton) paymentMethodGroup.getSelectedToggle();
-        if (selected != null) {
-            if (selected == cardPaymentRadio) {
-                cardPaymentSection.setVisible(true);
-                codPaymentSection.setVisible(false);
-            } else if (selected == walletPaymentRadio) {
-                walletPaymentSection.setVisible(true);
-                codPaymentSection.setVisible(false);
-                updateWalletDisplay();
-            }
-            // COD is visible by default
-        }
-    }
-
-    /**
-     * Update wallet display
-     */
-    private void updateWalletDisplay() {
-        walletBalanceLabel.setText(formatCurrency(walletBalance) + " تومان");
-        
-        double total = subtotal + deliveryFee - discount;
-        if (walletBalance >= total) {
-            walletStatusLabel.setText("موجودی کافی برای پرداخت");
-            walletStatusLabel.setStyle("-fx-text-fill: #28a745;");
-        } else {
-            walletStatusLabel.setText("موجودی ناکافی - نیاز به شارژ: " + 
-                                    formatCurrency(total - walletBalance) + " تومان");
-            walletStatusLabel.setStyle("-fx-text-fill: #dc3545;");
-        }
-    }
-
-    /**
-     * Validate payment form based on selected method
-     */
-    private void validatePaymentForm() {
-        boolean isValid = false;
-        
-        RadioButton selected = (RadioButton) paymentMethodGroup.getSelectedToggle();
-        if (selected != null) {
-            if (selected == cardPaymentRadio) {
-                isValid = validateCardPayment();
-            } else if (selected == walletPaymentRadio) {
-                isValid = validateWalletPayment();
-            } else if (selected == codPaymentRadio) {
-                isValid = true; // COD is always valid
-            }
+    private void setupPaymentMethods() {
+        if (paymentMethodGroup != null) {
+            paymentMethodGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -> {
+                updatePaymentMethodContainers();
+                updatePaymentSummary();
+            });
         }
         
-        confirmPaymentButton.setDisable(!isValid);
+        if (creditCardRadio != null) {
+            creditCardRadio.setSelected(true);
+            updatePaymentMethodContainers();
+        }
     }
-
+    
     /**
-     * Validate card payment form
+     * به‌روزرسانی نمایش کانتینرهای روش پرداخت
      */
-    private boolean validateCardPayment() {
-        String cardNumber = cardNumberField.getText().replaceAll("-", "");
-        String holderName = cardHolderNameField.getText().trim();
-        String month = cardExpiryMonthField.getText().trim();
-        String year = cardExpiryYearField.getText().trim();
-        String cvv = cardCvvField.getText().trim();
+    private void updatePaymentMethodContainers() {
+        if (creditCardContainer != null) creditCardContainer.setVisible(false);
+        if (walletContainer != null) walletContainer.setVisible(false);
+        if (cashContainer != null) cashContainer.setVisible(false);
         
-        return cardNumber.length() == 16 && 
-               !holderName.isEmpty() && 
-               month.length() == 2 && 
-               year.length() == 4 && 
-               cvv.length() >= 3;
-    }
-
-    /**
-     * Validate wallet payment
-     */
-    private boolean validateWalletPayment() {
-        double total = subtotal + deliveryFee - discount;
-        return walletBalance >= total;
-    }
-
-    /**
-     * Format currency value
-     */
-    private String formatCurrency(double amount) {
-        return currencyFormat.format(amount);
-    }
-
-    // ==================== EVENT HANDLERS ====================
-
-    /**
-     * Handle refresh wallet balance
-     */
-    @FXML
-    private void handleRefreshWallet() {
-        setLoading(true);
-        setStatus("در حال بروزرسانی موجودی کیف پول...");
-        
-        // Mock refresh operation
-        Task<Double> refreshTask = new Task<Double>() {
-            @Override
-            protected Double call() throws Exception {
-                Thread.sleep(1500); // Simulate API call
-                return 85000.0; // Mock updated balance
-            }
-        };
-        
-        refreshTask.setOnSucceeded(e -> Platform.runLater(() -> {
-            setLoading(false);
-            walletBalance = refreshTask.getValue();
+        if (paymentMethodGroup.getSelectedToggle() == creditCardRadio && creditCardContainer != null) {
+            creditCardContainer.setVisible(true);
+        } else if (paymentMethodGroup.getSelectedToggle() == walletRadio && walletContainer != null) {
+            walletContainer.setVisible(true);
             updateWalletDisplay();
-            validatePaymentForm();
-            setStatus("موجودی کیف پول بروزرسانی شد");
-        }));
-        
-        refreshTask.setOnFailed(e -> Platform.runLater(() -> {
-            setLoading(false);
-            setStatus("خطا در بروزرسانی موجودی");
-        }));
-        
-        new Thread(refreshTask).start();
+        } else if (paymentMethodGroup.getSelectedToggle() == cashOnDeliveryRadio && cashContainer != null) {
+            cashContainer.setVisible(true);
+        }
     }
 
     /**
-     * Handle confirm payment
+     * تنظیم Event Handlers
      */
-    @FXML
-    private void handleConfirmPayment() {
-        RadioButton selected = (RadioButton) paymentMethodGroup.getSelectedToggle();
-        if (selected == null) {
-            showError("خطا", "لطفاً روش پرداخت را انتخاب کنید");
+    private void setupEventHandlers() {
+        if (backToCartButton != null) {
+            backToCartButton.setOnAction(e -> backToCart());
+        }
+        
+        if (confirmPaymentButton != null) {
+            confirmPaymentButton.setOnAction(e -> processPayment());
+        }
+        
+        if (cancelOrderButton != null) {
+            cancelOrderButton.setOnAction(e -> cancelOrder());
+        }
+        
+        if (rechargeWalletButton != null) {
+            rechargeWalletButton.setOnAction(e -> showRechargeWalletDialog());
+        }
+        
+        if (addNewCardButton != null) {
+            addNewCardButton.setOnAction(e -> clearCardForm());
+        }
+        
+        if (savedCardsComboBox != null) {
+            savedCardsComboBox.setOnAction(e -> fillCardFromSaved());
+        }
+        
+        if (cardNumberField != null) {
+            cardNumberField.textProperty().addListener((obs, oldVal, newVal) -> {
+                formatCardNumber(newVal);
+            });
+        }
+        
+        if (cvvField != null) {
+            cvvField.textProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal.length() > 4) {
+                    cvvField.setText(oldVal);
+                }
+            });
+        }
+    }
+    
+    /**
+     * تنظیم validation ها
+     */
+    private void setupValidation() {
+        updateConfirmButtonState();
+        
+        if (cardNumberField != null) {
+            cardNumberField.textProperty().addListener((obs, oldVal, newVal) -> updateConfirmButtonState());
+        }
+        if (cardHolderField != null) {
+            cardHolderField.textProperty().addListener((obs, oldVal, newVal) -> updateConfirmButtonState());
+        }
+        if (cvvField != null) {
+            cvvField.textProperty().addListener((obs, oldVal, newVal) -> updateConfirmButtonState());
+        }
+    }
+    
+    /**
+     * بارگذاری اطلاعات اولیه
+     */
+    private void loadInitialData() {
+        loadSavedCards();
+        loadWalletInfo();
+        loadOrderSummary();
+        updateOrderDisplay();
+        updatePaymentSummary();
+    }
+    
+    // ==================== Payment Processing Methods ====================
+    
+    /**
+     * پردازش پرداخت
+     */
+    private void processPayment() {
+        if (!validatePaymentData()) {
             return;
         }
         
-        setLoading(true);
-        setStatus("در حال پردازش پرداخت...");
+        showLoadingIndicator(true);
+        paymentData.setPaymentMethod(getSelectedPaymentMethod());
+        paymentData.setAmount(orderSummary.getFinalAmount());
+        paymentData.setOrderId(currentOrderId);
         
-        Task<String> paymentTask = new Task<String>() {
-            @Override
-            protected String call() throws Exception {
-                Thread.sleep(3000); // Simulate payment processing
+        new Thread(() -> {
+            try {
+                Thread.sleep(2000);
                 
-                if (selected == cardPaymentRadio) {
-                    return processCardPayment();
-                } else if (selected == walletPaymentRadio) {
-                    return processWalletPayment();
-                } else {
-                    return processCODPayment();
-                }
+                boolean success = processPaymentWithProvider();
+                
+                javafx.application.Platform.runLater(() -> {
+                    showLoadingIndicator(false);
+                    if (success) {
+                        showPaymentSuccess();
+                    } else {
+                        showPaymentError("پرداخت ناموفق بود. لطفاً دوباره تلاش کنید.");
+                    }
+                });
+                
+            } catch (InterruptedException e) {
+                javafx.application.Platform.runLater(() -> {
+                    showLoadingIndicator(false);
+                    showPaymentError("خطا در پردازش پرداخت.");
+                });
             }
-        };
-        
-        paymentTask.setOnSucceeded(e -> Platform.runLater(() -> {
-            setLoading(false);
-            String result = paymentTask.getValue();
-            setStatus("پرداخت موفق");
-            
-            Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-            successAlert.setTitle("پرداخت موفق");
-            successAlert.setHeaderText("سفارش شما با موفقیت ثبت شد!");
-            successAlert.setContentText(result);
-            
-            successAlert.showAndWait().ifPresent(response -> {
-                // Navigate to order history or main page
-                navigationController.navigateTo(NavigationController.ORDER_HISTORY_SCENE);
-            });
-        }));
-        
-        paymentTask.setOnFailed(e -> Platform.runLater(() -> {
-            setLoading(false);
-            setStatus("خطا در پرداخت");
-            showError("خطا در پرداخت", paymentTask.getException().getMessage());
-        }));
-        
-        new Thread(paymentTask).start();
+        }).start();
     }
-
+    
     /**
-     * Process card payment
+     * اعتبارسنجی داده‌های پرداخت
      */
-    private String processCardPayment() throws Exception {
-        // Mock card payment processing
-        String cardNumber = cardNumberField.getText();
-        String lastFourDigits = cardNumber.substring(cardNumber.length() - 4);
+    private boolean validatePaymentData() {
+        PaymentMethod method = getSelectedPaymentMethod();
         
-        // Simulate potential failure
-        if (cardNumber.contains("0000")) {
-            throw new Exception("کارت بانکی نامعتبر است");
-        }
-        
-        return "پرداخت با کارت ****" + lastFourDigits + " انجام شد.\n" +
-               "شماره پیگیری: " + generateTrackingNumber() + "\n" +
-               "سفارش شما تا 45 دقیقه آینده تحویل داده خواهد شد.";
-    }
-
-    /**
-     * Process wallet payment
-     */
-    private String processWalletPayment() throws Exception {
-        double total = subtotal + deliveryFee - discount;
-        
-        if (walletBalance < total) {
-            throw new Exception("موجودی کیف پول کافی نیست");
-        }
-        
-        // Deduct from wallet balance
-        walletBalance -= total;
-        
-        return "پرداخت از کیف پول انجام شد.\n" +
-               "مبلغ پرداخت شده: " + formatCurrency(total) + " تومان\n" +
-               "موجودی باقی‌مانده: " + formatCurrency(walletBalance) + " تومان\n" +
-               "شماره پیگیری: " + generateTrackingNumber();
-    }
-
-    /**
-     * Process COD payment
-     */
-    private String processCODPayment() {
-        double total = subtotal + deliveryFee - discount;
-        
-        return "سفارش شما ثبت شد و پرداخت در محل انجام خواهد شد.\n" +
-               "مبلغ قابل پرداخت: " + formatCurrency(total) + " تومان\n" +
-               "شماره سفارش: " + generateTrackingNumber() + "\n" +
-               "لطفاً مبلغ دقیق آماده داشته باشید.";
-    }
-
-    /**
-     * Generate random tracking number
-     */
-    private String generateTrackingNumber() {
-        return "FO" + System.currentTimeMillis() % 1000000;
-    }
-
-    /**
-     * Handle back to cart
-     */
-    @FXML
-    private void handleBackToCart() {
-        navigationController.navigateTo(NavigationController.CART_SCENE);
-    }
-
-    /**
-     * Handle profile navigation
-     */
-    @FXML
-    private void handleProfile() {
-        navigationController.navigateTo(NavigationController.PROFILE_SCENE);
-    }
-
-    /**
-     * Handle order history navigation
-     */
-    @FXML
-    private void handleOrderHistory() {
-        navigationController.navigateTo(NavigationController.ORDER_HISTORY_SCENE);
-    }
-
-    /**
-     * Handle logout
-     */
-    @FXML
-    private void handleLogout() {
-        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmAlert.setTitle("تأیید خروج");
-        confirmAlert.setHeaderText("آیا مطمئن هستید؟");
-        confirmAlert.setContentText("آیا می‌خواهید از حساب کاربری خود خارج شوید؟");
-        
-        confirmAlert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) {
-                navigationController.logout();
-            }
-        });
-    }
-
-    // ==================== UTILITY METHODS ====================
-
-    /**
-     * Set loading state
-     */
-    private void setLoading(boolean loading) {
-        loadingIndicator.setVisible(loading);
-        confirmPaymentButton.setDisable(loading);
-        refreshWalletButton.setDisable(loading);
-    }
-
-    /**
-     * Set status message
-     */
-    private void setStatus(String message) {
-        if (statusLabel != null) {
-            statusLabel.setText(message);
+        switch (method) {
+            case CREDIT_CARD:
+                return validateCreditCardData();
+            case WALLET:
+                return validateWalletData();
+            case CASH_ON_DELIVERY:
+                return true;
+            default:
+                return false;
         }
     }
 
     /**
-     * Show error dialog
+     * اعتبارسنجی داده‌های کارت اعتباری
      */
-    private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    private boolean validateCreditCardData() {
+        if (cardNumberField.getText().trim().length() < 16) {
+            showErrorMessage("شماره کارت نامعتبر است");
+            return false;
+        }
+        
+        if (cardHolderField.getText().trim().isEmpty()) {
+            showErrorMessage("نام دارنده کارت الزامی است");
+            return false;
+        }
+        
+        if (expiryMonthComboBox.getValue() == null || expiryYearComboBox.getValue() == null) {
+            showErrorMessage("تاریخ انقضا الزامی است");
+            return false;
+        }
+        
+        if (cvvField.getText().trim().length() < 3) {
+            showErrorMessage("CVV نامعتبر است");
+            return false;
+        }
+        
+        return true;
     }
-
-    // ==================== DATA MODEL ====================
-
+    
     /**
-     * Order item data model
+     * اعتبارسنجی داده‌های کیف پول
+     */
+    private boolean validateWalletData() {
+        if (walletInfo.getBalance() < orderSummary.getFinalAmount()) {
+            showErrorMessage("موجودی کیف پول کافی نیست");
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * دریافت روش پرداخت انتخاب شده
+     */
+    private PaymentMethod getSelectedPaymentMethod() {
+        if (paymentMethodGroup.getSelectedToggle() == creditCardRadio) {
+            return PaymentMethod.CREDIT_CARD;
+        } else if (paymentMethodGroup.getSelectedToggle() == walletRadio) {
+            return PaymentMethod.WALLET;
+        } else {
+            return PaymentMethod.CASH_ON_DELIVERY;
+        }
+    }
+    
+    /**
+     * پردازش پرداخت با ارائه‌دهنده خدمات
+     */
+    private boolean processPaymentWithProvider() {
+        PaymentMethod method = getSelectedPaymentMethod();
+        
+        switch (method) {
+            case CREDIT_CARD:
+                return processCreditCardPayment();
+            case WALLET:
+                return processWalletPayment();
+            case CASH_ON_DELIVERY:
+                return processCashPayment();
+            default:
+                return false;
+        }
+    }
+    
+    /**
+     * پردازش پرداخت با کارت اعتباری
+     */
+    private boolean processCreditCardPayment() {
+        paymentData.setTransactionId("TXN-" + System.currentTimeMillis());
+        paymentData.setGatewayResponse("SUCCESS");
+        
+        if (saveCardCheckBox.isSelected()) {
+            saveCurrentCard();
+        }
+        
+        return true;
+    }
+    
+    /**
+     * پردازش پرداخت با کیف پول
+     */
+    private boolean processWalletPayment() {
+        double newBalance = walletInfo.getBalance() - orderSummary.getFinalAmount();
+        walletInfo.setBalance(newBalance);
+        
+        paymentData.setTransactionId("WALLET-" + System.currentTimeMillis());
+        paymentData.setGatewayResponse("SUCCESS");
+        
+        return true;
+    }
+    
+    /**
+     * پردازش پرداخت نقدی
+     */
+    private boolean processCashPayment() {
+        paymentData.setTransactionId("CASH-" + System.currentTimeMillis());
+        paymentData.setGatewayResponse("PENDING");
+        
+        return true;
+    }
+    
+    // ==================== Data Models ====================
+    
+    /**
+     * مدل آیتم سفارش
      */
     public static class OrderItem {
-        private String name;
-        private double price;
-        private int quantity;
-        private String restaurantName;
-
-        public OrderItem(String name, double price, int quantity, String restaurantName) {
-            this.name = name;
-            this.price = price;
+        private String itemName;
+        private Integer quantity;
+        private Double price;
+        private String specialInstructions;
+        
+        public OrderItem() {}
+        
+        public OrderItem(String itemName, Integer quantity, Double price) {
+            this.itemName = itemName;
             this.quantity = quantity;
-            this.restaurantName = restaurantName;
+            this.price = price;
         }
-
-        // Getters
-        public String getName() { return name; }
-        public double getPrice() { return price; }
-        public int getQuantity() { return quantity; }
-        public String getRestaurantName() { return restaurantName; }
+        
+        public javafx.beans.property.StringProperty itemNameProperty() {
+            return new SimpleStringProperty(itemName);
+        }
+        
+        public javafx.beans.property.IntegerProperty quantityProperty() {
+            return new javafx.beans.property.SimpleIntegerProperty(quantity);
+        }
+        
+        public javafx.beans.property.DoubleProperty priceProperty() {
+            return new SimpleDoubleProperty(price);
+        }
+        
+        public Double getTotalPrice() {
+            return price != null && quantity != null ? price * quantity : 0.0;
+        }
+        
+        public String getItemName() { return itemName; }
+        public void setItemName(String itemName) { this.itemName = itemName; }
+        
+        public Integer getQuantity() { return quantity; }
+        public void setQuantity(Integer quantity) { this.quantity = quantity; }
+        
+        public Double getPrice() { return price; }
+        public void setPrice(Double price) { this.price = price; }
+        
+        public String getSpecialInstructions() { return specialInstructions; }
+        public void setSpecialInstructions(String specialInstructions) { 
+            this.specialInstructions = specialInstructions; 
+        }
+    }
+    
+    /**
+     * enum روش‌های پرداخت
+     */
+    public enum PaymentMethod {
+        CREDIT_CARD("کارت اعتباری"),
+        WALLET("کیف پول"),
+        CASH_ON_DELIVERY("پرداخت نقدی");
+        
+        private final String displayName;
+        
+        PaymentMethod(String displayName) {
+            this.displayName = displayName;
+        }
+        
+        public String getDisplayName() {
+            return displayName;
+        }
+    }
+    
+    // ==================== Helper Methods ====================
+    
+    /**
+     * به‌روزرسانی وضعیت دکمه تأیید
+     */
+    private void updateConfirmButtonState() {
+        if (confirmPaymentButton != null) {
+            boolean isValid = validateCurrentPaymentMethod();
+            confirmPaymentButton.setDisable(!isValid);
+        }
+    }
+    
+    /**
+     * اعتبارسنجی روش پرداخت فعلی
+     */
+    private boolean validateCurrentPaymentMethod() {
+        PaymentMethod method = getSelectedPaymentMethod();
+        
+        switch (method) {
+            case CREDIT_CARD:
+                return !cardNumberField.getText().trim().isEmpty() &&
+                       !cardHolderField.getText().trim().isEmpty() &&
+                       !cvvField.getText().trim().isEmpty();
+            case WALLET:
+                return walletInfo.getBalance() >= orderSummary.getFinalAmount();
+            case CASH_ON_DELIVERY:
+                return true;
+            default:
+                return false;
+        }
+    }
+    
+    /**
+     * نمایش/مخفی کردن loading indicator
+     */
+    private void showLoadingIndicator(boolean show) {
+        if (paymentProgressIndicator != null) {
+            paymentProgressIndicator.setVisible(show);
+        }
+        if (confirmPaymentButton != null) {
+            confirmPaymentButton.setDisable(show);
+        }
+    }
+    
+    // ==================== Placeholder Methods ====================
+    
+    private void loadSavedCards() {
+        // TODO: Load from backend
+    }
+    
+    private void loadWalletInfo() {
+        // TODO: Load from backend
+        walletInfo.setBalance(150000.0);
+    }
+    
+    private void loadOrderSummary() {
+        // TODO: Load from previous cart data
+    }
+    
+    private void updateOrderDisplay() {
+        if (orderNumberLabel != null) {
+            orderNumberLabel.setText(currentOrderId);
+        }
+        if (orderDateLabel != null) {
+            orderDateLabel.setText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")));
+        }
+    }
+    
+    private void updatePaymentSummary() {
+        // TODO: Calculate and update payment summary
+    }
+    
+    private void updateWalletDisplay() {
+        if (walletBalanceLabel != null) {
+            walletBalanceLabel.setText(String.format("%,.0f تومان", walletInfo.getBalance()));
+        }
+    }
+    
+    private void formatCardNumber(String newVal) {
+        // TODO: Format card number with spaces
+    }
+    
+    private void fillCardFromSaved() {
+        // TODO: Fill form from saved card
+    }
+    
+    private void clearCardForm() {
+        // TODO: Clear card form fields
+    }
+    
+    private void saveCurrentCard() {
+        // TODO: Save current card info
+    }
+    
+    private void backToCart() {
+        // TODO: Navigate back to cart
+    }
+    
+    private void cancelOrder() {
+        // TODO: Cancel order with confirmation
+    }
+    
+    private void showRechargeWalletDialog() {
+        // TODO: Show wallet recharge dialog
+    }
+    
+    private void showPaymentSuccess() {
+        // TODO: Show success message and navigate to order tracking
+    }
+    
+    private void showPaymentError(String message) {
+        // TODO: Show error message
+    }
+    
+    private void showErrorMessage(String message) {
+        // TODO: Show error message
+    }
+    
+    /**
+     * مدل خلاصه سفارش
+     */
+    public static class OrderSummary {
+        private Double subtotal = 0.0;
+        private Double tax = 0.0;
+        private Double deliveryFee = 0.0;
+        private Double discount = 0.0;
+        private Double processingFee = 0.0;
+        private Double finalAmount = 0.0;
+        
+        public Double getSubtotal() { return subtotal; }
+        public void setSubtotal(Double subtotal) { this.subtotal = subtotal; }
+        
+        public Double getTax() { return tax; }
+        public void setTax(Double tax) { this.tax = tax; }
+        
+        public Double getDeliveryFee() { return deliveryFee; }
+        public void setDeliveryFee(Double deliveryFee) { this.deliveryFee = deliveryFee; }
+        
+        public Double getDiscount() { return discount; }
+        public void setDiscount(Double discount) { this.discount = discount; }
+        
+        public Double getProcessingFee() { return processingFee; }
+        public void setProcessingFee(Double processingFee) { this.processingFee = processingFee; }
+        
+        public Double getFinalAmount() { return finalAmount; }
+        public void setFinalAmount(Double finalAmount) { this.finalAmount = finalAmount; }
+    }
+    
+    /**
+     * مدل اطلاعات کیف پول
+     */
+    public static class WalletInfo {
+        private Double balance = 0.0;
+        private String status = "ACTIVE";
+        
+        public Double getBalance() { return balance; }
+        public void setBalance(Double balance) { this.balance = balance; }
+        
+        public String getStatus() { return status; }
+        public void setStatus(String status) { this.status = status; }
+    }
+    
+    /**
+     * مدل کارت ذخیره شده
+     */
+    public static class SavedCard {
+        private String maskedNumber;
+        private String cardHolder;
+        private String expiryMonth;
+        private String expiryYear;
+        
+        public String getMaskedNumber() { return maskedNumber; }
+        public void setMaskedNumber(String maskedNumber) { this.maskedNumber = maskedNumber; }
+        
+        public String getCardHolder() { return cardHolder; }
+        public void setCardHolder(String cardHolder) { this.cardHolder = cardHolder; }
+        
+        public String getExpiryMonth() { return expiryMonth; }
+        public void setExpiryMonth(String expiryMonth) { this.expiryMonth = expiryMonth; }
+        
+        public String getExpiryYear() { return expiryYear; }
+        public void setExpiryYear(String expiryYear) { this.expiryYear = expiryYear; }
+    }
+    
+    /**
+     * مدل داده‌های پرداخت
+     */
+    public static class PaymentData {
+        private PaymentMethod paymentMethod;
+        private Double amount;
+        private String orderId;
+        private String transactionId;
+        private String gatewayResponse;
+        
+        public PaymentMethod getPaymentMethod() { return paymentMethod; }
+        public void setPaymentMethod(PaymentMethod paymentMethod) { this.paymentMethod = paymentMethod; }
+        
+        public Double getAmount() { return amount; }
+        public void setAmount(Double amount) { this.amount = amount; }
+        
+        public String getOrderId() { return orderId; }
+        public void setOrderId(String orderId) { this.orderId = orderId; }
+        
+        public String getTransactionId() { return transactionId; }
+        public void setTransactionId(String transactionId) { this.transactionId = transactionId; }
+        
+        public String getGatewayResponse() { return gatewayResponse; }
+        public void setGatewayResponse(String gatewayResponse) { this.gatewayResponse = gatewayResponse; }
     }
 }

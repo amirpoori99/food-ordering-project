@@ -20,41 +20,74 @@ import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
 
 /**
- * Comprehensive test suite for LoginController
- * Tests UI behavior, validation, API integration, and edge cases
+ * مجموعه تست‌های جامع برای LoginController
+ * 
+ * این کلاس تست شامل موارد زیر است:
+ * - رفتار رابط کاربری
+ * - اعتبارسنجی فیلدها
+ * - یکپارچگی با API
+ * - حالات مختلف و Edge Cases
+ * - مدیریت Remember Me
+ * - Navigation و Loading states
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class LoginControllerTest extends TestFXBase {
 
+    /** کنترلر LoginController مورد تست */
     private LoginController controller;
+    
+    /** NavigationController ساختگی برای تست */
     private NavigationController mockNavigationController;
+    
+    /** Preferences ساختگی برای تست */
     private Preferences mockPreferences;
     
-    // UI Components
+    // کامپوننت‌های UI
+    /** فیلد ورودی شماره تلفن */
     private TextField phoneField;
+    
+    /** فیلد ورودی رمز عبور */
     private PasswordField passwordField;
+    
+    /** چک‌باکس "مرا به خاطر بسپار" */
     private CheckBox rememberMeCheckbox;
+    
+    /** دکمه ورود */
     private Button loginButton;
+    
+    /** لینک ثبت نام */
     private Hyperlink registerLink;
+    
+    /** برچسب نمایش وضعیت */
     private Label statusLabel;
+    
+    /** نشانگر بارگذاری */
     private ProgressIndicator loadingIndicator;
 
+    /**
+     * راه‌اندازی اولیه قبل از هر تست
+     * شامل بارگذاری FXML یا ایجاد UI ساختگی
+     */
     @BeforeEach
     @Override
     public void setUp() throws Exception {
-        super.setUp(); // Call parent setup
+        super.setUp(); // فراخوانی راه‌اندازی والد
         
-        // Try to load the actual LoginController from FXML
+        // تلاش برای بارگذاری LoginController واقعی از FXML
         this.controller = loadFXMLController("/fxml/Login.fxml");
         
-        // If FXML loading failed, create mock UI
+        // در صورت شکست بارگذاری FXML، ایجاد UI ساختگی
         if (controller == null) {
             createMockLoginUI();
         } else {
-            // Extract UI components from loaded FXML
+            // استخراج کامپوننت‌های UI از FXML بارگذاری شده
             extractUIComponents();
         }
         
-        // Initialize UI state
+        // مقداردهی اولیه وضعیت UI
         runOnFxThreadAndWait(() -> {
             if (phoneField != null) phoneField.clear();
             if (passwordField != null) passwordField.clear();
@@ -64,27 +97,30 @@ public class LoginControllerTest extends TestFXBase {
         });
     }
     
+    /**
+     * ایجاد UI ساختگی برای تست در صورت عدم دسترسی به FXML
+     */
     private void createMockLoginUI() {
-        // Create controller
+        // ایجاد کنترلر
         controller = new LoginController();
         
-        // Create mock components
+        // ایجاد کامپوننت‌های ساختگی
         phoneField = new TextField();
         phoneField.setId("phoneField");
         passwordField = new PasswordField();
         passwordField.setId("passwordField");
         rememberMeCheckbox = new CheckBox();
         rememberMeCheckbox.setId("rememberMeCheckbox");
-        loginButton = new Button("Login");
+        loginButton = new Button("ورود");
         loginButton.setId("loginButton");
-        registerLink = new Hyperlink("Register");
+        registerLink = new Hyperlink("ثبت نام");
         registerLink.setId("registerLink");
         statusLabel = new Label();
         statusLabel.setId("statusLabel");
         loadingIndicator = new ProgressIndicator();
         loadingIndicator.setId("loadingIndicator");
         
-        // Set up FXML injections manually
+        // تنظیم تزریق FXML به صورت دستی
         setPrivateField(controller, "phoneField", phoneField);
         setPrivateField(controller, "passwordField", passwordField);
         setPrivateField(controller, "rememberMeCheckbox", rememberMeCheckbox);
@@ -93,7 +129,7 @@ public class LoginControllerTest extends TestFXBase {
         setPrivateField(controller, "statusLabel", statusLabel);
         setPrivateField(controller, "loadingIndicator", loadingIndicator);
         
-        // Create scene with mock components
+        // ایجاد scene با کامپوننت‌های ساختگی
         runOnFxThreadAndWait(() -> {
             VBox root = new VBox(10);
             root.getChildren().addAll(
@@ -104,18 +140,21 @@ public class LoginControllerTest extends TestFXBase {
             Scene scene = new Scene(root, 800, 600);
             testStage.setScene(scene);
             
-            // Initialize controller
+            // مقداردهی اولیه کنترلر
             try {
                 controller.initialize(null, null);
                 loadingIndicator.setVisible(false);
             } catch (Exception e) {
-                // Ignore initialization errors in tests
+                // نادیده گرفتن خطاهای مقداردهی در تست‌ها
             }
         });
     }
     
+    /**
+     * استخراج کامپوننت‌های UI از FXML بارگذاری شده
+     */
     private void extractUIComponents() {
-        // Extract UI components from the loaded FXML
+        // استخراج کامپوننت‌های UI از FXML
         phoneField = lookup("#phoneField", TextField.class);
         passwordField = lookup("#passwordField", PasswordField.class);
         rememberMeCheckbox = lookup("#rememberMeCheckbox", CheckBox.class);
@@ -124,29 +163,35 @@ public class LoginControllerTest extends TestFXBase {
         statusLabel = lookup("#statusLabel", Label.class);
         loadingIndicator = lookup("#loadingIndicator", ProgressIndicator.class);
         
-        // If any component is missing, fall back to mock UI
+        // در صورت فقدان هر کامپوننت، بازگشت به UI ساختگی
         if (phoneField == null || passwordField == null || loginButton == null) {
             createMockLoginUI();
         }
     }
 
-    // ==================== INITIALIZATION TESTS ====================
+    // ==================== تست‌های مقداردهی اولیه ====================
 
+    /**
+     * تست صحت مقداردهی اولیه کنترلر
+     */
     @Test
-    @DisplayName("Should initialize controller properly")
+    @DisplayName("باید کنترلر را به درستی مقداردهی کند")
     void testInitialization() {
         assertNotNull(controller);
         assertNotNull(phoneField);
         assertNotNull(passwordField);
         assertNotNull(loginButton);
-        assertTrue(loginButton.isDisabled()); // Should be disabled initially
-        assertFalse(loadingIndicator.isVisible()); // Should be hidden initially
+        assertTrue(loginButton.isDisabled()); // در ابتدا باید غیرفعال باشد
+        assertFalse(loadingIndicator.isVisible()); // در ابتدا باید مخفی باشد
     }
 
-    // ==================== INPUT VALIDATION TESTS ====================
+    // ==================== تست‌های اعتبارسنجی ورودی ====================
 
+    /**
+     * تست فعال شدن دکمه ورود با ورودی‌های معتبر
+     */
     @Test
-    @DisplayName("Should enable login button when fields have valid input")
+    @DisplayName("باید دکمه ورود را با ورودی‌های معتبر فعال کند")
     void testLoginButtonEnabledWithValidInput() {
         Platform.runLater(() -> {
             phoneField.setText("09123456789");
@@ -157,8 +202,11 @@ public class LoginControllerTest extends TestFXBase {
         assertFalse(controller.isLoginButtonDisabled());
     }
 
+    /**
+     * تست غیرفعال بودن دکمه ورود با فیلدهای خالی
+     */
     @Test
-    @DisplayName("Should disable login button when fields are empty")
+    @DisplayName("باید دکمه ورود را با فیلدهای خالی غیرفعال کند")
     void testLoginButtonDisabledWithEmptyFields() {
         Platform.runLater(() -> {
             phoneField.setText("");
@@ -169,8 +217,11 @@ public class LoginControllerTest extends TestFXBase {
         assertTrue(controller.isLoginButtonDisabled());
     }
 
+    /**
+     * تست غیرفعال بودن دکمه ورود با شماره تلفن خالی
+     */
     @Test
-    @DisplayName("Should disable login button when phone is empty")
+    @DisplayName("باید دکمه ورود را با شماره تلفن خالی غیرفعال کند")
     void testLoginButtonDisabledWithEmptyPhone() {
         Platform.runLater(() -> {
             phoneField.setText("");
@@ -181,8 +232,11 @@ public class LoginControllerTest extends TestFXBase {
         assertTrue(controller.isLoginButtonDisabled());
     }
 
+    /**
+     * تست غیرفعال بودن دکمه ورود با رمز عبور خالی
+     */
     @Test
-    @DisplayName("Should disable login button when password is empty")
+    @DisplayName("باید دکمه ورود را با رمز عبور خالی غیرفعال کند")
     void testLoginButtonDisabledWithEmptyPassword() {
         Platform.runLater(() -> {
             phoneField.setText("09123456789");
@@ -193,13 +247,16 @@ public class LoginControllerTest extends TestFXBase {
         assertTrue(controller.isLoginButtonDisabled());
     }
 
-    // ==================== PHONE VALIDATION TESTS ====================
+    // ==================== تست‌های اعتبارسنجی شماره تلفن ====================
 
+    /**
+     * تست نمایش خطا برای فرمت نامعتبر شماره تلفن
+     */
     @Test
-    @DisplayName("Should show error for invalid phone number format")
+    @DisplayName("باید برای فرمت نامعتبر شماره تلفن خطا نمایش دهد")
     void testInvalidPhoneNumberFormat() {
         Platform.runLater(() -> {
-            controller.setPhoneFieldText("123456789"); // Invalid format
+            controller.setPhoneFieldText("123456789"); // فرمت نامعتبر
             controller.setPasswordFieldText("password123");
             controller.triggerLogin();
         });
@@ -208,11 +265,14 @@ public class LoginControllerTest extends TestFXBase {
         assertTrue(controller.getStatusText().contains("شماره تلفن باید با 09 شروع شود"));
     }
 
+    /**
+     * تست نمایش خطا برای شماره تلفن کوتاه
+     */
     @Test
-    @DisplayName("Should show error for short phone number")
+    @DisplayName("باید برای شماره تلفن کوتاه خطا نمایش دهد")
     void testShortPhoneNumber() {
         Platform.runLater(() -> {
-            controller.setPhoneFieldText("091234"); // Too short
+            controller.setPhoneFieldText("091234"); // خیلی کوتاه
             controller.setPasswordFieldText("password123");
             controller.triggerLogin();
         });
@@ -221,27 +281,33 @@ public class LoginControllerTest extends TestFXBase {
         assertTrue(controller.getStatusText().contains("شماره تلفن باید با 09 شروع شود"));
     }
 
+    /**
+     * تست پذیرش فرمت معتبر شماره تلفن
+     */
     @Test
-    @DisplayName("Should accept valid phone number format")
+    @DisplayName("باید فرمت معتبر شماره تلفن را بپذیرد")
     void testValidPhoneNumberFormat() {
         Platform.runLater(() -> {
-            controller.setPhoneFieldText("09123456789"); // Valid format
+            controller.setPhoneFieldText("09123456789"); // فرمت معتبر
             controller.setPasswordFieldText("password123");
         });
         WaitForAsyncUtils.waitForFxEvents();
         
-        // Should not show format error (we can't easily test API call without mocking)
+        // نباید خطای فرمت نشان دهد
         assertFalse(controller.isLoginButtonDisabled());
     }
 
-    // ==================== PASSWORD VALIDATION TESTS ====================
+    // ==================== تست‌های اعتبارسنجی رمز عبور ====================
 
+    /**
+     * تست نمایش خطا برای رمز عبور کوتاه
+     */
     @Test
-    @DisplayName("Should show error for short password")
+    @DisplayName("باید برای رمز عبور کوتاه خطا نمایش دهد")
     void testShortPassword() {
         Platform.runLater(() -> {
             controller.setPhoneFieldText("09123456789");
-            controller.setPasswordFieldText("123"); // Too short
+            controller.setPasswordFieldText("123"); // خیلی کوتاه
             controller.triggerLogin();
         });
         WaitForAsyncUtils.waitForFxEvents();
@@ -249,26 +315,32 @@ public class LoginControllerTest extends TestFXBase {
         assertTrue(controller.getStatusText().contains("رمز عبور باید حداقل 4 کاراکتر باشد"));
     }
 
+    /**
+     * تست پذیرش طول معتبر رمز عبور
+     */
     @Test
-    @DisplayName("Should accept valid password length")
+    @DisplayName("باید طول معتبر رمز عبور را بپذیرد")
     void testValidPasswordLength() {
         Platform.runLater(() -> {
             controller.setPhoneFieldText("09123456789");
-            controller.setPasswordFieldText("1234"); // Minimum valid length
+            controller.setPasswordFieldText("1234"); // حداقل طول معتبر
         });
         WaitForAsyncUtils.waitForFxEvents();
         
-        // Should not show length error
+        // نباید خطای طول نشان دهد
         assertFalse(controller.isLoginButtonDisabled());
     }
 
-    // ==================== EMPTY FIELD VALIDATION TESTS ====================
+    // ==================== تست‌های اعتبارسنجی فیلدهای خالی ====================
 
+    /**
+     * تست نمایش خطا برای فیلد شماره تلفن خالی
+     */
     @Test
-    @DisplayName("Should show error for empty phone field")
+    @DisplayName("باید برای فیلد شماره تلفن خالی خطا نمایش دهد")
     void testEmptyPhoneField() {
         Platform.runLater(() -> {
-            controller.setPhoneFieldText(""); // Empty
+            controller.setPhoneFieldText(""); // خالی
             controller.setPasswordFieldText("password123");
             controller.triggerLogin();
         });
@@ -277,12 +349,15 @@ public class LoginControllerTest extends TestFXBase {
         assertTrue(controller.getStatusText().contains("لطفاً شماره تلفن را وارد کنید"));
     }
 
+    /**
+     * تست نمایش خطا برای فیلد رمز عبور خالی
+     */
     @Test
-    @DisplayName("Should show error for empty password field")
+    @DisplayName("باید برای فیلد رمز عبور خالی خطا نمایش دهد")
     void testEmptyPasswordField() {
         Platform.runLater(() -> {
             controller.setPhoneFieldText("09123456789");
-            controller.setPasswordFieldText(""); // Empty
+            controller.setPasswordFieldText(""); // خالی
             controller.triggerLogin();
         });
         WaitForAsyncUtils.waitForFxEvents();
@@ -290,10 +365,13 @@ public class LoginControllerTest extends TestFXBase {
         assertTrue(controller.getStatusText().contains("لطفاً رمز عبور را وارد کنید"));
     }
 
-    // ==================== REMEMBER ME FUNCTIONALITY TESTS ====================
+    // ==================== تست‌های قابلیت Remember Me ====================
 
+    /**
+     * تست مدیریت وضعیت چک‌باکس "مرا به خاطر بسپار"
+     */
     @Test
-    @DisplayName("Should handle remember me checkbox state")
+    @DisplayName("باید وضعیت چک‌باکس مرا به خاطر بسپار را مدیریت کند")
     void testRememberMeCheckbox() {
         Platform.runLater(() -> {
             controller.setRememberMeSelected(true);
@@ -310,12 +388,15 @@ public class LoginControllerTest extends TestFXBase {
         assertFalse(controller.isRememberMeSelected());
     }
 
-    // ==================== NAVIGATION TESTS ====================
+    // ==================== تست‌های Navigation ====================
 
+    /**
+     * تست انتقال به صفحه ثبت نام
+     */
     @Test
-    @DisplayName("Should trigger register navigation")
+    @DisplayName("باید انتقال به صفحه ثبت نام را فعال کند")
     void testRegisterNavigation() {
-        // Mock the NavigationController to avoid null primaryStage
+        // ایجاد NavigationController ساختگی برای جلوگیری از null primaryStage
         NavigationController mockNavController = mock(NavigationController.class);
         setPrivateField(controller, "navigationController", mockNavController);
         
@@ -324,28 +405,34 @@ public class LoginControllerTest extends TestFXBase {
         });
         WaitForAsyncUtils.waitForFxEvents();
         
-        // Verify navigation was called
+        // تأیید فراخوانی navigation
         verify(mockNavController).navigateTo(NavigationController.REGISTER_SCENE);
     }
 
-    // ==================== UI STATE TESTS ====================
+    // ==================== تست‌های وضعیت UI ====================
 
+    /**
+     * تست مدیریت صحیح وضعیت بارگذاری
+     */
     @Test
-    @DisplayName("Should handle loading state properly")
+    @DisplayName("باید وضعیت بارگذاری را به درستی مدیریت کند")
     void testLoadingState() {
-        // Note: This test would require mocking the HTTP client
-        // For now, we test the UI component states
+        // نکته: این تست نیاز به mock کردن HTTP client دارد
+        // فعلاً وضعیت کامپوننت‌های UI را تست می‌کنیم
         assertFalse(controller.isLoadingVisible());
         
-        // We can't easily test the loading state without triggering actual API calls
-        // This would require more sophisticated mocking
+        // تست وضعیت loading بدون فراخوانی واقعی API
+        // نیاز به mock پیشرفته‌تر دارد
     }
 
+    /**
+     * تست پاک کردن پیام وضعیت
+     */
     @Test
-    @DisplayName("Should clear status message")
+    @DisplayName("باید پیام وضعیت را پاک کند")
     void testClearStatus() {
         Platform.runLater(() -> {
-            // Set some error first
+            // ابتدا یک خطا ایجاد کن
             controller.setPhoneFieldText("");
             controller.setPasswordFieldText("password123");
             controller.triggerLogin();
@@ -354,48 +441,57 @@ public class LoginControllerTest extends TestFXBase {
         
         assertFalse(controller.getStatusText().isEmpty());
         
-        // Now test that status gets cleared when typing
+        // حالا تست کن که وضعیت هنگام تایپ پاک می‌شود
         Platform.runLater(() -> {
             controller.setPhoneFieldText("09123456789");
         });
         WaitForAsyncUtils.waitForFxEvents();
         
-        // Status should be cleared when user starts typing
+        // وضعیت باید پاک شود وقتی کاربر شروع به تایپ کند
     }
 
-    // ==================== EDGE CASE TESTS ====================
+    // ==================== تست‌های Edge Case ====================
 
+    /**
+     * تست مدیریت فاصله در فیلد شماره تلفن
+     */
     @Test
-    @DisplayName("Should handle whitespace in phone field")
+    @DisplayName("باید فاصله در فیلد شماره تلفن را مدیریت کند")
     void testPhoneFieldWithWhitespace() {
         Platform.runLater(() -> {
-            controller.setPhoneFieldText("  09123456789  "); // With whitespace
+            controller.setPhoneFieldText("  09123456789  "); // با فاصله
             controller.setPasswordFieldText("password123");
         });
         WaitForAsyncUtils.waitForFxEvents();
         
-        // Should still work (trimmed internally)
+        // باید کار کند (به صورت داخلی trim می‌شود)
         assertFalse(controller.isLoginButtonDisabled());
     }
 
+    /**
+     * تست مدیریت کاراکترهای خاص در رمز عبور
+     */
     @Test
-    @DisplayName("Should handle special characters in password")
+    @DisplayName("باید کاراکترهای خاص در رمز عبور را مدیریت کند")
     void testPasswordWithSpecialCharacters() {
         Platform.runLater(() -> {
             controller.setPhoneFieldText("09123456789");
-            controller.setPasswordFieldText("pass@123!"); // Special characters
+            controller.setPasswordFieldText("pass@123!"); // کاراکترهای خاص
         });
         WaitForAsyncUtils.waitForFxEvents();
         
-        // Should accept special characters
+        // باید کاراکترهای خاص را بپذیرد
         assertFalse(controller.isLoginButtonDisabled());
     }
 
+    /**
+     * تست مدیریت ورودی‌های خیلی طولانی
+     */
     @Test
-    @DisplayName("Should handle very long inputs")
+    @DisplayName("باید ورودی‌های خیلی طولانی را مدیریت کند")
     void testVeryLongInputs() {
-        String longPhone = "09123456789123456789"; // Very long
-        String longPassword = "a".repeat(100); // Very long password
+        String longPhone = "09123456789123456789"; // خیلی طولانی
+        String longPassword = "a".repeat(100); // رمز عبور خیلی طولانی
         
         Platform.runLater(() -> {
             controller.setPhoneFieldText(longPhone);
@@ -403,14 +499,17 @@ public class LoginControllerTest extends TestFXBase {
         });
         WaitForAsyncUtils.waitForFxEvents();
         
-        // Should handle long inputs gracefully
+        // باید ورودی‌های طولانی را به آرامی مدیریت کند
         assertFalse(controller.isLoginButtonDisabled());
     }
 
-    // ==================== GETTER/SETTER TESTS ====================
+    // ==================== تست‌های Getter/Setter ====================
 
+    /**
+     * تست getter/setter فیلد شماره تلفن
+     */
     @Test
-    @DisplayName("Should handle phone field getter/setter")
+    @DisplayName("باید getter/setter فیلد شماره تلفن را مدیریت کند")
     void testPhoneFieldGetterSetter() {
         String testPhone = "09123456789";
         
@@ -422,8 +521,11 @@ public class LoginControllerTest extends TestFXBase {
         assertEquals(testPhone, controller.getPhoneFieldText());
     }
 
+    /**
+     * تست getter/setter فیلد رمز عبور
+     */
     @Test
-    @DisplayName("Should handle password field getter/setter")
+    @DisplayName("باید getter/setter فیلد رمز عبور را مدیریت کند")
     void testPasswordFieldGetterSetter() {
         String testPassword = "testPassword123";
         
@@ -435,13 +537,16 @@ public class LoginControllerTest extends TestFXBase {
         assertEquals(testPassword, controller.getPasswordFieldText());
     }
 
+    /**
+     * تست مدیریت دسترسی به فیلدهای null
+     */
     @Test
-    @DisplayName("Should handle null field access gracefully")
+    @DisplayName("باید دسترسی به فیلدهای null را به آرامی مدیریت کند")
     void testNullFieldAccess() {
-        // Create a controller without FXML injection
+        // ایجاد کنترلر بدون تزریق FXML
         LoginController emptyController = new LoginController();
         
-        // Should not throw exceptions
+        // نباید exception پرتاب کند
         assertDoesNotThrow(() -> {
             assertEquals("", emptyController.getPhoneFieldText());
             assertEquals("", emptyController.getPasswordFieldText());
@@ -452,10 +557,14 @@ public class LoginControllerTest extends TestFXBase {
         });
     }
 
-    // ==================== HELPER METHODS ====================
+    // ==================== متدهای کمکی ====================
 
     /**
-     * Helper method to set private fields using reflection
+     * متد کمکی برای تنظیم فیلدهای private با استفاده از reflection
+     * 
+     * @param object شیء مقصد
+     * @param fieldName نام فیلد
+     * @param value مقدار جدید
      */
     private void setPrivateField(Object object, String fieldName, Object value) {
         try {

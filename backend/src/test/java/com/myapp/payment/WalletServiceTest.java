@@ -491,6 +491,124 @@ class WalletServiceTest {
         }
     }
 
+    // ==================== WALLET TRANSFER TESTS ====================
+
+    @Nested
+    @DisplayName("Wallet Transfer Tests")
+    class WalletTransferTests {
+
+        @Test
+        @DisplayName("Should transfer between wallets successfully")
+        void transfer_Success() {
+            // Arrange
+            Long fromUserId = 1L;
+            Long toUserId = 2L;
+            java.math.BigDecimal amount = java.math.BigDecimal.valueOf(100.0);
+            String description = "Transfer test";
+            
+            User fromUser = createTestUser(fromUserId);
+            User toUser = createTestUser(toUserId);
+            
+            when(authRepository.existsById(fromUserId)).thenReturn(true);
+            when(authRepository.existsById(toUserId)).thenReturn(true);
+            when(paymentRepository.calculateWalletBalance(fromUserId)).thenReturn(200.0); // Sufficient balance
+            
+            when(paymentRepository.save(any(Transaction.class))).thenAnswer(invocation -> {
+                Transaction saved = invocation.getArgument(0);
+                saved.setId(System.currentTimeMillis()); // Mock ID generation
+                return saved;
+            });
+            
+            // Act
+            Transaction result = walletService.transfer(fromUserId, toUserId, amount, description);
+            
+            // Assert
+            assertNotNull(result);
+            assertEquals(fromUserId, result.getUserId());
+            assertEquals(amount.doubleValue(), result.getAmount());
+            assertTrue(result.getDescription().contains(toUserId.toString()));
+            assertTrue(result.getDescription().contains(description));
+            
+            verify(paymentRepository, times(3)).save(any(Transaction.class)); // debit, credit, transfer
+        }
+
+        @Test
+        @DisplayName("Should throw exception for insufficient balance in transfer")
+        void transfer_InsufficientBalance() {
+            // Arrange
+            Long fromUserId = 1L;
+            Long toUserId = 2L;
+            java.math.BigDecimal amount = java.math.BigDecimal.valueOf(300.0);
+            
+            when(authRepository.existsById(fromUserId)).thenReturn(true);
+            when(authRepository.existsById(toUserId)).thenReturn(true);
+            when(paymentRepository.calculateWalletBalance(fromUserId)).thenReturn(100.0); // Insufficient
+            
+            // Act & Assert
+            com.myapp.common.exceptions.InsufficientFundsException exception = 
+                assertThrows(com.myapp.common.exceptions.InsufficientFundsException.class, 
+                    () -> walletService.transfer(fromUserId, toUserId, amount, "Test"));
+            
+            assertTrue(exception.getMessage().contains("Insufficient"));
+        }
+
+        @Test
+        @DisplayName("Should throw exception for transfer to same user")
+        void transfer_SameUser() {
+            // Arrange
+            Long userId = 1L;
+            java.math.BigDecimal amount = java.math.BigDecimal.valueOf(100.0);
+            
+            // Act & Assert
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 
+                () -> walletService.transfer(userId, userId, amount, "Self transfer"));
+            
+            assertEquals("Cannot transfer to the same user", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should throw exception for invalid transfer amount")
+        void transfer_InvalidAmount() {
+            // Arrange
+            Long fromUserId = 1L;
+            Long toUserId = 2L;
+            
+            // Act & Assert - Zero amount
+            IllegalArgumentException exception1 = assertThrows(IllegalArgumentException.class, 
+                () -> walletService.transfer(fromUserId, toUserId, java.math.BigDecimal.ZERO, "Test"));
+            assertEquals("Transfer amount must be positive", exception1.getMessage());
+            
+            // Act & Assert - Negative amount
+            IllegalArgumentException exception2 = assertThrows(IllegalArgumentException.class, 
+                () -> walletService.transfer(fromUserId, toUserId, java.math.BigDecimal.valueOf(-50), "Test"));
+            assertEquals("Transfer amount must be positive", exception2.getMessage());
+            
+            // Act & Assert - Amount too large
+            IllegalArgumentException exception3 = assertThrows(IllegalArgumentException.class, 
+                () -> walletService.transfer(fromUserId, toUserId, java.math.BigDecimal.valueOf(15000), "Test"));
+            assertEquals("Maximum transfer amount is 10,000", exception3.getMessage());
+        }
+
+        @Test
+        @DisplayName("Should throw exception for non-existent users in transfer")
+        void transfer_UserNotFound() {
+            // Arrange
+            Long fromUserId = 1L;
+            Long toUserId = 999L;
+            java.math.BigDecimal amount = java.math.BigDecimal.valueOf(100.0);
+            
+            when(authRepository.existsById(fromUserId)).thenReturn(true);
+            when(authRepository.existsById(toUserId)).thenReturn(false);
+            
+            // Act & Assert
+            com.myapp.common.exceptions.NotFoundException exception = 
+                assertThrows(com.myapp.common.exceptions.NotFoundException.class, 
+                    () -> walletService.transfer(fromUserId, toUserId, amount, "Test"));
+            
+            assertTrue(exception.getMessage().contains("To user"));
+        }
+    }
+
     // ==================== WALLET STATISTICS TESTS ====================
 
     @Nested

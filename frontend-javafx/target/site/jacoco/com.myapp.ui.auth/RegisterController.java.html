@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RegisterController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">food-ordering-frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.auth</a> &gt; <span class="el_source">RegisterController.java</span></div><h1>RegisterController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.auth;
+
+import com.myapp.ui.common.HttpClientUtil;
+import com.myapp.ui.common.NavigationController;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
+
+/**
+ * کنترلر صفحه ثبت نام در سیستم
+ * 
+ * این کلاس مسئول مدیریت رابط کاربری ثبت نام شامل:
+ * - اعتبارسنجی کامل ورودی‌های کاربر
+ * - ارتباط با backend برای ایجاد حساب جدید
+ * - مدیریت انواع نقش کاربری (خریدار، فروشنده، پیک)
+ * - مدیریت حالت‌های loading و error
+ * - navigation به صفحات مختلف
+ * - تأیید رمز عبور و اعتبارسنجی ایمیل
+ * 
+ * Pattern های استفاده شده:
+ * - MVC Pattern: Controller جدا از View
+ * - Observer Pattern: event listeners برای UI components
+ * - Task Pattern: background processing برای API calls
+ * - Validation Pattern: اعتبارسنجی مرحله‌ای
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+<span class="nc" id="L36">public class RegisterController implements Initializable {</span>
+
+    /** فیلد ورودی نام کامل کاربر */
+    @FXML private TextField fullNameField;
+    
+    /** فیلد ورودی شماره تلفن */
+    @FXML private TextField phoneField;
+    
+    /** فیلد ورودی آدرس ایمیل */
+    @FXML private TextField emailField;
+    
+    /** فیلد ورودی رمز عبور */
+    @FXML private PasswordField passwordField;
+    
+    /** فیلد تأیید رمز عبور */
+    @FXML private PasswordField confirmPasswordField;
+    
+    /** فیلد ورودی آدرس کاربر */
+    @FXML private TextArea addressField;
+    
+    /** ComboBox انتخاب نقش کاربری */
+    @FXML private ComboBox&lt;String&gt; roleComboBox;
+    
+    /** دکمه ثبت نام */
+    @FXML private Button registerButton;
+    
+    /** لینک ورود (برای کاربران موجود) */
+    @FXML private Hyperlink loginLink;
+    
+    /** برچسب نمایش وضعیت و پیام‌های خطا */
+    @FXML private Label statusLabel;
+    
+    /** نشانگر loading در زمان پردازش درخواست */
+    @FXML private ProgressIndicator loadingIndicator;
+
+    /** کنترلر navigation برای تغییر صفحات */
+    private NavigationController navigationController;
+
+    /**
+     * متد مقداردهی اولیه که بعد از load شدن FXML اجرا می‌شود
+     * 
+     * @param location URL location مربوط به FXML
+     * @param resources منابع زبان و localization
+     */
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        // دریافت instance singleton NavigationController
+<span class="nc" id="L83">        this.navigationController = NavigationController.getInstance();</span>
+        
+        // راه‌اندازی کامپوننت‌های UI
+<span class="nc" id="L86">        setupUI();</span>
+        
+        // پر کردن لیست نقش‌های کاربری
+<span class="nc" id="L89">        populateRoles();</span>
+<span class="nc" id="L90">    }</span>
+
+    /**
+     * تنظیم NavigationController (مخصوص تست)
+     * این متد امکان injection کردن mock NavigationController را برای تست فراهم می‌کند
+     * 
+     * @param navigationController instance جدید NavigationController
+     */
+    public void setNavigationController(NavigationController navigationController) {
+<span class="nc" id="L99">        this.navigationController = navigationController;</span>
+<span class="nc" id="L100">    }</span>
+
+    /**
+     * راه‌اندازی کامپوننت‌های UI و event handler ها
+     * 
+     * شامل:
+     * - تنظیم listener ها برای enable/disable کردن دکمه ثبت نام
+     * - تنظیم action handler ها برای دکمه‌ها و لینک‌ها
+     * - تنظیم حالت اولیه فیلدها
+     */
+    private void setupUI() {
+        // فعال/غیرفعال کردن دکمه ثبت نام بر اساس پر بودن فیلدها
+<span class="nc" id="L112">        fullNameField.textProperty().addListener((obs, oldText, newText) -&gt; updateRegisterButtonState());</span>
+<span class="nc" id="L113">        phoneField.textProperty().addListener((obs, oldText, newText) -&gt; updateRegisterButtonState());</span>
+<span class="nc" id="L114">        passwordField.textProperty().addListener((obs, oldText, newText) -&gt; updateRegisterButtonState());</span>
+<span class="nc" id="L115">        confirmPasswordField.textProperty().addListener((obs, oldText, newText) -&gt; updateRegisterButtonState());</span>
+<span class="nc" id="L116">        addressField.textProperty().addListener((obs, oldText, newText) -&gt; updateRegisterButtonState());</span>
+<span class="nc" id="L117">        roleComboBox.valueProperty().addListener((obs, oldValue, newValue) -&gt; updateRegisterButtonState());</span>
+        
+        // تنظیم action handler ها برای تست‌های unit (FXML runtime را پوشش می‌دهد)
+<span class="nc" id="L120">        registerButton.setOnAction(e -&gt; handleRegister());</span>
+<span class="nc" id="L121">        loginLink.setOnAction(e -&gt; handleLoginLink());</span>
+        
+        // تنظیم حالت اولیه
+<span class="nc" id="L124">        updateRegisterButtonState();</span>
+<span class="nc" id="L125">        clearStatus();</span>
+<span class="nc" id="L126">    }</span>
+
+    /**
+     * پر کردن ComboBox نقش‌های کاربری
+     * 
+     * نقش‌های موجود:
+     * - BUYER: خریدار (کاربر عادی)
+     * - SELLER: فروشنده (صاحب رستوران)
+     * - COURIER: پیک (تحویل‌دهنده سفارشات)
+     */
+    private void populateRoles() {
+<span class="nc" id="L137">        roleComboBox.getItems().addAll(&quot;BUYER&quot;, &quot;SELLER&quot;, &quot;COURIER&quot;);</span>
+<span class="nc" id="L138">        roleComboBox.setValue(&quot;BUYER&quot;); // انتخاب پیش‌فرض: خریدار</span>
+<span class="nc" id="L139">    }</span>
+
+    /**
+     * پردازش کلیک روی دکمه ثبت نام
+     * 
+     * مراحل:
+     * 1. دریافت مقادیر فیلدها
+     * 2. اعتبارسنجی کامل ورودی‌ها
+     * 3. اجرای background task برای ارتباط با API
+     * 4. پردازش نتیجه و navigation
+     */
+    @FXML
+    private void handleRegister() {
+        // دریافت مقادیر فیلدها
+<span class="nc" id="L153">        String fullName = fullNameField.getText().trim();</span>
+<span class="nc" id="L154">        String phone = phoneField.getText().trim();</span>
+<span class="nc" id="L155">        String email = emailField.getText().trim();</span>
+<span class="nc" id="L156">        String password = passwordField.getText();</span>
+<span class="nc" id="L157">        String confirmPassword = confirmPasswordField.getText();</span>
+<span class="nc" id="L158">        String address = addressField.getText().trim();</span>
+<span class="nc" id="L159">        String role = roleComboBox.getValue();</span>
+        
+        // اعتبارسنجی ورودی‌ها
+<span class="nc bnc" id="L162" title="All 2 branches missed.">        if (!validateInput(fullName, phone, email, password, confirmPassword, address, role)) {</span>
+<span class="nc" id="L163">            return;</span>
+        }
+        
+        // شروع فرآیند ثبت نام
+<span class="nc" id="L167">        setLoading(true);</span>
+<span class="nc" id="L168">        clearStatus();</span>
+        
+        // ایجاد background task برای جلوگیری از freeze شدن UI
+<span class="nc" id="L171">        Task&lt;HttpClientUtil.ApiResponse&gt; registerTask = new Task&lt;HttpClientUtil.ApiResponse&gt;() {</span>
+            @Override
+            protected HttpClientUtil.ApiResponse call() throws Exception {
+                // فراخوانی API ثبت نام
+<span class="nc" id="L175">                return HttpClientUtil.register(fullName, phone, email, password, address);</span>
+            }
+        };
+        
+        // پردازش نتیجه موفق
+<span class="nc" id="L180">        registerTask.setOnSucceeded(e -&gt; {</span>
+<span class="nc" id="L181">            Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L182">                setLoading(false);</span>
+<span class="nc" id="L183">                HttpClientUtil.ApiResponse response = registerTask.getValue();</span>
+<span class="nc" id="L184">                handleRegisterResponse(response);</span>
+<span class="nc" id="L185">            });</span>
+<span class="nc" id="L186">        });</span>
+        
+        // پردازش خطا
+<span class="nc" id="L189">        registerTask.setOnFailed(e -&gt; {</span>
+<span class="nc" id="L190">            Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L191">                setLoading(false);</span>
+<span class="nc" id="L192">                Throwable exception = registerTask.getException();</span>
+<span class="nc" id="L193">                handleRegisterError(exception);</span>
+<span class="nc" id="L194">            });</span>
+<span class="nc" id="L195">        });</span>
+        
+        // اجرای task در thread جداگانه
+<span class="nc" id="L198">        Thread registerThread = new Thread(registerTask);</span>
+<span class="nc" id="L199">        registerThread.setDaemon(true); // daemon thread تا با بسته شدن برنامه تمام شود</span>
+<span class="nc" id="L200">        registerThread.start();</span>
+<span class="nc" id="L201">    }</span>
+
+    /**
+     * اعتبارسنجی کامل ورودی‌های کاربر
+     * 
+     * بررسی‌های انجام شده:
+     * - خالی نبودن تمام فیلدهای الزامی
+     * - فرمت صحیح شماره تلفن
+     * - حداقل طول رمز عبور
+     * - تطابق رمز عبور و تأیید آن
+     * - انتخاب نقش کاربری
+     * 
+     * @param fullName نام کامل کاربر
+     * @param phone شماره تلفن
+     * @param email آدرس ایمیل
+     * @param password رمز عبور
+     * @param confirmPassword تأیید رمز عبور
+     * @param address آدرس کاربر
+     * @param role نقش کاربری
+     * @return true اگر تمام ورودی‌ها معتبر باشند
+     */
+    private boolean validateInput(String fullName, String phone, String email, 
+                                 String password, String confirmPassword, String address, String role) {
+        // بررسی نام کامل
+<span class="nc bnc" id="L225" title="All 4 branches missed.">        if (fullName == null || fullName.trim().isEmpty()) {</span>
+<span class="nc" id="L226">            showError(&quot;لطفاً نام کامل را وارد کنید&quot;);</span>
+<span class="nc" id="L227">            fullNameField.requestFocus();</span>
+<span class="nc" id="L228">            return false;</span>
+        }
+        
+        // بررسی شماره تلفن
+<span class="nc bnc" id="L232" title="All 4 branches missed.">        if (phone == null || phone.trim().isEmpty()) {</span>
+<span class="nc" id="L233">            showError(&quot;لطفاً شماره تلفن را وارد کنید&quot;);</span>
+<span class="nc" id="L234">            phoneField.requestFocus();</span>
+<span class="nc" id="L235">            return false;</span>
+        }
+        
+        // اعتبارسنجی فرمت شماره تلفن (11 رقم، شروع با 09)
+<span class="nc bnc" id="L239" title="All 2 branches missed.">        if (!phone.trim().matches(&quot;^09\\d{9}$&quot;)) {</span>
+<span class="nc" id="L240">            showError(&quot;شماره تلفن باید با 09 شروع شود و 11 رقم باشد&quot;);</span>
+<span class="nc" id="L241">            phoneField.requestFocus();</span>
+<span class="nc" id="L242">            return false;</span>
+        }
+        
+        // بررسی رمز عبور
+<span class="nc bnc" id="L246" title="All 4 branches missed.">        if (password == null || password.isEmpty()) {</span>
+<span class="nc" id="L247">            showError(&quot;لطفاً رمز عبور را وارد کنید&quot;);</span>
+<span class="nc" id="L248">            passwordField.requestFocus();</span>
+<span class="nc" id="L249">            return false;</span>
+        }
+        
+        // بررسی حداقل طول رمز عبور
+<span class="nc bnc" id="L253" title="All 2 branches missed.">        if (password.length() &lt; 4) {</span>
+<span class="nc" id="L254">            showError(&quot;رمز عبور باید حداقل 4 کاراکتر باشد&quot;);</span>
+<span class="nc" id="L255">            passwordField.requestFocus();</span>
+<span class="nc" id="L256">            return false;</span>
+        }
+        
+        // بررسی تطابق رمز عبور
+<span class="nc bnc" id="L260" title="All 2 branches missed.">        if (!password.equals(confirmPassword)) {</span>
+<span class="nc" id="L261">            showError(&quot;رمز عبور و تکرار آن یکسان نیستند&quot;);</span>
+<span class="nc" id="L262">            confirmPasswordField.requestFocus();</span>
+<span class="nc" id="L263">            return false;</span>
+        }
+        
+        // بررسی آدرس
+<span class="nc bnc" id="L267" title="All 4 branches missed.">        if (address == null || address.trim().isEmpty()) {</span>
+<span class="nc" id="L268">            showError(&quot;لطفاً آدرس را وارد کنید&quot;);</span>
+<span class="nc" id="L269">            addressField.requestFocus();</span>
+<span class="nc" id="L270">            return false;</span>
+        }
+        
+        // بررسی انتخاب نقش
+<span class="nc bnc" id="L274" title="All 4 branches missed.">        if (role == null || role.isEmpty()) {</span>
+<span class="nc" id="L275">            showError(&quot;لطفاً نقش را انتخاب کنید&quot;);</span>
+<span class="nc" id="L276">            roleComboBox.requestFocus();</span>
+<span class="nc" id="L277">            return false;</span>
+        }
+        
+<span class="nc" id="L280">        return true;</span>
+    }
+
+    /**
+     * پردازش پاسخ دریافت شده از API ثبت نام
+     * 
+     * در صورت موفقیت:
+     * - نمایش پیام موفقیت
+     * - انتقال به صفحه ورود بعد از 2 ثانیه
+     * 
+     * در صورت خطا:
+     * - نمایش پیام خطای دریافت شده از سرور
+     * 
+     * @param response پاسخ API
+     */
+    private void handleRegisterResponse(HttpClientUtil.ApiResponse response) {
+<span class="nc bnc" id="L296" title="All 2 branches missed.">        if (response.isSuccess()) {</span>
+            // نمایش پیام موفقیت
+<span class="nc" id="L298">            showSuccess(&quot;ثبت‌نام موفقیت‌آمیز بود! اکنون وارد شوید&quot;);</span>
+            
+            // انتقال به صفحه ورود بعد از تأخیر کوتاه
+<span class="nc" id="L301">            Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L302">                Task&lt;Void&gt; delayTask = new Task&lt;Void&gt;() {</span>
+                    @Override
+                    protected Void call() throws Exception {
+<span class="nc" id="L305">                        Thread.sleep(2000); // انتظار 2 ثانیه</span>
+<span class="nc" id="L306">                        return null;</span>
+                    }
+                };
+<span class="nc" id="L309">                delayTask.setOnSucceeded(event -&gt; {</span>
+<span class="nc" id="L310">                    navigationController.navigateTo(NavigationController.LOGIN_SCENE);</span>
+<span class="nc" id="L311">                });</span>
+<span class="nc" id="L312">                new Thread(delayTask).start();</span>
+<span class="nc" id="L313">            });</span>
+            
+<span class="nc" id="L315">        } else {</span>
+            // نمایش پیام خطا دریافت شده از سرور
+<span class="nc" id="L317">            String errorMessage = response.getMessage();</span>
+<span class="nc bnc" id="L318" title="All 4 branches missed.">            if (errorMessage == null || errorMessage.isEmpty()) {</span>
+<span class="nc" id="L319">                errorMessage = &quot;خطا در ثبت‌نام&quot;;</span>
+            }
+<span class="nc" id="L321">            showError(errorMessage);</span>
+        }
+<span class="nc" id="L323">    }</span>
+
+    /**
+     * پردازش خطاهای ارتباط با سرور
+     * 
+     * انواع خطاهای پردازش شده:
+     * - IOException: خطاهای شبکه و اتصال
+     * - سایر exception ها: خطاهای عمومی
+     * 
+     * @param exception خطای رخ داده
+     */
+    private void handleRegisterError(Throwable exception) {
+<span class="nc" id="L335">        String errorMessage = &quot;خطا در اتصال به سرور&quot;;</span>
+        
+<span class="nc bnc" id="L337" title="All 2 branches missed.">        if (exception instanceof IOException) {</span>
+<span class="nc" id="L338">            errorMessage = &quot;خطا در اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید&quot;;</span>
+<span class="nc bnc" id="L339" title="All 4 branches missed.">        } else if (exception != null &amp;&amp; exception.getMessage() != null) {</span>
+<span class="nc" id="L340">            errorMessage = exception.getMessage();</span>
+        }
+        
+<span class="nc" id="L343">        showError(errorMessage);</span>
+<span class="nc" id="L344">    }</span>
+
+    /**
+     * پردازش کلیک روی لینک ورود
+     * انتقال کاربر به صفحه ورود (برای کاربران موجود)
+     */
+    @FXML
+    public void handleLoginLink() {
+<span class="nc" id="L352">        navigationController.navigateTo(NavigationController.LOGIN_SCENE);</span>
+<span class="nc" id="L353">    }</span>
+
+    /**
+     * به‌روزرسانی وضعیت دکمه ثبت نام بر اساس پر بودن فیلدها
+     * 
+     * دکمه ثبت نام فقط زمانی فعال است که تمام فیلدهای الزامی پر باشند:
+     * - نام کامل
+     * - شماره تلفن  
+     * - رمز عبور
+     * - تأیید رمز عبور
+     * - آدرس
+     * - نقش کاربری
+     */
+    private void updateRegisterButtonState() {
+<span class="nc bnc" id="L367" title="All 2 branches missed.">        boolean hasInput = !fullNameField.getText().trim().isEmpty() &amp;&amp; </span>
+<span class="nc bnc" id="L368" title="All 2 branches missed.">                          !phoneField.getText().trim().isEmpty() &amp;&amp;</span>
+<span class="nc bnc" id="L369" title="All 2 branches missed.">                          !passwordField.getText().isEmpty() &amp;&amp;</span>
+<span class="nc bnc" id="L370" title="All 2 branches missed.">                          !confirmPasswordField.getText().isEmpty() &amp;&amp;</span>
+<span class="nc bnc" id="L371" title="All 2 branches missed.">                          !addressField.getText().trim().isEmpty() &amp;&amp;</span>
+<span class="nc bnc" id="L372" title="All 2 branches missed.">                          roleComboBox.getValue() != null;</span>
+<span class="nc bnc" id="L373" title="All 2 branches missed.">        registerButton.setDisable(!hasInput);</span>
+<span class="nc" id="L374">    }</span>
+
+    /**
+     * تنظیم حالت loading برای UI
+     * 
+     * در حالت loading:
+     * - نشانگر loading نمایش داده می‌شود
+     * - تمام کنترل‌ها غیرفعال می‌شوند
+     * - پیام &quot;در حال ثبت‌نام...&quot; نمایش داده می‌شود
+     * 
+     * @param loading true برای فعال کردن loading
+     */
+    public void setLoading(boolean loading) {
+<span class="nc" id="L387">        loadingIndicator.setVisible(loading);</span>
+<span class="nc" id="L388">        registerButton.setDisable(loading);</span>
+<span class="nc" id="L389">        fullNameField.setDisable(loading);</span>
+<span class="nc" id="L390">        phoneField.setDisable(loading);</span>
+<span class="nc" id="L391">        emailField.setDisable(loading);</span>
+<span class="nc" id="L392">        passwordField.setDisable(loading);</span>
+<span class="nc" id="L393">        confirmPasswordField.setDisable(loading);</span>
+<span class="nc" id="L394">        addressField.setDisable(loading);</span>
+<span class="nc" id="L395">        roleComboBox.setDisable(loading);</span>
+<span class="nc" id="L396">        loginLink.setDisable(loading);</span>
+        
+<span class="nc bnc" id="L398" title="All 2 branches missed.">        if (loading) {</span>
+<span class="nc" id="L399">            statusLabel.setText(&quot;در حال ثبت‌نام...&quot;);</span>
+        }
+<span class="nc" id="L401">    }</span>
+
+    /**
+     * نمایش پیام خطا با رنگ قرمز
+     * 
+     * @param message متن پیام خطا
+     */
+    public void showError(String message) {
+<span class="nc" id="L409">        statusLabel.setText(message);</span>
+<span class="nc" id="L410">        statusLabel.setStyle(&quot;-fx-text-fill: red;&quot;);</span>
+<span class="nc" id="L411">    }</span>
+
+    /**
+     * نمایش پیام موفقیت با رنگ سبز
+     * 
+     * @param message متن پیام موفقیت
+     */
+    public void showSuccess(String message) {
+<span class="nc" id="L419">        statusLabel.setText(message);</span>
+<span class="nc" id="L420">        statusLabel.setStyle(&quot;-fx-text-fill: green;&quot;);</span>
+<span class="nc" id="L421">    }</span>
+
+    /**
+     * پاک کردن پیام وضعیت
+     */
+    public void clearStatus() {
+<span class="nc" id="L427">        statusLabel.setText(&quot;&quot;);</span>
+<span class="nc" id="L428">        statusLabel.setStyle(&quot;&quot;);</span>
+<span class="nc" id="L429">    }</span>
+
+    // ==================== PUBLIC METHODS FOR TESTING ====================
+
+    /**
+     * دریافت متن برچسب وضعیت (برای تست)
+     * @return متن وضعیت
+     */
+    public String getStatusText() {
+<span class="nc" id="L438">        return statusLabel.getText();</span>
+    }
+    
+    /**
+     * بررسی نمایش نشانگر loading (برای تست)
+     * @return true اگر loading نمایش داده شود
+     */
+    public boolean isLoadingVisible() {
+<span class="nc" id="L446">        return loadingIndicator.isVisible();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

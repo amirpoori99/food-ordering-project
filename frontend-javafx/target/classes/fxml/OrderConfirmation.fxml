@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.ui.order.OrderConfirmationController">
+   <children>
+      <!-- Header Section -->
+      <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="header-section">
+         <children>
+            <Button fx:id="backToMenuButton" onAction="#handleBackToMenu" styleClass="back-button" text="← بازگشت" />
+            <Label styleClass="page-title" text="تأیید سفارش" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="refreshMenuItem" onAction="#handleRefresh" styleClass="refresh-button" text="🔄 بروزرسانی" />
+         </children>
+         <padding>
+            <Insets left="20.0" right="20.0" top="15.0" bottom="15.0" />
+         </padding>
+      </HBox>
+
+      <!-- Main Content ScrollPane -->
+      <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+         <content>
+            <VBox spacing="20.0">
+               <children>
+                  <!-- Order Information Card -->
+                  <VBox spacing="15.0" styleClass="card">
+                     <children>
+                        <Label styleClass="section-title" text="📋 اطلاعات سفارش" />
+                        
+                        <!-- Order Details Grid -->
+                        <GridPane hgap="20.0" vgap="10.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <Label text="شماره سفارش:" styleClass="label-key" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                              <Label fx:id="orderNumberLabel" text="ORD-123456789" styleClass="label-value" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                              
+                              <Label text="تاریخ و زمان:" styleClass="label-key" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                              <Label fx:id="orderDateTimeLabel" text="1403/04/09 14:30" styleClass="label-value" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              
+                              <Label text="زمان تحویل:" styleClass="label-key" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                              <Label fx:id="estimatedDeliveryLabel" text="1403/04/09 15:15" styleClass="label-value-highlight" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                           </children>
+                        </GridPane>
+                     </children>
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                  </VBox>
+
+                  <!-- Order Status & Progress -->
+                  <VBox spacing="15.0" styleClass="card">
+                     <children>
+                        <Label styleClass="section-title" text="📊 وضعیت سفارش" />
+                        
+                        <VBox spacing="10.0">
+                           <children>
+                              <Label fx:id="currentStatusLabel" text="وضعیت فعلی: تأیید سفارش" styleClass="current-status" />
+                              <ProgressBar fx:id="orderProgressBar" maxWidth="1.7976931348623157E308" progress="0.2" styleClass="order-progress" />
+                              <ProgressIndicator fx:id="loadingIndicator" visible="false" />
+                           </children>
+                        </VBox>
+                        
+                        <!-- Tracking Steps -->
+                        <VBox fx:id="trackingStepsContainer" spacing="8.0" />
+                     </children>
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                  </VBox>
+
+                  <!-- Order Items -->
+                  <VBox spacing="15.0" styleClass="card">
+                     <children>
+                        <Label styleClass="section-title" text="🍽️ آیتم‌های سفارش" />
+                        <VBox fx:id="orderItemsContainer" spacing="10.0" />
+                     </children>
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                  </VBox>
+
+                  <!-- Order Summary -->
+                  <VBox spacing="15.0" styleClass="card">
+                     <children>
+                        <Label styleClass="section-title" text="💰 خلاصه مالی" />
+                        
+                        <GridPane hgap="20.0" vgap="8.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <Label text="جمع کل:" styleClass="label-key" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                              <Label fx:id="subtotalLabel" text="85,000 تومان" styleClass="label-value" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                              
+                              <Label text="مالیات:" styleClass="label-key" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                              <Label fx:id="taxLabel" text="7,650 تومان" styleClass="label-value" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              
+                              <Label text="هزینه ارسال:" styleClass="label-key" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                              <Label fx:id="deliveryFeeLabel" text="رایگان" styleClass="label-value-success" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              
+                              <Label text="تخفیف:" styleClass="label-key" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                              <Label fx:id="discountLabel" text="- 5,000 تومان" styleClass="label-value-success" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              
+                              <Separator GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                              
+                              <Label text="مبلغ نهایی:" styleClass="label-key-total" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                              <Label fx:id="totalAmountLabel" text="87,650 تومان" styleClass="label-value-total" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                           </children>
+                        </GridPane>
+                     </children>
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                  </VBox>
+
+                  <!-- Payment Information -->
+                  <VBox spacing="15.0" styleClass="card">
+                     <children>
+                        <Label styleClass="section-title" text="💳 اطلاعات پرداخت" />
+                        
+                        <GridPane hgap="20.0" vgap="10.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <Label text="روش پرداخت:" styleClass="label-key" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                              <Label fx:id="paymentMethodLabel" text="کارت اعتباری" styleClass="label-value" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                              
+                              <Label text="وضعیت پرداخت:" styleClass="label-key" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                              <Label fx:id="paymentStatusLabel" text="✅ تأیید شده" styleClass="label-value-success" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                           </children>
+                        </GridPane>
+                     </children>
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                  </VBox>
+
+                  <!-- Delivery Information -->
+                  <VBox spacing="15.0" styleClass="card">
+                     <children>
+                        <Label styleClass="section-title" text="🚚 اطلاعات تحویل" />
+                        
+                        <VBox spacing="10.0">
+                           <children>
+                              <Label text="آدرس تحویل:" styleClass="label-key" />
+                              <TextArea fx:id="deliveryAddressDisplay" editable="false" prefRowCount="2" 
+                                       text="تهران، خیابان ولیعصر، پلاک 123" wrapText="true" />
+                              
+                              <Label text="شماره تماس:" styleClass="label-key" />
+                              <TextField fx:id="customerPhoneDisplay" editable="false" text="09123456789" />
+                              
+                              <Label text="یادداشت سفارش:" styleClass="label-key" />
+                              <TextArea fx:id="orderNotesDisplay" editable="false" prefRowCount="2" 
+                                       text="بدون پیاز، اضافه سس" wrapText="true" />
+                           </children>
+                        </VBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                  </VBox>
+
+                  <!-- Restaurant Information -->
+                  <VBox spacing="15.0" styleClass="card">
+                     <children>
+                        <Label styleClass="section-title" text="🏪 اطلاعات رستوران" />
+                        
+                        <GridPane hgap="20.0" vgap="10.0">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <Label text="نام رستوران:" styleClass="label-key" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                              <Label fx:id="restaurantNameLabel" text="رستوران کباب ایرانی" styleClass="label-value" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                              
+                              <Label text="تلفن رستوران:" styleClass="label-key" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                              <Label fx:id="restaurantPhoneLabel" text="021-12345678" styleClass="label-value" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              
+                              <Label text="نام پیک:" styleClass="label-key" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                              <Label fx:id="courierNameLabel" text="احمد رضایی" styleClass="label-value" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              
+                              <Label text="تلفن پیک:" styleClass="label-key" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                              <Label fx:id="courierPhoneLabel" text="09987654321" styleClass="label-value" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                           </children>
+                        </GridPane>
+                     </children>
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                  </VBox>
+
+                  <!-- Notification Settings -->
+                  <VBox spacing="15.0" styleClass="card">
+                     <children>
+                        <Label styleClass="section-title" text="🔔 تنظیمات اطلاع‌رسانی" />
+                        
+                        <VBox spacing="8.0">
+                           <children>
+                              <CheckBox fx:id="emailNotificationCheckBox" selected="true" text="ارسال اطلاع‌رسانی به ایمیل" />
+                              <CheckBox fx:id="smsNotificationCheckBox" selected="true" text="ارسال اطلاع‌رسانی پیامکی" />
+                           </children>
+                        </VBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                  </VBox>
+
+                  <!-- Action Buttons -->
+                  <HBox spacing="15.0" alignment="CENTER">
+                     <children>
+                        <Button fx:id="cancelOrderButton" onAction="#handleCancelOrder" 
+                                styleClass="cancel-button" text="❌ لغو سفارش" />
+                        <Button fx:id="downloadReceiptButton" onAction="#handleDownloadReceipt" 
+                                styleClass="download-button" text="📄 دانلود رسید" />
+                        <Button fx:id="contactSupportButton" onAction="#handleContactSupport" 
+                                styleClass="support-button" text="📞 پشتیبانی" />
+                        <Button fx:id="trackOrderButton" onAction="#handleTrackOrder" 
+                                styleClass="track-button" text="🔍 پیگیری تفصیلی" />
+                        <Button fx:id="reorderButton" onAction="#handleReorder" 
+                                styleClass="reorder-button" text="🔄 سفارش مجدد" />
+                     </children>
+                     <padding>
+                        <Insets bottom="20.0" top="10.0" />
+                     </padding>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets left="20.0" right="20.0" top="10.0" bottom="20.0" />
+               </padding>
+            </VBox>
+         </content>
+      </ScrollPane>
+
+      <!-- Footer Status Bar -->
+      <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="status-bar">
+         <children>
+            <Label fx:id="statusMessageLabel" text="سفارش شما با موفقیت ثبت شد" styleClass="status-message" />
+            <Region HBox.hgrow="ALWAYS" />
+            <MenuButton styleClass="menu-button" text="منو">
+               <items>
+                  <MenuItem fx:id="printReceiptMenuItem" onAction="#handlePrintReceipt" text="چاپ رسید" />
+                  <MenuItem fx:id="orderHistoryMenuItem" onAction="#handleOrderHistory" text="تاریخچه سفارشات" />
+                  <SeparatorMenuItem />
+                  <MenuItem fx:id="homeMenuItem" onAction="#handleHome" text="صفحه اصلی" />
+               </items>
+            </MenuButton>
+         </children>
+         <padding>
+            <Insets left="20.0" right="20.0" top="10.0" bottom="10.0" />
+         </padding>
+      </HBox>
+   </children>
+</VBox>

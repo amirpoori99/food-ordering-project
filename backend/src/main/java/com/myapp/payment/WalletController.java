@@ -107,7 +107,12 @@ public class WalletController implements HttpHandler {
     }
     
     /**
-     * GET /api/wallet/{userId}/transactions - Get wallet transaction history
+     * GET /api/wallet/{userId}/transactions - دریافت تاریخچه تراکنش‌های کیف پول
+     * 
+     * این endpoint تاریخچه کامل یا در بازه زمانی مشخص تراکنش‌های کیف پول را برمی‌گرداند
+     * پشتیبانی از query parameters برای فیلتر زمانی:
+     * - startDate: تاریخ شروع (ISO format)
+     * - endDate: تاریخ پایان (ISO format)
      */
     private void getWalletTransactionHistory(HttpExchange exchange, String path) throws IOException {
         try {
@@ -115,7 +120,7 @@ public class WalletController implements HttpHandler {
             
             String query = exchange.getRequestURI().getQuery();
             if (query != null && query.contains("startDate") && query.contains("endDate")) {
-                // Handle date range query
+                // پردازش جستجو در بازه زمانی
                 Map<String, String> params = parseQueryParams(query);
                 String startDateStr = params.get("startDate");
                 String endDateStr = params.get("endDate");
@@ -127,7 +132,7 @@ public class WalletController implements HttpHandler {
                 String response = serializeTransactionList(transactions);
                 sendResponse(exchange, 200, response);
             } else {
-                // Get all wallet transactions
+                // دریافت تمام تراکنش‌های کیف پول
                 List<Transaction> transactions = walletService.getWalletTransactionHistory(userId);
                 String response = serializeTransactionList(transactions);
                 sendResponse(exchange, 200, response);
@@ -143,7 +148,9 @@ public class WalletController implements HttpHandler {
     }
     
     /**
-     * GET /api/wallet/{userId}/charges - Get wallet charge history
+     * GET /api/wallet/{userId}/charges - دریافت تاریخچه شارژ کیف پول
+     * 
+     * فقط تراکنش‌های شارژ کیف پول را برمی‌گرداند
      */
     private void getWalletChargeHistory(HttpExchange exchange, String path) throws IOException {
         try {
@@ -162,7 +169,9 @@ public class WalletController implements HttpHandler {
     }
     
     /**
-     * GET /api/wallet/{userId}/withdrawals - Get wallet withdrawal history
+     * GET /api/wallet/{userId}/withdrawals - دریافت تاریخچه برداشت از کیف پول
+     * 
+     * فقط تراکنش‌های برداشت از کیف پول را برمی‌گرداند
      */
     private void getWalletWithdrawalHistory(HttpExchange exchange, String path) throws IOException {
         try {
@@ -181,7 +190,9 @@ public class WalletController implements HttpHandler {
     }
     
     /**
-     * GET /api/wallet/{userId}/statistics - Get wallet statistics
+     * GET /api/wallet/{userId}/statistics - دریافت آمار کیف پول
+     * 
+     * آمار کاملی از فعالیت‌های کیف پول شامل موجودی، مجموع شارژ، برداشت و تعداد تراکنش‌ها
      */
     private void getWalletStatistics(HttpExchange exchange, String path) throws IOException {
         try {
@@ -200,11 +211,14 @@ public class WalletController implements HttpHandler {
     }
     
     /**
-     * GET /api/wallet/{userId}/sufficient-balance/{amount} - Check if user has sufficient balance
+     * GET /api/wallet/{userId}/sufficient-balance/{amount} - بررسی کفایت موجودی کیف پول
+     * 
+     * بررسی می‌کند که آیا کاربر موجودی کافی برای مبلغ مورد نظر دارد یا خیر
+     * مسیر: /api/wallet/123/sufficient-balance/100.50
      */
     private void checkSufficientBalance(HttpExchange exchange, String path) throws IOException {
         try {
-            // Extract userId and amount from path like /api/wallet/123/sufficient-balance/100.50
+            // استخراج userId و amount از مسیر مانند /api/wallet/123/sufficient-balance/100.50
             String[] parts = path.split("/");
             if (parts.length < 6) {
                 sendResponse(exchange, 400, "{\"error\":\"Invalid path format\"}");
@@ -254,7 +268,11 @@ public class WalletController implements HttpHandler {
     }
     
     /**
-     * POST /api/wallet/charge - Generic wallet charge
+     * POST /api/wallet/charge - شارژ عمومی کیف پول
+     * 
+     * شارژ کیف پول با روش پرداخت مشخص شده در درخواست
+     * پارامترهای ضروری: userId, amount, paymentMethod
+     * پارامتر اختیاری: description
      */
     private void chargeWallet(HttpExchange exchange) throws IOException {
         try {
@@ -279,7 +297,10 @@ public class WalletController implements HttpHandler {
     }
     
     /**
-     * POST /api/wallet/charge/card - Charge wallet with card
+     * POST /api/wallet/charge/card - شارژ کیف پول با کارت
+     * 
+     * شارژ کیف پول از طریق کارت بانکی
+     * پارامترهای ضروری: userId, amount
      */
     private void chargeWalletWithCard(HttpExchange exchange) throws IOException {
         try {
@@ -302,7 +323,10 @@ public class WalletController implements HttpHandler {
     }
     
     /**
-     * POST /api/wallet/charge/bank-transfer - Charge wallet with bank transfer
+     * POST /api/wallet/charge/bank-transfer - شارژ کیف پول با انتقال بانکی
+     * 
+     * شارژ کیف پول از طریق انتقال وجه بانکی
+     * پارامترهای ضروری: userId, amount, transferReference
      */
     private void chargeWalletWithBankTransfer(HttpExchange exchange) throws IOException {
         try {
@@ -326,7 +350,11 @@ public class WalletController implements HttpHandler {
     }
     
     /**
-     * POST /api/wallet/withdraw - Withdraw from wallet
+     * POST /api/wallet/withdraw - برداشت از کیف پول
+     * 
+     * برداشت وجه از کیف پول به حساب بانکی
+     * پارامترهای ضروری: userId, amount, bankAccount
+     * پارامتر اختیاری: reason
      */
     private void withdrawFromWallet(HttpExchange exchange) throws IOException {
         try {
@@ -351,7 +379,11 @@ public class WalletController implements HttpHandler {
     }
     
     /**
-     * POST /api/wallet/admin/credit - Admin credit to user wallet
+     * POST /api/wallet/admin/credit - شارژ کیف پول توسط ادمین
+     * 
+     * شارژ کیف پول کاربر توسط ادمین (عملیات مدیریتی)
+     * پارامترهای ضروری: userId, amount, adminId
+     * پارامتر اختیاری: reason
      */
     private void adminCreditWallet(HttpExchange exchange) throws IOException {
         try {
@@ -376,7 +408,11 @@ public class WalletController implements HttpHandler {
     }
     
     /**
-     * POST /api/wallet/admin/debit - Admin debit from user wallet
+     * POST /api/wallet/admin/debit - برداشت از کیف پول توسط ادمین
+     * 
+     * برداشت از کیف پول کاربر توسط ادمین (عملیات مدیریتی)
+     * پارامترهای ضروری: userId, amount, adminId
+     * پارامتر اختیاری: reason
      */
     private void adminDebitWallet(HttpExchange exchange) throws IOException {
         try {
@@ -420,7 +456,7 @@ public class WalletController implements HttpHandler {
     }
     
     private Map<String, Object> parseJsonRequest(String json) {
-        // Simple JSON parsing for basic requests
+        // پارس ساده JSON برای درخواست‌های پایه
         Map<String, Object> result = new java.util.HashMap<>();
         
         json = json.trim();
@@ -434,7 +470,7 @@ public class WalletController implements HttpHandler {
                     String key = keyValue[0].trim().replaceAll("\"", "");
                     String value = keyValue[1].trim().replaceAll("\"", "");
                     
-                    // Try to parse as number
+                    // تلاش برای پارس به عنوان عدد
                     try {
                         if (value.contains(".")) {
                             result.put(key, Double.parseDouble(value));

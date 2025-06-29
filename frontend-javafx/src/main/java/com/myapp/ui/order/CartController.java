@@ -11,6 +11,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.net.URL;
 import java.text.NumberFormat;
@@ -65,12 +67,13 @@ public class CartController implements Initializable {
     @FXML private MenuItem refreshMenuItem;
     @FXML private Label statusLabel;
     @FXML private ProgressIndicator loadingIndicator;
+    @FXML private TableView<CartItem> cartTableView;
 
     /** کنترلر navigation برای تغییر صفحات */
     private NavigationController navigationController;
     
     /** لیست آیتم‌های موجود در سبد خرید */
-    private List<CartItem> cartItems = new ArrayList<>();
+    private ObservableList<CartItem> cartItems;
     
     /** فرمت کردن ارز به فارسی */
     private final NumberFormat currencyFormat = NumberFormat.getInstance(new Locale("fa", "IR"));
@@ -86,6 +89,10 @@ public class CartController implements Initializable {
         this.navigationController = NavigationController.getInstance();
         setupUI();
         loadCart();
+        cartItems = FXCollections.observableArrayList();
+        if (cartTableView != null) {
+            cartTableView.setItems(cartItems);
+        }
     }
 
     /**
@@ -132,7 +139,8 @@ public class CartController implements Initializable {
         // پردازش نتیجه موفق
         loadTask.setOnSucceeded(e -> Platform.runLater(() -> {
             setLoading(false);
-            cartItems = loadTask.getValue();
+            cartItems.clear();
+            cartItems.addAll(loadTask.getValue());
             displayCartItems();
             updateCartSummary();
             setStatus("سبد خرید بارگذاری شد");
@@ -237,7 +245,7 @@ public class CartController implements Initializable {
     }
 
     private void validateCheckoutButton() {
-        boolean hasSelectedItems = cartItems.stream().anyMatch(CartItem::isSelected);
+        boolean hasSelectedItems = !cartItems.isEmpty() && cartItems.stream().anyMatch(CartItem::isSelected);
         boolean hasDeliveryAddress = !deliveryAddressField.getText().trim().isEmpty();
         boolean hasDeliveryPhone = !deliveryPhoneField.getText().trim().isEmpty();
         
@@ -250,7 +258,7 @@ public class CartController implements Initializable {
 
     @FXML
     private void handleSelectAll() {
-        boolean allSelected = cartItems.stream().allMatch(CartItem::isSelected);
+        boolean allSelected = !cartItems.isEmpty() && cartItems.stream().allMatch(CartItem::isSelected);
         cartItems.forEach(item -> item.setSelected(!allSelected));
         displayCartItems();
         updateCartSummary();
@@ -329,30 +337,126 @@ public class CartController implements Initializable {
         alert.showAndWait();
     }
 
+    public void addItemToCart(Long itemId, String itemName, Double price, Integer quantity) {
+        CartItem item = new CartItem();
+        item.setItemId(itemId);
+        item.setItemName(itemName);
+        item.setPrice(price);
+        item.setQuantity(quantity);
+        
+        cartItems.add(item);
+        updateTotal();
+    }
+    
+    private void updateTotal() {
+        double total = cartItems.stream()
+            .mapToDouble(item -> item.getPrice() * item.getQuantity())
+            .sum();
+        
+        if (totalAmountLabel != null) {
+            totalAmountLabel.setText(String.format("%,.0f تومان", total));
+        }
+    }
+
+    /**
+     * کلاس خلاصه سبد خرید
+     * شامل جمع کل، مالیات، هزینه ارسال و مبلغ نهایی
+     */
+    public static class CartSummary {
+        private double subtotal;
+        private double tax;
+        private double deliveryFee;
+        private double discount;
+        private double finalAmount;
+        private double totalAmount;
+        private int itemCount;
+        
+        public CartSummary() {
+            this.subtotal = 0.0;
+            this.tax = 0.0;
+            this.deliveryFee = 0.0;
+            this.discount = 0.0;
+            this.finalAmount = 0.0;
+            this.totalAmount = 0.0;
+            this.itemCount = 0;
+        }
+        
+        public double getSubtotal() { return subtotal; }
+        public void setSubtotal(double subtotal) { this.subtotal = subtotal; }
+        
+        public double getTax() { return tax; }
+        public void setTax(double tax) { this.tax = tax; }
+        
+        public double getDeliveryFee() { return deliveryFee; }
+        public void setDeliveryFee(double deliveryFee) { this.deliveryFee = deliveryFee; }
+        
+        public double getDiscount() { return discount; }
+        public void setDiscount(double discount) { this.discount = discount; }
+        
+        public double getFinalAmount() { return finalAmount; }
+        public void setFinalAmount(double finalAmount) { this.finalAmount = finalAmount; }
+        
+        public double getTotalAmount() { return totalAmount; }
+        public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }
+        
+        public int getItemCount() { return itemCount; }
+        public void setItemCount(int itemCount) { this.itemCount = itemCount; }
+    }
+
     public static class CartItem {
-        private Long id;
-        private String name;
-        private double price;
-        private int quantity;
+        private Long itemId;
+        private String itemName;
+        private Double price;
+        private Integer quantity;
         private String restaurantName;
         private boolean selected = true;
 
-        public CartItem(Long id, String name, double price, int quantity, String restaurantName) {
-            this.id = id;
-            this.name = name;
+        // Constructor پیش‌فرض
+        public CartItem() {
+            this.selected = true;
+        }
+
+        // Constructor کامل
+        public CartItem(Long itemId, String itemName, Double price, Integer quantity, String restaurantName) {
+            this.itemId = itemId;
+            this.itemName = itemName;
             this.price = price;
             this.quantity = quantity;
             this.restaurantName = restaurantName;
+            this.selected = true;
         }
 
         // Getters and setters
-        public Long getId() { return id; }
-        public String getName() { return name; }
-        public double getPrice() { return price; }
-        public int getQuantity() { return quantity; }
-        public void setQuantity(int quantity) { this.quantity = quantity; }
+        public Long getItemId() { return itemId; }
+        public void setItemId(Long itemId) { this.itemId = itemId; }
+        
+        public String getItemName() { return itemName; }
+        public void setItemName(String itemName) { this.itemName = itemName; }
+        
+        // Alias for getName()
+        public String getName() { return itemName; }
+        public Long getId() { return itemId; }
+        
+        public Double getPrice() { return price; }
+        public void setPrice(Double price) { this.price = price; }
+        
+        public Integer getQuantity() { return quantity; }
+        public void setQuantity(Integer quantity) { this.quantity = quantity; }
+        
         public String getRestaurantName() { return restaurantName; }
+        public void setRestaurantName(String restaurantName) { this.restaurantName = restaurantName; }
+        
         public boolean isSelected() { return selected; }
         public void setSelected(boolean selected) { this.selected = selected; }
+        
+        /**
+         * محاسبه قیمت کل آیتم (قیمت × تعداد)
+         */
+        public Double getTotalPrice() {
+            if (price == null || quantity == null) {
+                return 0.0;
+            }
+            return price * quantity;
+        }
     }
 } 

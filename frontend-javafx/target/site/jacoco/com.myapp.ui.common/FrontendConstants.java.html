@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FrontendConstants.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">food-ordering-frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.common</a> &gt; <span class="el_source">FrontendConstants.java</span></div><h1>FrontendConstants.java</h1><pre class="source lang-java linenums">package com.myapp.ui.common;
+
+/**
+ * کلاس ثابت‌های اختصاصی فرانت‌اند برای برنامه JavaFX
+ * 
+ * این کلاس شامل تمام ثابت‌ها، پیکربندی‌ها و تنظیمات مورد نیاز
+ * لایه رابط کاربری است:
+ * 
+ * - تنظیمات API و HTTP
+ * - ثابت‌های رابط کاربری (UI)
+ * - پیام‌های فارسی سیستم
+ * - قوانین اعتبارسنجی
+ * - تنظیمات فایل‌ها و فولدرها
+ * - فرمت‌های نمایش و واحدها
+ * - پیکربندی تست و عملکرد
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ * 
+ * Design Patterns Used:
+ * - Utility Class Pattern: کلاس utility با متدهای static
+ * - Nested Classes Pattern: گروه‌بندی منطقی ثابت‌ها
+ * - Constants Pattern: تمرکز تمام ثابت‌ها در یک مکان
+ * 
+ * Best Practices:
+ * - تمام nested class ها final و private constructor دارند
+ * - نام‌گذاری معنادار و واضح
+ * - گروه‌بندی منطقی ثابت‌ها
+ * - استفاده از فارسی برای متن‌های کاربرپسند
+ */
+public final class FrontendConstants {
+    
+    /**
+     * سازنده private برای جلوگیری از ایجاد instance
+     * این کلاس فقط برای نگهداری ثابت‌های static طراحی شده است
+     */
+<span class="nc" id="L38">    private FrontendConstants() {</span>
+<span class="nc" id="L39">        throw new UnsupportedOperationException(&quot;This is a utility class and cannot be instantiated&quot;);</span>
+    }
+    
+    // ==================== API Configuration ====================
+    
+    /**
+     * کلاس ثابت‌های پیکربندی API
+     * شامل URL ها و endpoint های مختلف بک‌اند
+     */
+    public static final class API {
+        /** URL پایه سرور بک‌اند */
+        public static final String BASE_URL = &quot;http://localhost:8081/api&quot;;
+        
+        /** endpoint ورود کاربر */
+        public static final String AUTH_LOGIN = &quot;/auth/login&quot;;
+        
+        /** endpoint ثبت نام کاربر */
+        public static final String AUTH_REGISTER = &quot;/auth/register&quot;;
+        
+        /** endpoint خروج کاربر */
+        public static final String AUTH_LOGOUT = &quot;/auth/logout&quot;;
+        
+        /** endpoint نوسازی token */
+        public static final String AUTH_REFRESH = &quot;/auth/refresh&quot;;
+        
+        /** endpoint مدیریت رستوران‌ها */
+        public static final String RESTAURANTS = &quot;/restaurants&quot;;
+        
+        /** endpoint مدیریت سفارشات */
+        public static final String ORDERS = &quot;/orders&quot;;
+        
+        /** endpoint مدیریت آیتم‌های غذایی */
+        public static final String ITEMS = &quot;/items&quot;;
+        
+        /** endpoint مدیریت پرداخت‌ها */
+        public static final String PAYMENTS = &quot;/payments&quot;;
+        
+        /** endpoint پروفایل کاربر */
+        public static final String PROFILE = &quot;/auth/profile&quot;;
+        
+        /**
+         * سازنده private برای جلوگیری از instantiation
+         */
+        private API() {}
+    }
+    
+    // ==================== HTTP Configuration ====================
+    
+    /**
+     * کلاس ثابت‌های پیکربندی HTTP
+     * شامل timeout ها، header ها و تنظیمات درخواست
+     */
+    public static final class HTTP {
+        /** زمان انتظار برای برقراری اتصال (ثانیه) */
+        public static final int CONNECT_TIMEOUT_SECONDS = 30;
+        
+        /** زمان انتظار برای خواندن داده (ثانیه) */
+        public static final int READ_TIMEOUT_SECONDS = 60;
+        
+        /** زمان انتظار برای نوشتن داده (ثانیه) */
+        public static final int WRITE_TIMEOUT_SECONDS = 60;
+        
+        /** نوع محتوای JSON با charset UTF-8 */
+        public static final String CONTENT_TYPE_JSON = &quot;application/json; charset=utf-8&quot;;
+        
+        /** نام header احراز هویت */
+        public static final String AUTHORIZATION_HEADER = &quot;Authorization&quot;;
+        
+        /** پیشوند Bearer برای JWT token */
+        public static final String BEARER_PREFIX = &quot;Bearer &quot;;
+        
+        /**
+         * سازنده private برای جلوگیری از instantiation
+         */
+        private HTTP() {}
+    }
+    
+    // ==================== UI Constants ====================
+    
+    /**
+     * کلاس ثابت‌های رابط کاربری
+     * شامل ابعاد پنجره، رنگ‌ها، استایل‌ها و انیمیشن‌ها
+     */
+    public static final class UI {
+        // ==================== ابعاد پنجره ====================
+        
+        /** عرض پیش‌فرض پنجره (پیکسل) */
+        public static final double DEFAULT_WINDOW_WIDTH = 1200;
+        
+        /** ارتفاع پیش‌فرض پنجره (پیکسل) */
+        public static final double DEFAULT_WINDOW_HEIGHT = 800;
+        
+        /** حداقل عرض پنجره (پیکسل) */
+        public static final double MIN_WINDOW_WIDTH = 800;
+        
+        /** حداقل ارتفاع پنجره (پیکسل) */
+        public static final double MIN_WINDOW_HEIGHT = 600;
+        
+        // ==================== پالت رنگ‌ها ====================
+        
+        /** رنگ اصلی (آبی) */
+        public static final String PRIMARY_COLOR = &quot;#007bff&quot;;
+        
+        /** رنگ موفقیت (سبز) */
+        public static final String SUCCESS_COLOR = &quot;#28a745&quot;;
+        
+        /** رنگ هشدار (زرد) */
+        public static final String WARNING_COLOR = &quot;#ffc107&quot;;
+        
+        /** رنگ خطر (قرمز) */
+        public static final String DANGER_COLOR = &quot;#dc3545&quot;;
+        
+        /** رنگ اطلاعات (آبی فیروزه‌ای) */
+        public static final String INFO_COLOR = &quot;#17a2b8&quot;;
+        
+        /** رنگ ثانویه (خاکستری) */
+        public static final String SECONDARY_COLOR = &quot;#6c757d&quot;;
+        
+        // ==================== استایل‌های CSS ====================
+        
+        /** استایل CSS برای پیام‌های موفقیت */
+        public static final String SUCCESS_STYLE = &quot;-fx-background-color: #d4edda; -fx-text-fill: #155724;&quot;;
+        
+        /** استایل CSS برای پیام‌های خطا */
+        public static final String ERROR_STYLE = &quot;-fx-background-color: #f8d7da; -fx-text-fill: #721c24;&quot;;
+        
+        /** استایل CSS برای پیام‌های هشدار */
+        public static final String WARNING_STYLE = &quot;-fx-background-color: #fff3cd; -fx-text-fill: #856404;&quot;;
+        
+        /** استایل CSS برای پیام‌های اطلاعاتی */
+        public static final String INFO_STYLE = &quot;-fx-background-color: #d1ecf1; -fx-text-fill: #0c5460;&quot;;
+        
+        // ==================== مدت زمان انیمیشن‌ها (میلی‌ثانیه) ====================
+        
+        /** مدت زمان انیمیشن fade (محو/ظهور) */
+        public static final int FADE_DURATION = 300;
+        
+        /** مدت زمان انیمیشن slide (کشیدن) */
+        public static final int SLIDE_DURATION = 500;
+        
+        /** مدت زمان انیمیشن loading (بارگذاری) */
+        public static final int LOADING_ANIMATION_DURATION = 1000;
+        
+        /**
+         * سازنده private برای جلوگیری از instantiation
+         */
+        private UI() {}
+    }
+    
+    // ==================== Messages ====================
+    
+    /**
+     * کلاس پیام‌های فارسی سیستم
+     * شامل تمام متن‌های قابل نمایش به کاربر
+     */
+    public static final class MESSAGES {
+        // ==================== پیام‌های موفقیت ====================
+        
+        /** پیام ورود موفقیت‌آمیز */
+        public static final String LOGIN_SUCCESS = &quot;ورود موفقیت‌آمیز بود&quot;;
+        
+        /** پیام خطا در ورود */
+        public static final String LOGIN_FAILED = &quot;خطا در ورود&quot;;
+        
+        /** پیام ثبت‌نام موفقیت‌آمیز */
+        public static final String REGISTER_SUCCESS = &quot;ثبت‌نام موفقیت‌آمیز بود&quot;;
+        
+        /** پیام خطا در ثبت‌نام */
+        public static final String REGISTER_FAILED = &quot;خطا در ثبت‌نام&quot;;
+        
+        /** پیام خروج موفقیت‌آمیز */
+        public static final String LOGOUT_SUCCESS = &quot;خروج موفقیت‌آمیز بود&quot;;
+        
+        /** پیام بروزرسانی پروفایل */
+        public static final String PROFILE_UPDATED = &quot;پروفایل بروزرسانی شد&quot;;
+        
+        /** پیام ثبت سفارش */
+        public static final String ORDER_PLACED = &quot;سفارش ثبت شد&quot;;
+        
+        /** پیام پرداخت موفقیت‌آمیز */
+        public static final String PAYMENT_SUCCESS = &quot;پرداخت موفقیت‌آمیز بود&quot;;
+        
+        /** پیام خطا در پرداخت */
+        public static final String PAYMENT_FAILED = &quot;خطا در پرداخت&quot;;
+        
+        // ==================== پیام‌های خطا ====================
+        
+        /** پیام خطای شبکه */
+        public static final String NETWORK_ERROR = &quot;خطا در ارتباط با سرور&quot;;
+        
+        /** پیام اطلاعات ورود نامعتبر */
+        public static final String INVALID_CREDENTIALS = &quot;شماره تلفن یا رمز عبور اشتباه است&quot;;
+        
+        /** پیام فیلد الزامی */
+        public static final String REQUIRED_FIELD = &quot;این فیلد الزامی است&quot;;
+        
+        /** پیام فرمت ایمیل نامعتبر */
+        public static final String INVALID_EMAIL = &quot;فرمت ایمیل صحیح نیست&quot;;
+        
+        /** پیام فرمت شماره تلفن نامعتبر */
+        public static final String INVALID_PHONE = &quot;فرمت شماره تلفن صحیح نیست&quot;;
+        
+        /** پیام رمز عبور ضعیف */
+        public static final String WEAK_PASSWORD = &quot;رمز عبور باید حداقل ۸ کاراکتر باشد&quot;;
+        
+        /** پیام عدم تطابق رمز عبور */
+        public static final String PASSWORD_MISMATCH = &quot;رمز عبور و تکرار آن یکسان نیستند&quot;;
+        
+        // ==================== پیام‌های بارگذاری ====================
+        
+        /** پیام بارگذاری عمومی */
+        public static final String LOADING = &quot;در حال بارگذاری...&quot;;
+        
+        /** پیام پردازش */
+        public static final String PROCESSING = &quot;در حال پردازش...&quot;;
+        
+        /** پیام اتصال */
+        public static final String CONNECTING = &quot;در حال اتصال...&quot;;
+        
+        /** پیام ذخیره */
+        public static final String SAVING = &quot;در حال ذخیره...&quot;;
+        
+        /**
+         * سازنده private برای جلوگیری از instantiation
+         */
+        private MESSAGES() {}
+    }
+    
+    // ==================== Validation ====================
+    
+    /**
+     * کلاس ثابت‌های اعتبارسنجی
+     * شامل قوانین و الگوهای مورد نیاز برای validation
+     */
+    public static final class VALIDATION {
+        // ==================== محدودیت‌های طول ====================
+        
+        /** حداقل طول رمز عبور */
+        public static final int MIN_PASSWORD_LENGTH = 8;
+        
+        /** حداکثر طول رمز عبور */
+        public static final int MAX_PASSWORD_LENGTH = 128;
+        
+        /** طول شماره تلفن (11 رقم) */
+        public static final int PHONE_LENGTH = 11;
+        
+        /** پیشوند شماره تلفن همراه */
+        public static final String PHONE_PREFIX = &quot;09&quot;;
+        
+        /** حداکثر طول نام */
+        public static final int MAX_NAME_LENGTH = 100;
+        
+        /** حداکثر طول ایمیل */
+        public static final int MAX_EMAIL_LENGTH = 100;
+        
+        /** حداکثر طول آدرس */
+        public static final int MAX_ADDRESS_LENGTH = 500;
+        
+        // ==================== الگوهای Regex ====================
+        
+        /** الگوی regex برای اعتبارسنجی ایمیل */
+        public static final String EMAIL_PATTERN = &quot;^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$&quot;;
+        
+        /** الگوی regex برای اعتبارسنجی شماره تلفن همراه */
+        public static final String PHONE_PATTERN = &quot;^09\\d{9}$&quot;;
+        
+        /** الگوی regex برای نام‌های فارسی */
+        public static final String PERSIAN_NAME_PATTERN = &quot;^[\\u0600-\\u06FF\\u0750-\\u077F\\u08A0-\\u08FF\\uFB50-\\uFDFF\\uFE70-\\uFEFF\\s\\w.-]+$&quot;;
+        
+        /**
+         * سازنده private برای جلوگیری از instantiation
+         */
+        private VALIDATION() {}
+    }
+    
+    // ==================== File System ====================
+    
+    /**
+     * کلاس ثابت‌های سیستم فایل
+     * شامل مسیرهای فولدرها و فایل‌های برنامه
+     */
+    public static final class FILES {
+        /** فولدر اصلی داده‌های کاربر در home directory */
+<span class="nc" id="L322">        public static final String USER_DATA_DIR = System.getProperty(&quot;user.home&quot;) + &quot;/.food-ordering&quot;;</span>
+        
+        /** نام فایل تنظیمات */
+        public static final String SETTINGS_FILE = &quot;settings.json&quot;;
+        
+        /** نام فولدر cache */
+        public static final String CACHE_DIR = &quot;cache&quot;;
+        
+        /** نام فولدر لاگ‌ها */
+<span class="nc" id="L331">        public static final String LOGS_DIR = &quot;logs&quot;;</span>
+        
+        /**
+         * سازنده private برای جلوگیری از instantiation
+         */
+        private FILES() {}
+    }
+    
+    // ==================== Currency &amp; Formatting ====================
+    
+    /**
+     * کلاس ثابت‌های فرمت‌بندی و نمایش
+     * شامل واحدها، فرمت‌های تاریخ/زمان و نحوه نمایش اعداد
+     */
+    public static final class FORMAT {
+        /** نماد واحد پولی */
+        public static final String CURRENCY_SYMBOL = &quot;تومان&quot;;
+        
+        /** فرمت نمایش اعداد بدون اعشار (با جداکننده هزارگان) */
+        public static final String DECIMAL_FORMAT = &quot;#,##0&quot;;
+        
+        /** فرمت نمایش اعداد با اعشار */
+        public static final String DECIMAL_FORMAT_WITH_FRACTION = &quot;#,##0.00&quot;;
+        
+        /** فرمت نمایش تاریخ (سال/ماه/روز) */
+        public static final String DATE_FORMAT = &quot;yyyy/MM/dd&quot;;
+        
+        /** فرمت نمایش زمان (ساعت:دقیقه) */
+        public static final String TIME_FORMAT = &quot;HH:mm&quot;;
+        
+        /** فرمت نمایش تاریخ و زمان */
+        public static final String DATETIME_FORMAT = &quot;yyyy/MM/dd HH:mm&quot;;
+        
+        /**
+         * سازنده private برای جلوگیری از instantiation
+         */
+        private FORMAT() {}
+    }
+    
+    // ==================== Test Configuration ====================
+    
+    /**
+     * کلاس ثابت‌های پیکربندی تست
+     * شامل timeout ها و داده‌های تستی
+     */
+    public static final class TEST {
+        // ==================== زمان‌های انتظار ====================
+        
+        /** timeout پیش‌فرض تست‌ها (ثانیه) */
+        public static final int DEFAULT_TIMEOUT_SECONDS = 30;
+        
+        /** timeout طولانی برای تست‌های پیچیده (ثانیه) */
+        public static final int LONG_TIMEOUT_SECONDS = 60;
+        
+        /** زمان انتظار برای عناصر UI (میلی‌ثانیه) */
+        public static final int UI_WAIT_TIME_MS = 100;
+        
+        /** timeout شبکه برای تست‌ها (میلی‌ثانیه) */
+        public static final int NETWORK_TIMEOUT_MS = 5000;
+        
+        // ==================== داده‌های تستی ====================
+        
+        /** شماره تلفن تستی */
+        public static final String TEST_PHONE = &quot;09123456789&quot;;
+        
+        /** ایمیل تستی */
+        public static final String TEST_EMAIL = &quot;test@example.com&quot;;
+        
+        /** رمز عبور تستی */
+        public static final String TEST_PASSWORD = &quot;TestPass123@&quot;;
+        
+        /** نام تستی */
+        public static final String TEST_NAME = &quot;تست کاربر&quot;;
+        
+        /**
+         * سازنده private برای جلوگیری از instantiation
+         */
+        private TEST() {}
+    }
+    
+    // ==================== Performance ====================
+    
+    /**
+     * کلاس ثابت‌های عملکرد و بهینه‌سازی
+     * شامل تنظیمات cache، retry و محدودیت‌های درخواست
+     */
+    public static final class PERFORMANCE {
+        /** حداکثر اندازه cache */
+        public static final int MAX_CACHE_SIZE = 100;
+        
+        /** مدت انقضای cache (دقیقه) */
+        public static final int CACHE_EXPIRY_MINUTES = 30;
+        
+        /** حداکثر تعداد درخواست‌های همزمان */
+        public static final int MAX_CONCURRENT_REQUESTS = 10;
+        
+        /** تعداد تلاش مجدد درخواست در صورت شکست */
+        public static final int REQUEST_RETRY_COUNT = 3;
+        
+        /** تأخیر بین تلاش‌های مجدد (میلی‌ثانیه) */
+        public static final int REQUEST_RETRY_DELAY_MS = 1000;
+        
+        /**
+         * سازنده private برای جلوگیری از instantiation
+         */
+        private PERFORMANCE() {}
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

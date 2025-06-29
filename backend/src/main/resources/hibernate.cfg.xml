@@ -4,23 +4,37 @@
         "http://hibernate.org/dtd/hibernate-configuration-5.4.dtd">
 <hibernate-configuration>
     <session-factory>
-        <!-- Database connection settings (SQLite default) -->
+        <!-- Database connection settings (SQLite optimized for testing) -->
         <property name="hibernate.connection.driver_class">org.sqlite.JDBC</property>
-        <property name="hibernate.connection.url">jdbc:sqlite:food_ordering.db?journal_mode=WAL&amp;synchronous=NORMAL&amp;busy_timeout=30000</property>
+        <property name="hibernate.connection.url">jdbc:sqlite:food_ordering.db?journal_mode=WAL&amp;synchronous=NORMAL&amp;busy_timeout=60000&amp;cache_size=10000&amp;temp_store=memory</property>
         <property name="hibernate.connection.username"></property>
         <property name="hibernate.connection.password"></property>
 
-        <!-- JDBC connection pool (use built-in) -->
-        <property name="connection.pool_size">5</property>
+        <!-- JDBC connection pool (increased for concurrent testing) -->
+        <property name="connection.pool_size">20</property>
+        <property name="hibernate.connection.provider_class">org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl</property>
         
-        <!-- Additional SQLite optimizations -->
+        <!-- Connection management settings -->
+        <property name="hibernate.connection.autocommit">false</property>
+        <property name="hibernate.connection.release_mode">auto</property>
+        
+        <!-- Additional SQLite optimizations for multi-threading -->
         <property name="hibernate.connection.isolation">2</property>
         <property name="hibernate.jdbc.batch_size">20</property>
         <property name="hibernate.order_inserts">true</property>
         <property name="hibernate.order_updates">true</property>
+        <property name="hibernate.jdbc.batch_versioned_data">true</property>
+        
+        <!-- Performance improvements -->
+        <property name="hibernate.cache.use_second_level_cache">false</property>
+        <property name="hibernate.cache.use_query_cache">false</property>
 
         <!-- SQL dialect -->
         <property name="hibernate.dialect">org.hibernate.community.dialect.SQLiteDialect</property>
+        
+        <!-- Session Context Configuration for Testing -->
+        <property name="hibernate.current_session_context_class">thread</property>
+        <property name="hibernate.connection.handling_mode">DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION</property>
 
         <!-- Echo SQL -->
         <property name="show_sql">true</property>

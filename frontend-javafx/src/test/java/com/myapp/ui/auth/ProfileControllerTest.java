@@ -23,36 +23,83 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.myapp.ui.common.TestFXBase;
 
 /**
- * Test cases for ProfileController
+ * تست‌کیس‌های ProfileController
+ * 
+ * این کلاس تست شامل موارد زیر است:
+ * - مقداردهی اولیه کنترلر
+ * - تست کامپوننت‌های UI
+ * - اعتبارسنجی اطلاعات پروفایل
+ * - تست تغییر رمز عبور
+ * - اعتبارسنجی فیلدهای مختلف
+ * - تست عملکرد دکمه‌ها
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 class ProfileControllerTest extends TestFXBase {
 
+    /** کنترلر ProfileController مورد تست */
     private ProfileController controller;
+    
+    /** فیلد ورودی آدرس ایمیل */
     private TextField emailField;
+    
+    /** فیلد ورودی نام کامل */
     private TextField fullNameField;
+    
+    /** فیلد نمایش شماره تلفن (غیرقابل ویرایش) */
     private TextField phoneField;
+    
+    /** فیلد ورودی آدرس */
     private TextArea addressField;
+    
+    /** برچسب نمایش تاریخ عضویت */
     private Label memberSinceLabel;
+    
+    /** برچسب نمایش وضعیت */
     private Label statusLabel;
+    
+    /** برچسب نمایش نقش کاربری */
     private Label roleLabel;
+    
+    /** برچسب نمایش وضعیت حساب */
     private Label accountStatusLabel;
+    
+    /** فیلد ورودی رمز عبور فعلی */
     private PasswordField currentPasswordField;
+    
+    /** فیلد ورودی رمز عبور جدید */
     private PasswordField newPasswordField;
+    
+    /** فیلد تأیید رمز عبور جدید */
     private PasswordField confirmPasswordField;
+    
+    /** دکمه ذخیره تغییرات */
     private Button saveButton;
+    
+    /** دکمه تغییر رمز عبور */
     private Button changePasswordButton;
+    
+    /** دکمه لغو تغییرات */
     private Button cancelButton;
+    
+    /** دکمه بروزرسانی */
     private Button refreshButton;
 
+    /**
+     * راه‌اندازی اولیه Stage برای تست
+     * تلاش برای بارگذاری FXML یا ایجاد UI ساختگی
+     */
     @Start
     public void start(Stage stage) throws Exception {
         try {
-            // Try to load FXML
+            // تلاش برای بارگذاری FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Profile.fxml"));
             Parent root = loader.load();
             controller = loader.getController();
             
-            // Get UI components
+            // دریافت کامپوننت‌های UI
             emailField = (TextField) root.lookup("#emailField");
             fullNameField = (TextField) root.lookup("#fullNameField");
             phoneField = (TextField) root.lookup("#phoneField");
@@ -72,15 +119,18 @@ class ProfileControllerTest extends TestFXBase {
             stage.setScene(new Scene(root, 800, 700));
             stage.show();
         } catch (Exception e) {
-            // FXML loading failed, create mock UI components
+            // بارگذاری FXML ناموفق، ایجاد کامپوننت‌های UI ساختگی
             createMockUI(stage);
         }
     }
     
+    /**
+     * ایجاد UI ساختگی در صورت شکست بارگذاری FXML
+     */
     private void createMockUI(Stage stage) {
         controller = new ProfileController();
         
-        // Create mock UI components
+        // ایجاد کامپوننت‌های UI ساختگی
         emailField = new TextField();
         fullNameField = new TextField();
         phoneField = new TextField();
@@ -94,16 +144,16 @@ class ProfileControllerTest extends TestFXBase {
         confirmPasswordField = new PasswordField();
         saveButton = new Button("Save");
         changePasswordButton = new Button("Change Password");
-        cancelButton = new Button("Cancel");
-        refreshButton = new Button("Refresh");
+        cancelButton = new Button("لغو");
+        refreshButton = new Button("بروزرسانی");
         
-        // Set IDs for lookup
+        // تنظیم ID ها برای lookup
         emailField.setId("emailField");
         fullNameField.setId("fullNameField");
         phoneField.setId("phoneField");
         addressField.setId("addressField");
         
-        // Create scene with mock components
+        // ایجاد scene با کامپوننت‌های ساختگی
         VBox root = new VBox(10);
         root.getChildren().addAll(
             emailField, fullNameField, phoneField, addressField,
@@ -116,10 +166,14 @@ class ProfileControllerTest extends TestFXBase {
         stage.show();
     }
 
+    /**
+     * راه‌اندازی قبل از هر تست
+     * پاک کردن تمام فیلدها
+     */
     @BeforeEach
     @Override
     public void setUp() throws Exception {
-        super.setUp(); // Call parent setup first
+        super.setUp(); // فراخوانی راه‌اندازی والد
         
         Platform.runLater(() -> {
             if (fullNameField != null) fullNameField.clear();
@@ -132,36 +186,42 @@ class ProfileControllerTest extends TestFXBase {
         WaitForAsyncUtils.waitForFxEvents();
     }
 
+    /**
+     * تست مقداردهی اولیه کنترلر
+     */
     @Test
     void testInitialization() {
-        assertNotNull(controller, "Controller should be initialized");
+        assertNotNull(controller, "کنترلر باید مقداردهی شود");
         if (emailField != null) {
-            assertNotNull(emailField, "Email field should be present");
+            assertNotNull(emailField, "فیلد ایمیل باید موجود باشد");
         }
         if (fullNameField != null) {
-            assertNotNull(fullNameField, "Full name field should be present");
+            assertNotNull(fullNameField, "فیلد نام کامل باید موجود باشد");
         }
         if (phoneField != null) {
-            assertNotNull(phoneField, "Phone field should be present");
+            assertNotNull(phoneField, "فیلد شماره تلفن باید موجود باشد");
         }
     }
 
+    /**
+     * تست وجود کامپوننت‌های UI
+     */
     @Test
     void testUIComponentsExist() {
-        // Skip test if UI components are null (FXML loading failed)
+        // نادیده گرفتن تست اگر کامپوننت‌های UI null هستند (بارگذاری FXML ناموفق)
         if (emailField == null || fullNameField == null) {
-            System.out.println("FXML loading failed, skipping UI components test");
+            System.out.println("بارگذاری FXML ناموفق، نادیده گرفتن تست کامپوننت‌های UI");
             return;
         }
         
-        assertNotNull(emailField, "Email field should exist");
-        assertNotNull(fullNameField, "Full name field should exist");
-        assertNotNull(phoneField, "Phone field should exist");
-        assertNotNull(addressField, "Address field should exist");
-        assertNotNull(memberSinceLabel, "Member since label should exist");
-        assertNotNull(statusLabel, "Status label should exist");
-        assertNotNull(roleLabel, "Role label should exist");
-        assertNotNull(accountStatusLabel, "Account status label should exist");
+        assertNotNull(emailField, "فیلد ایمیل باید وجود داشته باشد");
+        assertNotNull(fullNameField, "فیلد نام کامل باید وجود داشته باشد");
+        assertNotNull(phoneField, "فیلد شماره تلفن باید وجود داشته باشد");
+        assertNotNull(addressField, "فیلد آدرس باید وجود داشته باشد");
+        assertNotNull(memberSinceLabel, "برچسب تاریخ عضویت باید وجود داشته باشد");
+        assertNotNull(statusLabel, "برچسب وضعیت باید وجود داشته باشد");
+        assertNotNull(roleLabel, "برچسب نقش باید وجود داشته باشد");
+        assertNotNull(accountStatusLabel, "برچسب وضعیت حساب باید وجود داشته باشد");
     }
 
     @Test
@@ -669,9 +729,12 @@ class ProfileControllerTest extends TestFXBase {
         return fieldName.equals("fullName") || fieldName.equals("phone");
     }
     
+    /**
+     * متد کمکی برای نادیده گرفتن تست در صورت null بودن UI
+     */
     private boolean skipTestIfUINull(String testName) {
         if (emailField == null || fullNameField == null) {
-            System.out.println("FXML loading failed, skipping " + testName);
+            System.out.println("بارگذاری FXML ناموفق، نادیده گرفتن " + testName);
             return true;
         }
         return false;

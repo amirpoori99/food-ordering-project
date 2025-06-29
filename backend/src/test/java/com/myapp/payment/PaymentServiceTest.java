@@ -190,4 +190,74 @@ class PaymentServiceTest {
         assertThat(completedTransactions).allMatch(t -> t.getStatus() == TransactionStatus.COMPLETED);
         assertThat(pendingTransactions).allMatch(t -> t.getStatus() == TransactionStatus.PENDING);
     }
+
+    @Test
+    @DisplayName("Can refund transaction should work correctly")
+    void canRefundTransaction_shouldWork() {
+        // Given - تراکنش پرداخت موفق (mock mode)
+        // Test valid refundable transaction
+        boolean canRefundValid = paymentService.canRefundTransaction(1L);
+        
+        // Test invalid transaction ID
+        boolean canRefundInvalid = paymentService.canRefundTransaction(-1L);
+        boolean canRefundNull = paymentService.canRefundTransaction(null);
+        
+        // Then - بررسی validation منطق
+        assertThat(canRefundValid).isFalse(); // در محیط تست، transaction موجود نیست
+        assertThat(canRefundInvalid).isFalse();
+        assertThat(canRefundNull).isFalse();
+    }
+
+    @Test
+    @DisplayName("Update transaction status should work")
+    void updateTransactionStatus_shouldWork() {
+        // Test validation logic instead of actual database updates
+        // Given - تست validation منطق
+        
+        // When & Then - تست ورودی‌های نامعتبر
+        assertThatThrownBy(() -> paymentService.updateTransactionStatus(
+            null, TransactionStatus.COMPLETED, "REF123", "notes"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Transaction ID must be positive");
+            
+        assertThatThrownBy(() -> paymentService.updateTransactionStatus(
+            -1L, TransactionStatus.COMPLETED, "REF123", "notes"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Transaction ID must be positive");
+            
+        assertThatThrownBy(() -> paymentService.updateTransactionStatus(
+            1L, null, "REF123", "notes"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Transaction status cannot be null");
+            
+        // تست عدم وجود تراکنش
+        assertThatThrownBy(() -> paymentService.updateTransactionStatus(
+            99999L, TransactionStatus.COMPLETED, "REF123", "notes"))
+            .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("Can user make payment should work")
+    void canUserMakePayment_shouldWork() {
+        // Test validation logic only
+        // Given - تست validation منطق
+        
+        // When & Then - تست ورودی‌های نامعتبر
+        boolean canPayNullUser = paymentService.canUserMakePayment(null, 100.0, "CARD");
+        boolean canPayInvalidUser = paymentService.canUserMakePayment(-1L, 100.0, "CARD");
+        boolean canPayNullAmount = paymentService.canUserMakePayment(1L, null, "CARD");
+        boolean canPayZeroAmount = paymentService.canUserMakePayment(1L, 0.0, "CARD");
+        boolean canPayNullMethod = paymentService.canUserMakePayment(1L, 100.0, null);
+        boolean canPayInvalidMethod = paymentService.canUserMakePayment(1L, 100.0, "INVALID");
+        boolean canPayNonExistentUser = paymentService.canUserMakePayment(99999L, 100.0, "CARD");
+        
+        // Then - تمام موارد نامعتبر false باشند
+        assertThat(canPayNullUser).isFalse();
+        assertThat(canPayInvalidUser).isFalse();
+        assertThat(canPayNullAmount).isFalse();
+        assertThat(canPayZeroAmount).isFalse();
+        assertThat(canPayNullMethod).isFalse();
+        assertThat(canPayInvalidMethod).isFalse();
+        assertThat(canPayNonExistentUser).isFalse();
+    }
 } 

@@ -14,40 +14,103 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
- * Controller for User Profile management screen
- * Handles profile viewing, editing, and password change
+ * کنترلر صفحه مدیریت پروفایل کاربر
+ * 
+ * این کلاس مسئول مدیریت رابط کاربری پروفایل شامل:
+ * - مشاهده اطلاعات کاربر
+ * - ویرایش اطلاعات شخصی
+ * - تغییر رمز عبور
+ * - مدیریت وضعیت حساب
+ * - navigation به صفحات مختلف
+ * - بارگذاری و ذخیره اطلاعات
+ * 
+ * Pattern های استفاده شده:
+ * - MVC Pattern: Controller جدا از View
+ * - Observer Pattern: event listeners برای UI components
+ * - Task Pattern: background processing برای API calls
+ * - DTO Pattern: UserProfile data model
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class ProfileController implements Initializable {
 
+    /** فیلد ورودی نام کامل کاربر */
     @FXML private TextField fullNameField;
+    
+    /** فیلد نمایش شماره تلفن (غیرقابل ویرایش) */
     @FXML private TextField phoneField;
+    
+    /** فیلد ورودی آدرس ایمیل */
     @FXML private TextField emailField;
+    
+    /** فیلد ورودی آدرس کاربر */
     @FXML private TextArea addressField;
+    
+    /** برچسب نمایش نقش کاربری */
     @FXML private Label roleLabel;
+    
+    /** برچسب نمایش وضعیت حساب */
     @FXML private Label accountStatusLabel;
+    
+    /** برچسب نمایش تاریخ عضویت */
     @FXML private Label memberSinceLabel;
     
+    /** فیلد ورودی رمز عبور فعلی */
     @FXML private PasswordField currentPasswordField;
+    
+    /** فیلد ورودی رمز عبور جدید */
     @FXML private PasswordField newPasswordField;
+    
+    /** فیلد تأیید رمز عبور جدید */
     @FXML private PasswordField confirmPasswordField;
     
+    /** دکمه ذخیره تغییرات */
     @FXML private Button saveButton;
+    
+    /** دکمه لغو تغییرات */
     @FXML private Button cancelButton;
+    
+    /** دکمه بروزرسانی اطلاعات */
     @FXML private Button refreshButton;
+    
+    /** دکمه تغییر رمز عبور */
     @FXML private Button changePasswordButton;
+    
+    /** دکمه پاک کردن فیلدهای رمز عبور */
     @FXML private Button clearPasswordButton;
     
+    /** منوی بازگشت به صفحه اصلی */
     @FXML private MenuItem backMenuItem;
+    
+    /** منوی تاریخچه سفارشات */
     @FXML private MenuItem orderHistoryMenuItem;
+    
+    /** منوی سبد خرید */
     @FXML private MenuItem cartMenuItem;
+    
+    /** منوی خروج از حساب */
     @FXML private MenuItem logoutMenuItem;
     
+    /** برچسب نمایش وضعیت و پیام‌ها */
     @FXML private Label statusLabel;
+    
+    /** نشانگر loading در زمان پردازش */
     @FXML private ProgressIndicator loadingIndicator;
 
+    /** کنترلر navigation برای تغییر صفحات */
     private NavigationController navigationController;
+    
+    /** کپی اطلاعات اولیه کاربر برای بررسی تغییرات */
     private UserProfile originalProfile;
 
+    /**
+     * متد مقداردهی اولیه که بعد از load شدن FXML اجرا می‌شود
+     * 
+     * @param location URL location مربوط به FXML
+     * @param resources منابع زبان و localization
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.navigationController = NavigationController.getInstance();
@@ -57,36 +120,47 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Setup UI components and event handlers
+     * راه‌اندازی کامپوننت‌های UI و event handler ها
+     * 
+     * شامل:
+     * - تنظیم فیلد شماره تلفن به حالت فقط‌خواندنی
+     * - راه‌اندازی validation listener ها
+     * - تنظیم وضعیت اولیه
      */
     private void setupUI() {
-        // Make phone field read-only (cannot change phone number)
+        // تنظیم فیلد شماره تلفن به حالت فقط‌خواندنی (غیرقابل تغییر)
         phoneField.setEditable(false);
         phoneField.setStyle("-fx-background-color: #e9ecef;");
         
-        // Setup validation listeners
+        // راه‌اندازی listener های اعتبارسنجی
         setupValidationListeners();
         
-        // Initial status
+        // تنظیم وضعیت اولیه
         setStatus("در حال بارگذاری پروفایل...");
     }
 
     /**
-     * Setup validation listeners for form fields
+     * راه‌اندازی listener های اعتبارسنجی برای فیلدهای فرم
+     * 
+     * شامل:
+     * - بررسی تغییرات برای فعال کردن دکمه ذخیره
+     * - اعتبارسنجی فیلدهای رمز عبور
      */
     private void setupValidationListeners() {
-        // Enable save button only when changes are made
+        // فعال کردن دکمه ذخیره فقط زمانی که تغییراتی انجام شده باشد
         fullNameField.textProperty().addListener((obs, oldVal, newVal) -> checkForChanges());
         emailField.textProperty().addListener((obs, oldVal, newVal) -> checkForChanges());
         addressField.textProperty().addListener((obs, oldVal, newVal) -> checkForChanges());
         
-        // Password validation
+        // اعتبارسنجی فیلدهای رمز عبور
         newPasswordField.textProperty().addListener((obs, oldVal, newVal) -> validatePasswordFields());
         confirmPasswordField.textProperty().addListener((obs, oldVal, newVal) -> validatePasswordFields());
     }
 
     /**
-     * Load user profile from backend
+     * بارگذاری اطلاعات پروفایل کاربر از بک‌اند
+     * 
+     * این متد در background thread اجرا می‌شود تا UI freeze نشود
      */
     private void loadProfile() {
         setLoading(true);
@@ -134,7 +208,10 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Parse user profile from JSON response
+     * تجزیه اطلاعات پروفایل کاربر از پاسخ JSON
+     * 
+     * @param data داده JSON دریافت شده از سرور
+     * @return شیء UserProfile
      */
     private UserProfile parseUserProfile(JsonNode data) {
         UserProfile profile = new UserProfile();
@@ -149,7 +226,9 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Display user profile in form fields
+     * نمایش اطلاعات پروفایل کاربر در فیلدهای فرم
+     * 
+     * @param profile اطلاعات پروفایل کاربر
      */
     private void displayProfile(UserProfile profile) {
         fullNameField.setText(profile.getFullName());
@@ -163,7 +242,10 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Get Persian text for user role
+     * دریافت متن فارسی نقش کاربری
+     * 
+     * @param role نقش کاربری به انگلیسی
+     * @return متن فارسی نقش
      */
     private String getRoleText(String role) {
         switch (role.toUpperCase()) {
@@ -176,7 +258,9 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Check if profile has been modified
+     * بررسی وجود تغییرات در پروفایل
+     * 
+     * این متد دکمه‌های ذخیره و لغو را فعال/غیرفعال می‌کند
      */
     private void checkForChanges() {
         if (originalProfile == null) return;
@@ -190,7 +274,12 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Validate password fields for password change
+     * اعتبارسنجی فیلدهای رمز عبور برای تغییر رمز
+     * 
+     * شامل بررسی:
+     * - تطابق رمز جدید و تکرار آن
+     * - وجود رمز فعلی
+     * - حداقل طول رمز جدید
      */
     private void validatePasswordFields() {
         String newPassword = newPasswordField.getText();
@@ -209,7 +298,12 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Handle save profile changes
+     * پردازش ذخیره تغییرات پروفایل
+     * 
+     * مراحل:
+     * 1. اعتبارسنجی داده‌ها
+     * 2. ارسال به سرور در background thread
+     * 3. بروزرسانی UI
      */
     @FXML
     private void handleSave() {
@@ -244,7 +338,7 @@ public class ProfileController implements Initializable {
                 setLoading(false);
                 setStatus("تغییرات با موفقیت ذخیره شد");
                 showSuccess("موفقیت", "اطلاعات پروفایل با موفقیت به‌روزرسانی شد");
-                loadProfile(); // Reload to get updated data
+                loadProfile(); // بارگذاری مجدد برای دریافت داده‌های به‌روزرسانی شده
             });
         });
         
@@ -267,7 +361,9 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Validate profile data before saving
+     * اعتبارسنجی داده‌های پروفایل قبل از ذخیره
+     * 
+     * @return true اگر تمام داده‌ها معتبر باشند
      */
     private boolean validateProfileData() {
         String fullName = fullNameField.getText().trim();
@@ -289,14 +385,19 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Simple email validation
+     * اعتبارسنجی ساده ایمیل
+     * 
+     * @param email آدرس ایمیل
+     * @return true اگر فرمت صحیح باشد
      */
     private boolean isValidEmail(String email) {
         return email.matches("^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$");
     }
 
     /**
-     * Handle change password
+     * پردازش تغییر رمز عبور
+     * 
+     * شامل اعتبارسنجی و ارسال درخواست به سرور
      */
     @FXML
     private void handleChangePassword() {
@@ -317,8 +418,8 @@ public class ProfileController implements Initializable {
         setLoading(true);
         setStatus("در حال تغییر رمز عبور...");
         
-        // TODO: Implement password change API call
-        // For now, show a placeholder message
+        // TODO: پیاده‌سازی API تغییر رمز عبور
+        // فعلاً پیام placeholder نمایش داده می‌شود
         Platform.runLater(() -> {
             setLoading(false);
             setStatus("تغییر رمز عبور در نسخه آینده پیاده‌سازی خواهد شد");
@@ -328,7 +429,7 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Clear password fields
+     * پاک کردن فیلدهای رمز عبور
      */
     @FXML
     private void handleClearPasswordFields() {
@@ -338,7 +439,8 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Handle cancel changes
+     * پردازش لغو تغییرات
+     * بازگرداندن فیلدها به حالت اولیه
      */
     @FXML
     private void handleCancel() {
@@ -349,7 +451,8 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Handle refresh profile
+     * پردازش بروزرسانی پروفایل
+     * بارگذاری مجدد اطلاعات از سرور
      */
     @FXML
     private void handleRefresh() {
@@ -357,7 +460,7 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Handle back to main menu
+     * پردازش بازگشت به منوی اصلی
      */
     @FXML
     private void handleBack() {
@@ -365,7 +468,7 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Handle order history navigation
+     * پردازش انتقال به تاریخچه سفارشات
      */
     @FXML
     private void handleOrderHistory() {
@@ -373,7 +476,7 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Handle cart navigation
+     * پردازش انتقال به سبد خرید
      */
     @FXML
     private void handleCart() {
@@ -381,7 +484,8 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Handle logout
+     * پردازش خروج از حساب کاربری
+     * نمایش دیالوگ تأیید قبل از خروج
      */
     @FXML
     private void handleLogout() {
@@ -398,7 +502,11 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Set loading state
+     * تنظیم حالت loading برای UI
+     * 
+     * در حالت loading تمام کنترل‌ها غیرفعال می‌شوند
+     * 
+     * @param loading true برای فعال کردن loading
      */
     private void setLoading(boolean loading) {
         loadingIndicator.setVisible(loading);
@@ -414,7 +522,9 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Set status message
+     * تنظیم پیام وضعیت
+     * 
+     * @param message متن پیام
      */
     private void setStatus(String message) {
         if (statusLabel != null) {
@@ -423,7 +533,10 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Show error dialog
+     * نمایش دیالوگ خطا
+     * 
+     * @param title عنوان دیالوگ
+     * @param message متن پیام خطا
      */
     private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -434,7 +547,10 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Show success dialog
+     * نمایش دیالوگ موفقیت
+     * 
+     * @param title عنوان دیالوگ
+     * @param message متن پیام موفقیت
      */
     private void showSuccess(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -445,7 +561,10 @@ public class ProfileController implements Initializable {
     }
 
     /**
-     * Show info dialog
+     * نمایش دیالوگ اطلاعات
+     * 
+     * @param title عنوان دیالوگ
+     * @param message متن پیام اطلاعاتی
      */
     private void showInfo(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -458,18 +577,34 @@ public class ProfileController implements Initializable {
     // ==================== DATA MODEL ====================
 
     /**
-     * User profile data model
+     * مدل داده‌ای پروفایل کاربر
+     * 
+     * این کلاس شامل تمام اطلاعات مربوط به کاربر است
+     * و امکان کپی‌برداری از اطلاعات را فراهم می‌کند
      */
     public static class UserProfile {
+        /** شناسه منحصربه‌فرد کاربر */
         private Long id;
+        
+        /** نام کامل کاربر */
         private String fullName;
+        
+        /** شماره تلفن کاربر */
         private String phone;
+        
+        /** آدرس ایمیل کاربر */
         private String email;
+        
+        /** آدرس کاربر */
         private String address;
+        
+        /** نقش کاربری */
         private String role;
+        
+        /** وضعیت فعالیت حساب */
         private boolean active;
 
-        // Getters and setters
+        // Getter و Setter ها
         public Long getId() { return id; }
         public void setId(Long id) { this.id = id; }
 
@@ -492,7 +627,9 @@ public class ProfileController implements Initializable {
         public void setActive(boolean active) { this.active = active; }
 
         /**
-         * Create a copy of this profile
+         * ایجاد کپی از این پروفایل
+         * 
+         * @return کپی جدید از پروفایل
          */
         public UserProfile copy() {
             UserProfile copy = new UserProfile();

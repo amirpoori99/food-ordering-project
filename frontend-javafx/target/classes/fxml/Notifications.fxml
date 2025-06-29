@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.ui.notification.NotificationController">
+   <children>
+      <!-- Header Section -->
+      <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="header-section">
+         <children>
+            <Label styleClass="page-title" text="اطلاع‌رسانی‌ها و هشدارها" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="unreadCountLabel" styleClass="unread-badge" text="3" visible="true" />
+            <Button fx:id="refreshButton" onAction="#handleRefresh" styleClass="refresh-button" text="🔄 بروزرسانی" />
+            <Button fx:id="settingsButton" onAction="#handleSettings" styleClass="settings-button" text="⚙️ تنظیمات" />
+         </children>
+         <padding>
+            <Insets left="20.0" right="20.0" top="15.0" bottom="15.0" />
+         </padding>
+      </HBox>
+
+      <!-- Controls Section -->
+      <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="controls-section">
+         <children>
+            <Label text="فیلتر:" styleClass="control-label" />
+            <ComboBox fx:id="filterComboBox" prefWidth="150.0" />
+            
+            <Separator orientation="VERTICAL" />
+            
+            <Label text="جستجو:" styleClass="control-label" />
+            <TextField fx:id="searchField" prefWidth="200.0" promptText="جستجو در اطلاع‌رسانی‌ها..." />
+            
+            <Region HBox.hgrow="ALWAYS" />
+            
+            <Button fx:id="markAllReadButton" onAction="#handleMarkAllRead" styleClass="action-button" text="✓ همه خوانده شده" />
+            <Button fx:id="clearAllButton" onAction="#handleClearAll" styleClass="danger-button" text="🗑️ حذف همه" />
+            <Button fx:id="exportButton" onAction="#handleExport" styleClass="export-button" text="📥 صادرات" />
+         </children>
+         <padding>
+            <Insets left="20.0" right="20.0" top="10.0" bottom="10.0" />
+         </padding>
+      </HBox>
+
+      <!-- Main Content -->
+      <HBox VBox.vgrow="ALWAYS">
+         <children>
+            <!-- Notifications List -->
+            <VBox HBox.hgrow="ALWAYS" spacing="10.0">
+               <children>
+                  <Label styleClass="section-title" text="📋 لیست اطلاع‌رسانی‌ها" />
+                  
+                  <!-- Loading Indicator -->
+                  <StackPane>
+                     <children>
+                        <ProgressIndicator fx:id="loadingIndicator" visible="false" />
+                        
+                        <!-- Notification List Container -->
+                        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+                           <content>
+                              <VBox fx:id="notificationListContainer" spacing="8.0" />
+                           </content>
+                        </ScrollPane>
+                     </children>
+                  </StackPane>
+               </children>
+               <padding>
+                  <Insets left="20.0" right="10.0" top="10.0" bottom="20.0" />
+               </padding>
+            </VBox>
+
+            <!-- Settings Panel -->
+            <VBox prefWidth="300.0" spacing="15.0" styleClass="settings-panel">
+               <children>
+                  <Label styleClass="section-title" text="⚙️ تنظیمات اطلاع‌رسانی" />
+                  
+                  <!-- Notification Channels -->
+                  <VBox spacing="8.0" styleClass="settings-group">
+                     <children>
+                        <Label styleClass="group-title" text="کانال‌های اطلاع‌رسانی" />
+                        <CheckBox fx:id="emailNotificationsCheckBox" selected="true" text="📧 اطلاع‌رسانی ایمیل" />
+                        <CheckBox fx:id="smsNotificationsCheckBox" selected="true" text="📱 اطلاع‌رسانی پیامک" />
+                        <CheckBox fx:id="pushNotificationsCheckBox" selected="true" text="🔔 اطلاع‌رسانی فوری" />
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+
+                  <!-- Sound Settings -->
+                  <VBox spacing="8.0" styleClass="settings-group">
+                     <children>
+                        <Label styleClass="group-title" text="تنظیمات صدا" />
+                        <CheckBox fx:id="soundEnabledCheckBox" selected="true" text="🔊 فعال‌سازی صدا" />
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <children>
+                              <Label text="حجم:" />
+                              <Slider fx:id="volumeSlider" max="100.0" value="70.0" />
+                              <Label text="70%" />
+                           </children>
+                        </HBox>
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <children>
+                              <Label text="نوع صدا:" />
+                              <ComboBox fx:id="soundTypeComboBox" prefWidth="150.0" />
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+
+                  <!-- Do Not Disturb -->
+                  <VBox spacing="8.0" styleClass="settings-group">
+                     <children>
+                        <Label styleClass="group-title" text="حالت مزاحم نشوید" />
+                        <CheckBox fx:id="doNotDisturbCheckBox" text="🚫 مزاحم نشوید" />
+                        <Label styleClass="help-text" text="در این حالت، فقط اطلاع‌رسانی‌های مهم نمایش داده می‌شوند" wrapText="true" />
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+
+                  <!-- Auto Refresh -->
+                  <VBox spacing="8.0" styleClass="settings-group">
+                     <children>
+                        <Label styleClass="group-title" text="بروزرسانی خودکار" />
+                        <CheckBox fx:id="autoRefreshCheckBox" selected="true" text="🔄 بروزرسانی خودکار" />
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <children>
+                              <Label text="بازه (ثانیه):" />
+                              <Spinner fx:id="refreshIntervalSpinner" prefWidth="80.0" />
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+
+                  <!-- Statistics -->
+                  <VBox spacing="8.0" styleClass="settings-group">
+                     <children>
+                        <Label styleClass="group-title" text="آمار" />
+                        <Label text="کل اطلاع‌رسانی‌ها: 15" styleClass="stat-label" />
+                        <Label text="خوانده نشده: 3" styleClass="stat-label" />
+                        <Label fx:id="lastUpdateLabel" text="آخرین بروزرسانی: -" styleClass="stat-label" />
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets left="10.0" right="20.0" top="10.0" bottom="20.0" />
+               </padding>
+            </VBox>
+         </children>
+      </HBox>
+
+      <!-- Footer Status Bar -->
+      <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="status-bar">
+         <children>
+            <Label fx:id="statusLabel" text="آماده دریافت اطلاع‌رسانی‌ها" styleClass="status-message" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label text="وضعیت اتصال: آنلاین" styleClass="connection-status" />
+         </children>
+         <padding>
+            <Insets left="20.0" right="20.0" top="10.0" bottom="10.0" />
+         </padding>
+      </HBox>
+   </children>
+   
+   <!-- Toast Container (Overlay) -->
+   <VBox fx:id="toastContainer" alignment="TOP_RIGHT" mouseTransparent="true" spacing="5.0" 
+         StackPane.alignment="TOP_RIGHT" visible="false">
+      <padding>
+         <Insets right="20.0" top="20.0" />
+      </padding>
+   </VBox>
+</VBox>

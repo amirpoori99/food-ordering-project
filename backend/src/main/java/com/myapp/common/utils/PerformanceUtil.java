@@ -163,12 +163,17 @@ public class PerformanceUtil {
         return stats;
     }
     
-    // ==================== ASYNC PROCESSING ====================
+    // ==================== پردازش ناهمزمان (ASYNC PROCESSING) ====================
     
+    // استخر thread ها برای اجرای کارهای ناهمزمان (10 thread)
     private static final ExecutorService executor = Executors.newFixedThreadPool(10);
     
     /**
-     * Execute task asynchronously
+     * اجرای کار به صورت ناهمزمان
+     * این متد امکان اجرای کارها در background را فراهم می‌کند
+     * 
+     * @param task کار برای اجرای ناهمزمان
+     * @return Future برای کنترل و انتظار نتیجه
      */
     public static Future<Void> executeAsync(Runnable task) {
         return executor.submit(() -> {
@@ -178,7 +183,11 @@ public class PerformanceUtil {
     }
     
     /**
-     * Execute multiple tasks concurrently
+     * اجرای چندین کار به صورت همزمان و موازی
+     * این متد لیستی از کارها را در threads مختلف اجرا می‌کند
+     * 
+     * @param tasks لیست کارها برای اجرای موازی
+     * @return لیست Future برای کنترل همه کارها
      */
     public static List<Future<Void>> executeConcurrently(List<Runnable> tasks) {
         List<Future<Void>> futures = new ArrayList<>();
@@ -189,7 +198,13 @@ public class PerformanceUtil {
     }
     
     /**
-     * Wait for all tasks to complete with timeout
+     * انتظار برای تکمیل همه کارها با timeout
+     * این متد منتظر می‌ماند تا همه کارها تکمیل شوند یا timeout رخ دهد
+     * 
+     * @param futures لیست Future کارها
+     * @param timeout حداکثر زمان انتظار
+     * @param unit واحد زمانی timeout
+     * @return true اگر همه کارها تکمیل شوند، false در غیر اینصورت
      */
     public static boolean waitForCompletion(List<Future<Void>> futures, long timeout, TimeUnit unit) {
         try {
@@ -202,96 +217,127 @@ public class PerformanceUtil {
         }
     }
     
-    // ==================== MEMORY OPTIMIZATION ====================
+    // ==================== بهینه‌سازی حافظه (MEMORY OPTIMIZATION) ====================
     
     /**
-     * Force garbage collection and return memory statistics
+     * اجبار Garbage Collection و دریافت آمار حافظه
+     * این متد GC را اجرا کرده و آمار کامل حافظه قبل و بعد از GC برمی‌گرداند
+     * 
+     * @return نقشه آمار حافظه شامل مقادیر قبل/بعد GC و حافظه آزاد شده
      */
     public static Map<String, Long> forceGarbageCollection() {
         Runtime runtime = Runtime.getRuntime();
         
+        // محاسبه حافظه استفاده شده قبل از GC
         long beforeGC = runtime.totalMemory() - runtime.freeMemory();
-        runtime.gc();
+        runtime.gc(); // اجرای Garbage Collection
         
-        // Give GC time to complete
+        // دادن زمان برای تکمیل GC
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         
+        // محاسبه حافظه استفاده شده بعد از GC
         long afterGC = runtime.totalMemory() - runtime.freeMemory();
-        long recovered = beforeGC - afterGC;
+        long recovered = beforeGC - afterGC; // مقدار حافظه آزاد شده
         
+        // تهیه آمار کامل حافظه
         Map<String, Long> stats = new ConcurrentHashMap<>();
-        stats.put("memoryBeforeGC", beforeGC);
-        stats.put("memoryAfterGC", afterGC);
-        stats.put("memoryRecovered", recovered);
-        stats.put("totalMemory", runtime.totalMemory());
-        stats.put("maxMemory", runtime.maxMemory());
-        stats.put("freeMemory", runtime.freeMemory());
+        stats.put("memoryBeforeGC", beforeGC);      // حافظه قبل از GC (بایت)
+        stats.put("memoryAfterGC", afterGC);        // حافظه بعد از GC (بایت)
+        stats.put("memoryRecovered", recovered);     // حافظه آزاد شده (بایت)
+        stats.put("totalMemory", runtime.totalMemory()); // کل حافظه تخصیص یافته
+        stats.put("maxMemory", runtime.maxMemory());      // حداکثر حافظه در دسترس
+        stats.put("freeMemory", runtime.freeMemory());    // حافظه آزاد فعلی
         
         return stats;
     }
     
     /**
-     * Check if memory usage is critical
+     * بررسی وضعیت بحرانی استفاده از حافظه
+     * اگر استفاده از حافظه بیش از 85% باشد، وضعیت بحرانی است
+     * 
+     * @return true اگر استفاده از حافظه بحرانی باشد (بیش از 85%)
      */
     public static boolean isMemoryUsageCritical() {
         Runtime runtime = Runtime.getRuntime();
-        long usedMemory = runtime.totalMemory() - runtime.freeMemory();
-        long maxMemory = runtime.maxMemory();
+        long usedMemory = runtime.totalMemory() - runtime.freeMemory(); // حافظه استفاده شده
+        long maxMemory = runtime.maxMemory();                           // حداکثر حافظه
         
-        double usagePercentage = (double) usedMemory / maxMemory;
-        return usagePercentage > 0.85; // Critical if over 85%
+        double usagePercentage = (double) usedMemory / maxMemory;        // درصد استفاده
+        return usagePercentage > 0.85; // بحرانی اگر بیش از 85% باشد
     }
     
     /**
-     * Get current memory usage statistics
+     * دریافت آمار فعلی استفاده از حافظه
+     * شامل تمام اطلاعات مربوط به حافظه بر حسب مگابایت و درصد
+     * 
+     * @return نقشه آمار حافظه شامل مقادیر MB و درصد استفاده
      */
     public static Map<String, Object> getMemoryStats() {
         Runtime runtime = Runtime.getRuntime();
-        long usedMemory = runtime.totalMemory() - runtime.freeMemory();
-        long maxMemory = runtime.maxMemory();
+        long usedMemory = runtime.totalMemory() - runtime.freeMemory(); // حافظه استفاده شده
+        long maxMemory = runtime.maxMemory();                           // حداکثر حافظه
         
         Map<String, Object> stats = new ConcurrentHashMap<>();
-        stats.put("usedMemoryMB", usedMemory / 1024 / 1024);
-        stats.put("totalMemoryMB", runtime.totalMemory() / 1024 / 1024);
-        stats.put("maxMemoryMB", maxMemory / 1024 / 1024);
-        stats.put("freeMemoryMB", runtime.freeMemory() / 1024 / 1024);
-        stats.put("usagePercentage", Math.round((double) usedMemory / maxMemory * 100 * 100.0) / 100.0);
-        stats.put("isCritical", isMemoryUsageCritical());
+        stats.put("usedMemoryMB", usedMemory / 1024 / 1024);           // حافظه استفاده شده (MB)
+        stats.put("totalMemoryMB", runtime.totalMemory() / 1024 / 1024); // کل حافظه تخصیص یافته (MB)
+        stats.put("maxMemoryMB", maxMemory / 1024 / 1024);             // حداکثر حافظه (MB)
+        stats.put("freeMemoryMB", runtime.freeMemory() / 1024 / 1024); // حافظه آزاد (MB)
+        stats.put("usagePercentage", Math.round((double) usedMemory / maxMemory * 100 * 100.0) / 100.0); // درصد استفاده
+        stats.put("isCritical", isMemoryUsageCritical());              // وضعیت بحرانی یا نه
         
         return stats;
     }
     
-    // ==================== BULK OPERATIONS ====================
+    // ==================== عملیات دسته‌ای (BULK OPERATIONS) ====================
     
     /**
-     * Process data in batches for better performance
+     * پردازش داده‌ها در دسته‌های کوچک برای بهبود عملکرد
+     * این متد لیست بزرگ داده‌ها را به دسته‌های کوچک تقسیم و پردازش می‌کند
+     * برای جلوگیری از مشکلات حافظه و بهبود عملکرد پایگاه داده مفید است
+     * 
+     * @param data لیست کامل داده‌ها برای پردازش
+     * @param batchSize اندازه هر دسته (تعداد آیتم در هر batch)
+     * @param processor پردازشگر دسته‌ای که روی هر دسته اعمال می‌شود
+     * @param <T> نوع داده‌های درون لیست
      */
     public static <T> void processBatch(List<T> data, int batchSize, BatchProcessor<T> processor) {
-        if (data.isEmpty()) return;
+        if (data.isEmpty()) return; // اگر داده‌ای نباشد، هیچ کاری نکن
         
+        // تقسیم داده‌ها به دسته‌های کوچک و پردازش هر دسته
         for (int i = 0; i < data.size(); i += batchSize) {
-            int endIndex = Math.min(i + batchSize, data.size());
-            List<T> batch = data.subList(i, endIndex);
-            processor.process(batch);
+            int endIndex = Math.min(i + batchSize, data.size()); // محاسبه انتهای دسته
+            List<T> batch = data.subList(i, endIndex);           // استخراج دسته فعلی
+            processor.process(batch);                            // پردازش دسته
         }
     }
     
     /**
-     * Functional interface for batch processing
+     * رابط تابعی برای پردازش دسته‌ای
+     * این interface برای تعریف منطق پردازش هر دسته استفاده می‌شود
      */
     @FunctionalInterface
     public interface BatchProcessor<T> {
+        /**
+         * پردازش یک دسته از داده‌ها
+         * 
+         * @param batch دسته داده‌ها برای پردازش
+         */
         void process(List<T> batch);
     }
     
-    // ==================== QUERY OPTIMIZATION ====================
+    // ==================== بهینه‌سازی کوئری (QUERY OPTIMIZATION) ====================
     
     /**
-     * Create optimized cache key for database queries
+     * ایجاد کلید کش بهینه شده برای کوئری‌های پایگاه داده
+     * این متد کلید منحصر به فرد برای کش کردن نتایج کوئری‌ها می‌سازد
+     * 
+     * @param operation نام عملیات (مثل getUserById، getOrdersByStatus)
+     * @param params پارامترهای کوئری که در کلید کش لحاظ می‌شوند
+     * @return کلید کش منحصر به فرد
      */
     public static String createQueryCacheKey(String operation, Object... params) {
         StringBuilder keyBuilder = new StringBuilder(operation);
@@ -302,26 +348,41 @@ public class PerformanceUtil {
     }
     
     /**
-     * Execute query with caching support
+     * اجرای کوئری با پشتیبانی از کش (TTL پیش‌فرض)
+     * ابتدا از کش بررسی می‌کند، در صورت عدم وجود کوئری را اجرا می‌کند
+     * 
+     * @param cacheKey کلید کش برای ذخیره‌سازی
+     * @param executor اجراکننده کوئری
+     * @param resultType نوع نتیجه کوئری
+     * @param <T> نوع generic نتیجه
+     * @return نتیجه کوئری (از کش یا اجرای مستقیم)
      */
     public static <T> T executeWithCache(String cacheKey, QueryExecutor<T> executor, Class<T> resultType) {
         return executeWithCache(cacheKey, executor, resultType, DEFAULT_CACHE_TTL_MINUTES);
     }
     
     /**
-     * Execute query with caching support and custom TTL
+     * اجرای کوئری با پشتیبانی از کش (TTL سفارشی)
+     * این متد الگوی cache-aside را پیاده‌سازی می‌کند
+     * 
+     * @param cacheKey کلید کش برای ذخیره‌سازی
+     * @param executor اجراکننده کوئری
+     * @param resultType نوع نتیجه کوئری
+     * @param ttlMinutes مدت زمان انقضای کش (دقیقه)
+     * @param <T> نوع generic نتیجه
+     * @return نتیجه کوئری (از کش یا اجرای مستقیم)
      */
     public static <T> T executeWithCache(String cacheKey, QueryExecutor<T> executor, Class<T> resultType, long ttlMinutes) {
-        // Try to get from cache first
+        // ابتدا از کش بررسی کن
         T cachedResult = getCachedData(cacheKey, resultType);
         if (cachedResult != null) {
-            return cachedResult;
+            return cachedResult; // برگرداندن نتیجه از کش
         }
         
-        // Execute query
+        // اجرای کوئری اصلی
         T result = executor.execute();
         
-        // Cache result if not null
+        // کش کردن نتیجه در صورت null نبودن
         if (result != null) {
             cacheData(cacheKey, result, ttlMinutes);
         }
@@ -330,50 +391,81 @@ public class PerformanceUtil {
     }
     
     /**
-     * Functional interface for query execution
+     * رابط تابعی برای اجرای کوئری
+     * این interface برای تعریف منطق اجرای کوئری استفاده می‌شود
      */
     @FunctionalInterface
     public interface QueryExecutor<T> {
+        /**
+         * اجرای کوئری و برگرداندن نتیجه
+         * 
+         * @return نتیجه کوئری
+         */
         T execute();
     }
     
-    // ==================== PERFORMANCE MONITORING ====================
+    // ==================== نظارت بر عملکرد (PERFORMANCE MONITORING) ====================
     
     /**
-     * Measure execution time of a operation
+     * اندازه‌گیری زمان اجرا و استفاده حافظه یک عملیات
+     * این متد عملکرد یک تابع را کامل اندازه‌گیری می‌کند
+     * 
+     * @param operationName نام عملیات برای ثبت در نتیجه
+     * @param operation تابع برای اندازه‌گیری عملکرد
+     * @param <T> نوع نتیجه عملیات
+     * @return نتیجه شامل زمان اجرا، استفاده حافظه و نتیجه عملیات
      */
     public static <T> PerformanceResult<T> measurePerformance(String operationName, PerformanceOperation<T> operation) {
+        // ثبت زمان و حافظه قبل از شروع
         long startTime = System.currentTimeMillis();
         long startMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         
+        // اجرای عملیات اصلی
         T result = operation.execute();
         
+        // ثبت زمان و حافظه بعد از اتمام
         long endTime = System.currentTimeMillis();
         long endMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         
-        long executionTime = endTime - startTime;
-        long memoryUsed = endMemory - startMemory;
+        // محاسبه اختلاف‌ها
+        long executionTime = endTime - startTime;       // زمان اجرا (میلی‌ثانیه)
+        long memoryUsed = endMemory - startMemory;      // حافظه استفاده شده (بایت)
         
         return new PerformanceResult<>(operationName, result, executionTime, memoryUsed);
     }
     
     /**
-     * Performance operation interface
+     * رابط تابعی برای عملیات قابل اندازه‌گیری
+     * این interface برای تعریف عملیاتی که می‌خواهیم عملکردشان را اندازه‌گیری کنیم
      */
     @FunctionalInterface
     public interface PerformanceOperation<T> {
+        /**
+         * اجرای عملیات و برگرداندن نتیجه
+         * 
+         * @return نتیجه عملیات
+         */
         T execute();
     }
     
     /**
-     * Performance measurement result
+     * کلاس نتیجه اندازه‌گیری عملکرد
+     * شامل تمام اطلاعات مربوط به عملکرد یک عملیات
      */
     public static class PerformanceResult<T> {
-        private final String operationName;
-        private final T result;
-        private final long executionTimeMs;
-        private final long memoryUsedBytes;
+        private final String operationName;      // نام عملیات
+        private final T result;                  // نتیجه عملیات
+        private final long executionTimeMs;     // زمان اجرا (میلی‌ثانیه)
+        private final long memoryUsedBytes;     // حافظه استفاده شده (بایت)
         
+        /**
+         * سازنده نتیجه عملکرد
+         * 
+         * @param operationName نام عملیات
+         * @param result نتیجه عملیات
+         * @param executionTimeMs زمان اجرا بر حسب میلی‌ثانیه
+         * @param memoryUsedBytes حافظه استفاده شده بر حسب بایت
+         */
         public PerformanceResult(String operationName, T result, long executionTimeMs, long memoryUsedBytes) {
             this.operationName = operationName;
             this.result = result;
@@ -381,12 +473,24 @@ public class PerformanceUtil {
             this.memoryUsedBytes = memoryUsedBytes;
         }
         
+        // متدهای دسترسی به داده‌ها
         public String getOperationName() { return operationName; }
         public T getResult() { return result; }
         public long getExecutionTimeMs() { return executionTimeMs; }
         public long getMemoryUsedBytes() { return memoryUsedBytes; }
+        
+        /**
+         * دریافت حافظه استفاده شده بر حسب مگابایت
+         * 
+         * @return حافظه استفاده شده (MB)
+         */
         public double getMemoryUsedMB() { return memoryUsedBytes / 1024.0 / 1024.0; }
         
+        /**
+         * نمایش فرمت شده نتایج عملکرد
+         * 
+         * @return رشته فرمت شده نتایج
+         */
         @Override
         public String toString() {
             return String.format("Performance[%s]: %dms, %.2fMB", 
@@ -394,22 +498,28 @@ public class PerformanceUtil {
         }
     }
     
-    // ==================== CLEANUP ====================
+    // ==================== پاکسازی و خاتمه (CLEANUP) ====================
     
     /**
-     * Shutdown performance utilities
+     * خاتمه و پاکسازی ابزارهای عملکرد
+     * این متد تمام منابع استفاده شده توسط کلاس را آزاد می‌کند
+     * باید در shutdown hook یا پایان برنامه فراخوانی شود
      */
     public static void shutdown() {
         try {
+            // خاتمه ExecutorService به صورت graceful
             executor.shutdown();
             if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
+                // اگر بعد از 5 ثانیه هنوز تکمیل نشده، force shutdown
                 executor.shutdownNow();
             }
         } catch (InterruptedException e) {
+            // در صورت interrupt، فوری shutdown کن
             executor.shutdownNow();
             Thread.currentThread().interrupt();
         }
         
+        // پاکسازی کش
         clearCache();
     }
 } 

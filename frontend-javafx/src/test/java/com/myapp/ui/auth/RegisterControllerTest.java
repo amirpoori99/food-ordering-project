@@ -19,40 +19,83 @@ import static org.mockito.Mockito.*;
 import com.myapp.ui.common.TestFXBase;
 
 /**
- * Simplified tests for RegisterController
+ * تست‌های ساده‌شده برای RegisterController
+ * 
+ * این کلاس تست شامل موارد زیر است:
+ * - مقداردهی اولیه کنترلر
+ * - تست کامپوننت‌های UI
+ * - اعتبارسنجی فیلدهای ثبت نام
+ * - مدیریت وضعیت دکمه ثبت نام
+ * - Navigation به صفحه ورود
+ * - تست Role ComboBox
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
  */
 public class RegisterControllerTest extends TestFXBase {
 
+    /** کنترلر RegisterController مورد تست */
     private RegisterController controller;
+    
+    /** NavigationController ساختگی برای تست */
     private NavigationController mockNavigationController;
     
-    // UI Components
+    // کامپوننت‌های UI
+    /** فیلد ورودی نام کامل */
     private TextField fullNameField;
+    
+    /** فیلد ورودی شماره تلفن */
     private TextField phoneField;
+    
+    /** فیلد ورودی آدرس ایمیل */
     private TextField emailField;
+    
+    /** فیلد ورودی رمز عبور */
     private PasswordField passwordField;
+    
+    /** فیلد تأیید رمز عبور */
     private PasswordField confirmPasswordField;
+    
+    /** فیلد ورودی آدرس */
     private TextArea addressField;
+    
+    /** ComboBox انتخاب نقش کاربری */
     private ComboBox<String> roleComboBox;
+    
+    /** دکمه ثبت نام */
     private Button registerButton;
+    
+    /** لینک ورود */
     private Hyperlink loginLink;
+    
+    /** برچسب نمایش وضعیت */
     private Label statusLabel;
+    
+    /** نشانگر بارگذاری */
     private ProgressIndicator loadingIndicator;
 
+    /**
+     * راه‌اندازی کلی برای همه تست‌ها
+     */
     @BeforeAll
     public static void setUpClass() throws Exception {
         FxToolkit.registerPrimaryStage();
     }
 
+    /**
+     * راه‌اندازی اولیه قبل از هر تست
+     * شامل ایجاد کنترلر و کامپوننت‌های UI
+     */
     @BeforeEach
     @Override
     public void setUp() throws Exception {
-        super.setUp(); // Call parent setup first
+        super.setUp(); // فراخوانی راه‌اندازی والد
         
-        // Create controller
+        // ایجاد کنترلر
         controller = new RegisterController();
         
-        // Create UI components
+        // ایجاد کامپوننت‌های UI
         fullNameField = new TextField();
         phoneField = new TextField();
         emailField = new TextField();
@@ -60,15 +103,15 @@ public class RegisterControllerTest extends TestFXBase {
         confirmPasswordField = new PasswordField();
         addressField = new TextArea();
         roleComboBox = new ComboBox<>();
-        registerButton = new Button("Register");
-        loginLink = new Hyperlink("Login");
+        registerButton = new Button("ثبت نام");
+        loginLink = new Hyperlink("ورود");
         statusLabel = new Label();
         loadingIndicator = new ProgressIndicator();
         
-        // Mock dependencies
+        // ایجاد وابستگی‌های ساختگی
         mockNavigationController = mock(NavigationController.class);
         
-        // Set up FXML injections
+        // تنظیم تزریق‌های FXML
         setPrivateField(controller, "fullNameField", fullNameField);
         setPrivateField(controller, "phoneField", phoneField);
         setPrivateField(controller, "emailField", emailField);
@@ -82,13 +125,13 @@ public class RegisterControllerTest extends TestFXBase {
         setPrivateField(controller, "loadingIndicator", loadingIndicator);
         setPrivateField(controller, "navigationController", mockNavigationController);
         
-        // Initialize controller
+        // مقداردهی اولیه کنترلر
         Platform.runLater(() -> {
             controller.initialize(null, null);
             controller.setNavigationController(mockNavigationController);
             loadingIndicator.setVisible(false);
             
-            // Manually add action handler to button
+            // اضافه کردن دستی action handler به دکمه
             registerButton.setOnAction(event -> {
                 try {
                     Method handleRegisterMethod = RegisterController.class.getDeclaredMethod("handleRegister");
@@ -102,6 +145,9 @@ public class RegisterControllerTest extends TestFXBase {
         WaitForAsyncUtils.waitForFxEvents();
     }
 
+    /**
+     * پاکسازی بعد از هر تست
+     */
     @AfterEach
     public void tearDown() {
         Platform.runLater(() -> {
@@ -118,15 +164,21 @@ public class RegisterControllerTest extends TestFXBase {
         WaitForAsyncUtils.waitForFxEvents();
     }
 
+    /**
+     * پاکسازی کلی بعد از تمام تست‌ها
+     */
     @AfterAll
     public static void tearDownClass() throws TimeoutException {
         FxToolkit.cleanupStages();
     }
 
-    // ==================== BASIC FUNCTIONALITY TESTS ====================
+    // ==================== تست‌های عملکرد پایه ====================
 
+    /**
+     * تست صحت مقداردهی اولیه کنترلر
+     */
     @Test
-    @DisplayName("Should initialize controller properly")
+    @DisplayName("باید کنترلر را به درستی مقداردهی کند")
     void testInitialization() {
         assertNotNull(controller);
         assertNotNull(fullNameField);
@@ -136,10 +188,13 @@ public class RegisterControllerTest extends TestFXBase {
         assertNotNull(statusLabel);
     }
 
+    /**
+     * تست پر کردن ComboBox نقش‌ها با مقادیر صحیح
+     */
     @Test
-    @DisplayName("Should populate role combo box with correct values")
+    @DisplayName("باید ComboBox نقش‌ها را با مقادیر صحیح پر کند")
     void testRoleComboBoxPopulation() {
-        // Clear existing items first
+        // ابتدا آیتم‌های موجود را پاک کن
         Platform.runLater(() -> {
             roleComboBox.getItems().clear();
             roleComboBox.getItems().addAll("BUYER", "SELLER", "COURIER");
@@ -152,8 +207,11 @@ public class RegisterControllerTest extends TestFXBase {
         assertTrue(roleComboBox.getItems().contains("COURIER"));
     }
 
+    /**
+     * تست فعال شدن دکمه هنگام پر بودن همه فیلدها
+     */
     @Test
-    @DisplayName("Should enable button when all fields are filled")
+    @DisplayName("باید دکمه را هنگام پر بودن همه فیلدها فعال کند")
     void testButtonEnabledWhenAllFieldsFilled() {
         Platform.runLater(() -> {
             fullNameField.setText("احمد محمدی");
@@ -165,11 +223,14 @@ public class RegisterControllerTest extends TestFXBase {
         });
         WaitForAsyncUtils.waitForFxEvents();
         
-        assertFalse(registerButton.isDisabled(), "Button should be enabled when all fields are filled");
+        assertFalse(registerButton.isDisabled(), "دکمه باید با پر بودن همه فیلدها فعال باشد");
     }
     
+    /**
+     * تست غیرفعال بودن دکمه هنگام خالی بودن فیلدها
+     */
     @Test
-    @DisplayName("Should disable button when fields are empty")
+    @DisplayName("باید دکمه را هنگام خالی بودن فیلدها غیرفعال کند")
     void testButtonDisabledWhenFieldsEmpty() {
         Platform.runLater(() -> {
             fullNameField.clear();
@@ -181,23 +242,26 @@ public class RegisterControllerTest extends TestFXBase {
         });
         WaitForAsyncUtils.waitForFxEvents();
         
-        assertTrue(registerButton.isDisabled(), "Button should be disabled when fields are empty");
+        assertTrue(registerButton.isDisabled(), "دکمه باید با خالی بودن فیلدها غیرفعال باشد");
     }
     
+    /**
+     * تست به‌روزرسانی وضعیت دکمه هنگام تغییر فیلدها
+     */
     @Test
-    @DisplayName("Should update button state on field changes")
+    @DisplayName("باید وضعیت دکمه را هنگام تغییر فیلدها به‌روزرسانی کند")
     void testButtonStateUpdate() {
-        // Initially disabled
+        // در ابتدا غیرفعال
         assertTrue(registerButton.isDisabled());
         
-        // Fill one field at a time
+        // پر کردن یک فیلد در هر مرحله
         Platform.runLater(() -> {
             fullNameField.setText("احمد");
         });
         WaitForAsyncUtils.waitForFxEvents();
-        assertTrue(registerButton.isDisabled(), "Should still be disabled with only name");
+        assertTrue(registerButton.isDisabled(), "باید با فقط نام هنوز غیرفعال باشد");
         
-        // Fill all required fields
+        // پر کردن همه فیلدهای الزامی
         Platform.runLater(() -> {
             phoneField.setText("09123456789");
             passwordField.setText("password123");
@@ -206,11 +270,14 @@ public class RegisterControllerTest extends TestFXBase {
             roleComboBox.setValue("BUYER");
         });
         WaitForAsyncUtils.waitForFxEvents();
-        assertFalse(registerButton.isDisabled(), "Should be enabled with all fields filled");
+        assertFalse(registerButton.isDisabled(), "باید با پر بودن همه فیلدها فعال باشد");
     }
     
+    /**
+     * تست navigation لینک ورود
+     */
     @Test
-    @DisplayName("Should handle login link navigation")
+    @DisplayName("باید navigation لینک ورود را مدیریت کند")
     void testLoginLinkNavigation() {
         Platform.runLater(() -> {
             loginLink.fire();
@@ -220,8 +287,15 @@ public class RegisterControllerTest extends TestFXBase {
         verify(mockNavigationController).navigateTo("Login");
     }
 
-    // ==================== HELPER METHODS ====================
+    // ==================== متدهای کمکی ====================
 
+    /**
+     * متد کمکی برای تنظیم فیلدهای private
+     * 
+     * @param object شیء مقصد
+     * @param fieldName نام فیلد
+     * @param value مقدار جدید
+     */
     private void setPrivateField(Object object, String fieldName, Object value) {
         try {
             java.lang.reflect.Field field = object.getClass().getDeclaredField(fieldName);

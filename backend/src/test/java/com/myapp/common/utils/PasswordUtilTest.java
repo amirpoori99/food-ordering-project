@@ -354,15 +354,15 @@ public class PasswordUtilTest {
     @Test
     @DisplayName("Password strength description should return correct strings")
     public void testGetPasswordStrengthDescription() {
-        // بررسی تمام سطوح قدرت
-        assertEquals("Very Weak", PasswordUtil.getPasswordStrengthDescription(0));
-        assertEquals("Weak", PasswordUtil.getPasswordStrengthDescription(1));
-        assertEquals("Fair", PasswordUtil.getPasswordStrengthDescription(2));
-        assertEquals("Good", PasswordUtil.getPasswordStrengthDescription(3));
-        assertEquals("Strong", PasswordUtil.getPasswordStrengthDescription(4));
-        assertEquals("Very Strong", PasswordUtil.getPasswordStrengthDescription(5));
-        assertEquals("Unknown", PasswordUtil.getPasswordStrengthDescription(-1));
-        assertEquals("Unknown", PasswordUtil.getPasswordStrengthDescription(10));
+        // بررسی تمام سطوح قدرت - توضیحات فارسی
+        assertEquals("خیلی ضعیف", PasswordUtil.getPasswordStrengthDescription(0));
+        assertEquals("ضعیف", PasswordUtil.getPasswordStrengthDescription(1));
+        assertEquals("متوسط", PasswordUtil.getPasswordStrengthDescription(2));
+        assertEquals("خوب", PasswordUtil.getPasswordStrengthDescription(3));
+        assertEquals("قوی", PasswordUtil.getPasswordStrengthDescription(4));
+        assertEquals("خیلی قوی", PasswordUtil.getPasswordStrengthDescription(5));
+        assertEquals("نامشخص", PasswordUtil.getPasswordStrengthDescription(-1));
+        assertEquals("نامشخص", PasswordUtil.getPasswordStrengthDescription(10));
     }
     
     /**

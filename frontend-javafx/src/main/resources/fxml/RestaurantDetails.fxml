@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.ui.restaurant.RestaurantDetailsController">
+   <top>
+      <!-- Header Section -->
+      <VBox styleClass="header-section">
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+         
+         <!-- Navigation Bar -->
+         <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="nav-bar">
+            <Button fx:id="backButton" styleClass="icon-button" text="←" />
+            <Label styleClass="nav-title" text="جزئیات رستوران" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="favoriteButton" styleClass="icon-button" text="♥" />
+            <Button fx:id="shareButton" styleClass="icon-button" text="⚫" />
+         </HBox>
+         
+         <!-- Restaurant Info -->
+         <VBox spacing="10.0" styleClass="restaurant-info">
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+               <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                  <Label fx:id="restaurantNameLabel" styleClass="restaurant-name" text="نام رستوران" />
+                  <Label fx:id="restaurantAddressLabel" styleClass="restaurant-address" text="آدرس رستوران" />
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                     <Label fx:id="restaurantRatingLabel" styleClass="rating-label" text="4.5 ⭐" />
+                     <Label fx:id="restaurantPhoneLabel" styleClass="phone-label" text="تلفن: 021-12345678" />
+                  </HBox>
+               </VBox>
+               <VBox alignment="CENTER" spacing="5.0">
+                  <Label styleClass="status-badge" text="باز" />
+                  <Label styleClass="delivery-time" text="30-45 دقیقه" />
+               </VBox>
+            </HBox>
+         </VBox>
+      </VBox>
+   </top>
+   
+   <center>
+      <!-- Main Content -->
+      <HBox spacing="20.0">
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
+         </padding>
+         
+         <!-- Menu Section -->
+         <VBox spacing="15.0" HBox.hgrow="ALWAYS">
+            <!-- Search Bar -->
+            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="search-section">
+               <TextField fx:id="menuSearchField" promptText="جستجو در منو..." styleClass="search-field" HBox.hgrow="ALWAYS" />
+               <Button styleClass="search-button" text="🔍" />
+            </HBox>
+            
+            <!-- Menu Categories -->
+            <TabPane fx:id="menuTabPane" styleClass="menu-tabs" tabClosingPolicy="UNAVAILABLE">
+               <tabs>
+                  <Tab text="همه موارد">
+                     <content>
+                        <ScrollPane fitToWidth="true" styleClass="menu-scroll">
+                           <content>
+                              <VBox fx:id="menuContainer" spacing="10.0" styleClass="menu-container">
+                                 <!-- Menu items will be added dynamically -->
+                                 <VBox styleClass="menu-item">
+                                    <HBox alignment="CENTER_LEFT" spacing="15.0">
+                                       <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                          <Label styleClass="item-name" text="کباب کوبیده" />
+                                          <Label styleClass="item-description" text="کباب کوبیده مخصوص با برنج" />
+                                          <Label styleClass="item-price" text="85,000 تومان" />
+                                       </VBox>
+                                       <VBox alignment="CENTER" spacing="5.0">
+                                          <Button styleClass="add-to-cart-btn" text="+" />
+                                          <Label text="1" />
+                                          <Button styleClass="remove-from-cart-btn" text="-" />
+                                       </VBox>
+                                    </HBox>
+                                 </VBox>
+                                 
+                                 <VBox styleClass="menu-item">
+                                    <HBox alignment="CENTER_LEFT" spacing="15.0">
+                                       <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                          <Label styleClass="item-name" text="جوجه کباب" />
+                                          <Label styleClass="item-description" text="جوجه کباب با زعفران و برنج" />
+                                          <Label styleClass="item-price" text="95,000 تومان" />
+                                       </VBox>
+                                       <VBox alignment="CENTER" spacing="5.0">
+                                          <Button styleClass="add-to-cart-btn" text="+" />
+                                          <Label text="0" />
+                                          <Button styleClass="remove-from-cart-btn" text="-" />
+                                       </VBox>
+                                    </HBox>
+                                 </VBox>
+                              </VBox>
+                           </content>
+                        </ScrollPane>
+                     </content>
+                  </Tab>
+                  
+                  <Tab text="غذاهای اصلی">
+                     <content>
+                        <ScrollPane fitToWidth="true" styleClass="menu-scroll">
+                           <content>
+                              <VBox spacing="10.0" styleClass="menu-container">
+                                 <!-- Main dishes will be loaded here -->
+                              </VBox>
+                           </content>
+                        </ScrollPane>
+                     </content>
+                  </Tab>
+                  
+                  <Tab text="نوشیدنی">
+                     <content>
+                        <ScrollPane fitToWidth="true" styleClass="menu-scroll">
+                           <content>
+                              <VBox spacing="10.0" styleClass="menu-container">
+                                 <!-- Beverages will be loaded here -->
+                              </VBox>
+                           </content>
+                        </ScrollPane>
+                     </content>
+                  </Tab>
+                  
+                  <Tab text="دسر">
+                     <content>
+                        <ScrollPane fitToWidth="true" styleClass="menu-scroll">
+                           <content>
+                              <VBox spacing="10.0" styleClass="menu-container">
+                                 <!-- Desserts will be loaded here -->
+                              </VBox>
+                           </content>
+                        </ScrollPane>
+                     </content>
+                  </Tab>
+               </tabs>
+            </TabPane>
+         </VBox>
+         
+         <!-- Cart Sidebar -->
+         <VBox spacing="15.0" styleClass="cart-sidebar" minWidth="300.0" maxWidth="300.0">
+            <Label styleClass="cart-title" text="سبد خرید" />
+            
+            <!-- Cart Items -->
+            <ScrollPane fitToWidth="true" styleClass="cart-scroll" VBox.vgrow="ALWAYS">
+               <content>
+                  <VBox fx:id="cartSummaryBox" spacing="10.0" styleClass="cart-items">
+                     <!-- Cart items will be added dynamically -->
+                     <VBox styleClass="cart-item">
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                           <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                              <Label styleClass="cart-item-name" text="کباب کوبیده" />
+                              <Label styleClass="cart-item-price" text="85,000 × 1" />
+                           </VBox>
+                           <Button styleClass="remove-item-btn" text="×" />
+                        </HBox>
+                     </VBox>
+                  </VBox>
+               </content>
+            </ScrollPane>
+            
+            <!-- Cart Summary -->
+            <VBox spacing="10.0" styleClass="cart-summary">
+               <Separator />
+               <HBox alignment="CENTER_LEFT">
+                  <Label styleClass="summary-label" text="جمع کل:" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Label fx:id="cartTotalLabel" styleClass="total-price" text="85,000 تومان" />
+               </HBox>
+               <Button fx:id="checkoutButton" styleClass="checkout-btn" text="ثبت سفارش" maxWidth="Infinity" />
+            </VBox>
+         </VBox>
+      </HBox>
+   </center>
+   
+   <bottom>
+      <!-- Footer -->
+      <HBox alignment="CENTER" spacing="20.0" styleClass="footer">
+         <padding>
+            <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+         </padding>
+         <Label styleClass="footer-text" text="سفارش آنلاین غذا - سیستم مدیریت رستوران" />
+      </HBox>
+   </bottom>
+</BorderPane> 
