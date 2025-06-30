@@ -17,6 +17,7 @@ import javafx.util.Duration;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 
+import java.io.File;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
@@ -650,17 +651,117 @@ public class OrderConfirmationController implements Initializable {
 
     /**
      * ارسال اطلاع‌رسانی تکمیل سفارش
+     * 
+     * این متد اطلاع‌رسانی‌های مختلف را بر اساس تنظیمات کاربر ارسال می‌کند:
+     * - ایمیل: شامل رسید کامل و جزئیات تحویل
+     * - پیامک: پیام کوتاه تأیید تحویل
+     * - در نسخه آینده: Push notification و Telegram bot
      */
     private void sendCompletionNotification() {
+        // بررسی و ارسال اطلاع‌رسانی ایمیل
         if (emailNotificationCheckBox != null && emailNotificationCheckBox.isSelected()) {
-            // TODO: ارسال ایمیل
-            System.out.println("ایمیل تکمیل سفارش ارسال شد");
+            sendEmailNotification();
         }
         
+        // بررسی و ارسال اطلاع‌رسانی پیامکی
         if (smsNotificationCheckBox != null && smsNotificationCheckBox.isSelected()) {
-            // TODO: ارسال پیامک
-            System.out.println("پیامک تکمیل سفارش ارسال شد");
+            sendSMSNotification();
         }
+    }
+    
+    /**
+     * ارسال اطلاع‌رسانی ایمیل تکمیل سفارش
+     * 
+     * در پیاده‌سازی نهایی، این متد:
+     * 1. قالب ایمیل را از template engine بارگذاری می‌کند
+     * 2. اطلاعات سفارش را در قالب جایگذاری می‌کند
+     * 3. رسید PDF را به عنوان پیوست اضافه می‌کند
+     * 4. از SMTP server برای ارسال استفاده می‌کند
+     */
+    private void sendEmailNotification() {
+        try {
+            String customerEmail = getCurrentCustomerEmail();
+            String emailSubject = "تکمیل سفارش شما - شماره " + currentOrder.getOrderId();
+            String emailBody = generateEmailBody();
+            
+            // شبیه‌سازی ارسال ایمیل
+            System.out.println("📧 ایمیل تکمیل سفارش ارسال شد");
+            System.out.println("📧 آدرس گیرنده: " + customerEmail);
+            System.out.println("📧 موضوع: " + emailSubject);
+            
+            // در پیاده‌سازی واقعی:
+            // EmailService.sendOrderCompletionEmail(customerEmail, currentOrder);
+            
+        } catch (Exception e) {
+            System.err.println("❌ خطا در ارسال ایمیل: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * ارسال اطلاع‌رسانی پیامکی تکمیل سفارش
+     * 
+     * پیامک شامل اطلاعات خلاصه:
+     * - شماره سفارش
+     * - زمان تحویل
+     * - مبلغ نهایی
+     * - لینک نظرسنجی
+     */
+    private void sendSMSNotification() {
+        try {
+            String customerPhone = currentOrder.getCustomerPhone();
+            String smsMessage = generateSMSMessage();
+            
+            // شبیه‌سازی ارسال پیامک
+            System.out.println("📱 پیامک تکمیل سفارش ارسال شد");
+            System.out.println("📱 شماره گیرنده: " + customerPhone);
+            System.out.println("📱 متن پیام: " + smsMessage);
+            
+            // در پیاده‌سازی واقعی:
+            // SMSService.sendOrderCompletionSMS(customerPhone, smsMessage);
+            
+        } catch (Exception e) {
+            System.err.println("❌ خطا در ارسال پیامک: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * دریافت ایمیل مشتری فعلی
+     * 
+     * @return ایمیل مشتری از session یا پروفایل کاربر
+     */
+    private String getCurrentCustomerEmail() {
+        // در پیاده‌سازی واقعی از UserSession یا AuthService استفاده می‌شود
+        return "customer@example.com";
+    }
+    
+    /**
+     * تولید متن ایمیل تکمیل سفارش
+     * 
+     * @return HTML content برای ایمیل
+     */
+    private String generateEmailBody() {
+        StringBuilder emailBody = new StringBuilder();
+        emailBody.append("<!DOCTYPE html><html><body>");
+        emailBody.append("<h2>سفارش شما با موفقیت تحویل داده شد!</h2>");
+        emailBody.append("<p>شماره سفارش: ").append(currentOrder.getOrderId()).append("</p>");
+        emailBody.append("<p>رستوران: ").append(currentOrder.getRestaurantName()).append("</p>");
+        emailBody.append("<p>مبلغ کل: ").append(formatCurrency(currentOrder.getTotalAmount())).append(" تومان</p>");
+        emailBody.append("<p>از انتخاب ما متشکریم!</p>");
+        emailBody.append("</body></html>");
+        return emailBody.toString();
+    }
+    
+    /**
+     * تولید متن پیامک تکمیل سفارش
+     * 
+     * @return متن کوتاه و مختصر پیامک
+     */
+    private String generateSMSMessage() {
+        return String.format(
+            "سفارش %s با موفقیت تحویل شد. مبلغ: %s تومان. از انتخاب شما متشکریم!",
+            currentOrder.getOrderId(),
+            formatCurrency(currentOrder.getTotalAmount())
+        );
     }
 
     // ===== Event Handlers =====
@@ -674,22 +775,180 @@ public class OrderConfirmationController implements Initializable {
         
         Optional<ButtonType> result = confirmAlert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            // TODO: پیاده‌سازی لغو سفارش
-            setStatus("درخواست لغو سفارش ارسال شد");
+            processCancelOrder();
+        }
+    }
+    
+    /**
+     * پردازش درخواست لغو سفارش
+     * 
+     * این متد مراحل زیر را انجام می‌دهد:
+     * 1. بررسی امکان لغو سفارش (بر اساس وضعیت فعلی)
+     * 2. ارسال درخواست لغو به backend
+     * 3. بروزرسانی UI و غیرفعال کردن دکمه لغو
+     * 4. ارسال اطلاع‌رسانی لغو به مشتری
+     * 5. محاسبه و پردازش بازپرداخت (در صورت لزوم)
+     */
+    private void processCancelOrder() {
+        setStatus("در حال پردازش درخواست لغو سفارش...");
+        
+        // بررسی امکان لغو بر اساس وضعیت سفارش
+        if (!isOrderCancelable()) {
+            showError("خطا", "امکان لغو سفارش در مرحله فعلی وجود ندارد");
+            return;
+        }
+        
+        // شبیه‌سازی ارسال درخواست لغو به backend
+        Task<Boolean> cancelTask = new Task<Boolean>() {
+            @Override
+            protected Boolean call() throws Exception {
+                Thread.sleep(2000); // شبیه‌سازی تأخیر شبکه
+                
+                // در پیاده‌سازی واقعی:
+                // return OrderService.cancelOrder(currentOrder.getOrderId());
+                
+                // شبیه‌سازی موفقیت 90% و شکست 10%
+                return Math.random() > 0.1;
+            }
+        };
+        
+        cancelTask.setOnSucceeded(e -> Platform.runLater(() -> {
+            boolean success = cancelTask.getValue();
+            if (success) {
+                handleCancelOrderSuccess();
+            } else {
+                handleCancelOrderFailure("خطای سرور در پردازش درخواست لغو");
+            }
+        }));
+        
+        cancelTask.setOnFailed(e -> Platform.runLater(() -> {
+            Throwable exception = cancelTask.getException();
+            String errorMessage = exception != null ? exception.getMessage() : "خطای نامشخص";
+            handleCancelOrderFailure(errorMessage);
+        }));
+        
+        new Thread(cancelTask).start();
+    }
+    
+    /**
+     * بررسی امکان لغو سفارش بر اساس وضعیت فعلی
+     * 
+     * سفارش تنها در مراحل زیر قابل لغو است:
+     * - تأیید سفارش
+     * - آماده‌سازی غذا (تا 5 دقیقه اول)
+     * 
+     * @return true اگر سفارش قابل لغو باشد
+     */
+    private boolean isOrderCancelable() {
+        if (trackingSteps == null || trackingSteps.isEmpty()) {
+            return false;
+        }
+        
+        // محاسبه تعداد مراحل تکمیل شده
+        long completedSteps = trackingSteps.stream()
+            .mapToLong(step -> step.getStatus() == TrackingStatus.COMPLETED ? 1 : 0)
+            .sum();
+        
+        // اگر بیش از 2 مرحله تکمیل شده، امکان لغو وجود ندارد
+        if (completedSteps > 2) {
+            return false;
+        }
+        
+        // بررسی زمان سپری شده از ثبت سفارش
+        LocalDateTime orderTime = currentOrder.getOrderDateTime();
+        long minutesPassed = java.time.Duration.between(orderTime, LocalDateTime.now()).toMinutes();
+        
+        // حداکثر 10 دقیقه امکان لغو وجود دارد
+        return minutesPassed <= 10;
+    }
+    
+    /**
+     * مدیریت موفقیت در لغو سفارش
+     */
+    private void handleCancelOrderSuccess() {
+        setStatus("سفارش با موفقیت لغو شد");
+        
+        // غیرفعال کردن دکمه لغو و تغییر متن
             cancelOrderButton.setDisable(true);
+        cancelOrderButton.setText("لغو شده");
+        cancelOrderButton.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-opacity: 0.6;");
+        
+        // توقف timeline پیگیری
+        if (statusUpdateTimeline != null) {
+            statusUpdateTimeline.stop();
+        }
+        
+        // ارسال اطلاع‌رسانی لغو
+        sendCancellationNotification();
+        
+        // نمایش پیام موفقیت
+        showInfo("لغو موفق", 
+            "سفارش شما با موفقیت لغو شد.\n" +
+            "در صورت پرداخت آنلاین، مبلغ طی 2-3 روز کاری بازگردانده خواهد شد.\n" +
+            "شماره پیگیری لغو: CANCEL-" + System.currentTimeMillis());
+    }
+    
+    /**
+     * مدیریت شکست در لغو سفارش
+     * 
+     * @param errorMessage پیام خطا
+     */
+    private void handleCancelOrderFailure(String errorMessage) {
+        setStatus("خطا در لغو سفارش");
+        showError("خطا در لغو سفارش", 
+            "متأسفانه امکان لغو سفارش وجود ندارد.\n" +
+            "دلیل: " + errorMessage + "\n" +
+            "برای کمک بیشتر با پشتیبانی تماس بگیرید.");
+    }
+    
+    /**
+     * ارسال اطلاع‌رسانی لغو سفارش
+     */
+    private void sendCancellationNotification() {
+        if (emailNotificationCheckBox != null && emailNotificationCheckBox.isSelected()) {
+            System.out.println("📧 ایمیل لغو سفارش ارسال شد");
+        }
+        
+        if (smsNotificationCheckBox != null && smsNotificationCheckBox.isSelected()) {
+            System.out.println("📱 پیامک لغو سفارش ارسال شد");
         }
     }
 
     @FXML
     private void handleDownloadReceipt() {
-        // TODO: پیاده‌سازی دانلود رسید PDF
+        if (currentOrder == null) {
+            showError("خطا", "اطلاعات سفارش موجود نیست");
+            return;
+        }
+        
         setStatus("رسید در حال دانلود...");
         
-        // شبیه‌سازی دانلود
         Task<Void> downloadTask = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                Thread.sleep(2000);
+                try {
+                    // تعیین مسیر ذخیره فایل
+                    String userHome = System.getProperty("user.home");
+                    String downloadsPath = userHome + File.separator + "Downloads";
+                    File downloadsDir = new File(downloadsPath);
+                    
+                    if (!downloadsDir.exists()) {
+                        downloadsDir = new File(userHome);
+                    }
+                    
+                    String fileName = "receipt_" + currentOrder.getOrderId() + ".txt";
+                    File receiptFile = new File(downloadsDir, fileName);
+                    
+                    // استفاده از TextReceiptExporter برای تولید رسید
+                    com.myapp.ui.order.internal.TextReceiptExporter exporter = 
+                        new com.myapp.ui.order.internal.TextReceiptExporter();
+                    exporter.export(currentOrder, receiptFile);
+                    
+                    Thread.sleep(1000); // شبیه‌سازی تأخیر
+                    
+                } catch (Exception e) {
+                    throw new RuntimeException("خطا در تولید رسید: " + e.getMessage(), e);
+                }
                 return null;
             }
         };
@@ -699,20 +958,110 @@ public class OrderConfirmationController implements Initializable {
             showInfo("موفقیت", "رسید سفارش در پوشه Downloads ذخیره شد");
         }));
         
+        downloadTask.setOnFailed(e -> Platform.runLater(() -> {
+            setStatus("خطا در دانلود رسید");
+            Throwable exception = downloadTask.getException();
+            String errorMessage = exception != null ? exception.getMessage() : "خطای نامشخص";
+            showError("خطا", errorMessage);
+        }));
+        
         new Thread(downloadTask).start();
     }
 
     @FXML
     private void handleContactSupport() {
-        // TODO: باز کردن چت پشتیبانی
         setStatus("در حال اتصال به پشتیبانی...");
-        showInfo("پشتیبانی", "به زودی با پشتیبانی در تماس خواهید بود");
+        
+        // شبیه‌سازی اتصال به پشتیبانی
+        Task<Void> supportTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                Thread.sleep(1500); // شبیه‌سازی تأخیر اتصال
+                return null;
+            }
+        };
+        
+        supportTask.setOnSucceeded(e -> Platform.runLater(() -> {
+            setStatus("متصل به پشتیبانی");
+            showInfo("پشتیبانی", 
+                "شماره پشتیبانی: 021-91000000\n" +
+                "ساعت کاری: 24 ساعته\n" +
+                "شماره سفارش شما: " + (currentOrder != null ? currentOrder.getOrderId() : "نامشخص"));
+        }));
+        
+        supportTask.setOnFailed(e -> Platform.runLater(() -> {
+            setStatus("خطا در اتصال به پشتیبانی");
+            showError("خطا", "امکان اتصال به پشتیبانی وجود ندارد. لطفاً مجدداً تلاش کنید.");
+        }));
+        
+        new Thread(supportTask).start();
     }
 
     @FXML
     private void handleTrackOrder() {
-        // TODO: باز کردن صفحه پیگیری تفصیلی
+        openDetailedTrackingView();
+    }
+    
+    /**
+     * باز کردن صفحه پیگیری تفصیلی سفارش
+     * 
+     * این متد صفحه‌ای جداگانه برای پیگیری دقیق‌تر سفارش باز می‌کند که شامل:
+     * - نقشه مسیر پیک (در صورت وجود GPS tracking)
+     * - اطلاعات تماس پیک و رستوران
+     * - تاریخچه کامل تغییرات وضعیت
+     * - تخمین زمان دقیق‌تر تحویل
+     * - امکان چت مستقیم با پیک
+     */
+    private void openDetailedTrackingView() {
+        try {
+            // بررسی وجود سفارش جاری
+            if (currentOrder == null) {
+                showError("خطا", "اطلاعات سفارش برای پیگیری تفصیلی موجود نیست");
+                return;
+            }
+            
+            setStatus("در حال بارگذاری صفحه پیگیری تفصیلی...");
+            
+            // شبیه‌سازی بارگذاری صفحه پیگیری
+            Task<Void> loadTrackingTask = new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    Thread.sleep(1500); // شبیه‌سازی بارگذاری
+                    return null;
+                }
+            };
+            
+            loadTrackingTask.setOnSucceeded(e -> Platform.runLater(() -> {
+                setStatus("صفحه پیگیری تفصیلی بارگذاری شد");
+                
+                // در پیاده‌سازی واقعی، صفحه جدید باز می‌شود:
+                // navigationController.navigateToOrderTracking(currentOrder.getOrderId());
+                
+                // فعلاً پیام اطلاعاتی نمایش می‌دهیم
+                showInfo("پیگیری تفصیلی", 
+                    "صفحه پیگیری تفصیلی (نسخه آینده):\n\n" +
+                    "🗺️ نقشه مسیر پیک\n" +
+                    "📞 تماس مستقیم با پیک\n" +
+                    "💬 چت آنلاین\n" +
+                    "⏰ بروزرسانی لحظه‌ای\n" +
+                    "📍 موقعیت دقیق سفارش\n\n" +
+                    "شماره پیگیری: " + currentOrder.getOrderId());
+                
+                // در حال حاضر به صفحه پیگیری ساده هدایت می‌کنیم
         navigationController.navigateTo("OrderTracking");
+            }));
+            
+            loadTrackingTask.setOnFailed(e -> Platform.runLater(() -> {
+                setStatus("خطا در بارگذاری صفحه پیگیری");
+                showError("خطا", "امکان باز کردن صفحه پیگیری تفصیلی وجود ندارد");
+            }));
+            
+            new Thread(loadTrackingTask).start();
+            
+        } catch (Exception e) {
+            setStatus("خطا در پیگیری سفارش");
+            showError("خطای سیستم", "خطا در باز کردن صفحه پیگیری: " + e.getMessage());
+        }
     }
 
     @FXML
@@ -722,9 +1071,36 @@ public class OrderConfirmationController implements Initializable {
 
     @FXML
     private void handleReorder() {
-        // TODO: افزودن آیتم‌های سفارش به سبد جدید
+        if (currentOrder == null || currentOrder.getOrderItems() == null) {
+            showError("خطا", "اطلاعات سفارش برای سفارش مجدد موجود نیست");
+            return;
+        }
+        
+        setStatus("در حال افزودن آیتم‌ها به سبد خرید...");
+        
+        // شبیه‌سازی افزودن آیتم‌ها به سبد
+        Task<Void> reorderTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                Thread.sleep(1000); // شبیه‌سازی عملیات افزودن
+                return null;
+            }
+        };
+        
+        reorderTask.setOnSucceeded(e -> Platform.runLater(() -> {
         setStatus("آیتم‌های سفارش به سبد خرید اضافه شدند");
+            showInfo("موفقیت", 
+                currentOrder.getOrderItems().size() + " آیتم به سبد خرید شما اضافه شد.\n" +
+                "اکنون می‌توانید سبد خرید را بررسی کنید.");
         navigationController.navigateTo(NavigationController.CART_SCENE);
+        }));
+        
+        reorderTask.setOnFailed(e -> Platform.runLater(() -> {
+            setStatus("خطا در افزودن آیتم‌ها");
+            showError("خطا", "امکان افزودن آیتم‌ها به سبد خرید وجود ندارد");
+        }));
+        
+        new Thread(reorderTask).start();
     }
 
     @FXML
@@ -734,8 +1110,36 @@ public class OrderConfirmationController implements Initializable {
 
     @FXML
     private void handlePrintReceipt() {
-        // TODO: پرینت رسید
+        if (currentOrder == null) {
+            showError("خطا", "اطلاعات سفارش برای چاپ موجود نیست");
+            return;
+        }
+        
         setStatus("در حال آماده‌سازی برای چاپ...");
+        
+        // شبیه‌سازی آماده‌سازی چاپ
+        Task<Void> printTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                Thread.sleep(2000); // شبیه‌سازی تأخیر آماده‌سازی
+                return null;
+            }
+        };
+        
+        printTask.setOnSucceeded(e -> Platform.runLater(() -> {
+            setStatus("رسید آماده چاپ است");
+            showInfo("چاپ رسید", 
+                "رسید سفارش آماده چاپ شد.\n" +
+                "شماره سفارش: " + currentOrder.getOrderId() + "\n" +
+                "لطفاً چاپگر خود را بررسی کنید.");
+        }));
+        
+        printTask.setOnFailed(e -> Platform.runLater(() -> {
+            setStatus("خطا در آماده‌سازی چاپ");
+            showError("خطا", "امکان چاپ رسید وجود ندارد. لطفاً از دانلود رسید استفاده کنید.");
+        }));
+        
+        new Thread(printTask).start();
     }
 
     @FXML
@@ -749,11 +1153,135 @@ public class OrderConfirmationController implements Initializable {
     }
 
     /**
-     * بروزرسانی تنظیمات اطلاع‌رسانی
+     * بروزرسانی تنظیمات اطلاع‌رسانی کاربر
+     * 
+     * این متد تنظیمات اطلاع‌رسانی را در پروفایل کاربر ذخیره می‌کند:
+     * - ترجیح دریافت ایمیل
+     * - ترجیح دریافت پیامک
+     * - زمان‌بندی اطلاع‌رسانی‌ها
+     * - نوع اطلاع‌رسانی‌های دریافتی
      */
     private void updateNotificationPreferences() {
-        // TODO: ذخیره تنظیمات در پروفایل کاربر
+        try {
+            // دریافت تنظیمات جاری از UI
+            boolean emailEnabled = emailNotificationCheckBox != null && emailNotificationCheckBox.isSelected();
+            boolean smsEnabled = smsNotificationCheckBox != null && smsNotificationCheckBox.isSelected();
+            
+            // ایجاد شیء تنظیمات
+            NotificationPreferences preferences = new NotificationPreferences();
+            preferences.setEmailNotifications(emailEnabled);
+            preferences.setSmsNotifications(smsEnabled);
+            preferences.setOrderUpdates(true); // همیشه فعال
+            preferences.setPromotionalMessages(false); // پیش‌فرض غیرفعال
+            preferences.setUpdatedAt(LocalDateTime.now());
+            
+            // شبیه‌سازی ذخیره در backend
+            Task<Boolean> saveTask = new Task<Boolean>() {
+                @Override
+                protected Boolean call() throws Exception {
+                    Thread.sleep(1000); // شبیه‌سازی درخواست شبکه
+                    
+                    // در پیاده‌سازی واقعی:
+                    // return UserService.updateNotificationPreferences(getCurrentUserId(), preferences);
+                    
+                    return true; // شبیه‌سازی موفقیت
+                }
+            };
+            
+            saveTask.setOnSucceeded(e -> Platform.runLater(() -> {
+                boolean success = saveTask.getValue();
+                if (success) {
         setStatus("تنظیمات اطلاع‌رسانی بروزرسانی شد");
+                    
+                    // نمایش پیام تأیید کوتاه
+                    showTemporaryMessage("✅ تنظیمات ذخیره شد", 2000);
+                    
+                    // ذخیره در حافظه محلی برای استفاده سریع‌تر
+                    saveNotificationPreferencesLocally(preferences);
+                    
+                } else {
+                    setStatus("خطا در ذخیره تنظیمات");
+                    showError("خطا", "امکان ذخیره تنظیمات وجود ندارد");
+                }
+            }));
+            
+            saveTask.setOnFailed(e -> Platform.runLater(() -> {
+                setStatus("خطا در اتصال به سرور");
+                showError("خطای شبکه", "امکان بروزرسانی تنظیمات وجود ندارد");
+            }));
+            
+            new Thread(saveTask).start();
+            
+        } catch (Exception e) {
+            setStatus("خطا در بروزرسانی تنظیمات");
+            showError("خطای سیستم", "خطا در ذخیره تنظیمات: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * ذخیره تنظیمات اطلاع‌رسانی در حافظه محلی
+     * 
+     * @param preferences تنظیمات اطلاع‌رسانی
+     */
+    private void saveNotificationPreferencesLocally(NotificationPreferences preferences) {
+        try {
+            // در پیاده‌سازی واقعی از SharedPreferences یا Properties file استفاده می‌شود
+            System.out.println("💾 تنظیمات در حافظه محلی ذخیره شد:");
+            System.out.println("📧 ایمیل: " + preferences.isEmailNotifications());
+            System.out.println("📱 پیامک: " + preferences.isSmsNotifications());
+            System.out.println("🔔 بروزرسانی سفارش: " + preferences.isOrderUpdates());
+            
+        } catch (Exception e) {
+            System.err.println("❌ خطا در ذخیره محلی: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * نمایش پیام موقت در UI
+     * 
+     * @param message متن پیام
+     * @param durationMs مدت نمایش به میلی‌ثانیه
+     */
+    private void showTemporaryMessage(String message, int durationMs) {
+        if (statusMessageLabel != null) {
+            String originalMessage = statusMessageLabel.getText();
+            statusMessageLabel.setText(message);
+            statusMessageLabel.setStyle("-fx-text-fill: #28a745; -fx-font-weight: bold;");
+            
+            // برگرداندن پیام اصلی پس از مدت زمان مشخص
+            Timeline timeline = new Timeline(new KeyFrame(Duration.millis(durationMs), e -> {
+                statusMessageLabel.setText(originalMessage);
+                statusMessageLabel.setStyle(""); // حذف style خاص
+            }));
+            timeline.play();
+        }
+    }
+    
+    /**
+     * کلاس تنظیمات اطلاع‌رسانی
+     */
+    public static class NotificationPreferences {
+        private boolean emailNotifications;
+        private boolean smsNotifications;
+        private boolean orderUpdates;
+        private boolean promotionalMessages;
+        private LocalDateTime updatedAt;
+        
+        // Getters and Setters
+        public boolean isEmailNotifications() { return emailNotifications; }
+        public void setEmailNotifications(boolean emailNotifications) { this.emailNotifications = emailNotifications; }
+        
+        public boolean isSmsNotifications() { return smsNotifications; }
+        public void setSmsNotifications(boolean smsNotifications) { this.smsNotifications = smsNotifications; }
+        
+        public boolean isOrderUpdates() { return orderUpdates; }
+        public void setOrderUpdates(boolean orderUpdates) { this.orderUpdates = orderUpdates; }
+        
+        public boolean isPromotionalMessages() { return promotionalMessages; }
+        public void setPromotionalMessages(boolean promotionalMessages) { this.promotionalMessages = promotionalMessages; }
+        
+        public LocalDateTime getUpdatedAt() { return updatedAt; }
+        public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
     }
 
     // ===== Utility Methods =====

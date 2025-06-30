@@ -8,6 +8,7 @@ import com.myapp.common.utils.PerformanceUtil;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Future;
+import java.util.ArrayList;
 
 /**
  * سرویس مدیریت رستوران‌ها - لایه منطق کسب‌وکار
@@ -359,6 +360,7 @@ public class RestaurantService {
                             System.err.println("Failed to update restaurant " + id + ": " + e.getMessage());
                         }
                     }
+                    return new ArrayList<>(); // Return empty list as required by Function interface
                 });
                 
                 // Clear relevant caches after bulk update

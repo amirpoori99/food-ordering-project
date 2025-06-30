@@ -1,180 +1,483 @@
 #!/bin/bash
 
 # ================================================================
-# FOOD ORDERING SYSTEM - BACKUP SCRIPT
+# سیستم سفارش غذا - اسکریپت پیشرفته پشتیبان‌گیری
+# نسخه: ۲.۰ - پیاده‌سازی فاز ۳۲
 # ================================================================
 
-set -euo pipefail
+set -euo pipefail  # تنظیمات امنیتی: خروج در صورت خطا، استفاده از متغیرهای تعریف نشده، و pipe failures
 
-# Configuration
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CONFIG_FILE="${SCRIPT_DIR}/backup.conf"
-LOG_FILE="/var/log/food-ordering/backup.log"
-BACKUP_BASE_DIR="/var/backups/food-ordering"
-DATE=$(date +%Y%m%d_%H%M%S)
-BACKUP_DIR="${BACKUP_BASE_DIR}/${DATE}"
+# تنظیمات اولیه
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"  # مسیر دایرکتوری اسکریپت
+CONFIG_FILE="${SCRIPT_DIR}/backup.conf"  # فایل پیکربندی
+LOG_FILE="/var/log/food-ordering/backup.log"  # فایل لاگ
+BACKUP_BASE_DIR="/var/backups/food-ordering"  # مسیر اصلی پشتیبان‌گیری
+DATE=$(date +%Y%m%d_%H%M%S)  # تاریخ و زمان فعلی برای نام‌گذاری
+BACKUP_DIR="${BACKUP_BASE_DIR}/${DATE}"  # مسیر کامل پشتیبان‌گیری
 
-# Default configuration (can be overridden by backup.conf)
-DB_HOST="localhost"
-DB_PORT="5432"
-DB_NAME="food_ordering_prod"
-DB_USER="food_ordering_backup"
-DB_PASSWORD=""
-RETENTION_DAYS=30
-COMPRESS_BACKUPS=true
-VERIFY_BACKUPS=true
-EMAIL_NOTIFICATIONS=false
-EMAIL_TO=""
+# تنظیمات پیش‌فرض دیتابیس (می‌تواند توسط backup.conf بازنویسی شود)
+DB_HOST="localhost"  # میزبان دیتابیس
+DB_PORT="5432"  # پورت دیتابیس
+DB_NAME="food_ordering_prod"  # نام دیتابیس
+DB_USER="food_ordering_backup"  # کاربر دیتابیس
+DB_PASSWORD=""  # رمز عبور دیتابیس
+RETENTION_DAYS=30  # تعداد روزهای نگهداری نسخه‌های قدیمی
+COMPRESS_BACKUPS=true  # فشرده‌سازی پشتیبان‌گیری
+VERIFY_BACKUPS=true  # تأیید صحت پشتیبان‌گیری
+EMAIL_NOTIFICATIONS=false  # اعلان‌های ایمیل
+EMAIL_TO=""  # آدرس ایمیل دریافت‌کننده
+BACKUP_DATABASE=true  # پشتیبان‌گیری از دیتابیس
+BACKUP_APPLICATION=true  # پشتیبان‌گیری از فایل‌های اپلیکیشن
+BACKUP_CONFIGURATION=true  # پشتیبان‌گیری از تنظیمات
+BACKUP_LOGS=true  # پشتیبان‌گیری از لاگ‌ها
+ENCRYPT_BACKUPS=false  # رمزنگاری پشتیبان‌گیری
+ENCRYPTION_PASSWORD=""  # رمز عبور رمزنگاری
+UPLOAD_TO_CLOUD=false  # آپلود به ابر
+CLOUD_PROVIDER=""  # ارائه‌دهنده ابر
+CLOUD_BUCKET=""  # سطل ابر
+CLOUD_CREDENTIALS=""  # اعتبارنامه‌های ابر
 
-# Load configuration if exists
+# بارگذاری پیکربندی اگر وجود داشته باشد
 if [[ -f "${CONFIG_FILE}" ]]; then
-    source "${CONFIG_FILE}"
+    source "${CONFIG_FILE}"  # بارگذاری تنظیمات از فایل پیکربندی
 fi
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+# رنگ‌ها برای خروجی
+RED='\033[0;31m'  # قرمز برای خطاها
+GREEN='\033[0;32m'  # سبز برای موفقیت
+YELLOW='\033[1;33m'  # زرد برای هشدارها
+BLUE='\033[0;34m'  # آبی برای اطلاعات
+PURPLE='\033[0;35m'  # بنفش برای debug
+CYAN='\033[0;36m'  # فیروزه‌ای برای عنوان‌ها
+NC='\033[0m'  # بدون رنگ
 
-# Logging function
+# تابع پیشرفته لاگ‌گیری با چرخش
 log() {
-    local level=$1
+    local level=$1  # سطح لاگ (INFO, WARN, ERROR, SUCCESS, DEBUG)
     shift
-    local message="$*"
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-    echo -e "${timestamp} [${level}] ${message}" | tee -a "${LOG_FILE}"
+    local message="$*"  # پیام لاگ
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')  # برچسب زمانی
+    echo -e "${timestamp} [${level}] ${message}" | tee -a "${LOG_FILE}"  # نمایش و ذخیره در فایل
+    
+    # چرخش فایل لاگ اگر خیلی بزرگ باشد (>100MB)
+    if [[ -f "${LOG_FILE}" ]] && [[ $(stat -f%z "${LOG_FILE}" 2>/dev/null || stat -c%s "${LOG_FILE}" 2>/dev/null || echo 0) -gt 104857600 ]]; then
+        mv "${LOG_FILE}" "${LOG_FILE}.old"  # انتقال فایل قدیمی
+        touch "${LOG_FILE}"  # ایجاد فایل جدید
+        log "INFO" "فایل لاگ چرخش شد"  # ثبت لاگ چرخش
+    fi
 }
 
-info() { log "INFO" "$*"; }
-warn() { log "WARN" "${YELLOW}$*${NC}"; }
-error() { log "ERROR" "${RED}$*${NC}"; }
-success() { log "SUCCESS" "${GREEN}$*${NC}"; }
+# توابع کمکی برای لاگ‌گیری
+info() { log "INFO" "$*"; }  # اطلاعات عمومی
+warn() { log "WARN" "${YELLOW}$*${NC}"; }  # هشدار
+error() { log "ERROR" "${RED}$*${NC}"; }  # خطا
+success() { log "SUCCESS" "${GREEN}$*${NC}"; }  # موفقیت
+debug() { log "DEBUG" "${BLUE}$*${NC}"; }  # اطلاعات debug
 
-# Check dependencies
+# بررسی پیشرفته وابستگی‌ها
 check_dependencies() {
-    local deps=("pg_dump" "gzip" "tar")
+    local deps=("pg_dump" "gzip" "tar")  # وابستگی‌های اجباری
+    local optional_deps=("aws" "gcloud" "az" "openssl" "sha256sum")  # وابستگی‌های اختیاری
     
+    info "بررسی وابستگی‌های مورد نیاز..."
     for dep in "${deps[@]}"; do
         if ! command -v "$dep" &> /dev/null; then
-            error "Required dependency '$dep' is not installed"
-            exit 1
+            error "وابستگی اجباری '$dep' نصب نشده است"
+            exit 1  # خروج با کد خطا
+        fi
+        debug "✓ وابستگی اجباری یافت شد: $dep"
+    done
+    
+    info "بررسی وابستگی‌های اختیاری..."
+    for dep in "${optional_deps[@]}"; do
+        if command -v "$dep" &> /dev/null; then
+            debug "✓ وابستگی اختیاری یافت شد: $dep"
+        else
+            warn "وابستگی اختیاری '$dep' یافت نشد"
         fi
     done
 }
 
-# Create backup directory
+# ایجاد دایرکتوری پشتیبان‌گیری با ساختار پیشرفته
 create_backup_dir() {
     if [[ ! -d "${BACKUP_DIR}" ]]; then
-        mkdir -p "${BACKUP_DIR}"
-        info "Created backup directory: ${BACKUP_DIR}"
+        mkdir -p "${BACKUP_DIR}"  # ایجاد دایرکتوری اصلی
+        mkdir -p "${BACKUP_DIR}/database"  # دایرکتوری دیتابیس
+        mkdir -p "${BACKUP_DIR}/application"  # دایرکتوری اپلیکیشن
+        mkdir -p "${BACKUP_DIR}/configuration"  # دایرکتوری تنظیمات
+        mkdir -p "${BACKUP_DIR}/logs"  # دایرکتوری لاگ‌ها
+        mkdir -p "${BACKUP_DIR}/metadata"  # دایرکتوری متادیتا
+        info "ساختار پیشرفته دایرکتوری پشتیبان‌گیری ایجاد شد: ${BACKUP_DIR}"
     fi
 }
 
-# Database backup
+# پشتیبان‌گیری پیشرفته دیتابیس با تأیید
 backup_database() {
-    info "Starting database backup..."
+    if [[ "${BACKUP_DATABASE}" != "true" ]]; then
+        info "پشتیبان‌گیری دیتابیس رد شد (در پیکربندی غیرفعال شده)"
+        return 0
+    fi
     
-    local db_backup_file="${BACKUP_DIR}/database_${DATE}.sql"
+    info "شروع پشتیبان‌گیری پیشرفته دیتابیس..."
     
-    # Set password for pg_dump
+    local db_backup_file="${BACKUP_DIR}/database/database_${DATE}.sql"  # فایل پشتیبان دیتابیس
+    local db_checksum_file="${BACKUP_DIR}/database/database_${DATE}.checksum"  # فایل checksum
+    
+    # تنظیم رمز عبور برای pg_dump
     export PGPASSWORD="${DB_PASSWORD}"
     
-    # Create database dump
+    # ایجاد dump دیتابیس با گزینه‌های پیشرفته
     pg_dump -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" \
         --verbose --clean --create --if-exists \
         --format=plain \
+        --no-password \
+        --no-owner \
+        --no-privileges \
         > "${db_backup_file}" 2>>"${LOG_FILE}"
     
     if [[ $? -eq 0 ]]; then
-        success "Database backup completed: ${db_backup_file}"
+        success "پشتیبان‌گیری دیتابیس تکمیل شد: ${db_backup_file}"
         
-        # Compress if enabled
+        # ایجاد checksum برای تأیید یکپارچگی
+        if command -v sha256sum &> /dev/null; then
+            sha256sum "${db_backup_file}" > "${db_checksum_file}"
+            debug "Checksum دیتابیس ایجاد شد: ${db_checksum_file}"
+        fi
+        
+        # فشرده‌سازی اگر فعال باشد
         if [[ "${COMPRESS_BACKUPS}" == "true" ]]; then
             gzip "${db_backup_file}"
-            success "Database backup compressed: ${db_backup_file}.gz"
+            success "پشتیبان‌گیری دیتابیس فشرده شد: ${db_backup_file}.gz"
+            
+            # به‌روزرسانی checksum برای فایل فشرده
+            if command -v sha256sum &> /dev/null; then
+                sha256sum "${db_backup_file}.gz" > "${db_checksum_file}.gz"
+            fi
+        fi
+        
+        # رمزنگاری اگر فعال باشد
+        if [[ "${ENCRYPT_BACKUPS}" == "true" ]] && command -v openssl &> /dev/null; then
+            if [[ -n "${ENCRYPTION_PASSWORD}" ]]; then
+                local encrypted_file="${db_backup_file}.gz.enc"
+                echo "${ENCRYPTION_PASSWORD}" | openssl enc -aes-256-cbc -salt \
+                    -in "${db_backup_file}.gz" -out "${encrypted_file}" -pass stdin
+                success "پشتیبان‌گیری دیتابیس رمزنگاری شد: ${encrypted_file}"
+                
+                # حذف فایل غیررمزنگاری شده
+                rm "${db_backup_file}.gz"
+            else
+                warn "رمزنگاری فعال است اما رمز عبور ارائه نشده"
+            fi
         fi
     else
-        error "Database backup failed"
+        error "پشتیبان‌گیری دیتابیس ناموفق بود"
         return 1
     fi
     
-    unset PGPASSWORD
+    unset PGPASSWORD  # پاک کردن رمز عبور از محیط
 }
 
-# Application files backup
+# پشتیبان‌گیری پیشرفته فایل‌های اپلیکیشن
 backup_application_files() {
-    info "Starting application files backup..."
+    if [[ "${BACKUP_APPLICATION}" != "true" ]]; then
+        info "پشتیبان‌گیری فایل‌های اپلیکیشن رد شد (در پیکربندی غیرفعال شده)"
+        return 0
+    fi
+    
+    info "شروع پشتیبان‌گیری پیشرفته فایل‌های اپلیکیشن..."
     
     local app_dirs=(
-        "/opt/food-ordering"
-        "/etc/food-ordering"
-        "/var/log/food-ordering"
+        "/opt/food-ordering"  # دایرکتوری اصلی اپلیکیشن
+        "/etc/food-ordering"  # دایرکتوری تنظیمات
+        "/var/log/food-ordering"  # دایرکتوری لاگ‌ها
     )
     
-    local app_backup_file="${BACKUP_DIR}/application_${DATE}.tar"
+    local app_backup_file="${BACKUP_DIR}/application/application_${DATE}.tar"  # فایل پشتیبان اپلیکیشن
+    local app_checksum_file="${BACKUP_DIR}/application/application_${DATE}.checksum"  # فایل checksum
     
-    # Create tar archive
+    # ایجاد آرشیو tar با گزینه‌های پیشرفته
     tar -cf "${app_backup_file}" \
         --exclude="*.log" \
         --exclude="*.tmp" \
         --exclude="target/*" \
+        --exclude="node_modules/*" \
+        --exclude=".git/*" \
+        --exclude="*.db" \
+        --exclude="*.db-shm" \
+        --exclude="*.db-wal" \
+        --exclude="*.pid" \
+        --exclude="*.lock" \
         "${app_dirs[@]}" 2>>"${LOG_FILE}"
     
     if [[ $? -eq 0 ]]; then
-        success "Application files backup completed: ${app_backup_file}"
+        success "پشتیبان‌گیری فایل‌های اپلیکیشن تکمیل شد: ${app_backup_file}"
         
-        # Compress if enabled
+        # ایجاد checksum
+        if command -v sha256sum &> /dev/null; then
+            sha256sum "${app_backup_file}" > "${app_checksum_file}"
+            debug "Checksum اپلیکیشن ایجاد شد: ${app_checksum_file}"
+        fi
+        
+        # فشرده‌سازی اگر فعال باشد
         if [[ "${COMPRESS_BACKUPS}" == "true" ]]; then
             gzip "${app_backup_file}"
-            success "Application files backup compressed: ${app_backup_file}.gz"
+            success "پشتیبان‌گیری فایل‌های اپلیکیشن فشرده شد: ${app_backup_file}.gz"
+            
+            # به‌روزرسانی checksum برای فایل فشرده
+            if command -v sha256sum &> /dev/null; then
+                sha256sum "${app_backup_file}.gz" > "${app_checksum_file}.gz"
+            fi
         fi
     else
-        error "Application files backup failed"
+        error "پشتیبان‌گیری فایل‌های اپلیکیشن ناموفق بود"
         return 1
     fi
 }
 
-# Configuration backup
+# پشتیبان‌گیری پیشرفته تنظیمات
 backup_configuration() {
-    info "Starting configuration backup..."
+    if [[ "${BACKUP_CONFIGURATION}" != "true" ]]; then
+        info "پشتیبان‌گیری تنظیمات رد شد (در پیکربندی غیرفعال شده)"
+        return 0
+    fi
+    
+    info "شروع پشتیبان‌گیری پیشرفته تنظیمات..."
     
     local config_dirs=(
-        "/etc/food-ordering"
-        "/etc/systemd/system/food-ordering.service"
-        "/etc/nginx/sites-available/food-ordering"
-        "/etc/ssl/food-ordering"
+        "/etc/food-ordering"  # تنظیمات اپلیکیشن
+        "/etc/systemd/system/food-ordering.service"  # فایل سرویس systemd
+        "/etc/nginx/sites-available/food-ordering"  # تنظیمات nginx
+        "/etc/ssl/food-ordering"  # گواهینامه‌های SSL
+        "/etc/cron.d/food-ordering"  # وظایف cron
     )
     
-    local config_backup_file="${BACKUP_DIR}/configuration_${DATE}.tar"
+    local config_backup_file="${BACKUP_DIR}/configuration/config_${DATE}.tar"  # فایل پشتیبان تنظیمات
+    local config_checksum_file="${BACKUP_DIR}/configuration/config_${DATE}.checksum"  # فایل checksum
     
-    # Create tar archive (ignore missing files)
+    # ایجاد آرشیو tar برای تنظیمات
     tar -cf "${config_backup_file}" \
-        --ignore-failed-read \
+        --exclude="*.log" \
+        --exclude="*.tmp" \
+        --exclude="*.pid" \
+        --exclude="*.lock" \
         "${config_dirs[@]}" 2>>"${LOG_FILE}"
     
-    if [[ $? -eq 0 || $? -eq 1 ]]; then  # 1 means some files missing but ok
-        success "Configuration backup completed: ${config_backup_file}"
+    if [[ $? -eq 0 ]]; then
+        success "پشتیبان‌گیری تنظیمات تکمیل شد: ${config_backup_file}"
         
-        # Compress if enabled
+        # ایجاد checksum
+        if command -v sha256sum &> /dev/null; then
+            sha256sum "${config_backup_file}" > "${config_checksum_file}"
+            debug "Checksum تنظیمات ایجاد شد: ${config_checksum_file}"
+        fi
+        
+        # فشرده‌سازی اگر فعال باشد
         if [[ "${COMPRESS_BACKUPS}" == "true" ]]; then
             gzip "${config_backup_file}"
-            success "Configuration backup compressed: ${config_backup_file}.gz"
+            success "پشتیبان‌گیری تنظیمات فشرده شد: ${config_backup_file}.gz"
+            
+            # به‌روزرسانی checksum برای فایل فشرده
+            if command -v sha256sum &> /dev/null; then
+                sha256sum "${config_backup_file}.gz" > "${config_checksum_file}.gz"
+            fi
         fi
     else
-        error "Configuration backup failed"
+        error "پشتیبان‌گیری تنظیمات ناموفق بود"
         return 1
     fi
 }
 
-# Create backup manifest
+# New: Log files backup
+backup_log_files() {
+    if [[ "${BACKUP_LOGS}" != "true" ]]; then
+        info "پشتیبان‌گیری لاگ‌ها رد شد (در پیکربندی غیرفعال شده)"
+        return 0
+    fi
+    
+    info "شروع پشتیبان‌گیری لاگ‌ها..."
+    
+    local log_dirs=(
+        "/var/log/food-ordering"
+        "/opt/food-ordering/logs"
+    )
+    
+    local log_backup_file="${BACKUP_DIR}/logs/logs_${DATE}.tar"
+    local log_checksum_file="${BACKUP_DIR}/logs/logs_${DATE}.checksum"
+    
+    # ایجاد آرشیو tar از فایل‌های لاگ (فقط آخرین 7 روز را نگهداری کنید)
+    find "${log_dirs[@]}" -name "*.log" -mtime -7 -type f 2>/dev/null | \
+        tar -cf "${log_backup_file}" -T - 2>>"${LOG_FILE}"
+    
+    if [[ $? -eq 0 ]]; then
+        success "پشتیبان‌گیری لاگ‌ها تکمیل شد: ${log_backup_file}"
+        
+        # ایجاد checksum
+        if command -v sha256sum &> /dev/null; then
+            sha256sum "${log_backup_file}" > "${log_checksum_file}"
+            debug "Checksum لاگ‌ها ایجاد شد: ${log_checksum_file}"
+        fi
+        
+        # فشرده‌سازی اگر فعال باشد
+        if [[ "${COMPRESS_BACKUPS}" == "true" ]]; then
+            gzip "${log_backup_file}"
+            success "پشتیبان‌گیری لاگ‌ها فشرده شد: ${log_backup_file}.gz"
+            
+            # به‌روزرسانی checksum برای فایل فشرده
+            if command -v sha256sum &> /dev/null; then
+                sha256sum "${log_backup_file}.gz" > "${log_checksum_file}.gz"
+            fi
+        fi
+    else
+        warn "پشتیبان‌گیری لاگ‌ها با هشدارها تکمیل شد (برخی فایل‌ها ممکن است از دست رفته)"
+    fi
+}
+
+# Enhanced backup verification
+verify_backup() {
+    if [[ "${VERIFY_BACKUPS}" != "true" ]]; then
+        info "تأیید یکپارچگی پشتیبان‌گیری رد شد (در پیکربندی غیرفعال شده)"
+        return 0
+    fi
+    
+    info "تأیید یکپارچگی پشتیبان‌گیری..."
+    
+    local verification_failed=false
+    
+    # Verify checksums
+    for checksum_file in "${BACKUP_DIR}"/*/*.checksum*; do
+        if [[ -f "${checksum_file}" ]]; then
+            if ! sha256sum -c "${checksum_file}" &>/dev/null; then
+                error "تأیید checksum برای: ${checksum_file} ناموفق بود"
+                verification_failed=true
+            else
+                debug "✓ تأیید checksum برای: ${checksum_file}"
+            fi
+        fi
+    done
+    
+    # Verify file sizes
+    for backup_file in "${BACKUP_DIR}"/*/*.{sql,tar}*; do
+        if [[ -f "${backup_file}" ]]; then
+            local file_size=$(stat -f%z "${backup_file}" 2>/dev/null || stat -c%s "${backup_file}" 2>/dev/null || echo 0)
+            if [[ "${file_size}" -eq 0 ]]; then
+                error "فایل پشتیبان خالی است: ${backup_file}"
+                verification_failed=true
+            else
+                debug "✓ تأیید اندازه فایل: ${backup_file} (${file_size} بایت)"
+            fi
+        fi
+    done
+    
+    if [[ "${verification_failed}" == "true" ]]; then
+        error "تأیید یکپارچگی ناموفق بود"
+        return 1
+    else
+        success "تأیید یکپارچگی پشتیبان‌گیری تکمیل شد با موفقیت"
+    fi
+}
+
+# New: Cloud upload functionality
+upload_to_cloud() {
+    if [[ "${UPLOAD_TO_CLOUD}" != "true" ]]; then
+        info "آپلود به ابر رد شد (در پیکربندی غیرفعال شده)"
+        return 0
+    fi
+    
+    info "آپلود پشتیبان به ابر ذخیره‌سازی..."
+    
+    case "${CLOUD_PROVIDER}" in
+        "aws")
+            if command -v aws &> /dev/null; then
+                aws s3 sync "${BACKUP_DIR}" "s3://${CLOUD_BUCKET}/backups/${DATE}/" \
+                    --delete --quiet
+                if [[ $? -eq 0 ]]; then
+                    success "پشتیبان به AWS S3 آپلود شد: s3://${CLOUD_BUCKET}/backups/${DATE}/"
+                else
+                    error "آپلود به AWS S3 ناموفق بود"
+                    return 1
+                fi
+            else
+                error "CLI AWS یافت نشد"
+                return 1
+            fi
+            ;;
+        "gcp")
+            if command -v gsutil &> /dev/null; then
+                gsutil -m cp -r "${BACKUP_DIR}" "gs://${CLOUD_BUCKET}/backups/${DATE}/"
+                if [[ $? -eq 0 ]]; then
+                    success "پشتیبان به Google Cloud Storage آپلود شد: gs://${CLOUD_BUCKET}/backups/${DATE}/"
+                else
+                    error "آپلود به Google Cloud Storage ناموفق بود"
+                    return 1
+                fi
+            else
+                error "SDK Google Cloud یافت نشد"
+                return 1
+            fi
+            ;;
+        "azure")
+            if command -v az &> /dev/null; then
+                az storage blob upload-batch \
+                    --source "${BACKUP_DIR}" \
+                    --destination "${CLOUD_BUCKET}" \
+                    --destination-path "backups/${DATE}/"
+                if [[ $? -eq 0 ]]; then
+                    success "پشتیبان به Azure Blob Storage آپلود شد: ${CLOUD_BUCKET}/backups/${DATE}/"
+                else
+                    error "آپلود به Azure Blob Storage ناموفق بود"
+                    return 1
+                fi
+            else
+                error "CLI Azure یافت نشد"
+                return 1
+            fi
+            ;;
+        *)
+            warn "Unknown cloud provider: ${CLOUD_PROVIDER}"
+            return 1
+            ;;
+    esac
+}
+
+# Enhanced backup cleanup
+cleanup_old_backups() {
+    info "Cleaning up old backups (retention: ${RETENTION_DAYS} days)..."
+    
+    local deleted_count=0
+    local current_time=$(date +%s)
+    local retention_seconds=$((RETENTION_DAYS * 24 * 60 * 60))
+    
+    for backup_dir in "${BACKUP_BASE_DIR}"/*; do
+        if [[ -d "${backup_dir}" ]]; then
+            local dir_name=$(basename "${backup_dir}")
+            local dir_time=$(date -d "${dir_name}" +%s 2>/dev/null || echo 0)
+            
+            if [[ "${dir_time}" -gt 0 ]] && [[ $((current_time - dir_time)) -gt "${retention_seconds}" ]]; then
+                rm -rf "${backup_dir}"
+                deleted_count=$((deleted_count + 1))
+                debug "Deleted old backup: ${dir_name}"
+            fi
+        fi
+    done
+    
+    if [[ "${deleted_count}" -gt 0 ]]; then
+        success "Cleaned up ${deleted_count} old backup(s)"
+    else
+        info "No old backups to clean up"
+    fi
+}
+
+# Enhanced manifest creation
 create_manifest() {
-    info "Creating backup manifest..."
+    info "Creating enhanced backup manifest..."
     
-    local manifest_file="${BACKUP_DIR}/manifest.txt"
+    local manifest_file="${BACKUP_DIR}/metadata/manifest.txt"
+    local system_info_file="${BACKUP_DIR}/metadata/system_info.txt"
     
+    # Create main manifest
     cat > "${manifest_file}" << EOF
-# Food Ordering System Backup Manifest
+# Food Ordering System Enhanced Backup Manifest
+# Version: 2.0
 # Created: $(date)
 # Backup Directory: ${BACKUP_DIR}
 
@@ -184,121 +487,83 @@ DB_HOST=${DB_HOST}
 DB_PORT=${DB_PORT}
 COMPRESSED=${COMPRESS_BACKUPS}
 VERIFIED=${VERIFY_BACKUPS}
+ENCRYPTED=${ENCRYPT_BACKUPS}
+UPLOADED_TO_CLOUD=${UPLOAD_TO_CLOUD}
+CLOUD_PROVIDER=${CLOUD_PROVIDER}
+
+# Backup Configuration:
+BACKUP_DATABASE=${BACKUP_DATABASE}
+BACKUP_APPLICATION=${BACKUP_APPLICATION}
+BACKUP_CONFIGURATION=${BACKUP_CONFIGURATION}
+BACKUP_LOGS=${BACKUP_LOGS}
 
 # Files in this backup:
 EOF
     
-    ls -la "${BACKUP_DIR}" >> "${manifest_file}"
+    find "${BACKUP_DIR}" -type f -exec ls -la {} \; >> "${manifest_file}"
     
-    # Calculate checksums
+    # Create system information
+    cat > "${system_info_file}" << EOF
+# System Information
+# Generated: $(date)
+
+OS: $(uname -a)
+Hostname: $(hostname)
+Uptime: $(uptime)
+Disk Usage: $(df -h .)
+Memory Usage: $(free -h)
+Java Version: $(java -version 2>&1 | head -1)
+Maven Version: $(mvn -version 2>&1 | head -1)
+EOF
+    
+    # Calculate checksums for all files
     if command -v sha256sum &> /dev/null; then
         echo "" >> "${manifest_file}"
         echo "# SHA256 Checksums:" >> "${manifest_file}"
         cd "${BACKUP_DIR}"
-        sha256sum *.sql* *.tar* 2>/dev/null >> "${manifest_file}" || true
+        find . -type f -name "*.sql*" -o -name "*.tar*" -o -name "*.gz*" | \
+            xargs sha256sum >> "${manifest_file}" 2>/dev/null || true
     fi
     
-    success "Backup manifest created: ${manifest_file}"
+    success "Enhanced manifest created: ${manifest_file}"
 }
 
-# Verify backup integrity
-verify_backup() {
-    if [[ "${VERIFY_BACKUPS}" != "true" ]]; then
-        return 0
-    fi
-    
-    info "Verifying backup integrity..."
-    
-    local verification_passed=true
-    
-    # Check if files exist and are not empty
-    for file in "${BACKUP_DIR}"/*.{sql,tar}*; do
-        if [[ -f "$file" ]] && [[ -s "$file" ]]; then
-            info "✓ File exists and not empty: $(basename "$file")"
-        else
-            error "✗ File missing or empty: $(basename "$file")"
-            verification_passed=false
-        fi
-    done
-    
-    # Test compressed files
-    for file in "${BACKUP_DIR}"/*.gz; do
-        if [[ -f "$file" ]]; then
-            if gzip -t "$file" 2>/dev/null; then
-                info "✓ Compressed file is valid: $(basename "$file")"
-            else
-                error "✗ Compressed file is corrupted: $(basename "$file")"
-                verification_passed=false
-            fi
-        fi
-    done
-    
-    if [[ "$verification_passed" == "true" ]]; then
-        success "Backup verification passed"
-    else
-        error "Backup verification failed"
-        return 1
-    fi
-}
-
-# Clean old backups
-cleanup_old_backups() {
-    info "Cleaning up old backups (keeping last ${RETENTION_DAYS} days)..."
-    
-    # Find and remove directories older than retention period
-    find "${BACKUP_BASE_DIR}" -type d -name "20*" -mtime +${RETENTION_DAYS} -exec rm -rf {} + 2>/dev/null || true
-    
-    # Count remaining backups
-    local remaining_backups=$(find "${BACKUP_BASE_DIR}" -type d -name "20*" | wc -l)
-    info "Cleanup completed. ${remaining_backups} backup sets remaining."
-}
-
-# Send email notification
+# Enhanced email notification
 send_notification() {
     if [[ "${EMAIL_NOTIFICATIONS}" != "true" ]] || [[ -z "${EMAIL_TO}" ]]; then
         return 0
     fi
     
-    local status=$1
-    local subject="Food Ordering System Backup - ${status}"
-    local message_file="/tmp/backup_notification_${DATE}.txt"
+    info "Sending email notification..."
     
-    cat > "${message_file}" << EOF
-Food Ordering System Backup Report
-
-Status: ${status}
-Date: $(date)
+    local subject="Food Ordering System Backup - ${DATE}"
+    local body="Backup completed successfully at $(date)
+    
 Backup Directory: ${BACKUP_DIR}
+Database: ${DB_NAME}
+Compressed: ${COMPRESS_BACKUPS}
+Verified: ${VERIFY_BACKUPS}
+Encrypted: ${ENCRYPT_BACKUPS}
+Cloud Upload: ${UPLOAD_TO_CLOUD}
 
-Backup Details:
-$(cat "${BACKUP_DIR}/manifest.txt" 2>/dev/null || echo "Manifest not available")
-
-Log Summary:
-$(tail -20 "${LOG_FILE}")
-EOF
+Total backup size: $(du -sh "${BACKUP_DIR}" | cut -f1)
+"
     
-    # Send email using mail command (if available)
     if command -v mail &> /dev/null; then
-        mail -s "${subject}" "${EMAIL_TO}" < "${message_file}"
-        info "Email notification sent to ${EMAIL_TO}"
+        echo "${body}" | mail -s "${subject}" "${EMAIL_TO}"
+        success "Email notification sent to ${EMAIL_TO}"
+    else
+        warn "Mail command not available, skipping email notification"
     fi
-    
-    rm -f "${message_file}"
 }
 
-# Calculate backup size
-calculate_backup_size() {
-    local size_bytes=$(du -sb "${BACKUP_DIR}" 2>/dev/null | cut -f1)
-    local size_mb=$((size_bytes / 1024 / 1024))
-    info "Total backup size: ${size_mb} MB"
-}
-
-# Main backup function
-run_backup() {
-    info "Starting Food Ordering System backup..."
+# Main execution function
+main() {
+    info "Starting enhanced backup process..."
     info "Backup directory: ${BACKUP_DIR}"
     
-    local backup_status="SUCCESS"
+    # Create log directory
+    mkdir -p "$(dirname "${LOG_FILE}")"
     
     # Check dependencies
     check_dependencies
@@ -307,124 +572,40 @@ run_backup() {
     create_backup_dir
     
     # Perform backups
-    backup_database || backup_status="FAILED"
-    backup_application_files || backup_status="FAILED"
-    backup_configuration || backup_status="FAILED"
+    local backup_failed=false
+    
+    backup_database || backup_failed=true
+    backup_application_files || backup_failed=true
+    backup_configuration || backup_failed=true
+    backup_log_files || backup_failed=true
+    
+    # Verify backup if enabled
+    if [[ "${backup_failed}" == "false" ]]; then
+        verify_backup || backup_failed=true
+    fi
+    
+    # Upload to cloud if enabled
+    if [[ "${backup_failed}" == "false" ]]; then
+        upload_to_cloud || warn "Cloud upload failed, but backup completed"
+    fi
     
     # Create manifest
     create_manifest
-    
-    # Verify backup
-    verify_backup || backup_status="FAILED"
-    
-    # Calculate size
-    calculate_backup_size
     
     # Cleanup old backups
     cleanup_old_backups
     
     # Send notification
-    send_notification "${backup_status}"
-    
-    if [[ "${backup_status}" == "SUCCESS" ]]; then
-        success "Backup completed successfully!"
-        exit 0
+    if [[ "${backup_failed}" == "false" ]]; then
+        send_notification
+        success "Enhanced backup process completed successfully"
+        info "Backup location: ${BACKUP_DIR}"
+        info "Total size: $(du -sh "${BACKUP_DIR}" | cut -f1)"
     else
-        error "Backup completed with errors!"
+        error "Backup process completed with errors"
         exit 1
     fi
 }
 
-# Recovery functions
-restore_database() {
-    local backup_file=$1
-    
-    if [[ ! -f "${backup_file}" ]]; then
-        error "Backup file not found: ${backup_file}"
-        return 1
-    fi
-    
-    info "Restoring database from: ${backup_file}"
-    
-    # Decompress if needed
-    if [[ "${backup_file}" == *.gz ]]; then
-        backup_file=$(gunzip -c "${backup_file}")
-    fi
-    
-    export PGPASSWORD="${DB_PASSWORD}"
-    
-    psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" \
-        < "${backup_file}"
-    
-    unset PGPASSWORD
-    
-    success "Database restored successfully"
-}
-
-# Usage information
-usage() {
-    cat << EOF
-Usage: $0 [COMMAND] [OPTIONS]
-
-Commands:
-    backup          Perform full system backup
-    restore-db      Restore database from backup file
-    list-backups    List available backups
-    cleanup         Clean old backups
-    verify          Verify backup integrity
-    help            Show this help message
-
-Options:
-    --config FILE   Use custom configuration file
-    --retention N   Keep backups for N days (default: 30)
-    --no-compress   Don't compress backup files
-    --no-verify     Skip backup verification
-
-Examples:
-    $0 backup
-    $0 restore-db /var/backups/food-ordering/20231201_120000/database_20231201_120000.sql.gz
-    $0 list-backups
-    $0 cleanup --retention 14
-
-Configuration:
-    Edit backup.conf to customize settings
-EOF
-}
-
-# Parse command line arguments
-case "${1:-}" in
-    backup)
-        run_backup
-        ;;
-    restore-db)
-        if [[ -z "${2:-}" ]]; then
-            error "Please specify backup file path"
-            usage
-            exit 1
-        fi
-        restore_database "$2"
-        ;;
-    list-backups)
-        echo "Available backups:"
-        ls -la "${BACKUP_BASE_DIR}"/*/manifest.txt 2>/dev/null | sed 's|/manifest.txt||' || echo "No backups found"
-        ;;
-    cleanup)
-        cleanup_old_backups
-        ;;
-    verify)
-        if [[ -z "${2:-}" ]]; then
-            error "Please specify backup directory"
-            exit 1
-        fi
-        BACKUP_DIR="$2"
-        verify_backup
-        ;;
-    help|--help|-h)
-        usage
-        ;;
-    *)
-        error "Unknown command: ${1:-}"
-        usage
-        exit 1
-        ;;
-esac 
+# Execute main function
+main "$@" 

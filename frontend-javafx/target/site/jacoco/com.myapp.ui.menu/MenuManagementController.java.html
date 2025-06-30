@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MenuManagementController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">food-ordering-frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.menu</a> &gt; <span class="el_source">MenuManagementController.java</span></div><h1>MenuManagementController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.menu;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MenuManagementController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.menu</a> &gt; <span class="el_source">MenuManagementController.java</span></div><h1>MenuManagementController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.menu;
 
 import com.myapp.ui.common.HttpClientUtil;
 import com.myapp.ui.common.NavigationController;
@@ -38,7 +38,7 @@ import java.util.ResourceBundle;
  * @version 1.0
  * @since 2024
  */
-<span class="nc" id="L41">public class MenuManagementController implements Initializable {</span>
+<span class="fc" id="L41">public class MenuManagementController implements Initializable {</span>
 
     // UI Components - Header
     @FXML private Button backButton;
@@ -98,7 +98,7 @@ import java.util.ResourceBundle;
     private NotificationService notificationService;
 
     // Data
-<span class="nc" id="L101">    private List&lt;MenuCategory&gt; menuCategories = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L101">    private List&lt;MenuCategory&gt; menuCategories = new ArrayList&lt;&gt;();</span>
     private MenuCategory selectedCategory;
     private Long restaurantId;
 
@@ -152,7 +152,7 @@ import java.util.ResourceBundle;
 <span class="nc bnc" id="L152" title="All 2 branches missed.">                        for (JsonNode categoryNode : dataArray) {</span>
 <span class="nc" id="L153">                            MenuCategory category = parseMenuCategory(categoryNode);</span>
 <span class="nc" id="L154">                            categories.add(category);</span>
-                        }
+<span class="nc" id="L155">                        }</span>
                     }
                     
 <span class="nc" id="L158">                    return categories;</span>
@@ -457,7 +457,7 @@ import java.util.ResourceBundle;
             }
 <span class="nc" id="L458">        } catch (NumberFormatException e) {</span>
 <span class="nc" id="L459">            category.setDisplayOrder(1);</span>
-        }
+<span class="nc" id="L460">        }</span>
         
 <span class="nc" id="L462">        return category;</span>
     }
@@ -476,7 +476,7 @@ import java.util.ResourceBundle;
                     // ویرایش دسته موجود
 <span class="nc" id="L477">                    endpoint += &quot;/&quot; + selectedCategory.getId();</span>
 <span class="nc" id="L478">                    response = HttpClientUtil.put(endpoint, category);</span>
-<span class="nc" id="L479">                } else {</span>
+                } else {
                     // ایجاد دسته جدید
 <span class="nc" id="L481">                    response = HttpClientUtil.post(endpoint, category);</span>
                 }
@@ -630,7 +630,7 @@ import java.util.ResourceBundle;
 <span class="nc bnc" id="L630" title="All 2 branches missed.">            for (JsonNode itemNode : node.get(&quot;items&quot;)) {</span>
 <span class="nc" id="L631">                MenuItem item = parseMenuItem(itemNode);</span>
 <span class="nc" id="L632">                items.add(item);</span>
-            }
+<span class="nc" id="L633">            }</span>
         }
 <span class="nc" id="L635">        category.setItems(items);</span>
         
@@ -656,59 +656,59 @@ import java.util.ResourceBundle;
     /**
      * مدل داده دسته منو
      */
-<span class="nc" id="L659">    public static class MenuCategory {</span>
+<span class="fc" id="L659">    public static class MenuCategory {</span>
         private Long id;
         private String name;
         private String description;
-<span class="nc" id="L663">        private boolean active = true;</span>
-<span class="nc" id="L664">        private int displayOrder = 1;</span>
-<span class="nc" id="L665">        private List&lt;MenuItem&gt; items = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L663">        private boolean active = true;</span>
+<span class="fc" id="L664">        private int displayOrder = 1;</span>
+<span class="fc" id="L665">        private List&lt;MenuItem&gt; items = new ArrayList&lt;&gt;();</span>
 
         // Getters and setters
-<span class="nc" id="L668">        public Long getId() { return id; }</span>
-<span class="nc" id="L669">        public void setId(Long id) { this.id = id; }</span>
+<span class="fc" id="L668">        public Long getId() { return id; }</span>
+<span class="fc" id="L669">        public void setId(Long id) { this.id = id; }</span>
 
-<span class="nc" id="L671">        public String getName() { return name; }</span>
-<span class="nc" id="L672">        public void setName(String name) { this.name = name; }</span>
+<span class="fc" id="L671">        public String getName() { return name; }</span>
+<span class="fc" id="L672">        public void setName(String name) { this.name = name; }</span>
 
-<span class="nc" id="L674">        public String getDescription() { return description; }</span>
-<span class="nc" id="L675">        public void setDescription(String description) { this.description = description; }</span>
+<span class="fc" id="L674">        public String getDescription() { return description; }</span>
+<span class="fc" id="L675">        public void setDescription(String description) { this.description = description; }</span>
 
-<span class="nc" id="L677">        public boolean isActive() { return active; }</span>
-<span class="nc" id="L678">        public void setActive(boolean active) { this.active = active; }</span>
+<span class="fc" id="L677">        public boolean isActive() { return active; }</span>
+<span class="fc" id="L678">        public void setActive(boolean active) { this.active = active; }</span>
 
-<span class="nc" id="L680">        public int getDisplayOrder() { return displayOrder; }</span>
-<span class="nc" id="L681">        public void setDisplayOrder(int displayOrder) { this.displayOrder = displayOrder; }</span>
+<span class="fc" id="L680">        public int getDisplayOrder() { return displayOrder; }</span>
+<span class="fc" id="L681">        public void setDisplayOrder(int displayOrder) { this.displayOrder = displayOrder; }</span>
 
-<span class="nc" id="L683">        public List&lt;MenuItem&gt; getItems() { return items; }</span>
+<span class="fc" id="L683">        public List&lt;MenuItem&gt; getItems() { return items; }</span>
 <span class="nc" id="L684">        public void setItems(List&lt;MenuItem&gt; items) { this.items = items; }</span>
     }
 
     /**
      * مدل داده آیتم منو
      */
-<span class="nc" id="L690">    public static class MenuItem {</span>
+<span class="fc" id="L690">    public static class MenuItem {</span>
         private Long id;
         private String name;
         private String description;
         private Double price;
-<span class="nc" id="L695">        private boolean active = true;</span>
+<span class="fc" id="L695">        private boolean active = true;</span>
 
         // Getters and setters
-<span class="nc" id="L698">        public Long getId() { return id; }</span>
-<span class="nc" id="L699">        public void setId(Long id) { this.id = id; }</span>
+<span class="fc" id="L698">        public Long getId() { return id; }</span>
+<span class="fc" id="L699">        public void setId(Long id) { this.id = id; }</span>
 
-<span class="nc" id="L701">        public String getName() { return name; }</span>
-<span class="nc" id="L702">        public void setName(String name) { this.name = name; }</span>
+<span class="fc" id="L701">        public String getName() { return name; }</span>
+<span class="fc" id="L702">        public void setName(String name) { this.name = name; }</span>
 
-<span class="nc" id="L704">        public String getDescription() { return description; }</span>
-<span class="nc" id="L705">        public void setDescription(String description) { this.description = description; }</span>
+<span class="fc" id="L704">        public String getDescription() { return description; }</span>
+<span class="fc" id="L705">        public void setDescription(String description) { this.description = description; }</span>
 
-<span class="nc" id="L707">        public Double getPrice() { return price; }</span>
-<span class="nc" id="L708">        public void setPrice(Double price) { this.price = price; }</span>
+<span class="fc" id="L707">        public Double getPrice() { return price; }</span>
+<span class="fc" id="L708">        public void setPrice(Double price) { this.price = price; }</span>
 
-<span class="nc" id="L710">        public boolean isActive() { return active; }</span>
-<span class="nc" id="L711">        public void setActive(boolean active) { this.active = active; }</span>
+<span class="fc" id="L710">        public boolean isActive() { return active; }</span>
+<span class="fc" id="L711">        public void setActive(boolean active) { this.active = active; }</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

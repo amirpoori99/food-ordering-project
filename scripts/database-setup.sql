@@ -1,4 +1,10 @@
 -- ================================================================
+-- سیستم سفارش غذا - اسکریپت راه‌اندازی دیتابیس production
+-- این فایل دیتابیس PostgreSQL را برای محیط production آماده می‌کند
+-- شامل: ایجاد دیتابیس، کاربران، جداول مانیتورینگ و تنظیمات امنیتی
+-- ================================================================
+
+-- ================================================================
 -- FOOD ORDERING SYSTEM - DATABASE PRODUCTION SETUP
 -- PostgreSQL Database Initialization Script
 -- ================================================================
@@ -6,9 +12,9 @@
 -- ================================================================
 -- 1. CREATE DATABASE AND USER
 -- ================================================================
--- Run as PostgreSQL superuser (postgres)
+-- Run as PostgreSQL superuser (postgres)  # اجرا به عنوان superuser
 
--- Create database
+-- Create database  # ایجاد دیتابیس
 CREATE DATABASE food_ordering_prod
     WITH 
     OWNER = postgres
@@ -18,23 +24,23 @@ CREATE DATABASE food_ordering_prod
     TABLESPACE = pg_default
     CONNECTION LIMIT = -1;
 
--- Create application user
+-- Create application user  # ایجاد کاربر اپلیکیشن
 CREATE USER food_ordering_user WITH ENCRYPTED PASSWORD 'your_secure_password_here';
 
--- Grant privileges
+-- Grant privileges  # اعطای امتیازات
 GRANT CONNECT ON DATABASE food_ordering_prod TO food_ordering_user;
 GRANT USAGE ON SCHEMA public TO food_ordering_user;
 GRANT CREATE ON SCHEMA public TO food_ordering_user;
 
--- Connect to the application database
+-- Connect to the application database  # اتصال به دیتابیس اپلیکیشن
 \c food_ordering_prod;
 
--- Grant all privileges on all tables (current and future)
+-- Grant all privileges on all tables (current and future)  # اعطای تمام امتیازات
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO food_ordering_user;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO food_ordering_user;
 GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO food_ordering_user;
 
--- Set default privileges for future objects
+-- Set default privileges for future objects  # تنظیم امتیازات پیش‌فرض
 ALTER DEFAULT PRIVILEGES IN SCHEMA public 
     GRANT ALL PRIVILEGES ON TABLES TO food_ordering_user;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public 
@@ -43,35 +49,35 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public
     GRANT ALL PRIVILEGES ON FUNCTIONS TO food_ordering_user;
 
 -- ================================================================
--- 2. CREATE BACKUP USER (READ-ONLY)
+-- 2. CREATE BACKUP USER (READ-ONLY)  # ایجاد کاربر پشتیبان (فقط خواندن)
 -- ================================================================
 CREATE USER food_ordering_backup WITH ENCRYPTED PASSWORD 'backup_password_here';
 GRANT CONNECT ON DATABASE food_ordering_prod TO food_ordering_backup;
 GRANT USAGE ON SCHEMA public TO food_ordering_backup;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO food_ordering_backup;
 
--- Default privileges for backup user
+-- Default privileges for backup user  # امتیازات پیش‌فرض کاربر پشتیبان
 ALTER DEFAULT PRIVILEGES IN SCHEMA public 
     GRANT SELECT ON TABLES TO food_ordering_backup;
 
 -- ================================================================
--- 3. ENABLE EXTENSIONS
+-- 3. ENABLE EXTENSIONS  # فعال‌سازی extension ها
 -- ================================================================
--- UUID extension for generating UUIDs
+-- UUID extension for generating UUIDs  # extension برای تولید UUID
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Full text search extension
+-- Full text search extension  # extension جستجوی متنی
 CREATE EXTENSION IF NOT EXISTS "unaccent";
 
--- PostGIS (if location features needed)
+-- PostGIS (if location features needed)  # PostGIS برای ویژگی‌های مکانی
 -- CREATE EXTENSION IF NOT EXISTS "postgis";
 
 -- ================================================================
--- 4. PERFORMANCE OPTIMIZATIONS
+-- 4. PERFORMANCE OPTIMIZATIONS  # بهینه‌سازی عملکرد
 -- ================================================================
 
--- Increase work_mem for better performance
--- Add these to postgresql.conf:
+-- Increase work_mem for better performance  # افزایش work_mem برای عملکرد بهتر
+-- Add these to postgresql.conf:  # این موارد را به postgresql.conf اضافه کنید
 /*
 work_mem = 16MB
 shared_buffers = 256MB
@@ -81,7 +87,7 @@ max_connections = 200
 */
 
 -- ================================================================
--- 5. CREATE AUDIT LOGGING TABLE
+-- 5. CREATE AUDIT LOGGING TABLE  # ایجاد جدول لاگ audit
 -- ================================================================
 CREATE TABLE IF NOT EXISTS audit_log (
     id BIGSERIAL PRIMARY KEY,
@@ -95,16 +101,16 @@ CREATE TABLE IF NOT EXISTS audit_log (
     user_agent TEXT
 );
 
--- Index for performance
+-- Index for performance  # ایندکس برای عملکرد
 CREATE INDEX IF NOT EXISTS idx_audit_log_timestamp ON audit_log(timestamp);
 CREATE INDEX IF NOT EXISTS idx_audit_log_table_name ON audit_log(table_name);
 CREATE INDEX IF NOT EXISTS idx_audit_log_user_id ON audit_log(user_id);
 
 -- ================================================================
--- 6. CREATE SYSTEM MONITORING TABLES
+-- 6. CREATE SYSTEM MONITORING TABLES  # ایجاد جداول مانیتورینگ سیستم
 -- ================================================================
 
--- System health monitoring
+-- System health monitoring  # مانیتورینگ سلامت سیستم
 CREATE TABLE IF NOT EXISTS system_health (
     id BIGSERIAL PRIMARY KEY,
     timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -116,7 +122,7 @@ CREATE TABLE IF NOT EXISTS system_health (
     status VARCHAR(20) DEFAULT 'healthy'
 );
 
--- API endpoint monitoring
+-- API endpoint monitoring  # مانیتورینگ endpoint های API
 CREATE TABLE IF NOT EXISTS api_monitoring (
     id BIGSERIAL PRIMARY KEY,
     endpoint VARCHAR(200) NOT NULL,
@@ -127,16 +133,16 @@ CREATE TABLE IF NOT EXISTS api_monitoring (
     error_message TEXT
 );
 
--- Indexes for monitoring tables
+-- Indexes for monitoring tables  # ایندکس‌های جداول مانیتورینگ
 CREATE INDEX IF NOT EXISTS idx_system_health_timestamp ON system_health(timestamp);
 CREATE INDEX IF NOT EXISTS idx_api_monitoring_timestamp ON api_monitoring(timestamp);
 CREATE INDEX IF NOT EXISTS idx_api_monitoring_endpoint ON api_monitoring(endpoint);
 
 -- ================================================================
--- 7. DATA RETENTION POLICIES
+-- 7. DATA RETENTION POLICIES  # سیاست‌های نگهداری داده
 -- ================================================================
 
--- Function to clean old audit logs (keep last 90 days)
+-- Function to clean old audit logs (keep last 90 days)  # تابع پاک کردن لاگ‌های قدیمی
 CREATE OR REPLACE FUNCTION clean_audit_logs()
 RETURNS INTEGER AS $$
 DECLARE
@@ -150,7 +156,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Function to clean old system health data (keep last 30 days)
+-- Function to clean old system health data (keep last 30 days)  # تابع پاک کردن داده‌های سلامت سیستم
 CREATE OR REPLACE FUNCTION clean_system_health()
 RETURNS INTEGER AS $$
 DECLARE
@@ -164,7 +170,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Function to clean old API monitoring data (keep last 7 days)
+-- Function to clean old API monitoring data (keep last 7 days)  # تابع پاک کردن داده‌های مانیتورینگ API
 CREATE OR REPLACE FUNCTION clean_api_monitoring()
 RETURNS INTEGER AS $$
 DECLARE
@@ -179,7 +185,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ================================================================
--- 8. BACKUP VERIFICATION TABLE
+-- 8. BACKUP VERIFICATION TABLE  # جدول تأیید پشتیبان‌گیری
 -- ================================================================
 CREATE TABLE IF NOT EXISTS backup_verification (
     id BIGSERIAL PRIMARY KEY,
@@ -194,10 +200,10 @@ CREATE TABLE IF NOT EXISTS backup_verification (
 );
 
 -- ================================================================
--- 9. SECURITY SETTINGS
+-- 9. SECURITY SETTINGS  # تنظیمات امنیتی
 -- ================================================================
 
--- Create function to hash passwords (BCrypt-compatible)
+-- Create function to hash passwords (BCrypt-compatible)  # تابع hash کردن رمزهای عبور
 CREATE OR REPLACE FUNCTION hash_password(password TEXT)
 RETURNS TEXT AS $$
 BEGIN

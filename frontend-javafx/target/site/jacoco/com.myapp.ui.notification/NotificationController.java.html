@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NotificationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">food-ordering-frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.notification</a> &gt; <span class="el_source">NotificationController.java</span></div><h1>NotificationController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.notification;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NotificationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.notification</a> &gt; <span class="el_source">NotificationController.java</span></div><h1>NotificationController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.notification;
 
 import com.myapp.ui.common.NavigationController;
 import javafx.application.Platform;
@@ -236,30 +236,30 @@ import java.util.*;
 <span class="nc" id="L236">        List&lt;NotificationItem&gt; notifications = new ArrayList&lt;&gt;();</span>
         
 <span class="nc" id="L238">        notifications.add(new NotificationItem(</span>
-<span class="nc" id="L239">            &quot;سفارش شما آماده است&quot;,</span>
-<span class="nc" id="L240">            &quot;سفارش شماره ORD-123456789 آماده تحویل است&quot;,</span>
-<span class="nc" id="L241">            NotificationType.ORDER_UPDATE,</span>
-<span class="nc" id="L242">            NotificationPriority.HIGH,</span>
+            &quot;سفارش شما آماده است&quot;,
+            &quot;سفارش شماره ORD-123456789 آماده تحویل است&quot;,
+            NotificationType.ORDER_UPDATE,
+            NotificationPriority.HIGH,
 <span class="nc" id="L243">            LocalDateTime.now().minusMinutes(5),</span>
-<span class="nc" id="L244">            false</span>
+            false
         ));
         
 <span class="nc" id="L247">        notifications.add(new NotificationItem(</span>
-<span class="nc" id="L248">            &quot;تخفیف ویژه&quot;,</span>
-<span class="nc" id="L249">            &quot;20% تخفیف برای سفارش بعدی شما - کد: SAVE20&quot;,</span>
-<span class="nc" id="L250">            NotificationType.PROMOTION,</span>
-<span class="nc" id="L251">            NotificationPriority.MEDIUM,</span>
+            &quot;تخفیف ویژه&quot;,
+            &quot;20% تخفیف برای سفارش بعدی شما - کد: SAVE20&quot;,
+            NotificationType.PROMOTION,
+            NotificationPriority.MEDIUM,
 <span class="nc" id="L252">            LocalDateTime.now().minusHours(1),</span>
-<span class="nc" id="L253">            true</span>
+            true
         ));
         
 <span class="nc" id="L256">        notifications.add(new NotificationItem(</span>
-<span class="nc" id="L257">            &quot;پرداخت موفق&quot;,</span>
-<span class="nc" id="L258">            &quot;پرداخت 87,650 تومان با موفقیت انجام شد&quot;,</span>
-<span class="nc" id="L259">            NotificationType.PAYMENT,</span>
-<span class="nc" id="L260">            NotificationPriority.HIGH,</span>
+            &quot;پرداخت موفق&quot;,
+            &quot;پرداخت 87,650 تومان با موفقیت انجام شد&quot;,
+            NotificationType.PAYMENT,
+            NotificationPriority.HIGH,
 <span class="nc" id="L261">            LocalDateTime.now().minusHours(2),</span>
-<span class="nc" id="L262">            true</span>
+            true
         ));
         
 <span class="nc" id="L265">        return notifications;</span>
@@ -283,7 +283,7 @@ import java.util.*;
 <span class="nc bnc" id="L283" title="All 2 branches missed.">        for (NotificationItem notification : filteredNotifications) {</span>
 <span class="nc" id="L284">            VBox notificationCard = createNotificationCard(notification);</span>
 <span class="nc" id="L285">            notificationListContainer.getChildren().add(notificationCard);</span>
-        }
+<span class="nc" id="L286">        }</span>
 <span class="nc" id="L287">    }</span>
 
     /**
@@ -512,8 +512,8 @@ import java.util.*;
         private LocalDateTime timestamp;
         private boolean read;
         
-<span class="fc" id="L515">        public NotificationItem(String title, String message, NotificationType type, </span>
-                              NotificationPriority priority, LocalDateTime timestamp, boolean read) {
+        public NotificationItem(String title, String message, NotificationType type, 
+<span class="fc" id="L516">                              NotificationPriority priority, LocalDateTime timestamp, boolean read) {</span>
 <span class="fc" id="L517">            this.title = title;</span>
 <span class="fc" id="L518">            this.message = message;</span>
 <span class="fc" id="L519">            this.type = type;</span>

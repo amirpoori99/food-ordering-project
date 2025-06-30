@@ -75,6 +75,9 @@ public class NavigationController {
     /** صفحه پروفایل کاربر */
     public static final String PROFILE_SCENE = "Profile";
     
+    /** صفحه پروفایل و تاریخچه کاربر (فاز 28) */
+    public static final String USER_PROFILE_SCENE = "UserProfile";
+    
     /** صفحه پرداخت */
     public static final String PAYMENT_SCENE = "Payment";
     
@@ -391,6 +394,9 @@ public class NavigationController {
                 break;
             case PROFILE_SCENE:
                 title += " - پروفایل";
+                break;
+            case USER_PROFILE_SCENE:
+                title += " - مدیریت پروفایل و تاریخچه";
                 break;
             case PAYMENT_SCENE:
                 title += " - پرداخت";

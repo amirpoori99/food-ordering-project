@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">food-ordering-frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.payment</a> &gt; <span class="el_source">PaymentController.java</span></div><h1>PaymentController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.payment;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.payment</a> &gt; <span class="el_source">PaymentController.java</span></div><h1>PaymentController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.payment;
 
 import com.myapp.ui.common.NavigationController;
 import javafx.application.Platform;
@@ -37,7 +37,7 @@ import java.time.format.DateTimeFormatter;
  * @version 1.0
  * @since فاز 25 - Payment Processing
  */
-<span class="nc" id="L40">public class PaymentController implements Initializable {</span>
+<span class="fc" id="L40">public class PaymentController implements Initializable {</span>
 
     // ==================== UI Components - Order Summary ====================
     
@@ -123,8 +123,8 @@ import java.time.format.DateTimeFormatter;
     private static final double MIN_WALLET_BALANCE = 10000.0; // حداقل موجودی کیف پول
 
     private NavigationController navigationController;
-<span class="nc" id="L126">    private final NumberFormat currencyFormat = NumberFormat.getInstance(new Locale(&quot;fa&quot;, &quot;IR&quot;));</span>
-    
+<span class="fc" id="L126">    private final NumberFormat currencyFormat = NumberFormat.getInstance(new Locale(&quot;fa&quot;, &quot;IR&quot;));</span>
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 <span class="nc" id="L130">        this.navigationController = NavigationController.getInstance();</span>
@@ -183,11 +183,11 @@ import java.time.format.DateTimeFormatter;
 <span class="nc" id="L183">                        super.updateItem(quantity, empty);</span>
 <span class="nc bnc" id="L184" title="All 4 branches missed.">                        if (empty || quantity == null) {</span>
 <span class="nc" id="L185">                            setText(null);</span>
-<span class="nc" id="L186">                        } else {</span>
+                        } else {
 <span class="nc" id="L187">                            setText(quantity + &quot; عدد&quot;);</span>
                         }
 <span class="nc" id="L189">                    }</span>
-<span class="nc" id="L190">                });</span>
+                });
             }
             
 <span class="nc bnc" id="L193" title="All 2 branches missed.">            if (itemPriceColumn != null) {</span>
@@ -199,11 +199,11 @@ import java.time.format.DateTimeFormatter;
 <span class="nc" id="L199">                        super.updateItem(price, empty);</span>
 <span class="nc bnc" id="L200" title="All 4 branches missed.">                        if (empty || price == null) {</span>
 <span class="nc" id="L201">                            setText(null);</span>
-<span class="nc" id="L202">                        } else {</span>
+                        } else {
 <span class="nc" id="L203">                            setText(String.format(&quot;%,.0f تومان&quot;, price));</span>
                         }
 <span class="nc" id="L205">                    }</span>
-<span class="nc" id="L206">                });</span>
+                });
             }
             
 <span class="nc bnc" id="L209" title="All 2 branches missed.">            if (itemTotalColumn != null) {</span>
@@ -215,11 +215,11 @@ import java.time.format.DateTimeFormatter;
 <span class="nc" id="L215">                        super.updateItem(total, empty);</span>
 <span class="nc bnc" id="L216" title="All 4 branches missed.">                        if (empty || total == null) {</span>
 <span class="nc" id="L217">                            setText(null);</span>
-<span class="nc" id="L218">                        } else {</span>
+                        } else {
 <span class="nc" id="L219">                            setText(String.format(&quot;%,.0f تومان&quot;, total));</span>
                         }
 <span class="nc" id="L221">                    }</span>
-<span class="nc" id="L222">                });</span>
+                });
             }
         }
 <span class="nc" id="L225">    }</span>
@@ -230,8 +230,8 @@ import java.time.format.DateTimeFormatter;
     private void setupComboBoxes() {
 <span class="nc bnc" id="L231" title="All 2 branches missed.">        if (expiryMonthComboBox != null) {</span>
 <span class="nc" id="L232">            expiryMonthComboBox.setItems(FXCollections.observableArrayList(</span>
-<span class="nc" id="L233">                &quot;01&quot;, &quot;02&quot;, &quot;03&quot;, &quot;04&quot;, &quot;05&quot;, &quot;06&quot;, </span>
-<span class="nc" id="L234">                &quot;07&quot;, &quot;08&quot;, &quot;09&quot;, &quot;10&quot;, &quot;11&quot;, &quot;12&quot;</span>
+                &quot;01&quot;, &quot;02&quot;, &quot;03&quot;, &quot;04&quot;, &quot;05&quot;, &quot;06&quot;, 
+                &quot;07&quot;, &quot;08&quot;, &quot;09&quot;, &quot;10&quot;, &quot;11&quot;, &quot;12&quot;
             ));
         }
         
@@ -252,18 +252,18 @@ import java.time.format.DateTimeFormatter;
 <span class="nc" id="L252">                    super.updateItem(card, empty);</span>
 <span class="nc bnc" id="L253" title="All 4 branches missed.">                    if (empty || card == null) {</span>
 <span class="nc" id="L254">                        setText(null);</span>
-<span class="nc" id="L255">                    } else {</span>
+                    } else {
 <span class="nc" id="L256">                        setText(card.getMaskedNumber() + &quot; - &quot; + card.getCardHolder());</span>
                     }
 <span class="nc" id="L258">                }</span>
-<span class="nc" id="L259">            });</span>
+            });
 <span class="nc" id="L260">            savedCardsComboBox.setButtonCell(new ListCell&lt;SavedCard&gt;() {</span>
                 @Override
                 protected void updateItem(SavedCard card, boolean empty) {
 <span class="nc" id="L263">                    super.updateItem(card, empty);</span>
 <span class="nc bnc" id="L264" title="All 4 branches missed.">                    if (empty || card == null) {</span>
 <span class="nc" id="L265">                        setText(&quot;انتخاب کارت ذخیره شده&quot;);</span>
-<span class="nc" id="L266">                    } else {</span>
+                    } else {
 <span class="nc" id="L267">                        setText(card.getMaskedNumber());</span>
                     }
 <span class="nc" id="L269">                }</span>
@@ -305,7 +305,7 @@ import java.time.format.DateTimeFormatter;
 <span class="nc" id="L305">            cashContainer.setVisible(true);</span>
         }
 <span class="nc" id="L307">    }</span>
-    
+
     /**
      * تنظیم Event Handlers
      */
@@ -402,7 +402,7 @@ import java.time.format.DateTimeFormatter;
 <span class="nc" id="L402">                    showLoadingIndicator(false);</span>
 <span class="nc bnc" id="L403" title="All 2 branches missed.">                    if (success) {</span>
 <span class="nc" id="L404">                        showPaymentSuccess();</span>
-<span class="nc" id="L405">                    } else {</span>
+                    } else {
 <span class="nc" id="L406">                        showPaymentError(&quot;پرداخت ناموفق بود. لطفاً دوباره تلاش کنید.&quot;);</span>
                     }
 <span class="nc" id="L408">                });</span>
@@ -412,7 +412,7 @@ import java.time.format.DateTimeFormatter;
 <span class="nc" id="L412">                    showLoadingIndicator(false);</span>
 <span class="nc" id="L413">                    showPaymentError(&quot;خطا در پردازش پرداخت.&quot;);</span>
 <span class="nc" id="L414">                });</span>
-            }
+<span class="nc" id="L415">            }</span>
 <span class="nc" id="L416">        }).start();</span>
 <span class="nc" id="L417">    }</span>
     
@@ -433,7 +433,7 @@ import java.time.format.DateTimeFormatter;
 <span class="nc" id="L433">                return false;</span>
         }
     }
-    
+
     /**
      * اعتبارسنجی داده‌های کارت اعتباری
      */
@@ -554,11 +554,11 @@ import java.time.format.DateTimeFormatter;
         
 <span class="nc" id="L555">        public OrderItem() {}</span>
         
-<span class="nc" id="L557">        public OrderItem(String itemName, Integer quantity, Double price) {</span>
-<span class="nc" id="L558">            this.itemName = itemName;</span>
-<span class="nc" id="L559">            this.quantity = quantity;</span>
-<span class="nc" id="L560">            this.price = price;</span>
-<span class="nc" id="L561">        }</span>
+<span class="fc" id="L557">        public OrderItem(String itemName, Integer quantity, Double price) {</span>
+<span class="fc" id="L558">            this.itemName = itemName;</span>
+<span class="fc" id="L559">            this.quantity = quantity;</span>
+<span class="fc" id="L560">            this.price = price;</span>
+<span class="fc" id="L561">        }</span>
         
         public javafx.beans.property.StringProperty itemNameProperty() {
 <span class="nc" id="L564">            return new SimpleStringProperty(itemName);</span>
@@ -573,16 +573,16 @@ import java.time.format.DateTimeFormatter;
         }
         
         public Double getTotalPrice() {
-<span class="nc bnc" id="L576" title="All 4 branches missed.">            return price != null &amp;&amp; quantity != null ? price * quantity : 0.0;</span>
+<span class="pc bpc" id="L576" title="2 of 4 branches missed.">            return price != null &amp;&amp; quantity != null ? price * quantity : 0.0;</span>
         }
         
-<span class="nc" id="L579">        public String getItemName() { return itemName; }</span>
+<span class="fc" id="L579">        public String getItemName() { return itemName; }</span>
 <span class="nc" id="L580">        public void setItemName(String itemName) { this.itemName = itemName; }</span>
         
-<span class="nc" id="L582">        public Integer getQuantity() { return quantity; }</span>
+<span class="fc" id="L582">        public Integer getQuantity() { return quantity; }</span>
 <span class="nc" id="L583">        public void setQuantity(Integer quantity) { this.quantity = quantity; }</span>
         
-<span class="nc" id="L585">        public Double getPrice() { return price; }</span>
+<span class="fc" id="L585">        public Double getPrice() { return price; }</span>
 <span class="nc" id="L586">        public void setPrice(Double price) { this.price = price; }</span>
         
 <span class="nc" id="L588">        public String getSpecialInstructions() { return specialInstructions; }</span>
@@ -594,19 +594,19 @@ import java.time.format.DateTimeFormatter;
     /**
      * enum روش‌های پرداخت
      */
-<span class="nc" id="L597">    public enum PaymentMethod {</span>
-<span class="nc" id="L598">        CREDIT_CARD(&quot;کارت اعتباری&quot;),</span>
-<span class="nc" id="L599">        WALLET(&quot;کیف پول&quot;),</span>
-<span class="nc" id="L600">        CASH_ON_DELIVERY(&quot;پرداخت نقدی&quot;);</span>
+<span class="fc" id="L597">    public enum PaymentMethod {</span>
+<span class="fc" id="L598">        CREDIT_CARD(&quot;کارت اعتباری&quot;),</span>
+<span class="fc" id="L599">        WALLET(&quot;کیف پول&quot;),</span>
+<span class="fc" id="L600">        CASH_ON_DELIVERY(&quot;پرداخت نقدی&quot;);</span>
         
         private final String displayName;
         
-<span class="nc" id="L604">        PaymentMethod(String displayName) {</span>
-<span class="nc" id="L605">            this.displayName = displayName;</span>
-<span class="nc" id="L606">        }</span>
+<span class="fc" id="L604">        PaymentMethod(String displayName) {</span>
+<span class="fc" id="L605">            this.displayName = displayName;</span>
+<span class="fc" id="L606">        }</span>
         
         public String getDisplayName() {
-<span class="nc" id="L609">            return displayName;</span>
+<span class="fc" id="L609">            return displayName;</span>
         }
     }
     
@@ -731,22 +731,22 @@ import java.time.format.DateTimeFormatter;
     /**
      * مدل خلاصه سفارش
      */
-<span class="nc" id="L734">    public static class OrderSummary {</span>
-<span class="nc" id="L735">        private Double subtotal = 0.0;</span>
-<span class="nc" id="L736">        private Double tax = 0.0;</span>
-<span class="nc" id="L737">        private Double deliveryFee = 0.0;</span>
-<span class="nc" id="L738">        private Double discount = 0.0;</span>
-<span class="nc" id="L739">        private Double processingFee = 0.0;</span>
-<span class="nc" id="L740">        private Double finalAmount = 0.0;</span>
+<span class="fc" id="L734">    public static class OrderSummary {</span>
+<span class="fc" id="L735">        private Double subtotal = 0.0;</span>
+<span class="fc" id="L736">        private Double tax = 0.0;</span>
+<span class="fc" id="L737">        private Double deliveryFee = 0.0;</span>
+<span class="fc" id="L738">        private Double discount = 0.0;</span>
+<span class="fc" id="L739">        private Double processingFee = 0.0;</span>
+<span class="fc" id="L740">        private Double finalAmount = 0.0;</span>
         
-<span class="nc" id="L742">        public Double getSubtotal() { return subtotal; }</span>
-<span class="nc" id="L743">        public void setSubtotal(Double subtotal) { this.subtotal = subtotal; }</span>
+<span class="fc" id="L742">        public Double getSubtotal() { return subtotal; }</span>
+<span class="fc" id="L743">        public void setSubtotal(Double subtotal) { this.subtotal = subtotal; }</span>
         
-<span class="nc" id="L745">        public Double getTax() { return tax; }</span>
-<span class="nc" id="L746">        public void setTax(Double tax) { this.tax = tax; }</span>
+<span class="fc" id="L745">        public Double getTax() { return tax; }</span>
+<span class="fc" id="L746">        public void setTax(Double tax) { this.tax = tax; }</span>
         
-<span class="nc" id="L748">        public Double getDeliveryFee() { return deliveryFee; }</span>
-<span class="nc" id="L749">        public void setDeliveryFee(Double deliveryFee) { this.deliveryFee = deliveryFee; }</span>
+<span class="fc" id="L748">        public Double getDeliveryFee() { return deliveryFee; }</span>
+<span class="fc" id="L749">        public void setDeliveryFee(Double deliveryFee) { this.deliveryFee = deliveryFee; }</span>
         
 <span class="nc" id="L751">        public Double getDiscount() { return discount; }</span>
 <span class="nc" id="L752">        public void setDiscount(Double discount) { this.discount = discount; }</span>
@@ -754,22 +754,22 @@ import java.time.format.DateTimeFormatter;
 <span class="nc" id="L754">        public Double getProcessingFee() { return processingFee; }</span>
 <span class="nc" id="L755">        public void setProcessingFee(Double processingFee) { this.processingFee = processingFee; }</span>
         
-<span class="nc" id="L757">        public Double getFinalAmount() { return finalAmount; }</span>
-<span class="nc" id="L758">        public void setFinalAmount(Double finalAmount) { this.finalAmount = finalAmount; }</span>
+<span class="fc" id="L757">        public Double getFinalAmount() { return finalAmount; }</span>
+<span class="fc" id="L758">        public void setFinalAmount(Double finalAmount) { this.finalAmount = finalAmount; }</span>
     }
     
     /**
      * مدل اطلاعات کیف پول
      */
-<span class="nc" id="L764">    public static class WalletInfo {</span>
-<span class="nc" id="L765">        private Double balance = 0.0;</span>
-<span class="nc" id="L766">        private String status = &quot;ACTIVE&quot;;</span>
+<span class="fc" id="L764">    public static class WalletInfo {</span>
+<span class="fc" id="L765">        private Double balance = 0.0;</span>
+<span class="fc" id="L766">        private String status = &quot;ACTIVE&quot;;</span>
         
-<span class="nc" id="L768">        public Double getBalance() { return balance; }</span>
-<span class="nc" id="L769">        public void setBalance(Double balance) { this.balance = balance; }</span>
+<span class="fc" id="L768">        public Double getBalance() { return balance; }</span>
+<span class="fc" id="L769">        public void setBalance(Double balance) { this.balance = balance; }</span>
         
-<span class="nc" id="L771">        public String getStatus() { return status; }</span>
-<span class="nc" id="L772">        public void setStatus(String status) { this.status = status; }</span>
+<span class="fc" id="L771">        public String getStatus() { return status; }</span>
+<span class="fc" id="L772">        public void setStatus(String status) { this.status = status; }</span>
     }
     
     /**

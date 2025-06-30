@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProfileController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">food-ordering-frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.auth</a> &gt; <span class="el_source">ProfileController.java</span></div><h1>ProfileController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.auth;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProfileController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.auth</a> &gt; <span class="el_source">ProfileController.java</span></div><h1>ProfileController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.auth;
 
 import com.myapp.ui.common.HttpClientUtil;
 import com.myapp.ui.common.NavigationController;
@@ -34,7 +34,7 @@ import java.util.ResourceBundle;
  * @version 1.0
  * @since 2024
  */
-<span class="nc" id="L37">public class ProfileController implements Initializable {</span>
+<span class="fc" id="L37">public class ProfileController implements Initializable {</span>
 
     /** فیلد ورودی نام کامل کاربر */
     @FXML private TextField fullNameField;
@@ -113,11 +113,11 @@ import java.util.ResourceBundle;
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-<span class="nc" id="L116">        this.navigationController = NavigationController.getInstance();</span>
+<span class="fc" id="L116">        this.navigationController = NavigationController.getInstance();</span>
         
-<span class="nc" id="L118">        setupUI();</span>
-<span class="nc" id="L119">        loadProfile();</span>
-<span class="nc" id="L120">    }</span>
+<span class="fc" id="L118">        setupUI();</span>
+<span class="fc" id="L119">        loadProfile();</span>
+<span class="fc" id="L120">    }</span>
 
     /**
      * راه‌اندازی کامپوننت‌های UI و event handler ها
@@ -129,15 +129,15 @@ import java.util.ResourceBundle;
      */
     private void setupUI() {
         // تنظیم فیلد شماره تلفن به حالت فقط‌خواندنی (غیرقابل تغییر)
-<span class="nc" id="L132">        phoneField.setEditable(false);</span>
-<span class="nc" id="L133">        phoneField.setStyle(&quot;-fx-background-color: #e9ecef;&quot;);</span>
+<span class="fc" id="L132">        phoneField.setEditable(false);</span>
+<span class="fc" id="L133">        phoneField.setStyle(&quot;-fx-background-color: #e9ecef;&quot;);</span>
         
         // راه‌اندازی listener های اعتبارسنجی
-<span class="nc" id="L136">        setupValidationListeners();</span>
+<span class="fc" id="L136">        setupValidationListeners();</span>
         
         // تنظیم وضعیت اولیه
-<span class="nc" id="L139">        setStatus(&quot;در حال بارگذاری پروفایل...&quot;);</span>
-<span class="nc" id="L140">    }</span>
+<span class="fc" id="L139">        setStatus(&quot;در حال بارگذاری پروفایل...&quot;);</span>
+<span class="fc" id="L140">    }</span>
 
     /**
      * راه‌اندازی listener های اعتبارسنجی برای فیلدهای فرم
@@ -148,14 +148,14 @@ import java.util.ResourceBundle;
      */
     private void setupValidationListeners() {
         // فعال کردن دکمه ذخیره فقط زمانی که تغییراتی انجام شده باشد
-<span class="nc" id="L151">        fullNameField.textProperty().addListener((obs, oldVal, newVal) -&gt; checkForChanges());</span>
-<span class="nc" id="L152">        emailField.textProperty().addListener((obs, oldVal, newVal) -&gt; checkForChanges());</span>
-<span class="nc" id="L153">        addressField.textProperty().addListener((obs, oldVal, newVal) -&gt; checkForChanges());</span>
+<span class="pc" id="L151">        fullNameField.textProperty().addListener((obs, oldVal, newVal) -&gt; checkForChanges());</span>
+<span class="pc" id="L152">        emailField.textProperty().addListener((obs, oldVal, newVal) -&gt; checkForChanges());</span>
+<span class="pc" id="L153">        addressField.textProperty().addListener((obs, oldVal, newVal) -&gt; checkForChanges());</span>
         
         // اعتبارسنجی فیلدهای رمز عبور
-<span class="nc" id="L156">        newPasswordField.textProperty().addListener((obs, oldVal, newVal) -&gt; validatePasswordFields());</span>
-<span class="nc" id="L157">        confirmPasswordField.textProperty().addListener((obs, oldVal, newVal) -&gt; validatePasswordFields());</span>
-<span class="nc" id="L158">    }</span>
+<span class="pc" id="L156">        newPasswordField.textProperty().addListener((obs, oldVal, newVal) -&gt; validatePasswordFields());</span>
+<span class="pc" id="L157">        confirmPasswordField.textProperty().addListener((obs, oldVal, newVal) -&gt; validatePasswordFields());</span>
+<span class="fc" id="L158">    }</span>
 
     /**
      * بارگذاری اطلاعات پروفایل کاربر از بک‌اند
@@ -163,23 +163,23 @@ import java.util.ResourceBundle;
      * این متد در background thread اجرا می‌شود تا UI freeze نشود
      */
     private void loadProfile() {
-<span class="nc" id="L166">        setLoading(true);</span>
+<span class="fc" id="L166">        setLoading(true);</span>
         
-<span class="nc" id="L168">        Task&lt;UserProfile&gt; loadTask = new Task&lt;UserProfile&gt;() {</span>
+<span class="fc" id="L168">        Task&lt;UserProfile&gt; loadTask = new Task&lt;UserProfile&gt;() {</span>
             @Override
             protected UserProfile call() throws Exception {
-<span class="nc" id="L171">                HttpClientUtil.ApiResponse response = HttpClientUtil.get(&quot;/auth/profile&quot;);</span>
+<span class="fc" id="L171">                HttpClientUtil.ApiResponse response = HttpClientUtil.get(&quot;/auth/profile&quot;);</span>
                 
-<span class="nc bnc" id="L173" title="All 4 branches missed.">                if (response.isSuccess() &amp;&amp; response.getData() != null) {</span>
+<span class="pc bpc" id="L173" title="3 of 4 branches missed.">                if (response.isSuccess() &amp;&amp; response.getData() != null) {</span>
 <span class="nc" id="L174">                    return parseUserProfile(response.getData());</span>
                 } else {
-<span class="nc bnc" id="L176" title="All 2 branches missed.">                    throw new RuntimeException(response.getMessage() != null ? </span>
-<span class="nc" id="L177">                                               response.getMessage() : &quot;خطا در بارگذاری پروفایل&quot;);</span>
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">                    throw new RuntimeException(response.getMessage() != null ? </span>
+<span class="pc" id="L177">                                               response.getMessage() : &quot;خطا در بارگذاری پروفایل&quot;);</span>
                 }
             }
         };
         
-<span class="nc" id="L182">        loadTask.setOnSucceeded(e -&gt; {</span>
+<span class="fc" id="L182">        loadTask.setOnSucceeded(e -&gt; {</span>
 <span class="nc" id="L183">            Platform.runLater(() -&gt; {</span>
 <span class="nc" id="L184">                setLoading(false);</span>
 <span class="nc" id="L185">                UserProfile profile = loadTask.getValue();</span>
@@ -189,23 +189,23 @@ import java.util.ResourceBundle;
 <span class="nc" id="L189">            });</span>
 <span class="nc" id="L190">        });</span>
         
-<span class="nc" id="L192">        loadTask.setOnFailed(e -&gt; {</span>
-<span class="nc" id="L193">            Platform.runLater(() -&gt; {</span>
-<span class="nc" id="L194">                setLoading(false);</span>
-<span class="nc" id="L195">                Throwable exception = loadTask.getException();</span>
-<span class="nc" id="L196">                String errorMessage = &quot;خطا در بارگذاری پروفایل&quot;;</span>
-<span class="nc bnc" id="L197" title="All 4 branches missed.">                if (exception != null &amp;&amp; exception.getMessage() != null) {</span>
-<span class="nc" id="L198">                    errorMessage = exception.getMessage();</span>
+<span class="fc" id="L192">        loadTask.setOnFailed(e -&gt; {</span>
+<span class="fc" id="L193">            Platform.runLater(() -&gt; {</span>
+<span class="fc" id="L194">                setLoading(false);</span>
+<span class="fc" id="L195">                Throwable exception = loadTask.getException();</span>
+<span class="fc" id="L196">                String errorMessage = &quot;خطا در بارگذاری پروفایل&quot;;</span>
+<span class="pc bpc" id="L197" title="2 of 4 branches missed.">                if (exception != null &amp;&amp; exception.getMessage() != null) {</span>
+<span class="fc" id="L198">                    errorMessage = exception.getMessage();</span>
                 }
-<span class="nc" id="L200">                setStatus(errorMessage);</span>
-<span class="nc" id="L201">                showError(&quot;خطا&quot;, errorMessage);</span>
-<span class="nc" id="L202">            });</span>
-<span class="nc" id="L203">        });</span>
+<span class="fc" id="L200">                setStatus(errorMessage);</span>
+<span class="fc" id="L201">                showError(&quot;خطا&quot;, errorMessage);</span>
+<span class="fc" id="L202">            });</span>
+<span class="fc" id="L203">        });</span>
         
-<span class="nc" id="L205">        Thread loadThread = new Thread(loadTask);</span>
-<span class="nc" id="L206">        loadThread.setDaemon(true);</span>
-<span class="nc" id="L207">        loadThread.start();</span>
-<span class="nc" id="L208">    }</span>
+<span class="fc" id="L205">        Thread loadThread = new Thread(loadTask);</span>
+<span class="fc" id="L206">        loadThread.setDaemon(true);</span>
+<span class="fc" id="L207">        loadThread.start();</span>
+<span class="fc" id="L208">    }</span>
 
     /**
      * تجزیه اطلاعات پروفایل کاربر از پاسخ JSON
@@ -291,8 +291,8 @@ import java.util.ResourceBundle;
 <span class="nc bnc" id="L291" title="All 2 branches missed.">        boolean hasNewPassword = !newPassword.trim().isEmpty();</span>
 <span class="nc bnc" id="L292" title="All 2 branches missed.">        boolean passwordLengthValid = newPassword.length() &gt;= 4;</span>
         
-<span class="nc bnc" id="L294" title="All 4 branches missed.">        boolean canChangePassword = hasCurrentPassword &amp;&amp; hasNewPassword &amp;&amp; </span>
-<span class="nc bnc" id="L295" title="All 4 branches missed.">                                  passwordsMatch &amp;&amp; passwordLengthValid;</span>
+<span class="nc bnc" id="L294" title="All 8 branches missed.">        boolean canChangePassword = hasCurrentPassword &amp;&amp; hasNewPassword &amp;&amp; </span>
+                                  passwordsMatch &amp;&amp; passwordLengthValid;
         
 <span class="nc bnc" id="L297" title="All 2 branches missed.">        changePasswordButton.setDisable(!canChangePassword);</span>
 <span class="nc" id="L298">    }</span>
@@ -509,17 +509,17 @@ import java.util.ResourceBundle;
      * @param loading true برای فعال کردن loading
      */
     private void setLoading(boolean loading) {
-<span class="nc" id="L512">        loadingIndicator.setVisible(loading);</span>
-<span class="nc" id="L513">        saveButton.setDisable(loading);</span>
-<span class="nc" id="L514">        refreshButton.setDisable(loading);</span>
-<span class="nc" id="L515">        changePasswordButton.setDisable(loading);</span>
-<span class="nc" id="L516">        fullNameField.setDisable(loading);</span>
-<span class="nc" id="L517">        emailField.setDisable(loading);</span>
-<span class="nc" id="L518">        addressField.setDisable(loading);</span>
-<span class="nc" id="L519">        currentPasswordField.setDisable(loading);</span>
-<span class="nc" id="L520">        newPasswordField.setDisable(loading);</span>
-<span class="nc" id="L521">        confirmPasswordField.setDisable(loading);</span>
-<span class="nc" id="L522">    }</span>
+<span class="fc" id="L512">        loadingIndicator.setVisible(loading);</span>
+<span class="fc" id="L513">        saveButton.setDisable(loading);</span>
+<span class="fc" id="L514">        refreshButton.setDisable(loading);</span>
+<span class="fc" id="L515">        changePasswordButton.setDisable(loading);</span>
+<span class="fc" id="L516">        fullNameField.setDisable(loading);</span>
+<span class="fc" id="L517">        emailField.setDisable(loading);</span>
+<span class="fc" id="L518">        addressField.setDisable(loading);</span>
+<span class="fc" id="L519">        currentPasswordField.setDisable(loading);</span>
+<span class="fc" id="L520">        newPasswordField.setDisable(loading);</span>
+<span class="fc" id="L521">        confirmPasswordField.setDisable(loading);</span>
+<span class="fc" id="L522">    }</span>
 
     /**
      * تنظیم پیام وضعیت
@@ -527,10 +527,10 @@ import java.util.ResourceBundle;
      * @param message متن پیام
      */
     private void setStatus(String message) {
-<span class="nc bnc" id="L530" title="All 2 branches missed.">        if (statusLabel != null) {</span>
-<span class="nc" id="L531">            statusLabel.setText(message);</span>
+<span class="pc bpc" id="L530" title="1 of 2 branches missed.">        if (statusLabel != null) {</span>
+<span class="fc" id="L531">            statusLabel.setText(message);</span>
         }
-<span class="nc" id="L533">    }</span>
+<span class="fc" id="L533">    }</span>
 
     /**
      * نمایش دیالوگ خطا
@@ -539,12 +539,12 @@ import java.util.ResourceBundle;
      * @param message متن پیام خطا
      */
     private void showError(String title, String message) {
-<span class="nc" id="L542">        Alert alert = new Alert(Alert.AlertType.ERROR);</span>
-<span class="nc" id="L543">        alert.setTitle(title);</span>
-<span class="nc" id="L544">        alert.setHeaderText(null);</span>
-<span class="nc" id="L545">        alert.setContentText(message);</span>
-<span class="nc" id="L546">        alert.showAndWait();</span>
-<span class="nc" id="L547">    }</span>
+<span class="fc" id="L542">        Alert alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="fc" id="L543">        alert.setTitle(title);</span>
+<span class="fc" id="L544">        alert.setHeaderText(null);</span>
+<span class="fc" id="L545">        alert.setContentText(message);</span>
+<span class="fc" id="L546">        alert.showAndWait();</span>
+<span class="fc" id="L547">    }</span>
 
     /**
      * نمایش دیالوگ موفقیت

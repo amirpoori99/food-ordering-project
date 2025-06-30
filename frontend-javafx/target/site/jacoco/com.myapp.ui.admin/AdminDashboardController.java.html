@@ -1,0 +1,788 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminDashboardController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.admin</a> &gt; <span class="el_source">AdminDashboardController.java</span></div><h1>AdminDashboardController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.admin;
+
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.LineChart;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.BorderPane;
+import java.net.URL;
+import java.util.ResourceBundle;
+import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.chart.XYChart;
+
+/**
+ * کنترلر داشبورد جامع مدیریت ادمین (فاز 29)
+ * 
+ * این کنترلر مسئول مدیریت بخش‌های مختلف داشبورد ادمین شامل:
+ * - مدیریت کاربران
+ * - مدیریت سفارشات
+ * - مدیریت تراکنش‌ها
+ * - مدیریت رستوران‌ها
+ * - گزارش‌ها و آمار
+ * - تنظیمات ادمین
+ * 
+ * هر تب دارای جدول/نمودار/فرم مرتبط است.
+ * تمام اجزا با کامنت فارسی مستندسازی شده‌اند.
+ *
+ * @author تیم توسعه سیستم سفارش غذا
+ * @version 1.0
+ * @since 1404/04/10
+ */
+<span class="fc" id="L38">public class AdminDashboardController implements Initializable {</span>
+
+    // ========== Data Collections ==========
+    /** لیست داده‌های کاربران */
+<span class="fc" id="L42">    private ObservableList&lt;UserData&gt; usersData = FXCollections.observableArrayList();</span>
+    /** لیست داده‌های سفارشات */
+<span class="fc" id="L44">    private ObservableList&lt;OrderData&gt; ordersData = FXCollections.observableArrayList();</span>
+    /** لیست داده‌های تراکنش‌ها */
+<span class="fc" id="L46">    private ObservableList&lt;TransactionData&gt; transactionsData = FXCollections.observableArrayList();</span>
+    /** لیست داده‌های رستوران‌ها */
+<span class="fc" id="L48">    private ObservableList&lt;RestaurantData&gt; restaurantsData = FXCollections.observableArrayList();</span>
+
+    // ========== Tab Container ==========
+    /** کانتینر اصلی تب‌ها */
+    @FXML TabPane mainTabPane;
+    /** کانتینر تب‌های ادمین (برای تست) */
+    @FXML TabPane adminTabPane;
+    /** تب مدیریت کاربران */
+    @FXML Tab usersTab;
+    /** تب مدیریت سفارشات */
+    @FXML Tab ordersTab;
+    /** تب مدیریت تراکنش‌ها */
+    @FXML Tab transactionsTab;
+    /** تب مدیریت رستوران‌ها */
+    @FXML Tab restaurantsTab;
+    /** تب گزارش‌ها و آمار */
+    @FXML Tab reportsTab;
+    /** تب تنظیمات */
+    @FXML Tab settingsTab;
+
+    // ========== Users Tab Components ==========
+    /** جدول کاربران */
+    @FXML TableView&lt;UserData&gt; usersTable;
+    /** دکمه افزودن کاربر */
+    @FXML Button addUserButton;
+    /** دکمه ویرایش کاربر */
+    @FXML Button editUserButton;
+    /** دکمه حذف کاربر */
+    @FXML Button deleteUserButton;
+    /** فیلد جستجوی کاربر */
+    @FXML TextField userSearchField;
+    /** فیلتر نقش کاربر */
+    @FXML ComboBox&lt;String&gt; userRoleFilter;
+
+    // ========== Orders Tab Components ==========
+    /** جدول سفارشات */
+    @FXML TableView&lt;OrderData&gt; ordersTable;
+    /** فیلد جستجوی سفارش */
+    @FXML TextField orderSearchField;
+    /** فیلتر وضعیت سفارش */
+    @FXML ComboBox&lt;String&gt; orderStatusFilter;
+    /** دکمه Export سفارشات */
+    @FXML Button exportOrdersButton;
+
+    // ========== Transactions Tab Components ==========
+    /** جدول تراکنش‌ها */
+    @FXML TableView&lt;TransactionData&gt; transactionsTable;
+    /** فیلد جستجوی تراکنش */
+    @FXML TextField transactionSearchField;
+    /** فیلتر نوع تراکنش */
+    @FXML ComboBox&lt;String&gt; transactionTypeFilter;
+    /** دکمه Export تراکنش‌ها */
+    @FXML Button exportTransactionsButton;
+
+    // ========== Restaurants Tab Components ==========
+    /** جدول رستوران‌ها */
+    @FXML TableView&lt;RestaurantData&gt; restaurantsTable;
+    /** دکمه افزودن رستوران */
+    @FXML Button addRestaurantButton;
+    /** دکمه ویرایش رستوران */
+    @FXML Button editRestaurantButton;
+    /** دکمه حذف رستوران */
+    @FXML Button deleteRestaurantButton;
+    /** فیلد جستجوی رستوران */
+    @FXML TextField restaurantSearchField;
+
+    // ========== Reports Tab Components ==========
+    /** نمودار دایره‌ای سفارشات */
+    @FXML PieChart ordersPieChart;
+    /** نمودار خطی درآمد */
+    @FXML LineChart&lt;String, Number&gt; revenueLineChart;
+    /** دکمه Export گزارش */
+    @FXML Button exportReportButton;
+
+    // ========== Settings Tab Components ==========
+    /** فرم تنظیمات ادمین */
+    @FXML VBox adminSettingsForm;
+    /** دکمه ذخیره تنظیمات */
+    @FXML Button saveSettingsButton;
+    /** دکمه بازنشانی تنظیمات */
+    @FXML Button resetSettingsButton;
+
+    // ========== سایر اجزای عمومی ==========
+    /** برچسب وضعیت */
+    @FXML Label statusLabel;
+    /** Indicator بارگذاری */
+    @FXML ProgressIndicator loadingIndicator;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        // مقداردهی اولیه UI و بارگذاری داده‌ها
+<span class="fc" id="L139">        setupUI();</span>
+<span class="fc" id="L140">        setupTables();</span>
+<span class="fc" id="L141">        setupListeners();</span>
+<span class="fc" id="L142">        loadInitialData();</span>
+<span class="fc" id="L143">    }</span>
+
+    /** تنظیم اولیه UI */
+    private void setupUI() {
+        // مقداردهی اولیه فیلترها
+<span class="fc" id="L148">        userRoleFilter.getItems().addAll(&quot;همه&quot;, &quot;کاربر&quot;, &quot;ادمین&quot;, &quot;فروشنده&quot;, &quot;پیک&quot;);</span>
+<span class="fc" id="L149">        orderStatusFilter.getItems().addAll(&quot;همه&quot;, &quot;در انتظار&quot;, &quot;تأیید شده&quot;, &quot;در حال آماده‌سازی&quot;, &quot;ارسال شده&quot;, &quot;تحویل شده&quot;, &quot;لغو شده&quot;);</span>
+<span class="fc" id="L150">        transactionTypeFilter.getItems().addAll(&quot;همه&quot;, &quot;پرداخت&quot;, &quot;برداشت&quot;, &quot;بازگشت&quot;, &quot;کمیسیون&quot;);</span>
+<span class="fc" id="L151">    }</span>
+
+    /** تنظیم جداول */
+    private void setupTables() {
+        // تنظیم ستون‌های جدول کاربران
+<span class="fc" id="L156">        usersTable.setPlaceholder(new Label(&quot;هیچ کاربری یافت نشد&quot;));</span>
+<span class="fc" id="L157">        usersTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);</span>
+        
+        // تنظیم ستون‌های جدول سفارشات
+<span class="fc" id="L160">        ordersTable.setPlaceholder(new Label(&quot;هیچ سفارشی یافت نشد&quot;));</span>
+<span class="fc" id="L161">        ordersTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);</span>
+        
+        // تنظیم ستون‌های جدول تراکنش‌ها
+<span class="fc" id="L164">        transactionsTable.setPlaceholder(new Label(&quot;هیچ تراکنشی یافت نشد&quot;));</span>
+<span class="fc" id="L165">        transactionsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);</span>
+        
+        // تنظیم ستون‌های جدول رستوران‌ها
+<span class="fc" id="L168">        restaurantsTable.setPlaceholder(new Label(&quot;هیچ رستورانی یافت نشد&quot;));</span>
+<span class="fc" id="L169">        restaurantsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);</span>
+<span class="fc" id="L170">    }</span>
+
+    /** تنظیم Listener ها */
+    private void setupListeners() {
+        // Listener برای فیلتر کاربران
+<span class="fc" id="L175">        userSearchField.textProperty().addListener((observable, oldValue, newValue) -&gt; filterUsers());</span>
+<span class="fc" id="L176">        userRoleFilter.setOnAction(event -&gt; filterUsers());</span>
+        
+        // Listener برای فیلتر سفارشات
+<span class="fc" id="L179">        orderSearchField.textProperty().addListener((observable, oldValue, newValue) -&gt; filterOrders());</span>
+<span class="fc" id="L180">        orderStatusFilter.setOnAction(event -&gt; filterOrders());</span>
+        
+        // Listener برای فیلتر تراکنش‌ها
+<span class="fc" id="L183">        transactionSearchField.textProperty().addListener((observable, oldValue, newValue) -&gt; filterTransactions());</span>
+<span class="fc" id="L184">        transactionTypeFilter.setOnAction(event -&gt; filterTransactions());</span>
+        
+        // Listener برای فیلتر رستوران‌ها
+<span class="fc" id="L187">        restaurantSearchField.textProperty().addListener((observable, oldValue, newValue) -&gt; filterRestaurants());</span>
+<span class="fc" id="L188">    }</span>
+
+    /** بارگذاری داده‌های اولیه */
+    private void loadInitialData() {
+<span class="fc" id="L192">        loadUsers();</span>
+<span class="fc" id="L193">        loadOrders();</span>
+<span class="fc" id="L194">        loadTransactions();</span>
+<span class="fc" id="L195">        loadRestaurants();</span>
+<span class="fc" id="L196">        loadReports();</span>
+<span class="fc" id="L197">    }</span>
+
+    /** بارگذاری لیست کاربران */
+    private void loadUsers() {
+<span class="fc" id="L201">        setLoading(true);</span>
+<span class="fc" id="L202">        setStatus(&quot;در حال بارگذاری کاربران...&quot;);</span>
+        
+        // شبیه‌سازی بارگذاری از API
+        // در حالت واقعی، اینجا درخواست HTTP به سرور ارسال می‌شود
+<span class="fc" id="L206">        List&lt;UserData&gt; sampleUsers = Arrays.asList(</span>
+<span class="fc" id="L207">            new UserData(1L, &quot;احمد محمدی&quot;, &quot;ahmad@example.com&quot;, &quot;کاربر&quot;, &quot;فعال&quot;, &quot;2024-01-15&quot;),</span>
+<span class="fc" id="L208">            new UserData(2L, &quot;فاطمه احمدی&quot;, &quot;fateme@example.com&quot;, &quot;ادمین&quot;, &quot;فعال&quot;, &quot;2024-01-10&quot;),</span>
+<span class="fc" id="L209">            new UserData(3L, &quot;علی رضایی&quot;, &quot;ali@example.com&quot;, &quot;فروشنده&quot;, &quot;فعال&quot;, &quot;2024-01-20&quot;),</span>
+<span class="fc" id="L210">            new UserData(4L, &quot;مریم کریمی&quot;, &quot;maryam@example.com&quot;, &quot;پیک&quot;, &quot;غیرفعال&quot;, &quot;2024-01-05&quot;)</span>
+        );
+        
+<span class="fc" id="L213">        usersData.clear();</span>
+<span class="fc" id="L214">        usersData.addAll(sampleUsers);</span>
+<span class="fc" id="L215">        usersTable.setItems(usersData);</span>
+        
+<span class="fc" id="L217">        setLoading(false);</span>
+<span class="fc" id="L218">        setStatus(&quot;کاربران بارگذاری شدند&quot;);</span>
+<span class="fc" id="L219">    }</span>
+
+    /** فیلتر کردن کاربران */
+    private void filterUsers() {
+<span class="fc" id="L223">        String searchText = userSearchField.getText().toLowerCase();</span>
+<span class="fc" id="L224">        String selectedRole = userRoleFilter.getValue();</span>
+        
+        // منطق فیلتر کردن بر اساس متن جستجو و نقش انتخاب شده
+<span class="fc" id="L227">        List&lt;UserData&gt; filteredUsers = usersData.stream()</span>
+<span class="fc" id="L228">            .filter(user -&gt; {</span>
+<span class="fc bfc" id="L229" title="All 2 branches covered.">                boolean matchesSearch = searchText.isEmpty() || </span>
+<span class="fc bfc" id="L230" title="All 2 branches covered.">                    user.getName().toLowerCase().contains(searchText) ||</span>
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">                    user.getEmail().toLowerCase().contains(searchText);</span>
+                
+<span class="pc bpc" id="L233" title="1 of 4 branches missed.">                boolean matchesRole = selectedRole == null || selectedRole.equals(&quot;همه&quot;) || </span>
+<span class="fc bfc" id="L234" title="All 2 branches covered.">                    user.getRole().equals(selectedRole);</span>
+                
+<span class="fc bfc" id="L236" title="All 4 branches covered.">                return matchesSearch &amp;&amp; matchesRole;</span>
+            })
+<span class="fc" id="L238">            .collect(Collectors.toList());</span>
+        
+<span class="fc" id="L240">        usersTable.setItems(FXCollections.observableArrayList(filteredUsers));</span>
+<span class="fc" id="L241">    }</span>
+
+    /** افزودن کاربر جدید */
+    @FXML
+    private void handleAddUser() {
+        // نمایش دیالوگ افزودن کاربر
+<span class="nc" id="L247">        setStatus(&quot;در حال باز کردن فرم افزودن کاربر...&quot;);</span>
+        // در حالت واقعی، اینجا دیالوگ باز می‌شود
+        // ...
+<span class="nc" id="L250">    }</span>
+
+    /** ویرایش کاربر انتخاب شده */
+    @FXML
+    private void handleEditUser() {
+<span class="nc" id="L255">        UserData selectedUser = usersTable.getSelectionModel().getSelectedItem();</span>
+<span class="nc bnc" id="L256" title="All 2 branches missed.">        if (selectedUser == null) {</span>
+<span class="nc" id="L257">            setStatus(&quot;لطفاً یک کاربر را انتخاب کنید&quot;);</span>
+<span class="nc" id="L258">            return;</span>
+        }
+        
+<span class="nc" id="L261">        setStatus(&quot;در حال باز کردن فرم ویرایش کاربر: &quot; + selectedUser.getName());</span>
+        // در حالت واقعی، اینجا دیالوگ ویرایش باز می‌شود
+        // ...
+<span class="nc" id="L264">    }</span>
+
+    /** حذف کاربر انتخاب شده */
+    @FXML
+    private void handleDeleteUser() {
+<span class="nc" id="L269">        UserData selectedUser = usersTable.getSelectionModel().getSelectedItem();</span>
+<span class="nc bnc" id="L270" title="All 2 branches missed.">        if (selectedUser == null) {</span>
+<span class="nc" id="L271">            setStatus(&quot;لطفاً یک کاربر را انتخاب کنید&quot;);</span>
+<span class="nc" id="L272">            return;</span>
+        }
+        
+<span class="nc" id="L275">        setStatus(&quot;در حال حذف کاربر: &quot; + selectedUser.getName());</span>
+        // در حالت واقعی، اینجا دیالوگ تأیید حذف باز می‌شود
+        // ...
+<span class="nc" id="L278">    }</span>
+
+    /** بارگذاری لیست سفارشات */
+    private void loadOrders() {
+<span class="fc" id="L282">        setLoading(true);</span>
+<span class="fc" id="L283">        setStatus(&quot;در حال بارگذاری سفارشات...&quot;);</span>
+        
+        // شبیه‌سازی بارگذاری از API
+<span class="fc" id="L286">        List&lt;OrderData&gt; sampleOrders = Arrays.asList(</span>
+<span class="fc" id="L287">            new OrderData(1001L, &quot;احمد محمدی&quot;, &quot;رستوران تهران&quot;, &quot;تحویل شده&quot;, 150000L, &quot;2024-01-20 14:30&quot;),</span>
+<span class="fc" id="L288">            new OrderData(1002L, &quot;فاطمه احمدی&quot;, &quot;رستوران شیراز&quot;, &quot;در حال آماده‌سازی&quot;, 85000L, &quot;2024-01-20 15:45&quot;),</span>
+<span class="fc" id="L289">            new OrderData(1003L, &quot;علی رضایی&quot;, &quot;رستوران اصفهان&quot;, &quot;ارسال شده&quot;, 120000L, &quot;2024-01-20 16:15&quot;),</span>
+<span class="fc" id="L290">            new OrderData(1004L, &quot;مریم کریمی&quot;, &quot;رستوران مشهد&quot;, &quot;در انتظار&quot;, 95000L, &quot;2024-01-20 17:00&quot;)</span>
+        );
+        
+<span class="fc" id="L293">        ordersData.clear();</span>
+<span class="fc" id="L294">        ordersData.addAll(sampleOrders);</span>
+<span class="fc" id="L295">        ordersTable.setItems(ordersData);</span>
+        
+<span class="fc" id="L297">        setLoading(false);</span>
+<span class="fc" id="L298">        setStatus(&quot;سفارشات بارگذاری شدند&quot;);</span>
+<span class="fc" id="L299">    }</span>
+
+    /** فیلتر کردن سفارشات */
+    private void filterOrders() {
+<span class="fc" id="L303">        String searchText = orderSearchField.getText().toLowerCase();</span>
+<span class="fc" id="L304">        String selectedStatus = orderStatusFilter.getValue();</span>
+        
+        // منطق فیلتر کردن بر اساس متن جستجو و وضعیت انتخاب شده
+<span class="fc" id="L307">        List&lt;OrderData&gt; filteredOrders = ordersData.stream()</span>
+<span class="fc" id="L308">            .filter(order -&gt; {</span>
+<span class="fc bfc" id="L309" title="All 2 branches covered.">                boolean matchesSearch = searchText.isEmpty() || </span>
+<span class="pc bpc" id="L310" title="1 of 2 branches missed.">                    order.getCustomerName().toLowerCase().contains(searchText) ||</span>
+<span class="fc bfc" id="L311" title="All 2 branches covered.">                    order.getRestaurantName().toLowerCase().contains(searchText) ||</span>
+<span class="pc bpc" id="L312" title="1 of 2 branches missed.">                    order.getId().toString().contains(searchText);</span>
+                
+<span class="pc bpc" id="L314" title="1 of 4 branches missed.">                boolean matchesStatus = selectedStatus == null || selectedStatus.equals(&quot;همه&quot;) || </span>
+<span class="fc bfc" id="L315" title="All 2 branches covered.">                    order.getStatus().equals(selectedStatus);</span>
+                
+<span class="fc bfc" id="L317" title="All 4 branches covered.">                return matchesSearch &amp;&amp; matchesStatus;</span>
+            })
+<span class="fc" id="L319">            .collect(Collectors.toList());</span>
+        
+<span class="fc" id="L321">        ordersTable.setItems(FXCollections.observableArrayList(filteredOrders));</span>
+<span class="fc" id="L322">    }</span>
+
+    /** Export سفارشات */
+    @FXML
+    private void handleExportOrders() {
+<span class="nc" id="L327">        setStatus(&quot;در حال Export سفارشات...&quot;);</span>
+        // Export سفارشات به فایل CSV/Excel
+        // در حالت واقعی، اینجا فایل CSV ایجاد می‌شود
+        // ...
+<span class="nc" id="L331">        setStatus(&quot;سفارشات با موفقیت Export شدند&quot;);</span>
+<span class="nc" id="L332">    }</span>
+
+    /** بارگذاری لیست تراکنش‌ها */
+    private void loadTransactions() {
+<span class="fc" id="L336">        setLoading(true);</span>
+<span class="fc" id="L337">        setStatus(&quot;در حال بارگذاری تراکنش‌ها...&quot;);</span>
+        
+        // شبیه‌سازی بارگذاری از API
+<span class="fc" id="L340">        List&lt;TransactionData&gt; sampleTransactions = Arrays.asList(</span>
+<span class="fc" id="L341">            new TransactionData(2001L, &quot;احمد محمدی&quot;, &quot;پرداخت&quot;, 150000L, &quot;موفق&quot;, &quot;2024-01-20 14:30&quot;),</span>
+<span class="fc" id="L342">            new TransactionData(2002L, &quot;فاطمه احمدی&quot;, &quot;برداشت&quot;, 50000L, &quot;موفق&quot;, &quot;2024-01-20 15:45&quot;),</span>
+<span class="fc" id="L343">            new TransactionData(2003L, &quot;علی رضایی&quot;, &quot;بازگشت&quot;, 25000L, &quot;موفق&quot;, &quot;2024-01-20 16:15&quot;),</span>
+<span class="fc" id="L344">            new TransactionData(2004L, &quot;مریم کریمی&quot;, &quot;کمیسیون&quot;, 15000L, &quot;موفق&quot;, &quot;2024-01-20 17:00&quot;)</span>
+        );
+        
+<span class="fc" id="L347">        transactionsData.clear();</span>
+<span class="fc" id="L348">        transactionsData.addAll(sampleTransactions);</span>
+<span class="fc" id="L349">        transactionsTable.setItems(transactionsData);</span>
+        
+<span class="fc" id="L351">        setLoading(false);</span>
+<span class="fc" id="L352">        setStatus(&quot;تراکنش‌ها بارگذاری شدند&quot;);</span>
+<span class="fc" id="L353">    }</span>
+
+    /** فیلتر کردن تراکنش‌ها */
+    private void filterTransactions() {
+<span class="fc" id="L357">        String searchText = transactionSearchField.getText().toLowerCase();</span>
+<span class="fc" id="L358">        String selectedType = transactionTypeFilter.getValue();</span>
+        
+        // منطق فیلتر کردن بر اساس متن جستجو و نوع انتخاب شده
+<span class="fc" id="L361">        List&lt;TransactionData&gt; filteredTransactions = transactionsData.stream()</span>
+<span class="fc" id="L362">            .filter(transaction -&gt; {</span>
+<span class="fc bfc" id="L363" title="All 2 branches covered.">                boolean matchesSearch = searchText.isEmpty() || </span>
+<span class="fc bfc" id="L364" title="All 2 branches covered.">                    transaction.getUserName().toLowerCase().contains(searchText) ||</span>
+<span class="pc bpc" id="L365" title="1 of 2 branches missed.">                    transaction.getId().toString().contains(searchText);</span>
+                
+<span class="pc bpc" id="L367" title="1 of 4 branches missed.">                boolean matchesType = selectedType == null || selectedType.equals(&quot;همه&quot;) || </span>
+<span class="fc bfc" id="L368" title="All 2 branches covered.">                    transaction.getType().equals(selectedType);</span>
+                
+<span class="fc bfc" id="L370" title="All 4 branches covered.">                return matchesSearch &amp;&amp; matchesType;</span>
+            })
+<span class="fc" id="L372">            .collect(Collectors.toList());</span>
+        
+<span class="fc" id="L374">        transactionsTable.setItems(FXCollections.observableArrayList(filteredTransactions));</span>
+<span class="fc" id="L375">    }</span>
+
+    /** Export تراکنش‌ها */
+    @FXML
+    private void handleExportTransactions() {
+<span class="nc" id="L380">        setStatus(&quot;در حال Export تراکنش‌ها...&quot;);</span>
+        // Export تراکنش‌ها به فایل CSV/Excel
+        // در حالت واقعی، اینجا فایل CSV ایجاد می‌شود
+        // ...
+<span class="nc" id="L384">        setStatus(&quot;تراکنش‌ها با موفقیت Export شدند&quot;);</span>
+<span class="nc" id="L385">    }</span>
+
+    /** بارگذاری لیست رستوران‌ها */
+    private void loadRestaurants() {
+<span class="fc" id="L389">        setLoading(true);</span>
+<span class="fc" id="L390">        setStatus(&quot;در حال بارگذاری رستوران‌ها...&quot;);</span>
+        
+        // شبیه‌سازی بارگذاری از API
+<span class="fc" id="L393">        List&lt;RestaurantData&gt; sampleRestaurants = Arrays.asList(</span>
+<span class="fc" id="L394">            new RestaurantData(3001L, &quot;رستوران تهران&quot;, &quot;تهران، خیابان ولیعصر&quot;, &quot;فعال&quot;, 4.5, 150),</span>
+<span class="fc" id="L395">            new RestaurantData(3002L, &quot;رستوران شیراز&quot;, &quot;شیراز، خیابان زند&quot;, &quot;فعال&quot;, 4.2, 120),</span>
+<span class="fc" id="L396">            new RestaurantData(3003L, &quot;رستوران اصفهان&quot;, &quot;اصفهان، خیابان چهارباغ&quot;, &quot;غیرفعال&quot;, 4.0, 80),</span>
+<span class="fc" id="L397">            new RestaurantData(3004L, &quot;رستوران مشهد&quot;, &quot;مشهد، خیابان امام رضا&quot;, &quot;فعال&quot;, 4.8, 200)</span>
+        );
+        
+<span class="fc" id="L400">        restaurantsData.clear();</span>
+<span class="fc" id="L401">        restaurantsData.addAll(sampleRestaurants);</span>
+<span class="fc" id="L402">        restaurantsTable.setItems(restaurantsData);</span>
+        
+<span class="fc" id="L404">        setLoading(false);</span>
+<span class="fc" id="L405">        setStatus(&quot;رستوران‌ها بارگذاری شدند&quot;);</span>
+<span class="fc" id="L406">    }</span>
+
+    /** فیلتر کردن رستوران‌ها */
+    private void filterRestaurants() {
+<span class="fc" id="L410">        String searchText = restaurantSearchField.getText().toLowerCase();</span>
+        
+        // منطق فیلتر کردن بر اساس متن جستجو
+<span class="fc" id="L413">        List&lt;RestaurantData&gt; filteredRestaurants = restaurantsData.stream()</span>
+<span class="fc" id="L414">            .filter(restaurant -&gt; {</span>
+<span class="pc bpc" id="L415" title="1 of 2 branches missed.">                boolean matchesSearch = searchText.isEmpty() || </span>
+<span class="fc bfc" id="L416" title="All 2 branches covered.">                    restaurant.getName().toLowerCase().contains(searchText) ||</span>
+<span class="pc bpc" id="L417" title="1 of 2 branches missed.">                    restaurant.getAddress().toLowerCase().contains(searchText) ||</span>
+<span class="pc bpc" id="L418" title="1 of 2 branches missed.">                    restaurant.getId().toString().contains(searchText);</span>
+                
+<span class="fc" id="L420">                return matchesSearch;</span>
+            })
+<span class="fc" id="L422">            .collect(Collectors.toList());</span>
+        
+<span class="fc" id="L424">        restaurantsTable.setItems(FXCollections.observableArrayList(filteredRestaurants));</span>
+<span class="fc" id="L425">    }</span>
+
+    /** افزودن رستوران جدید */
+    @FXML
+    private void handleAddRestaurant() {
+<span class="nc" id="L430">        setStatus(&quot;در حال باز کردن فرم افزودن رستوران...&quot;);</span>
+        // نمایش دیالوگ افزودن رستوران
+        // در حالت واقعی، اینجا دیالوگ باز می‌شود
+        // ...
+<span class="nc" id="L434">    }</span>
+
+    /** ویرایش رستوران انتخاب شده */
+    @FXML
+    private void handleEditRestaurant() {
+<span class="nc" id="L439">        RestaurantData selectedRestaurant = restaurantsTable.getSelectionModel().getSelectedItem();</span>
+<span class="nc bnc" id="L440" title="All 2 branches missed.">        if (selectedRestaurant == null) {</span>
+<span class="nc" id="L441">            setStatus(&quot;لطفاً یک رستوران را انتخاب کنید&quot;);</span>
+<span class="nc" id="L442">            return;</span>
+        }
+        
+<span class="nc" id="L445">        setStatus(&quot;در حال باز کردن فرم ویرایش رستوران: &quot; + selectedRestaurant.getName());</span>
+        // در حالت واقعی، اینجا دیالوگ ویرایش باز می‌شود
+        // ...
+<span class="nc" id="L448">    }</span>
+
+    /** حذف رستوران انتخاب شده */
+    @FXML
+    private void handleDeleteRestaurant() {
+<span class="nc" id="L453">        RestaurantData selectedRestaurant = restaurantsTable.getSelectionModel().getSelectedItem();</span>
+<span class="nc bnc" id="L454" title="All 2 branches missed.">        if (selectedRestaurant == null) {</span>
+<span class="nc" id="L455">            setStatus(&quot;لطفاً یک رستوران را انتخاب کنید&quot;);</span>
+<span class="nc" id="L456">            return;</span>
+        }
+        
+<span class="nc" id="L459">        setStatus(&quot;در حال حذف رستوران: &quot; + selectedRestaurant.getName());</span>
+        // در حالت واقعی، اینجا دیالوگ تأیید حذف باز می‌شود
+        // ...
+<span class="nc" id="L462">    }</span>
+
+    /** بارگذاری گزارش‌ها و آمار */
+    private void loadReports() {
+<span class="fc" id="L466">        setLoading(true);</span>
+<span class="fc" id="L467">        setStatus(&quot;در حال بارگذاری گزارش‌ها...&quot;);</span>
+        
+        // بارگذاری داده‌های نمودارها
+<span class="fc" id="L470">        loadOrdersChart();</span>
+<span class="fc" id="L471">        loadRevenueChart();</span>
+        
+<span class="fc" id="L473">        setLoading(false);</span>
+<span class="fc" id="L474">        setStatus(&quot;گزارش‌ها بارگذاری شدند&quot;);</span>
+<span class="fc" id="L475">    }</span>
+
+    /** بارگذاری نمودار سفارشات */
+    private void loadOrdersChart() {
+        // تنظیم داده‌های نمودار دایره‌ای سفارشات
+<span class="fc" id="L480">        PieChart.Data pendingData = new PieChart.Data(&quot;در انتظار&quot;, 25);</span>
+<span class="fc" id="L481">        PieChart.Data confirmedData = new PieChart.Data(&quot;تأیید شده&quot;, 30);</span>
+<span class="fc" id="L482">        PieChart.Data preparingData = new PieChart.Data(&quot;در حال آماده‌سازی&quot;, 20);</span>
+<span class="fc" id="L483">        PieChart.Data deliveredData = new PieChart.Data(&quot;تحویل شده&quot;, 15);</span>
+<span class="fc" id="L484">        PieChart.Data cancelledData = new PieChart.Data(&quot;لغو شده&quot;, 10);</span>
+        
+<span class="fc" id="L486">        ordersPieChart.getData().clear();</span>
+<span class="fc" id="L487">        ordersPieChart.getData().addAll(pendingData, confirmedData, preparingData, deliveredData, cancelledData);</span>
+        
+        // تنظیم رنگ‌ها
+<span class="fc" id="L490">        ordersPieChart.getData().get(0).getNode().setStyle(&quot;-fx-pie-color: #FFA500;&quot;); // نارنجی</span>
+<span class="fc" id="L491">        ordersPieChart.getData().get(1).getNode().setStyle(&quot;-fx-pie-color: #4169E1;&quot;); // آبی</span>
+<span class="fc" id="L492">        ordersPieChart.getData().get(2).getNode().setStyle(&quot;-fx-pie-color: #32CD32;&quot;); // سبز</span>
+<span class="fc" id="L493">        ordersPieChart.getData().get(3).getNode().setStyle(&quot;-fx-pie-color: #228B22;&quot;); // سبز تیره</span>
+<span class="fc" id="L494">        ordersPieChart.getData().get(4).getNode().setStyle(&quot;-fx-pie-color: #DC143C;&quot;); // قرمز</span>
+<span class="fc" id="L495">    }</span>
+
+    /** بارگذاری نمودار درآمد */
+    private void loadRevenueChart() {
+        // تنظیم داده‌های نمودار خطی درآمد
+<span class="fc" id="L500">        XYChart.Series&lt;String, Number&gt; series = new XYChart.Series&lt;&gt;();</span>
+<span class="fc" id="L501">        series.setName(&quot;درآمد روزانه&quot;);</span>
+        
+<span class="fc" id="L503">        series.getData().add(new XYChart.Data&lt;&gt;(&quot;شنبه&quot;, 1500000));</span>
+<span class="fc" id="L504">        series.getData().add(new XYChart.Data&lt;&gt;(&quot;یکشنبه&quot;, 1800000));</span>
+<span class="fc" id="L505">        series.getData().add(new XYChart.Data&lt;&gt;(&quot;دوشنبه&quot;, 1200000));</span>
+<span class="fc" id="L506">        series.getData().add(new XYChart.Data&lt;&gt;(&quot;سه‌شنبه&quot;, 2000000));</span>
+<span class="fc" id="L507">        series.getData().add(new XYChart.Data&lt;&gt;(&quot;چهارشنبه&quot;, 1600000));</span>
+<span class="fc" id="L508">        series.getData().add(new XYChart.Data&lt;&gt;(&quot;پنج‌شنبه&quot;, 2200000));</span>
+<span class="fc" id="L509">        series.getData().add(new XYChart.Data&lt;&gt;(&quot;جمعه&quot;, 1900000));</span>
+        
+<span class="fc" id="L511">        revenueLineChart.getData().clear();</span>
+<span class="fc" id="L512">        revenueLineChart.getData().add(series);</span>
+        
+        // تنظیم عنوان محورها
+<span class="fc" id="L515">        revenueLineChart.getXAxis().setLabel(&quot;روز هفته&quot;);</span>
+<span class="fc" id="L516">        revenueLineChart.getYAxis().setLabel(&quot;درآمد (تومان)&quot;);</span>
+<span class="fc" id="L517">    }</span>
+
+    /** Export گزارش‌ها */
+    @FXML
+    private void handleExportReports() {
+<span class="nc" id="L522">        setStatus(&quot;در حال Export گزارش‌ها...&quot;);</span>
+        // Export گزارش‌ها به فایل PDF/Excel
+        // در حالت واقعی، اینجا فایل PDF ایجاد می‌شود
+        // ...
+<span class="nc" id="L526">        setStatus(&quot;گزارش‌ها با موفقیت Export شدند&quot;);</span>
+<span class="nc" id="L527">    }</span>
+
+    /** ذخیره تنظیمات */
+    @FXML
+    private void handleSaveSettings() {
+<span class="nc" id="L532">        setStatus(&quot;در حال ذخیره تنظیمات...&quot;);</span>
+        // ذخیره تنظیمات ادمین
+        // در حالت واقعی، اینجا تنظیمات در فایل یا دیتابیس ذخیره می‌شود
+        // ...
+<span class="nc" id="L536">        setStatus(&quot;تنظیمات با موفقیت ذخیره شدند&quot;);</span>
+<span class="nc" id="L537">    }</span>
+
+    /** بازنشانی تنظیمات */
+    @FXML
+    private void handleResetSettings() {
+<span class="nc" id="L542">        setStatus(&quot;در حال بازنشانی تنظیمات...&quot;);</span>
+        // بازنشانی تنظیمات به مقادیر پیش‌فرض
+        // در حالت واقعی، اینجا تنظیمات به مقادیر پیش‌فرض باز می‌گردد
+        // ...
+<span class="nc" id="L546">        setStatus(&quot;تنظیمات به مقادیر پیش‌فرض بازنشانی شدند&quot;);</span>
+<span class="nc" id="L547">    }</span>
+
+    /** تنظیم وضعیت بارگذاری */
+    private void setLoading(boolean loading) {
+<span class="fc" id="L551">        loadingIndicator.setVisible(loading);</span>
+        
+        // غیرفعال کردن دکمه‌ها در حین بارگذاری
+<span class="fc" id="L554">        addUserButton.setDisable(loading);</span>
+<span class="fc" id="L555">        editUserButton.setDisable(loading);</span>
+<span class="fc" id="L556">        deleteUserButton.setDisable(loading);</span>
+<span class="fc" id="L557">        exportOrdersButton.setDisable(loading);</span>
+<span class="fc" id="L558">        exportTransactionsButton.setDisable(loading);</span>
+<span class="fc" id="L559">        addRestaurantButton.setDisable(loading);</span>
+<span class="fc" id="L560">        editRestaurantButton.setDisable(loading);</span>
+<span class="fc" id="L561">        deleteRestaurantButton.setDisable(loading);</span>
+<span class="fc" id="L562">        exportReportButton.setDisable(loading);</span>
+<span class="fc" id="L563">        saveSettingsButton.setDisable(loading);</span>
+<span class="fc" id="L564">        resetSettingsButton.setDisable(loading);</span>
+        
+        // غیرفعال کردن فیلترها در حین بارگذاری
+<span class="fc" id="L567">        userSearchField.setDisable(loading);</span>
+<span class="fc" id="L568">        userRoleFilter.setDisable(loading);</span>
+<span class="fc" id="L569">        orderSearchField.setDisable(loading);</span>
+<span class="fc" id="L570">        orderStatusFilter.setDisable(loading);</span>
+<span class="fc" id="L571">        transactionSearchField.setDisable(loading);</span>
+<span class="fc" id="L572">        transactionTypeFilter.setDisable(loading);</span>
+<span class="fc" id="L573">        restaurantSearchField.setDisable(loading);</span>
+<span class="fc" id="L574">    }</span>
+
+    /** تنظیم پیام وضعیت */
+    private void setStatus(String message) {
+<span class="fc" id="L578">        statusLabel.setText(&quot;وضعیت: &quot; + message);</span>
+<span class="fc" id="L579">    }</span>
+
+    // ========== مدل‌های داده داخلی ==========
+
+    /**
+     * مدل داده کاربر برای جدول کاربران
+     */
+    public static class UserData {
+        /** شناسه کاربر */
+        private Long id;
+        /** نام کامل */
+        private String name;
+        /** ایمیل */
+        private String email;
+        /** نقش */
+        private String role;
+        /** وضعیت */
+        private String status;
+        /** تاریخ عضویت */
+        private String createdAt;
+
+        /** سازنده کلاس */
+<span class="fc" id="L601">        public UserData(Long id, String name, String email, String role, String status, String createdAt) {</span>
+<span class="fc" id="L602">            this.id = id;</span>
+<span class="fc" id="L603">            this.name = name;</span>
+<span class="fc" id="L604">            this.email = email;</span>
+<span class="fc" id="L605">            this.role = role;</span>
+<span class="fc" id="L606">            this.status = status;</span>
+<span class="fc" id="L607">            this.createdAt = createdAt;</span>
+<span class="fc" id="L608">        }</span>
+
+        // Getter methods
+<span class="nc" id="L611">        public Long getId() { return id; }</span>
+<span class="fc" id="L612">        public String getName() { return name; }</span>
+<span class="fc" id="L613">        public String getEmail() { return email; }</span>
+<span class="fc" id="L614">        public String getRole() { return role; }</span>
+<span class="nc" id="L615">        public String getStatus() { return status; }</span>
+<span class="nc" id="L616">        public String getCreatedAt() { return createdAt; }</span>
+
+        // Setter methods
+<span class="nc" id="L619">        public void setId(Long id) { this.id = id; }</span>
+<span class="nc" id="L620">        public void setName(String name) { this.name = name; }</span>
+<span class="nc" id="L621">        public void setEmail(String email) { this.email = email; }</span>
+<span class="nc" id="L622">        public void setRole(String role) { this.role = role; }</span>
+<span class="nc" id="L623">        public void setStatus(String status) { this.status = status; }</span>
+<span class="nc" id="L624">        public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }</span>
+    }
+
+    /**
+     * مدل داده سفارش برای جدول سفارشات
+     */
+    public static class OrderData {
+        /** شناسه سفارش */
+        private Long id;
+        /** نام مشتری */
+        private String customerName;
+        /** نام رستوران */
+        private String restaurantName;
+        /** وضعیت */
+        private String status;
+        /** مبلغ کل */
+        private Long amount;
+        /** تاریخ سفارش */
+        private String orderDate;
+
+        /** سازنده کلاس */
+<span class="fc" id="L645">        public OrderData(Long id, String customerName, String restaurantName, String status, Long amount, String orderDate) {</span>
+<span class="fc" id="L646">            this.id = id;</span>
+<span class="fc" id="L647">            this.customerName = customerName;</span>
+<span class="fc" id="L648">            this.restaurantName = restaurantName;</span>
+<span class="fc" id="L649">            this.status = status;</span>
+<span class="fc" id="L650">            this.amount = amount;</span>
+<span class="fc" id="L651">            this.orderDate = orderDate;</span>
+<span class="fc" id="L652">        }</span>
+
+        // Getter methods
+<span class="fc" id="L655">        public Long getId() { return id; }</span>
+<span class="fc" id="L656">        public String getCustomerName() { return customerName; }</span>
+<span class="fc" id="L657">        public String getRestaurantName() { return restaurantName; }</span>
+<span class="fc" id="L658">        public String getStatus() { return status; }</span>
+<span class="fc" id="L659">        public Long getAmount() { return amount; }</span>
+<span class="nc" id="L660">        public String getOrderDate() { return orderDate; }</span>
+
+        // Setter methods
+<span class="nc" id="L663">        public void setId(Long id) { this.id = id; }</span>
+<span class="nc" id="L664">        public void setCustomerName(String customerName) { this.customerName = customerName; }</span>
+<span class="nc" id="L665">        public void setRestaurantName(String restaurantName) { this.restaurantName = restaurantName; }</span>
+<span class="nc" id="L666">        public void setStatus(String status) { this.status = status; }</span>
+<span class="nc" id="L667">        public void setAmount(Long amount) { this.amount = amount; }</span>
+<span class="nc" id="L668">        public void setOrderDate(String orderDate) { this.orderDate = orderDate; }</span>
+    }
+
+    /**
+     * مدل داده تراکنش برای جدول تراکنش‌ها
+     */
+    public static class TransactionData {
+        /** شناسه تراکنش */
+        private Long id;
+        /** نام کاربر */
+        private String userName;
+        /** نوع تراکنش */
+        private String type;
+        /** مبلغ */
+        private Long amount;
+        /** وضعیت */
+        private String status;
+        /** تاریخ */
+        private String date;
+
+        /** سازنده کلاس */
+<span class="fc" id="L689">        public TransactionData(Long id, String userName, String type, Long amount, String status, String date) {</span>
+<span class="fc" id="L690">            this.id = id;</span>
+<span class="fc" id="L691">            this.userName = userName;</span>
+<span class="fc" id="L692">            this.type = type;</span>
+<span class="fc" id="L693">            this.amount = amount;</span>
+<span class="fc" id="L694">            this.status = status;</span>
+<span class="fc" id="L695">            this.date = date;</span>
+<span class="fc" id="L696">        }</span>
+
+        // Getter methods
+<span class="fc" id="L699">        public Long getId() { return id; }</span>
+<span class="fc" id="L700">        public String getUserName() { return userName; }</span>
+<span class="fc" id="L701">        public String getType() { return type; }</span>
+<span class="fc" id="L702">        public Long getAmount() { return amount; }</span>
+<span class="fc" id="L703">        public String getStatus() { return status; }</span>
+<span class="nc" id="L704">        public String getDate() { return date; }</span>
+
+        // Setter methods
+<span class="nc" id="L707">        public void setId(Long id) { this.id = id; }</span>
+<span class="nc" id="L708">        public void setUserName(String userName) { this.userName = userName; }</span>
+<span class="nc" id="L709">        public void setType(String type) { this.type = type; }</span>
+<span class="nc" id="L710">        public void setAmount(Long amount) { this.amount = amount; }</span>
+<span class="nc" id="L711">        public void setStatus(String status) { this.status = status; }</span>
+<span class="nc" id="L712">        public void setDate(String date) { this.date = date; }</span>
+    }
+
+    /**
+     * مدل داده رستوران برای جدول رستوران‌ها
+     */
+    public static class RestaurantData {
+        /** شناسه رستوران */
+        private Long id;
+        /** نام رستوران */
+        private String name;
+        /** آدرس */
+        private String address;
+        /** وضعیت */
+        private String status;
+        /** امتیاز */
+        private Double rating;
+        /** تعداد سفارشات */
+        private Integer orderCount;
+
+        /** سازنده کلاس */
+<span class="fc" id="L733">        public RestaurantData(Long id, String name, String address, String status, Double rating, Integer orderCount) {</span>
+<span class="fc" id="L734">            this.id = id;</span>
+<span class="fc" id="L735">            this.name = name;</span>
+<span class="fc" id="L736">            this.address = address;</span>
+<span class="fc" id="L737">            this.status = status;</span>
+<span class="fc" id="L738">            this.rating = rating;</span>
+<span class="fc" id="L739">            this.orderCount = orderCount;</span>
+<span class="fc" id="L740">        }</span>
+
+        // Getter methods
+<span class="fc" id="L743">        public Long getId() { return id; }</span>
+<span class="fc" id="L744">        public String getName() { return name; }</span>
+<span class="fc" id="L745">        public String getAddress() { return address; }</span>
+<span class="fc" id="L746">        public String getStatus() { return status; }</span>
+<span class="fc" id="L747">        public Double getRating() { return rating; }</span>
+<span class="nc" id="L748">        public Integer getOrderCount() { return orderCount; }</span>
+
+        // Setter methods
+<span class="nc" id="L751">        public void setId(Long id) { this.id = id; }</span>
+<span class="nc" id="L752">        public void setName(String name) { this.name = name; }</span>
+<span class="nc" id="L753">        public void setAddress(String address) { this.address = address; }</span>
+<span class="nc" id="L754">        public void setStatus(String status) { this.status = status; }</span>
+<span class="nc" id="L755">        public void setRating(Double rating) { this.rating = rating; }</span>
+<span class="nc" id="L756">        public void setOrderCount(Integer orderCount) { this.orderCount = orderCount; }</span>
+    }
+
+    /**
+     * مدل داده گزارش برای تب گزارش‌ها
+     */
+    public static class ReportData {
+        /** عنوان گزارش */
+        private String title;
+        /** مقدار */
+        private Double value;
+        /** بازه زمانی */
+        private String period;
+
+        /** سازنده کلاس */
+<span class="nc" id="L771">        public ReportData(String title, Double value, String period) {</span>
+<span class="nc" id="L772">            this.title = title;</span>
+<span class="nc" id="L773">            this.value = value;</span>
+<span class="nc" id="L774">            this.period = period;</span>
+<span class="nc" id="L775">        }</span>
+
+        // Getter methods
+<span class="nc" id="L778">        public String getTitle() { return title; }</span>
+<span class="nc" id="L779">        public Double getValue() { return value; }</span>
+<span class="nc" id="L780">        public String getPeriod() { return period; }</span>
+
+        // Setter methods
+<span class="nc" id="L783">        public void setTitle(String title) { this.title = title; }</span>
+<span class="nc" id="L784">        public void setValue(Double value) { this.value = value; }</span>
+<span class="nc" id="L785">        public void setPeriod(String period) { this.period = period; }</span>
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

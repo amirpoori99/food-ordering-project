@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NotificationService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">food-ordering-frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.common</a> &gt; <span class="el_source">NotificationService.java</span></div><h1>NotificationService.java</h1><pre class="source lang-java linenums">package com.myapp.ui.common;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NotificationService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.common</a> &gt; <span class="el_source">NotificationService.java</span></div><h1>NotificationService.java</h1><pre class="source lang-java linenums">package com.myapp.ui.common;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -130,8 +130,8 @@ public class NotificationService {
 <span class="nc" id="L130">        toastContainer.setPadding(new Insets(10, 20, 10, 20));</span>
 <span class="nc" id="L131">        toastContainer.setBackground(new Background(new BackgroundFill(</span>
 <span class="nc" id="L132">            getBackgroundColor(type), </span>
-<span class="nc" id="L133">            new CornerRadii(5), </span>
-<span class="nc" id="L134">            Insets.EMPTY</span>
+            new CornerRadii(5), 
+            Insets.EMPTY
         )));
         
         // ایجاد Popup
@@ -151,7 +151,7 @@ public class NotificationService {
         
         // بستن خودکار بعد از مدت زمان مشخص
 <span class="nc" id="L153">        CompletableFuture.delayedExecutor((long) duration.toMillis(), </span>
-<span class="nc" id="L154">            java.util.concurrent.TimeUnit.MILLISECONDS)</span>
+            java.util.concurrent.TimeUnit.MILLISECONDS)
 <span class="nc" id="L155">            .execute(() -&gt; Platform.runLater(popup::hide));</span>
 <span class="nc" id="L156">    }</span>
     
@@ -268,7 +268,7 @@ public class NotificationService {
      */
     public CompletableFuture&lt;Boolean&gt; showLogoutConfirm() {
 <span class="nc" id="L270">        return showConfirmDialog(&quot;تأیید خروج&quot;, </span>
-<span class="nc" id="L271">            &quot;آیا مطمئن هستید که می‌خواهید از حساب کاربری خود خارج شوید؟&quot;);</span>
+            &quot;آیا مطمئن هستید که می‌خواهید از حساب کاربری خود خارج شوید؟&quot;);
     }
     
     /**
@@ -279,7 +279,7 @@ public class NotificationService {
      */
     public CompletableFuture&lt;Boolean&gt; showDeleteConfirm(String itemName) {
 <span class="nc" id="L281">        return showConfirmDialog(&quot;تأیید حذف&quot;, </span>
-<span class="nc" id="L282">            &quot;آیا مطمئن هستید که می‌خواهید &quot; + itemName + &quot; را حذف کنید؟\n&quot; +</span>
+            &quot;آیا مطمئن هستید که می‌خواهید &quot; + itemName + &quot; را حذف کنید؟\n&quot; +
             &quot;این عمل قابل بازگشت نیست.&quot;);
     }
     
@@ -363,9 +363,9 @@ public class NotificationService {
 <span class="nc" id="L363">                        break;</span>
                     case WARNING:
 <span class="nc bnc" id="L365" title="All 2 branches missed.">                        service.showWarningDialog(title != null ? title : &quot;هشدار&quot;, message);</span>
-                        break;
+<span class="nc" id="L366">                        break;</span>
                 }
-<span class="nc" id="L368">            } else {</span>
+            } else {
 <span class="nc" id="L369">                service.showToast(message, type, duration);</span>
             }
 <span class="nc" id="L371">        }</span>
@@ -386,16 +386,16 @@ public class NotificationService {
      * انواع اعلان‌های موجود
      */
 <span class="nc" id="L388">    public enum NotificationType {</span>
-<span class="nc" id="L389">        /** اعلان موفقیت (سبز) */</span>
+        /** اعلان موفقیت (سبز) */
 <span class="nc" id="L390">        SUCCESS,</span>
         
-<span class="nc" id="L392">        /** اعلان خطا (قرمز) */</span>
+        /** اعلان خطا (قرمز) */
 <span class="nc" id="L393">        ERROR,</span>
         
-<span class="nc" id="L395">        /** اعلان هشدار (زرد) */</span>
+        /** اعلان هشدار (زرد) */
 <span class="nc" id="L396">        WARNING,</span>
         
-<span class="nc" id="L398">        /** اعلان اطلاعات (آبی) */</span>
+        /** اعلان اطلاعات (آبی) */
 <span class="nc" id="L399">        INFO</span>
     }
 }

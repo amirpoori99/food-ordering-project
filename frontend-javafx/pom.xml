@@ -6,8 +6,10 @@
     
     <groupId>com.myapp</groupId>
     <artifactId>food-ordering-frontend</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
+    <name>Food Ordering Frontend</name>
+    <description>JavaFX Frontend for Food Ordering System</description>
     
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -15,6 +17,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx.version>17.0.2</javafx.version>
         <junit.jupiter.version>5.9.2</junit.jupiter.version>
+        <jackson.version>2.15.2</jackson.version>
+        <okhttp.version>4.11.0</okhttp.version>
+        <testfx.version>4.0.16-alpha</testfx.version>
     </properties>
     
     <dependencies>
@@ -36,21 +41,21 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>4.11.0</version>
+            <version>${okhttp.version}</version>
         </dependency>
         
         <!-- Jackson for JSON processing -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.15.2</version>
+            <version>${jackson.version}</version>
         </dependency>
         
         <!-- Jackson JSR310 for LocalDateTime support -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.15.2</version>
+            <version>${jackson.version}</version>
         </dependency>
         
         <!-- JUnit 5 for testing -->
@@ -96,14 +101,14 @@
         <dependency>
             <groupId>org.testfx</groupId>
             <artifactId>testfx-core</artifactId>
-            <version>4.0.16-alpha</version>
+            <version>${testfx.version}</version>
             <scope>test</scope>
         </dependency>
         
         <dependency>
             <groupId>org.testfx</groupId>
             <artifactId>testfx-junit5</artifactId>
-            <version>4.0.16-alpha</version>
+            <version>${testfx.version}</version>
             <scope>test</scope>
         </dependency>
         
@@ -135,9 +140,21 @@
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
         <testSourceDirectory>src/test/java</testSourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
         
         <plugins>
-            <!-- Maven Compiler Plugin -->
+            <!-- Maven Compiler Plugin with enhanced configuration -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -145,20 +162,49 @@
                 <configuration>
                     <source>17</source>
                     <target>17</target>
+                    <encoding>UTF-8</encoding>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                        <arg>-Xlint:unchecked</arg>
+                        <arg>-Xlint:deprecation</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             
-            <!-- JavaFX Maven Plugin -->
+            <!-- Maven Resources Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>fxml</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>css</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>png</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jpg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gif</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
+                </configuration>
+            </plugin>
+            
+            <!-- JavaFX Maven Plugin with enhanced configuration -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>com.myapp.ui.MainApp</mainClass>
+                    <options>
+                        <option>--add-opens</option>
+                        <option>javafx.graphics/javafx.scene=ALL-UNNAMED</option>
+                        <option>--add-opens</option>
+                        <option>javafx.controls/javafx.scene.control=ALL-UNNAMED</option>
+                    </options>
                 </configuration>
             </plugin>
             
-            <!-- Maven Surefire Plugin for comprehensive testing -->
+            <!-- Maven Surefire Plugin for comprehensive testing with enhanced configuration -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -173,6 +219,9 @@
                         <include>**/*EdgeCaseTest.java</include>
                         <include>**/*TestSuite.java</include>
                     </includes>
+                    <excludes>
+                        <exclude>**/*ManualTest.java</exclude>
+                    </excludes>
                     <parallel>classes</parallel>
                     <threadCount>4</threadCount>
                     <perCoreThreadCount>true</perCoreThreadCount>
@@ -187,11 +236,40 @@
                         <prism.text>t2k</prism.text>
                         <java.awt.headless>true</java.awt.headless>
                         <test.comprehensive>true</test.comprehensive>
+                        <javafx.verbose>false</javafx.verbose>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
             
-            <!-- Maven Surefire Report Plugin -->
+            <!-- Maven Failsafe Plugin for integration tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.0.0-M9</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/*IntegrationTest.java</include>
+                                <include>**/*PerformanceTest.java</include>
+                            </includes>
+                            <systemPropertyVariables>
+                                <testfx.robot>glass</testfx.robot>
+                                <testfx.headless>true</testfx.headless>
+                                <prism.order>sw</prism.order>
+                                <prism.text>t2k</prism.text>
+                                <java.awt.headless>true</java.awt.headless>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- Maven Surefire Report Plugin with enhanced configuration -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
@@ -199,10 +277,11 @@
                 <configuration>
                     <showSuccess>true</showSuccess>
                     <outputDirectory>${project.reporting.outputDirectory}/surefire-reports</outputDirectory>
+                    <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
                 </configuration>
             </plugin>
             
-            <!-- JaCoCo for code coverage -->
+            <!-- JaCoCo for code coverage with enhanced configuration -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -219,6 +298,149 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                    </execution>
+                    <execution>
+                        <id>check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.85</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.80</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>METHOD</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.90</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- Maven JAR Plugin with manifest configuration -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.myapp.ui.MainApp</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            
+            <!-- Maven Dependency Plugin for copying dependencies -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- Maven Assembly Plugin for creating executable JAR -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.myapp.ui.MainApp</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- Maven Clean Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.3.2</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>${project.build.directory}</directory>
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+            
+            <!-- Maven Shade Plugin for creating uber JAR -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.4.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.myapp.ui.MainApp</mainClass>
+                                </transformer>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

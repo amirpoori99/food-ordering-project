@@ -460,4 +460,13 @@ public class LoginController implements Initializable {
     public void triggerRegisterLink() {
         handleRegisterLink();
     }
+
+    /**
+     * دریافت view اصلی (مخصوص تست)
+     * 
+     * @return Parent node از view
+     */
+    public javafx.scene.Parent getView() {
+        return phoneField.getScene().getRoot();
+    }
 }

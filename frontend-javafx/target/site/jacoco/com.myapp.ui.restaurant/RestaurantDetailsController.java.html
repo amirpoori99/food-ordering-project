@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RestaurantDetailsController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">food-ordering-frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.restaurant</a> &gt; <span class="el_source">RestaurantDetailsController.java</span></div><h1>RestaurantDetailsController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.restaurant;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RestaurantDetailsController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.restaurant</a> &gt; <span class="el_source">RestaurantDetailsController.java</span></div><h1>RestaurantDetailsController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.restaurant;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
  * @version 1.0
  * @since فاز 23
  */
-<span class="nc" id="L27">public class RestaurantDetailsController implements Initializable {</span>
+<span class="fc" id="L27">public class RestaurantDetailsController implements Initializable {</span>
 
     // UI Components - Restaurant Info
     @FXML private Label restaurantNameLabel;
@@ -98,12 +98,12 @@ import java.util.ArrayList;
 
     // Getter و Setter برای currentRestaurant
     public Restaurant getCurrentRestaurant() {
-<span class="nc" id="L101">        return currentRestaurant;</span>
+<span class="fc" id="L101">        return currentRestaurant;</span>
     }
 
     public void setCurrentRestaurant(Restaurant restaurant) {
-<span class="nc" id="L105">        this.currentRestaurant = restaurant;</span>
-<span class="nc" id="L106">    }</span>
+<span class="fc" id="L105">        this.currentRestaurant = restaurant;</span>
+<span class="fc" id="L106">    }</span>
 
     /**
      * کلاس مدل داده رستوران
@@ -121,45 +121,45 @@ import java.util.ArrayList;
         private String openingHours;
         
         // Constructors
-<span class="nc" id="L124">        public Restaurant() {}</span>
+<span class="fc" id="L124">        public Restaurant() {}</span>
         
-<span class="nc" id="L126">        public Restaurant(Long id, String name, String address, String phone) {</span>
-<span class="nc" id="L127">            this.id = id;</span>
-<span class="nc" id="L128">            this.name = name;</span>
-<span class="nc" id="L129">            this.address = address;</span>
-<span class="nc" id="L130">            this.phone = phone;</span>
-<span class="nc" id="L131">        }</span>
+<span class="fc" id="L126">        public Restaurant(Long id, String name, String address, String phone) {</span>
+<span class="fc" id="L127">            this.id = id;</span>
+<span class="fc" id="L128">            this.name = name;</span>
+<span class="fc" id="L129">            this.address = address;</span>
+<span class="fc" id="L130">            this.phone = phone;</span>
+<span class="fc" id="L131">        }</span>
         
         // Getters and Setters
-<span class="nc" id="L134">        public Long getId() { return id; }</span>
-<span class="nc" id="L135">        public void setId(Long id) { this.id = id; }</span>
+<span class="fc" id="L134">        public Long getId() { return id; }</span>
+<span class="fc" id="L135">        public void setId(Long id) { this.id = id; }</span>
         
-<span class="nc" id="L137">        public String getName() { return name; }</span>
-<span class="nc" id="L138">        public void setName(String name) { this.name = name; }</span>
+<span class="fc" id="L137">        public String getName() { return name; }</span>
+<span class="fc" id="L138">        public void setName(String name) { this.name = name; }</span>
         
-<span class="nc" id="L140">        public String getAddress() { return address; }</span>
-<span class="nc" id="L141">        public void setAddress(String address) { this.address = address; }</span>
+<span class="fc" id="L140">        public String getAddress() { return address; }</span>
+<span class="fc" id="L141">        public void setAddress(String address) { this.address = address; }</span>
         
-<span class="nc" id="L143">        public String getPhone() { return phone; }</span>
-<span class="nc" id="L144">        public void setPhone(String phone) { this.phone = phone; }</span>
+<span class="fc" id="L143">        public String getPhone() { return phone; }</span>
+<span class="fc" id="L144">        public void setPhone(String phone) { this.phone = phone; }</span>
         
-<span class="nc" id="L146">        public Double getRating() { return rating; }</span>
-<span class="nc" id="L147">        public void setRating(Double rating) { this.rating = rating; }</span>
+<span class="fc" id="L146">        public Double getRating() { return rating; }</span>
+<span class="fc" id="L147">        public void setRating(Double rating) { this.rating = rating; }</span>
         
-<span class="nc" id="L149">        public Integer getReviewCount() { return reviewCount; }</span>
-<span class="nc" id="L150">        public void setReviewCount(Integer reviewCount) { this.reviewCount = reviewCount; }</span>
+<span class="fc" id="L149">        public Integer getReviewCount() { return reviewCount; }</span>
+<span class="fc" id="L150">        public void setReviewCount(Integer reviewCount) { this.reviewCount = reviewCount; }</span>
         
-<span class="nc" id="L152">        public String getDescription() { return description; }</span>
-<span class="nc" id="L153">        public void setDescription(String description) { this.description = description; }</span>
+<span class="fc" id="L152">        public String getDescription() { return description; }</span>
+<span class="fc" id="L153">        public void setDescription(String description) { this.description = description; }</span>
         
-<span class="nc" id="L155">        public String getImageUrl() { return imageUrl; }</span>
-<span class="nc" id="L156">        public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }</span>
+<span class="fc" id="L155">        public String getImageUrl() { return imageUrl; }</span>
+<span class="fc" id="L156">        public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }</span>
         
-<span class="nc" id="L158">        public boolean isOpen() { return isOpen; }</span>
-<span class="nc" id="L159">        public void setOpen(boolean open) { isOpen = open; }</span>
+<span class="fc" id="L158">        public boolean isOpen() { return isOpen; }</span>
+<span class="fc" id="L159">        public void setOpen(boolean open) { isOpen = open; }</span>
         
-<span class="nc" id="L161">        public String getOpeningHours() { return openingHours; }</span>
-<span class="nc" id="L162">        public void setOpeningHours(String openingHours) { this.openingHours = openingHours; }</span>
+<span class="fc" id="L161">        public String getOpeningHours() { return openingHours; }</span>
+<span class="fc" id="L162">        public void setOpeningHours(String openingHours) { this.openingHours = openingHours; }</span>
     }
 
     /**
@@ -174,35 +174,35 @@ import java.util.ArrayList;
         private Integer displayOrder;
         
         // Constructors
-<span class="nc" id="L177">        public MenuCategory() {</span>
-<span class="nc" id="L178">            this.items = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L179">        }</span>
+<span class="fc" id="L177">        public MenuCategory() {</span>
+<span class="fc" id="L178">            this.items = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L179">        }</span>
         
         public MenuCategory(Long id, String name, String description) {
-<span class="nc" id="L182">            this();</span>
-<span class="nc" id="L183">            this.id = id;</span>
-<span class="nc" id="L184">            this.name = name;</span>
-<span class="nc" id="L185">            this.description = description;</span>
-<span class="nc" id="L186">        }</span>
+<span class="fc" id="L182">            this();</span>
+<span class="fc" id="L183">            this.id = id;</span>
+<span class="fc" id="L184">            this.name = name;</span>
+<span class="fc" id="L185">            this.description = description;</span>
+<span class="fc" id="L186">        }</span>
         
         // Getters and Setters
-<span class="nc" id="L189">        public Long getId() { return id; }</span>
-<span class="nc" id="L190">        public void setId(Long id) { this.id = id; }</span>
+<span class="fc" id="L189">        public Long getId() { return id; }</span>
+<span class="fc" id="L190">        public void setId(Long id) { this.id = id; }</span>
         
-<span class="nc" id="L192">        public String getName() { return name; }</span>
-<span class="nc" id="L193">        public void setName(String name) { this.name = name; }</span>
+<span class="fc" id="L192">        public String getName() { return name; }</span>
+<span class="fc" id="L193">        public void setName(String name) { this.name = name; }</span>
         
-<span class="nc" id="L195">        public String getDescription() { return description; }</span>
-<span class="nc" id="L196">        public void setDescription(String description) { this.description = description; }</span>
+<span class="fc" id="L195">        public String getDescription() { return description; }</span>
+<span class="fc" id="L196">        public void setDescription(String description) { this.description = description; }</span>
         
-<span class="nc" id="L198">        public List&lt;MenuItem&gt; getItems() { return items; }</span>
-<span class="nc" id="L199">        public void setItems(List&lt;MenuItem&gt; items) { this.items = items; }</span>
+<span class="fc" id="L198">        public List&lt;MenuItem&gt; getItems() { return items; }</span>
+<span class="fc" id="L199">        public void setItems(List&lt;MenuItem&gt; items) { this.items = items; }</span>
         
-<span class="nc" id="L201">        public boolean isActive() { return isActive; }</span>
-<span class="nc" id="L202">        public void setActive(boolean active) { isActive = active; }</span>
+<span class="fc" id="L201">        public boolean isActive() { return isActive; }</span>
+<span class="fc" id="L202">        public void setActive(boolean active) { isActive = active; }</span>
         
-<span class="nc" id="L204">        public Integer getDisplayOrder() { return displayOrder; }</span>
-<span class="nc" id="L205">        public void setDisplayOrder(Integer displayOrder) { this.displayOrder = displayOrder; }</span>
+<span class="fc" id="L204">        public Integer getDisplayOrder() { return displayOrder; }</span>
+<span class="fc" id="L205">        public void setDisplayOrder(Integer displayOrder) { this.displayOrder = displayOrder; }</span>
     }
 
     /**
@@ -221,49 +221,49 @@ import java.util.ArrayList;
         private List&lt;String&gt; allergens;
         
         // Constructors
-<span class="nc" id="L224">        public MenuItem() {</span>
-<span class="nc" id="L225">            this.ingredients = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L226">            this.allergens = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L227">        }</span>
+<span class="fc" id="L224">        public MenuItem() {</span>
+<span class="fc" id="L225">            this.ingredients = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L226">            this.allergens = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L227">        }</span>
         
         public MenuItem(Long id, String name, Double price, boolean available) {
-<span class="nc" id="L230">            this();</span>
-<span class="nc" id="L231">            this.id = id;</span>
-<span class="nc" id="L232">            this.name = name;</span>
-<span class="nc" id="L233">            this.price = price;</span>
-<span class="nc" id="L234">            this.available = available;</span>
-<span class="nc" id="L235">        }</span>
+<span class="fc" id="L230">            this();</span>
+<span class="fc" id="L231">            this.id = id;</span>
+<span class="fc" id="L232">            this.name = name;</span>
+<span class="fc" id="L233">            this.price = price;</span>
+<span class="fc" id="L234">            this.available = available;</span>
+<span class="fc" id="L235">        }</span>
         
         // Getters and Setters
-<span class="nc" id="L238">        public Long getId() { return id; }</span>
-<span class="nc" id="L239">        public void setId(Long id) { this.id = id; }</span>
+<span class="fc" id="L238">        public Long getId() { return id; }</span>
+<span class="fc" id="L239">        public void setId(Long id) { this.id = id; }</span>
         
-<span class="nc" id="L241">        public String getName() { return name; }</span>
-<span class="nc" id="L242">        public void setName(String name) { this.name = name; }</span>
+<span class="fc" id="L241">        public String getName() { return name; }</span>
+<span class="fc" id="L242">        public void setName(String name) { this.name = name; }</span>
         
-<span class="nc" id="L244">        public String getDescription() { return description; }</span>
-<span class="nc" id="L245">        public void setDescription(String description) { this.description = description; }</span>
+<span class="fc" id="L244">        public String getDescription() { return description; }</span>
+<span class="fc" id="L245">        public void setDescription(String description) { this.description = description; }</span>
         
-<span class="nc" id="L247">        public Double getPrice() { return price; }</span>
-<span class="nc" id="L248">        public void setPrice(Double price) { this.price = price; }</span>
+<span class="fc" id="L247">        public Double getPrice() { return price; }</span>
+<span class="fc" id="L248">        public void setPrice(Double price) { this.price = price; }</span>
         
-<span class="nc" id="L250">        public boolean isAvailable() { return available; }</span>
-<span class="nc" id="L251">        public void setAvailable(boolean available) { this.available = available; }</span>
+<span class="fc" id="L250">        public boolean isAvailable() { return available; }</span>
+<span class="fc" id="L251">        public void setAvailable(boolean available) { this.available = available; }</span>
         
-<span class="nc" id="L253">        public String getImageUrl() { return imageUrl; }</span>
-<span class="nc" id="L254">        public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }</span>
+<span class="fc" id="L253">        public String getImageUrl() { return imageUrl; }</span>
+<span class="fc" id="L254">        public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }</span>
         
-<span class="nc" id="L256">        public Long getCategoryId() { return categoryId; }</span>
-<span class="nc" id="L257">        public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }</span>
+<span class="fc" id="L256">        public Long getCategoryId() { return categoryId; }</span>
+<span class="fc" id="L257">        public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }</span>
         
-<span class="nc" id="L259">        public Integer getPreparationTime() { return preparationTime; }</span>
-<span class="nc" id="L260">        public void setPreparationTime(Integer preparationTime) { this.preparationTime = preparationTime; }</span>
+<span class="fc" id="L259">        public Integer getPreparationTime() { return preparationTime; }</span>
+<span class="fc" id="L260">        public void setPreparationTime(Integer preparationTime) { this.preparationTime = preparationTime; }</span>
         
-<span class="nc" id="L262">        public List&lt;String&gt; getIngredients() { return ingredients; }</span>
-<span class="nc" id="L263">        public void setIngredients(List&lt;String&gt; ingredients) { this.ingredients = ingredients; }</span>
+<span class="fc" id="L262">        public List&lt;String&gt; getIngredients() { return ingredients; }</span>
+<span class="fc" id="L263">        public void setIngredients(List&lt;String&gt; ingredients) { this.ingredients = ingredients; }</span>
         
-<span class="nc" id="L265">        public List&lt;String&gt; getAllergens() { return allergens; }</span>
-<span class="nc" id="L266">        public void setAllergens(List&lt;String&gt; allergens) { this.allergens = allergens; }</span>
+<span class="fc" id="L265">        public List&lt;String&gt; getAllergens() { return allergens; }</span>
+<span class="fc" id="L266">        public void setAllergens(List&lt;String&gt; allergens) { this.allergens = allergens; }</span>
     }
 
     /**
@@ -278,50 +278,50 @@ import java.util.ArrayList;
         private Double totalPrice;
         
         // Constructors
-<span class="nc" id="L281">        public CartItem() {}</span>
+<span class="fc" id="L281">        public CartItem() {}</span>
         
-<span class="nc" id="L283">        public CartItem(Long itemId, String itemName, Double price, Integer quantity) {</span>
-<span class="nc" id="L284">            this.itemId = itemId;</span>
-<span class="nc" id="L285">            this.itemName = itemName;</span>
-<span class="nc" id="L286">            this.price = price;</span>
-<span class="nc" id="L287">            this.quantity = quantity;</span>
-<span class="nc" id="L288">            calculateTotalPrice();</span>
-<span class="nc" id="L289">        }</span>
+<span class="fc" id="L283">        public CartItem(Long itemId, String itemName, Double price, Integer quantity) {</span>
+<span class="fc" id="L284">            this.itemId = itemId;</span>
+<span class="fc" id="L285">            this.itemName = itemName;</span>
+<span class="fc" id="L286">            this.price = price;</span>
+<span class="fc" id="L287">            this.quantity = quantity;</span>
+<span class="fc" id="L288">            calculateTotalPrice();</span>
+<span class="fc" id="L289">        }</span>
         
         // Getters and Setters
-<span class="nc" id="L292">        public Long getItemId() { return itemId; }</span>
-<span class="nc" id="L293">        public void setItemId(Long itemId) { this.itemId = itemId; }</span>
+<span class="fc" id="L292">        public Long getItemId() { return itemId; }</span>
+<span class="fc" id="L293">        public void setItemId(Long itemId) { this.itemId = itemId; }</span>
         
-<span class="nc" id="L295">        public String getItemName() { return itemName; }</span>
-<span class="nc" id="L296">        public void setItemName(String itemName) { this.itemName = itemName; }</span>
+<span class="fc" id="L295">        public String getItemName() { return itemName; }</span>
+<span class="fc" id="L296">        public void setItemName(String itemName) { this.itemName = itemName; }</span>
         
-<span class="nc" id="L298">        public Double getPrice() { return price; }</span>
+<span class="fc" id="L298">        public Double getPrice() { return price; }</span>
         public void setPrice(Double price) { 
-<span class="nc" id="L300">            this.price = price;</span>
-<span class="nc" id="L301">            calculateTotalPrice();</span>
-<span class="nc" id="L302">        }</span>
+<span class="fc" id="L300">            this.price = price;</span>
+<span class="fc" id="L301">            calculateTotalPrice();</span>
+<span class="fc" id="L302">        }</span>
         
-<span class="nc" id="L304">        public Integer getQuantity() { return quantity; }</span>
+<span class="fc" id="L304">        public Integer getQuantity() { return quantity; }</span>
         public void setQuantity(Integer quantity) { 
-<span class="nc" id="L306">            this.quantity = quantity;</span>
-<span class="nc" id="L307">            calculateTotalPrice();</span>
-<span class="nc" id="L308">        }</span>
+<span class="fc" id="L306">            this.quantity = quantity;</span>
+<span class="fc" id="L307">            calculateTotalPrice();</span>
+<span class="fc" id="L308">        }</span>
         
-<span class="nc" id="L310">        public String getSpecialInstructions() { return specialInstructions; }</span>
+<span class="fc" id="L310">        public String getSpecialInstructions() { return specialInstructions; }</span>
         public void setSpecialInstructions(String specialInstructions) { 
-<span class="nc" id="L312">            this.specialInstructions = specialInstructions; </span>
-<span class="nc" id="L313">        }</span>
+<span class="fc" id="L312">            this.specialInstructions = specialInstructions; </span>
+<span class="fc" id="L313">        }</span>
         
-<span class="nc" id="L315">        public Double getTotalPrice() { return totalPrice; }</span>
+<span class="fc" id="L315">        public Double getTotalPrice() { return totalPrice; }</span>
         
         /**
          * محاسبه قیمت کل آیتم
          */
         private void calculateTotalPrice() {
-<span class="nc bnc" id="L321" title="All 4 branches missed.">            if (price != null &amp;&amp; quantity != null) {</span>
-<span class="nc" id="L322">                this.totalPrice = price * quantity;</span>
+<span class="pc bpc" id="L321" title="1 of 4 branches missed.">            if (price != null &amp;&amp; quantity != null) {</span>
+<span class="fc" id="L322">                this.totalPrice = price * quantity;</span>
             }
-<span class="nc" id="L324">        }</span>
+<span class="fc" id="L324">        }</span>
     }
 } 
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

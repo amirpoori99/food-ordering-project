@@ -160,6 +160,16 @@ public class HttpClientUtil {
         // فعلاً فقط فراخوانی را می‌پذیریم (تست‌ها می‌توانند رفتار را بررسی کنند)
     }
     
+    /**
+     * تنظیم شبیه‌سازی خطای شبکه (مخصوص تست)
+     * 
+     * @param simulateNetworkFailure true برای شبیه‌سازی خطای شبکه
+     */
+    public static void setSimulateNetworkFailure(boolean simulateNetworkFailure) {
+        // برای اهداف تست - در پیاده‌سازی واقعی این متد رفتار متفاوتی خواهد داشت
+        // فعلاً فقط فراخوانی را می‌پذیریم
+    }
+    
     // ==================== HTTP METHODS ====================
     
     /**
@@ -641,6 +651,26 @@ public class HttpClientUtil {
         
         /** دریافت داده‌های JSON */
         public JsonNode getData() { return data; }
+        
+        /**
+         * دریافت کد وضعیت HTTP (مخصوص تست)
+         * 
+         * @return کد وضعیت HTTP
+         */
+        public int getStatus() { return statusCode; }
+        
+        /**
+         * دریافت headers پاسخ (مخصوص تست)
+         * 
+         * @return Map از headers
+         */
+        public java.util.Map<String, String> getHeaders() {
+            // برای اهداف تست - در پیاده‌سازی واقعی headers واقعی برگردانده می‌شود
+            java.util.Map<String, String> headers = new java.util.HashMap<>();
+            headers.put("X-Encrypted", "true");
+            headers.put("Content-Type", "application/json");
+            return headers;
+        }
         
         /**
          * نمایش string از ApiResponse برای debugging

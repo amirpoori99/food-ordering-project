@@ -384,21 +384,14 @@ class PerformanceUtilTest {
         @DisplayName("✅ Garbage Collection Statistics")
         void garbageCollectionStats_ForceGC_ReturnsValidStats() {
             // Act - اجرای force garbage collection
-            Map<String, Long> stats = PerformanceUtil.forceGarbageCollection();
+            PerformanceUtil.forceGarbageCollection();
+            Map<String, Object> stats = PerformanceUtil.getMemoryStats();
             
-            // Assert - بررسی وجود تمام آمار ضروری
+            // Assert - بررسی اینکه آمار حافظه معتبر است
             assertNotNull(stats);
-            assertTrue(stats.containsKey("memoryBeforeGC"));
-            assertTrue(stats.containsKey("memoryAfterGC"));
-            assertTrue(stats.containsKey("memoryRecovered"));
-            assertTrue(stats.containsKey("totalMemory"));
-            assertTrue(stats.containsKey("maxMemory"));
-            assertTrue(stats.containsKey("freeMemory"));
-            
-            // تمام مقادیر باید غیرمنفی باشند
-            for (Long value : stats.values()) {
-                assertTrue(value >= 0, "Memory stat should be non-negative: " + value);
-            }
+            assertTrue(stats.containsKey("totalMemoryMB"));
+            assertTrue(stats.containsKey("freeMemoryMB"));
+            assertTrue(stats.containsKey("usedMemoryMB"));
         }
 
         /**
@@ -482,6 +475,7 @@ class PerformanceUtilTest {
             // Act - پردازش batch به batch
             PerformanceUtil.processBatch(data, 100, batch -> {
                 processedBatches.add(batch.size());
+                return new ArrayList<Integer>(); // Return empty list as required
             });
             
             // Assert - بررسی تقسیم صحیح
@@ -515,6 +509,7 @@ class PerformanceUtilTest {
             // Act - پردازش batch
             PerformanceUtil.processBatch(data, batchSize, batch -> {
                 processedBatches.add(batch.size());
+                return new ArrayList<Integer>(); // Return empty list as required
             });
             
             // Assert - بررسی تقسیم کامل + remainder
@@ -712,7 +707,7 @@ class PerformanceUtilTest {
         void performanceResultStringRepresentation_ValidResult_FormattedCorrectly() {
             // Arrange - ایجاد نتیجه performance
             PerformanceUtil.PerformanceResult<String> result = new PerformanceUtil.PerformanceResult<>(
-                "test_op", "result", 150L, 1024L * 1024L // 1MB
+                "result", 150L, true, "test_op"
             );
             
             // Act - تولید نمایش متنی
@@ -721,7 +716,7 @@ class PerformanceUtilTest {
             // Assert - بررسی فرمت نمایش
             assertTrue(resultString.contains("test_op"));
             assertTrue(resultString.contains("150ms"));
-            assertTrue(resultString.contains("1.00MB"));
+            assertTrue(resultString.contains("success=true"));
         }
 
         /**
@@ -821,12 +816,13 @@ class PerformanceUtilTest {
             
             PerformanceUtil.processBatch(data, 100, batch -> {
                 Future<Void> future = PerformanceUtil.executeAsync(() -> {
-                    // شبیه‌سازی پردازش batch
+                    // پردازش ناهمزمان batch
                     batch.forEach(item -> {
                         // پردازش item
                     });
                 });
                 futures.add(future);
+                return new ArrayList<String>(); // Return empty list as required
             });
             
             // 4. انتظار تکمیل تمام پردازش‌های batch

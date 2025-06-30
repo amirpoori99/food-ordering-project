@@ -1,147 +1,129 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<!--
+    فایل FXML داشبورد ادمین (فاز 29)
+    شامل ۶ تب اصلی:
+    1. کاربران
+    2. سفارشات
+    3. تراکنش‌ها
+    4. رستوران‌ها
+    5. گزارش‌ها
+    6. تنظیمات
+    هر تب دارای جدول/نمودار/فرم مرتبط است.
+    کامنت‌گذاری کامل فارسی برای هر بخش.
+-->
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
+<?import javafx.scene.chart.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.myapp.ui.admin.AdminDashboardController">
    <top>
-      <VBox>
+      <HBox alignment="CENTER" spacing="10.0" style="-fx-background-color: #f8f9fa;">
          <children>
-            <MenuBar>
-               <menus>
-                  <Menu text="مدیریت">
-                     <items>
-                        <MenuItem fx:id="usersMenuItem" onAction="#handleUsers" text="مدیریت کاربران" />
-                        <MenuItem fx:id="restaurantsMenuItem" onAction="#handleRestaurants" text="مدیریت رستوران‌ها" />
-                        <MenuItem fx:id="ordersMenuItem" onAction="#handleOrders" text="مدیریت سفارشات" />
-                        <MenuItem fx:id="reportsMenuItem" onAction="#handleReports" text="گزارشات" />
-                     </items>
-                  </Menu>
-                  <Menu text="حساب کاربری">
-                     <items>
-                        <MenuItem fx:id="profileMenuItem" onAction="#handleProfile" text="پروفایل" />
-                        <MenuItem fx:id="logoutMenuItem" onAction="#handleLogout" text="خروج" />
-                     </items>
-                  </Menu>
-               </menus>
-            </MenuBar>
-            <HBox alignment="CENTER" spacing="10.0">
-               <children>
-                  <Label text="پنل مدیریت سیستم">
-                     <font>
-                        <Font name="System Bold" size="18.0" />
-                     </font>
-                  </Label>
-               </children>
-               <padding>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-               </padding>
-            </HBox>
+            <Label text="داشبورد مدیریت ادمین">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Label>
          </children>
-      </VBox>
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </padding>
+      </HBox>
    </top>
    <center>
       <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE">
          <tabs>
-            <Tab text="داشبورد">
+            <!-- تب کاربران -->
+            <Tab fx:id="usersTab" text="کاربران">
                <content>
-                  <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
-                     <content>
-                        <VBox spacing="15.0">
-                           <children>
-                              <!-- Statistics Cards -->
-                              <HBox spacing="15.0">
-                                 <children>
-                                    <VBox spacing="10.0" style="-fx-background-color: #e7f3ff; -fx-border-color: #b3d9ff; -fx-border-radius: 5; -fx-background-radius: 5;" HBox.hgrow="ALWAYS">
-                                       <children>
-                                          <Label text="کل کاربران">
-                                             <font>
-                                                <Font name="System Bold" size="14.0" />
-                                             </font>
-                                          </Label>
-                                          <Label fx:id="totalUsersLabel" style="-fx-text-fill: #0056b3; -fx-font-size: 24; -fx-font-weight: bold;" text="0" />
-                                       </children>
-                                       <padding>
-                                          <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                                       </padding>
-                                    </VBox>
-                                    <VBox spacing="10.0" style="-fx-background-color: #f0f8e7; -fx-border-color: #c3e6cb; -fx-border-radius: 5; -fx-background-radius: 5;" HBox.hgrow="ALWAYS">
-                                       <children>
-                                          <Label text="کل رستوران‌ها">
-                                             <font>
-                                                <Font name="System Bold" size="14.0" />
-                                             </font>
-                                          </Label>
-                                          <Label fx:id="totalRestaurantsLabel" style="-fx-text-fill: #155724; -fx-font-size: 24; -fx-font-weight: bold;" text="0" />
-                                       </children>
-                                       <padding>
-                                          <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                                       </padding>
-                                    </VBox>
-                                    <VBox spacing="10.0" style="-fx-background-color: #fff3cd; -fx-border-color: #ffeaa7; -fx-border-radius: 5; -fx-background-radius: 5;" HBox.hgrow="ALWAYS">
-                                       <children>
-                                          <Label text="سفارشات امروز">
-                                             <font>
-                                                <Font name="System Bold" size="14.0" />
-                                             </font>
-                                          </Label>
-                                          <Label fx:id="todayOrdersLabel" style="-fx-text-fill: #856404; -fx-font-size: 24; -fx-font-weight: bold;" text="0" />
-                                       </children>
-                                       <padding>
-                                          <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                                       </padding>
-                                    </VBox>
-                                 </children>
-                              </HBox>
-                              
-                              <!-- Recent Activities -->
-                              <VBox spacing="10.0" style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 5; -fx-background-radius: 5;">
-                                 <children>
-                                    <Label text="فعالیت‌های اخیر">
-                                       <font>
-                                          <Font name="System Bold" size="16.0" />
-                                       </font>
-                                    </Label>
-                                    <ListView fx:id="recentActivitiesListView" maxHeight="200.0" />
-                                 </children>
-                                 <padding>
-                                    <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                                 </padding>
-                              </VBox>
-                           </children>
-                           <padding>
-                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                           </padding>
-                        </VBox>
-                     </content>
-                  </ScrollPane>
-               </content>
-            </Tab>
-            <Tab text="مدیریت کاربران">
-               <content>
-                  <VBox fx:id="usersManagementPane" spacing="10.0">
-                     <children>
-                        <Label text="مدیریت کاربران" />
-                        <TableView fx:id="usersTableView" VBox.vgrow="ALWAYS" />
-                     </children>
-                     <padding>
-                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                     </padding>
+                  <VBox spacing="10.0">
+                     <!-- جدول کاربران -->
+                     <TableView fx:id="usersTable" prefHeight="300.0" />
+                     <HBox spacing="10.0">
+                        <Button fx:id="addUserButton" text="افزودن کاربر" />
+                        <Button fx:id="editUserButton" text="ویرایش" />
+                        <Button fx:id="deleteUserButton" text="حذف" />
+                        <TextField fx:id="userSearchField" promptText="جستجوی کاربر..." />
+                        <ComboBox fx:id="userRoleFilter" promptText="نقش کاربر" />
+                     </HBox>
                   </VBox>
                </content>
             </Tab>
-            <Tab text="مدیریت رستوران‌ها">
+            <!-- تب سفارشات -->
+            <Tab fx:id="ordersTab" text="سفارشات">
                <content>
-                  <VBox fx:id="restaurantsManagementPane" spacing="10.0">
-                     <children>
-                        <Label text="مدیریت رستوران‌ها" />
-                        <TableView fx:id="restaurantsTableView" VBox.vgrow="ALWAYS" />
-                     </children>
-                     <padding>
-                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                     </padding>
+                  <VBox spacing="10.0">
+                     <!-- جدول سفارشات -->
+                     <TableView fx:id="ordersTable" prefHeight="300.0" />
+                     <HBox spacing="10.0">
+                        <TextField fx:id="orderSearchField" promptText="جستجوی سفارش..." />
+                        <ComboBox fx:id="orderStatusFilter" promptText="وضعیت سفارش" />
+                        <Button fx:id="exportOrdersButton" text="خروجی سفارشات" />
+                     </HBox>
+                  </VBox>
+               </content>
+            </Tab>
+            <!-- تب تراکنش‌ها -->
+            <Tab fx:id="transactionsTab" text="تراکنش‌ها">
+               <content>
+                  <VBox spacing="10.0">
+                     <!-- جدول تراکنش‌ها -->
+                     <TableView fx:id="transactionsTable" prefHeight="300.0" />
+                     <HBox spacing="10.0">
+                        <TextField fx:id="transactionSearchField" promptText="جستجوی تراکنش..." />
+                        <ComboBox fx:id="transactionTypeFilter" promptText="نوع تراکنش" />
+                        <Button fx:id="exportTransactionsButton" text="خروجی تراکنش‌ها" />
+                     </HBox>
+                  </VBox>
+               </content>
+            </Tab>
+            <!-- تب رستوران‌ها -->
+            <Tab fx:id="restaurantsTab" text="رستوران‌ها">
+               <content>
+                  <VBox spacing="10.0">
+                     <!-- جدول رستوران‌ها -->
+                     <TableView fx:id="restaurantsTable" prefHeight="300.0" />
+                     <HBox spacing="10.0">
+                        <Button fx:id="addRestaurantButton" text="افزودن رستوران" />
+                        <Button fx:id="editRestaurantButton" text="ویرایش" />
+                        <Button fx:id="deleteRestaurantButton" text="حذف" />
+                        <TextField fx:id="restaurantSearchField" promptText="جستجوی رستوران..." />
+                     </HBox>
+                  </VBox>
+               </content>
+            </Tab>
+            <!-- تب گزارش‌ها -->
+            <Tab fx:id="reportsTab" text="گزارش‌ها و آمار">
+               <content>
+                  <VBox spacing="10.0">
+                     <!-- نمودار دایره‌ای سفارشات -->
+                     <PieChart fx:id="ordersPieChart" prefHeight="200.0" />
+                     <!-- نمودار خطی درآمد -->
+                     <LineChart fx:id="revenueLineChart" prefHeight="200.0">
+                        <xAxis>
+                           <CategoryAxis label="ماه" />
+                        </xAxis>
+                        <yAxis>
+                           <NumberAxis label="درآمد (تومان)" />
+                        </yAxis>
+                     </LineChart>
+                     <Button fx:id="exportReportButton" text="خروجی گزارش" />
+                  </VBox>
+               </content>
+            </Tab>
+            <!-- تب تنظیمات -->
+            <Tab fx:id="settingsTab" text="تنظیمات">
+               <content>
+                  <VBox fx:id="adminSettingsForm" spacing="10.0">
+                     <!-- فرم تنظیمات ادمین -->
+                     <Label text="تنظیمات ادمین" />
+                     <!-- ... سایر فیلدهای تنظیمات ... -->
+                     <HBox spacing="10.0">
+                        <Button fx:id="saveSettingsButton" text="ذخیره تنظیمات" />
+                        <Button fx:id="resetSettingsButton" text="بازنشانی" />
+                     </HBox>
                   </VBox>
                </content>
             </Tab>
@@ -149,19 +131,14 @@
       </TabPane>
    </center>
    <bottom>
-      <VBox>
+      <HBox spacing="10.0" alignment="CENTER_LEFT">
          <children>
-            <Separator />
-            <HBox alignment="CENTER" spacing="10.0">
-               <children>
-                  <Label fx:id="statusLabel" text="آماده" />
-                  <ProgressIndicator fx:id="loadingIndicator" maxHeight="20.0" maxWidth="20.0" visible="false" />
-               </children>
-               <padding>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-               </padding>
-            </HBox>
+            <Label fx:id="statusLabel" text="وضعیت: آماده" />
+            <ProgressIndicator fx:id="loadingIndicator" visible="false" />
          </children>
-      </VBox>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+      </HBox>
    </bottom>
 </BorderPane>

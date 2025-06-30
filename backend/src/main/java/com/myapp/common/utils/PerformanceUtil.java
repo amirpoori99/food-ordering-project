@@ -5,122 +5,520 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.time.LocalDateTime;
 import java.time.Duration;
+import java.util.function.Supplier;
+import java.util.function.Consumer;
 
 /**
- * کلاس ابزاری بهینه‌سازی عملکرد برای سیستم سفارش غذا
- * شامل سیستم cache، پردازش ناهمزمان، مدیریت حافظه و نظارت بر عملکرد
+ * کلاس ابزاری بهینه‌سازی عملکرد پیشرفته برای سیستم سفارش غذا
+ * Version: 2.0 - Phase 33 Implementation
+ * 
+ * شامل سیستم cache پیشرفته، پردازش ناهمزمان، مدیریت حافظه، 
+ * بهینه‌سازی کوئری، نظارت بر عملکرد و تکنیک‌های پیشرفته بهینه‌سازی
+ * 
  * این کلاس ابزارهای پیشرفته‌ای برای بهبود سرعت و کارایی سیستم فراهم می‌کند
  */
 public class PerformanceUtil {
     
-    // ==================== سیستم کش (CACHING SYSTEM) ====================
+    // ==================== سیستم کش پیشرفته (ADVANCED CACHING SYSTEM) ====================
     
     // نقشه thread-safe برای ذخیره‌سازی داده‌های کش شده
     private static final Map<String, CacheEntry> cache = new ConcurrentHashMap<>();
-    // مدت زمان پیش‌فرض انقضای کش (30 دقیقه)
+    // کش برای آمار عملکرد
+    private static final Map<String, PerformanceStats> performanceCache = new ConcurrentHashMap<>();
+    // صف برای مدیریت LRU (Least Recently Used)
+    private static final Queue<String> lruQueue = new ConcurrentLinkedQueue<>();
+    
+    // تنظیمات پیشرفته کش
     private static final long DEFAULT_CACHE_TTL_MINUTES = 30;
-    // حداکثر تعداد آیتم‌های قابل ذخیره در کش
-    private static final int MAX_CACHE_SIZE = 1000;
+    private static final int MAX_CACHE_SIZE = 1000; // کاهش اندازه کش برای هماهنگی با تست
+    private static final int LRU_CLEANUP_THRESHOLD = 100; // آستانه پاک‌سازی LRU
+    private static final AtomicLong cacheHits = new AtomicLong(0);
+    private static final AtomicLong cacheMisses = new AtomicLong(0);
     
     /**
-     * کلاس داخلی برای ذخیره‌سازی آیتم‌های کش با پشتیبانی از TTL
-     * هر آیتم شامل مقدار و زمان انقضا می‌باشد
+     * کلاس داخلی پیشرفته برای ذخیره‌سازی آیتم‌های کش با پشتیبانی از TTL و LRU
      */
     private static class CacheEntry {
-        private final Object value;         // مقدار ذخیره شده
-        private final LocalDateTime expiryTime;  // زمان انقضا
+        private final Object value;
+        private final LocalDateTime expiryTime;
+        private LocalDateTime lastAccessTime; // حذف final برای امکان تغییر
+        private final AtomicInteger accessCount;
         
-        /**
-         * سازنده آیتم کش
-         * 
-         * @param value مقدار برای ذخیره‌سازی
-         * @param ttlMinutes مدت زمان زنده بودن به دقیقه
-         */
         public CacheEntry(Object value, long ttlMinutes) {
             this.value = value;
             this.expiryTime = LocalDateTime.now().plusMinutes(ttlMinutes);
+            this.lastAccessTime = LocalDateTime.now();
+            this.accessCount = new AtomicInteger(0);
         }
         
-        /**
-         * بررسی انقضای آیتم کش
-         * 
-         * @return true اگر آیتم منقضی شده باشد
-         */
         public boolean isExpired() {
             return LocalDateTime.now().isAfter(expiryTime);
         }
         
-        /**
-         * دریافت مقدار ذخیره شده
-         * 
-         * @return مقدار آیتم کش
-         */
         public Object getValue() {
+            lastAccessTime = LocalDateTime.now();
+            accessCount.incrementAndGet();
             return value;
+        }
+        
+        public LocalDateTime getLastAccessTime() {
+            return lastAccessTime;
+        }
+        
+        public int getAccessCount() {
+            return accessCount.get();
+        }
+        
+        public boolean isHot() {
+            return accessCount.get() > 10; // آیتم‌های داغ
         }
     }
     
     /**
-     * ذخیره‌سازی داده در کش با TTL پیش‌فرض
-     * 
-     * @param key کلید منحصر به فرد برای داده
-     * @param data داده برای ذخیره‌سازی
+     * کلاس آمار عملکرد برای مانیتورینگ
+     */
+    private static class PerformanceStats {
+        private final AtomicLong totalExecutions = new AtomicLong(0);
+        private final AtomicLong totalExecutionTime = new AtomicLong(0);
+        private final AtomicLong minExecutionTime = new AtomicLong(Long.MAX_VALUE);
+        private final AtomicLong maxExecutionTime = new AtomicLong(0);
+        private final AtomicLong errors = new AtomicLong(0);
+        
+        public void recordExecution(long executionTime) {
+            totalExecutions.incrementAndGet();
+            totalExecutionTime.addAndGet(executionTime);
+            
+            // Update min/max
+            long currentMin = minExecutionTime.get();
+            while (executionTime < currentMin && 
+                   !minExecutionTime.compareAndSet(currentMin, executionTime)) {
+                currentMin = minExecutionTime.get();
+            }
+            
+            long currentMax = maxExecutionTime.get();
+            while (executionTime > currentMax && 
+                   !maxExecutionTime.compareAndSet(currentMax, executionTime)) {
+                currentMax = maxExecutionTime.get();
+            }
+        }
+        
+        public void recordError() {
+            errors.incrementAndGet();
+        }
+        
+        public double getAverageExecutionTime() {
+            long total = totalExecutions.get();
+            return total > 0 ? (double) totalExecutionTime.get() / total : 0;
+        }
+        
+        public long getMinExecutionTime() {
+            return minExecutionTime.get() == Long.MAX_VALUE ? 0 : minExecutionTime.get();
+        }
+        
+        public long getMaxExecutionTime() {
+            return maxExecutionTime.get();
+        }
+        
+        public long getTotalExecutions() {
+            return totalExecutions.get();
+        }
+        
+        public long getErrorCount() {
+            return errors.get();
+        }
+        
+        public double getErrorRate() {
+            long total = totalExecutions.get();
+            return total > 0 ? (double) errors.get() / total : 0;
+        }
+    }
+    
+    // ==================== سیستم کش پیشرفته ====================
+    
+    /**
+     * ذخیره‌سازی داده در کش با TTL پیش‌فرض و مدیریت LRU
      */
     public static void cacheData(String key, Object data) {
         cacheData(key, data, DEFAULT_CACHE_TTL_MINUTES);
     }
     
     /**
-     * ذخیره‌سازی داده در کش با TTL سفارشی
-     * 
-     * @param key کلید منحصر به فرد برای داده
-     * @param data داده برای ذخیره‌سازی
-     * @param ttlMinutes مدت زمان زنده بودن به دقیقه
+     * ذخیره‌سازی داده در کش با TTL سفارشی و مدیریت LRU
      */
     public static void cacheData(String key, Object data, long ttlMinutes) {
-        // جلوگیری از رشد بیش از حد کش
+        // مدیریت LRU و اندازه کش
         if (cache.size() >= MAX_CACHE_SIZE) {
-            cleanExpiredEntries();
+            cleanupLRU();
         }
         
         cache.put(key, new CacheEntry(data, ttlMinutes));
+        lruQueue.offer(key);
     }
     
     /**
-     * دریافت داده از کش
-     * 
-     * @param key کلید داده
-     * @param type نوع کلاس داده
-     * @param <T> نوع generic داده
-     * @return داده کش شده یا null در صورت عدم وجود یا انقضا
+     * دریافت داده از کش با آمارگیری
      */
     @SuppressWarnings("unchecked")
     public static <T> T getCachedData(String key, Class<T> type) {
         CacheEntry entry = cache.get(key);
         if (entry == null || entry.isExpired()) {
             cache.remove(key);
+            cacheMisses.incrementAndGet();
             return null;
         }
         
+        cacheHits.incrementAndGet();
         try {
             return type.cast(entry.getValue());
         } catch (ClassCastException e) {
-            cache.remove(key); // حذف آیتم نامعتبر
+            cache.remove(key);
+            cacheMisses.incrementAndGet();
             return null;
         }
     }
     
     /**
-     * بررسی وجود داده در کش و معتبر بودن آن
-     * 
-     * @param key کلید داده
-     * @return true اگر داده در کش موجود و معتبر باشد
+     * پاک‌سازی LRU برای آزادسازی فضا
      */
+    private static void cleanupLRU() {
+        int itemsToRemove = LRU_CLEANUP_THRESHOLD;
+        List<String> itemsToRemoveList = new ArrayList<>();
+        
+        // پیدا کردن آیتم‌های کم‌استفاده
+        for (Map.Entry<String, CacheEntry> entry : cache.entrySet()) {
+            if (itemsToRemoveList.size() >= itemsToRemove) break;
+            
+            CacheEntry cacheEntry = entry.getValue();
+            if (!cacheEntry.isHot() && !cacheEntry.isExpired()) {
+                itemsToRemoveList.add(entry.getKey());
+            }
+        }
+        
+        // حذف آیتم‌های انتخاب شده
+        for (String key : itemsToRemoveList) {
+            cache.remove(key);
+            lruQueue.remove(key);
+        }
+    }
+    
+    /**
+     * دریافت آمار پیشرفته کش
+     */
+    public static Map<String, Object> getAdvancedCacheStats() {
+        Map<String, Object> stats = new ConcurrentHashMap<>();
+        stats.put("totalEntries", cache.size());
+        stats.put("maxSize", MAX_CACHE_SIZE);
+        stats.put("cacheHits", cacheHits.get());
+        stats.put("cacheMisses", cacheMisses.get());
+        
+        long totalRequests = cacheHits.get() + cacheMisses.get();
+        double hitRate = totalRequests > 0 ? (double) cacheHits.get() / totalRequests : 0;
+        stats.put("hitRate", String.format("%.2f%%", hitRate * 100));
+        
+        // آمار آیتم‌های داغ
+        long hotItems = cache.values().stream().mapToLong(entry -> entry.isHot() ? 1 : 0).sum();
+        stats.put("hotItems", hotItems);
+        
+        // آمار آیتم‌های منقضی
+        long expiredCount = cache.values().stream().mapToLong(entry -> entry.isExpired() ? 1 : 0).sum();
+        stats.put("expiredEntries", expiredCount);
+        stats.put("activeEntries", cache.size() - expiredCount);
+        
+        return stats;
+    }
+    
+    // ==================== پردازش ناهمزمان پیشرفته (ADVANCED ASYNC PROCESSING) ====================
+    
+    // Thread pool پیشرفته با تنظیمات بهینه
+    private static final ExecutorService executor = new ThreadPoolExecutor(
+        10, // core pool size
+        50, // maximum pool size
+        60L, // keep alive time
+        TimeUnit.SECONDS,
+        new LinkedBlockingQueue<>(1000), // work queue
+        new ThreadPoolExecutor.CallerRunsPolicy() // rejection policy
+    );
+    
+    // Thread pool برای کارهای I/O محور
+    private static final ExecutorService ioExecutor = Executors.newCachedThreadPool();
+    
+    /**
+     * اجرای کار به صورت ناهمزمان با CompletableFuture
+     */
+    public static <T> CompletableFuture<T> executeAsync(Supplier<T> supplier) {
+        return CompletableFuture.supplyAsync(supplier, executor);
+    }
+    
+    /**
+     * اجرای کار به صورت ناهمزمان برای I/O operations
+     */
+    public static <T> CompletableFuture<T> executeIOAsync(Supplier<T> supplier) {
+        return CompletableFuture.supplyAsync(supplier, ioExecutor);
+    }
+    
+    /**
+     * اجرای چندین کار به صورت همزمان با timeout
+     */
+    public static <T> List<T> executeConcurrentlyWithTimeout(
+            List<Supplier<T>> suppliers, long timeout, TimeUnit unit) {
+        
+        List<CompletableFuture<T>> futures = suppliers.stream()
+            .map(supplier -> CompletableFuture.supplyAsync(supplier, executor))
+            .toList();
+        
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(
+            futures.toArray(new CompletableFuture[0])
+        );
+        
+        try {
+            allFutures.get(timeout, unit);
+        } catch (Exception e) {
+            // Timeout or other exception
+            allFutures.cancel(true);
+        }
+        
+        return futures.stream()
+            .map(future -> {
+                try {
+                    return future.get(0, TimeUnit.MILLISECONDS);
+                } catch (Exception e) {
+                    return null;
+                }
+            })
+            .toList();
+    }
+    
+    // ==================== بهینه‌سازی حافظه پیشرفته (ADVANCED MEMORY OPTIMIZATION) ====================
+    
+    /**
+     * مانیتورینگ پیشرفته حافظه با آمار تفصیلی
+     */
+    public static Map<String, Object> getAdvancedMemoryStats() {
+        Runtime runtime = Runtime.getRuntime();
+        Map<String, Object> stats = new ConcurrentHashMap<>();
+        
+        // آمار حافظه
+        long totalMemory = runtime.totalMemory();
+        long freeMemory = runtime.freeMemory();
+        long usedMemory = totalMemory - freeMemory;
+        long maxMemory = runtime.maxMemory();
+        
+        stats.put("totalMemoryMB", totalMemory / 1024 / 1024);
+        stats.put("freeMemoryMB", freeMemory / 1024 / 1024);
+        stats.put("usedMemoryMB", usedMemory / 1024 / 1024);
+        stats.put("maxMemoryMB", maxMemory / 1024 / 1024);
+        stats.put("memoryUsagePercent", (double) usedMemory / maxMemory * 100);
+        
+        // اضافه کردن کلیدهای مورد نیاز تست‌ها
+        stats.put("usagePercentage", (double) usedMemory / maxMemory * 100);
+        stats.put("isCritical", isMemoryUsageCritical());
+        
+        // آمار GC
+        long gcCount = 0;
+        long gcTime = 0;
+        try {
+            java.lang.management.GarbageCollectorMXBean[] gcBeans = 
+                java.lang.management.ManagementFactory.getGarbageCollectorMXBeans()
+                    .toArray(new java.lang.management.GarbageCollectorMXBean[0]);
+            
+            for (java.lang.management.GarbageCollectorMXBean gcBean : gcBeans) {
+                gcCount += gcBean.getCollectionCount();
+                gcTime += gcBean.getCollectionTime();
+            }
+        } catch (Exception e) {
+            // GC stats not available
+        }
+        
+        stats.put("gcCount", gcCount);
+        stats.put("gcTimeMS", gcTime);
+        
+        return stats;
+    }
+    
+    /**
+     * بررسی بحرانی بودن استفاده از حافظه
+     */
+    public static boolean isMemoryUsageCritical() {
+        Runtime runtime = Runtime.getRuntime();
+        long usedMemory = runtime.totalMemory() - runtime.freeMemory();
+        long maxMemory = runtime.maxMemory();
+        double memoryUsage = (double) usedMemory / maxMemory;
+        return memoryUsage > 0.9; // بیش از 90% استفاده
+    }
+    
+    /**
+     * بهینه‌سازی حافظه با تنظیمات پیشرفته
+     */
+    public static void optimizeMemory() {
+        Runtime runtime = Runtime.getRuntime();
+        
+        // بررسی وضعیت حافظه
+        long usedMemory = runtime.totalMemory() - runtime.freeMemory();
+        long maxMemory = runtime.maxMemory();
+        double memoryUsage = (double) usedMemory / maxMemory;
+        
+        // اگر استفاده از حافظه بیش از 80% باشد، GC اجباری
+        if (memoryUsage > 0.8) {
+            System.gc();
+            
+            // بررسی مجدد بعد از GC
+            usedMemory = runtime.totalMemory() - runtime.freeMemory();
+            memoryUsage = (double) usedMemory / maxMemory;
+            
+            // اگر همچنان بالا است، هشدار
+            if (memoryUsage > 0.9) {
+                System.err.println("⚠️ WARNING: High memory usage detected: " + 
+                    String.format("%.1f%%", memoryUsage * 100));
+            }
+        }
+    }
+    
+    // ==================== پردازش Batch ====================
+    
+    /**
+     * پردازش Batch برای عملیات‌های بزرگ
+     */
+    public static <T, R> List<R> processBatch(List<T> items, int batchSize, 
+                                             java.util.function.Function<List<T>, List<R>> batchProcessor) {
+        List<R> results = new ArrayList<>();
+        
+        for (int i = 0; i < items.size(); i += batchSize) {
+            int endIndex = Math.min(i + batchSize, items.size());
+            List<T> batch = items.subList(i, endIndex);
+            
+            List<R> batchResults = batchProcessor.apply(batch);
+            results.addAll(batchResults);
+        }
+        
+        return results;
+    }
+    
+    // ==================== بهینه‌سازی کوئری پیشرفته (ADVANCED QUERY OPTIMIZATION) ====================
+    
+    /**
+     * اجرای کوئری با کش پیشرفته و آمارگیری عملکرد
+     */
+    public static <T> T executeWithAdvancedCache(String cacheKey, Supplier<T> executor, Class<T> resultType) {
+        return executeWithAdvancedCache(cacheKey, executor, resultType, DEFAULT_CACHE_TTL_MINUTES);
+    }
+    
+    /**
+     * اجرای کوئری با کش پیشرفته، آمارگیری و مانیتورینگ
+     */
+    public static <T> T executeWithAdvancedCache(String cacheKey, Supplier<T> executor, Class<T> resultType, long ttlMinutes) {
+        // بررسی کش
+        T cachedResult = getCachedData(cacheKey, resultType);
+        if (cachedResult != null) {
+            return cachedResult;
+        }
+        
+        // اجرای کوئری با آمارگیری
+        long startTime = System.currentTimeMillis();
+        T result = null;
+        boolean success = false;
+        
+        try {
+            result = executor.get();
+            success = true;
+        } catch (Exception e) {
+            // ثبت خطا در آمار
+            recordPerformanceError(cacheKey);
+            throw e;
+        } finally {
+            long executionTime = System.currentTimeMillis() - startTime;
+            recordPerformanceStats(cacheKey, executionTime, success);
+        }
+        
+        // کش کردن نتیجه
+        if (result != null) {
+            cacheData(cacheKey, result, ttlMinutes);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * ثبت آمار عملکرد
+     */
+    private static void recordPerformanceStats(String operation, long executionTime, boolean success) {
+        PerformanceStats stats = performanceCache.computeIfAbsent(operation, k -> new PerformanceStats());
+        
+        if (success) {
+            stats.recordExecution(executionTime);
+        } else {
+            stats.recordError();
+        }
+    }
+    
+    /**
+     * ثبت خطای عملکرد
+     */
+    private static void recordPerformanceError(String operation) {
+        PerformanceStats stats = performanceCache.computeIfAbsent(operation, k -> new PerformanceStats());
+        stats.recordError();
+    }
+    
+    /**
+     * دریافت آمار عملکرد برای عملیات خاص
+     */
+    public static Map<String, Object> getPerformanceStats(String operation) {
+        PerformanceStats stats = performanceCache.get(operation);
+        if (stats == null) {
+            return new ConcurrentHashMap<>();
+        }
+        
+        Map<String, Object> result = new ConcurrentHashMap<>();
+        result.put("operation", operation);
+        result.put("totalExecutions", stats.getTotalExecutions());
+        result.put("averageExecutionTime", stats.getAverageExecutionTime());
+        result.put("minExecutionTime", stats.getMinExecutionTime());
+        result.put("maxExecutionTime", stats.getMaxExecutionTime());
+        result.put("errorCount", stats.getErrorCount());
+        result.put("errorRate", stats.getErrorRate());
+        
+        return result;
+    }
+    
+    /**
+     * دریافت آمار عملکرد کلی
+     */
+    public static Map<String, Object> getAllPerformanceStats() {
+        Map<String, Object> allStats = new ConcurrentHashMap<>();
+        allStats.put("totalOperations", performanceCache.size());
+        
+        // آمار کلی
+        long totalExecutions = 0;
+        long totalErrors = 0;
+        double totalExecutionTime = 0;
+        
+        for (PerformanceStats stats : performanceCache.values()) {
+            totalExecutions += stats.getTotalExecutions();
+            totalErrors += stats.getErrorCount();
+            totalExecutionTime += stats.getAverageExecutionTime() * stats.getTotalExecutions();
+        }
+        
+        allStats.put("totalExecutions", totalExecutions);
+        allStats.put("totalErrors", totalErrors);
+        allStats.put("overallErrorRate", totalExecutions > 0 ? (double) totalErrors / totalExecutions : 0);
+        allStats.put("averageExecutionTime", totalExecutions > 0 ? totalExecutionTime / totalExecutions : 0);
+        
+        return allStats;
+    }
+    
+    // ==================== متدهای موجود (EXISTING METHODS) ====================
+    
     public static boolean isCached(String key) {
         CacheEntry entry = cache.get(key);
         if (entry == null || entry.isExpired()) {
@@ -130,51 +528,21 @@ public class PerformanceUtil {
         return true;
     }
     
-    /**
-     * پاک کردن تمام آیتم‌های کش
-     */
     public static void clearCache() {
         cache.clear();
+        lruQueue.clear();
+        cacheHits.set(0);
+        cacheMisses.set(0);
     }
     
-    /**
-     * پاک کردن آیتم‌های منقضی شده از کش
-     */
     public static void cleanExpiredEntries() {
         cache.entrySet().removeIf(entry -> entry.getValue().isExpired());
     }
     
-    /**
-     * دریافت آمار کش
-     * 
-     * @return نقشه شامل آمار کش (تعداد کل، حداکثر اندازه، آیتم‌های فعال و منقضی)
-     */
     public static Map<String, Object> getCacheStats() {
-        Map<String, Object> stats = new ConcurrentHashMap<>();
-        stats.put("totalEntries", cache.size());
-        stats.put("maxSize", MAX_CACHE_SIZE);
-        
-        long expiredCount = cache.values().stream()
-            .mapToLong(entry -> entry.isExpired() ? 1 : 0)
-            .sum();
-        stats.put("expiredEntries", expiredCount);
-        stats.put("activeEntries", cache.size() - expiredCount);
-        
-        return stats;
+        return getAdvancedCacheStats();
     }
     
-    // ==================== پردازش ناهمزمان (ASYNC PROCESSING) ====================
-    
-    // استخر thread ها برای اجرای کارهای ناهمزمان (10 thread)
-    private static final ExecutorService executor = Executors.newFixedThreadPool(10);
-    
-    /**
-     * اجرای کار به صورت ناهمزمان
-     * این متد امکان اجرای کارها در background را فراهم می‌کند
-     * 
-     * @param task کار برای اجرای ناهمزمان
-     * @return Future برای کنترل و انتظار نتیجه
-     */
     public static Future<Void> executeAsync(Runnable task) {
         return executor.submit(() -> {
             task.run();
@@ -182,13 +550,6 @@ public class PerformanceUtil {
         });
     }
     
-    /**
-     * اجرای چندین کار به صورت همزمان و موازی
-     * این متد لیستی از کارها را در threads مختلف اجرا می‌کند
-     * 
-     * @param tasks لیست کارها برای اجرای موازی
-     * @return لیست Future برای کنترل همه کارها
-     */
     public static List<Future<Void>> executeConcurrently(List<Runnable> tasks) {
         List<Future<Void>> futures = new ArrayList<>();
         for (Runnable task : tasks) {
@@ -197,15 +558,6 @@ public class PerformanceUtil {
         return futures;
     }
     
-    /**
-     * انتظار برای تکمیل همه کارها با timeout
-     * این متد منتظر می‌ماند تا همه کارها تکمیل شوند یا timeout رخ دهد
-     * 
-     * @param futures لیست Future کارها
-     * @param timeout حداکثر زمان انتظار
-     * @param unit واحد زمانی timeout
-     * @return true اگر همه کارها تکمیل شوند، false در غیر اینصورت
-     */
     public static boolean waitForCompletion(List<Future<Void>> futures, long timeout, TimeUnit unit) {
         try {
             for (Future<Void> future : futures) {
@@ -217,128 +569,14 @@ public class PerformanceUtil {
         }
     }
     
-    // ==================== بهینه‌سازی حافظه (MEMORY OPTIMIZATION) ====================
-    
-    /**
-     * اجبار Garbage Collection و دریافت آمار حافظه
-     * این متد GC را اجرا کرده و آمار کامل حافظه قبل و بعد از GC برمی‌گرداند
-     * 
-     * @return نقشه آمار حافظه شامل مقادیر قبل/بعد GC و حافظه آزاد شده
-     */
-    public static Map<String, Long> forceGarbageCollection() {
-        Runtime runtime = Runtime.getRuntime();
-        
-        // محاسبه حافظه استفاده شده قبل از GC
-        long beforeGC = runtime.totalMemory() - runtime.freeMemory();
-        runtime.gc(); // اجرای Garbage Collection
-        
-        // دادن زمان برای تکمیل GC
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        
-        // محاسبه حافظه استفاده شده بعد از GC
-        long afterGC = runtime.totalMemory() - runtime.freeMemory();
-        long recovered = beforeGC - afterGC; // مقدار حافظه آزاد شده
-        
-        // تهیه آمار کامل حافظه
-        Map<String, Long> stats = new ConcurrentHashMap<>();
-        stats.put("memoryBeforeGC", beforeGC);      // حافظه قبل از GC (بایت)
-        stats.put("memoryAfterGC", afterGC);        // حافظه بعد از GC (بایت)
-        stats.put("memoryRecovered", recovered);     // حافظه آزاد شده (بایت)
-        stats.put("totalMemory", runtime.totalMemory()); // کل حافظه تخصیص یافته
-        stats.put("maxMemory", runtime.maxMemory());      // حداکثر حافظه در دسترس
-        stats.put("freeMemory", runtime.freeMemory());    // حافظه آزاد فعلی
-        
-        return stats;
-    }
-    
-    /**
-     * بررسی وضعیت بحرانی استفاده از حافظه
-     * اگر استفاده از حافظه بیش از 85% باشد، وضعیت بحرانی است
-     * 
-     * @return true اگر استفاده از حافظه بحرانی باشد (بیش از 85%)
-     */
-    public static boolean isMemoryUsageCritical() {
-        Runtime runtime = Runtime.getRuntime();
-        long usedMemory = runtime.totalMemory() - runtime.freeMemory(); // حافظه استفاده شده
-        long maxMemory = runtime.maxMemory();                           // حداکثر حافظه
-        
-        double usagePercentage = (double) usedMemory / maxMemory;        // درصد استفاده
-        return usagePercentage > 0.85; // بحرانی اگر بیش از 85% باشد
-    }
-    
-    /**
-     * دریافت آمار فعلی استفاده از حافظه
-     * شامل تمام اطلاعات مربوط به حافظه بر حسب مگابایت و درصد
-     * 
-     * @return نقشه آمار حافظه شامل مقادیر MB و درصد استفاده
-     */
     public static Map<String, Object> getMemoryStats() {
-        Runtime runtime = Runtime.getRuntime();
-        long usedMemory = runtime.totalMemory() - runtime.freeMemory(); // حافظه استفاده شده
-        long maxMemory = runtime.maxMemory();                           // حداکثر حافظه
-        
-        Map<String, Object> stats = new ConcurrentHashMap<>();
-        stats.put("usedMemoryMB", usedMemory / 1024 / 1024);           // حافظه استفاده شده (MB)
-        stats.put("totalMemoryMB", runtime.totalMemory() / 1024 / 1024); // کل حافظه تخصیص یافته (MB)
-        stats.put("maxMemoryMB", maxMemory / 1024 / 1024);             // حداکثر حافظه (MB)
-        stats.put("freeMemoryMB", runtime.freeMemory() / 1024 / 1024); // حافظه آزاد (MB)
-        stats.put("usagePercentage", Math.round((double) usedMemory / maxMemory * 100 * 100.0) / 100.0); // درصد استفاده
-        stats.put("isCritical", isMemoryUsageCritical());              // وضعیت بحرانی یا نه
-        
-        return stats;
+        return getAdvancedMemoryStats();
     }
     
-    // ==================== عملیات دسته‌ای (BULK OPERATIONS) ====================
-    
-    /**
-     * پردازش داده‌ها در دسته‌های کوچک برای بهبود عملکرد
-     * این متد لیست بزرگ داده‌ها را به دسته‌های کوچک تقسیم و پردازش می‌کند
-     * برای جلوگیری از مشکلات حافظه و بهبود عملکرد پایگاه داده مفید است
-     * 
-     * @param data لیست کامل داده‌ها برای پردازش
-     * @param batchSize اندازه هر دسته (تعداد آیتم در هر batch)
-     * @param processor پردازشگر دسته‌ای که روی هر دسته اعمال می‌شود
-     * @param <T> نوع داده‌های درون لیست
-     */
-    public static <T> void processBatch(List<T> data, int batchSize, BatchProcessor<T> processor) {
-        if (data.isEmpty()) return; // اگر داده‌ای نباشد، هیچ کاری نکن
-        
-        // تقسیم داده‌ها به دسته‌های کوچک و پردازش هر دسته
-        for (int i = 0; i < data.size(); i += batchSize) {
-            int endIndex = Math.min(i + batchSize, data.size()); // محاسبه انتهای دسته
-            List<T> batch = data.subList(i, endIndex);           // استخراج دسته فعلی
-            processor.process(batch);                            // پردازش دسته
-        }
+    public static void forceGarbageCollection() {
+        System.gc();
     }
     
-    /**
-     * رابط تابعی برای پردازش دسته‌ای
-     * این interface برای تعریف منطق پردازش هر دسته استفاده می‌شود
-     */
-    @FunctionalInterface
-    public interface BatchProcessor<T> {
-        /**
-         * پردازش یک دسته از داده‌ها
-         * 
-         * @param batch دسته داده‌ها برای پردازش
-         */
-        void process(List<T> batch);
-    }
-    
-    // ==================== بهینه‌سازی کوئری (QUERY OPTIMIZATION) ====================
-    
-    /**
-     * ایجاد کلید کش بهینه شده برای کوئری‌های پایگاه داده
-     * این متد کلید منحصر به فرد برای کش کردن نتایج کوئری‌ها می‌سازد
-     * 
-     * @param operation نام عملیات (مثل getUserById، getOrdersByStatus)
-     * @param params پارامترهای کوئری که در کلید کش لحاظ می‌شوند
-     * @return کلید کش منحصر به فرد
-     */
     public static String createQueryCacheKey(String operation, Object... params) {
         StringBuilder keyBuilder = new StringBuilder(operation);
         for (Object param : params) {
@@ -347,179 +585,126 @@ public class PerformanceUtil {
         return keyBuilder.toString();
     }
     
-    /**
-     * اجرای کوئری با پشتیبانی از کش (TTL پیش‌فرض)
-     * ابتدا از کش بررسی می‌کند، در صورت عدم وجود کوئری را اجرا می‌کند
-     * 
-     * @param cacheKey کلید کش برای ذخیره‌سازی
-     * @param executor اجراکننده کوئری
-     * @param resultType نوع نتیجه کوئری
-     * @param <T> نوع generic نتیجه
-     * @return نتیجه کوئری (از کش یا اجرای مستقیم)
-     */
     public static <T> T executeWithCache(String cacheKey, QueryExecutor<T> executor, Class<T> resultType) {
         return executeWithCache(cacheKey, executor, resultType, DEFAULT_CACHE_TTL_MINUTES);
     }
     
-    /**
-     * اجرای کوئری با پشتیبانی از کش (TTL سفارشی)
-     * این متد الگوی cache-aside را پیاده‌سازی می‌کند
-     * 
-     * @param cacheKey کلید کش برای ذخیره‌سازی
-     * @param executor اجراکننده کوئری
-     * @param resultType نوع نتیجه کوئری
-     * @param ttlMinutes مدت زمان انقضای کش (دقیقه)
-     * @param <T> نوع generic نتیجه
-     * @return نتیجه کوئری (از کش یا اجرای مستقیم)
-     */
     public static <T> T executeWithCache(String cacheKey, QueryExecutor<T> executor, Class<T> resultType, long ttlMinutes) {
-        // ابتدا از کش بررسی کن
-        T cachedResult = getCachedData(cacheKey, resultType);
-        if (cachedResult != null) {
-            return cachedResult; // برگرداندن نتیجه از کش
-        }
-        
-        // اجرای کوئری اصلی
-        T result = executor.execute();
-        
-        // کش کردن نتیجه در صورت null نبودن
-        if (result != null) {
-            cacheData(cacheKey, result, ttlMinutes);
-        }
-        
-        return result;
+        return executeWithAdvancedCache(cacheKey, executor::execute, resultType, ttlMinutes);
     }
     
-    /**
-     * رابط تابعی برای اجرای کوئری
-     * این interface برای تعریف منطق اجرای کوئری استفاده می‌شود
-     */
     @FunctionalInterface
     public interface QueryExecutor<T> {
-        /**
-         * اجرای کوئری و برگرداندن نتیجه
-         * 
-         * @return نتیجه کوئری
-         */
         T execute();
     }
     
-    // ==================== نظارت بر عملکرد (PERFORMANCE MONITORING) ====================
-    
-    /**
-     * اندازه‌گیری زمان اجرا و استفاده حافظه یک عملیات
-     * این متد عملکرد یک تابع را کامل اندازه‌گیری می‌کند
-     * 
-     * @param operationName نام عملیات برای ثبت در نتیجه
-     * @param operation تابع برای اندازه‌گیری عملکرد
-     * @param <T> نوع نتیجه عملیات
-     * @return نتیجه شامل زمان اجرا، استفاده حافظه و نتیجه عملیات
-     */
-    public static <T> PerformanceResult<T> measurePerformance(String operationName, PerformanceOperation<T> operation) {
-        // ثبت زمان و حافظه قبل از شروع
+    public static <T> PerformanceResult<T> measurePerformance(String operation, Supplier<T> supplier) {
         long startTime = System.currentTimeMillis();
-        long startMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        T result = null;
+        boolean success = false;
         
-        // اجرای عملیات اصلی
-        T result = operation.execute();
-        
-        // ثبت زمان و حافظه بعد از اتمام
-        long endTime = System.currentTimeMillis();
-        long endMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-        
-        // محاسبه اختلاف‌ها
-        long executionTime = endTime - startTime;       // زمان اجرا (میلی‌ثانیه)
-        long memoryUsed = endMemory - startMemory;      // حافظه استفاده شده (بایت)
-        
-        return new PerformanceResult<>(operationName, result, executionTime, memoryUsed);
-    }
-    
-    /**
-     * رابط تابعی برای عملیات قابل اندازه‌گیری
-     * این interface برای تعریف عملیاتی که می‌خواهیم عملکردشان را اندازه‌گیری کنیم
-     */
-    @FunctionalInterface
-    public interface PerformanceOperation<T> {
-        /**
-         * اجرای عملیات و برگرداندن نتیجه
-         * 
-         * @return نتیجه عملیات
-         */
-        T execute();
-    }
-    
-    /**
-     * کلاس نتیجه اندازه‌گیری عملکرد
-     * شامل تمام اطلاعات مربوط به عملکرد یک عملیات
-     */
-    public static class PerformanceResult<T> {
-        private final String operationName;      // نام عملیات
-        private final T result;                  // نتیجه عملیات
-        private final long executionTimeMs;     // زمان اجرا (میلی‌ثانیه)
-        private final long memoryUsedBytes;     // حافظه استفاده شده (بایت)
-        
-        /**
-         * سازنده نتیجه عملکرد
-         * 
-         * @param operationName نام عملیات
-         * @param result نتیجه عملیات
-         * @param executionTimeMs زمان اجرا بر حسب میلی‌ثانیه
-         * @param memoryUsedBytes حافظه استفاده شده بر حسب بایت
-         */
-        public PerformanceResult(String operationName, T result, long executionTimeMs, long memoryUsedBytes) {
-            this.operationName = operationName;
-            this.result = result;
-            this.executionTimeMs = executionTimeMs;
-            this.memoryUsedBytes = memoryUsedBytes;
+        try {
+            result = supplier.get();
+            success = true;
+        } catch (Exception e) {
+            recordPerformanceError(operation);
+            throw e;
+        } finally {
+            long executionTime = System.currentTimeMillis() - startTime;
+            recordPerformanceStats(operation, executionTime, success);
         }
         
-        // متدهای دسترسی به داده‌ها
-        public String getOperationName() { return operationName; }
+        return new PerformanceResult<>(result, System.currentTimeMillis() - startTime, success, operation);
+    }
+    
+    public static class PerformanceResult<T> {
+        private final T result;
+        private final long executionTime;
+        private final boolean success;
+        private final String operationName;
+        
+        public PerformanceResult(T result, long executionTime, boolean success) {
+            this.result = result;
+            this.executionTime = executionTime;
+            this.success = success;
+            this.operationName = "unknown";
+        }
+        
+        public PerformanceResult(T result, long executionTime, boolean success, String operationName) {
+            this.result = result;
+            this.executionTime = executionTime;
+            this.success = success;
+            this.operationName = operationName;
+        }
+        
         public T getResult() { return result; }
-        public long getExecutionTimeMs() { return executionTimeMs; }
-        public long getMemoryUsedBytes() { return memoryUsedBytes; }
+        public long getExecutionTime() { return executionTime; }
+        public long getExecutionTimeMs() { return executionTime; }
+        public boolean isSuccess() { return success; }
+        public String getOperationName() { return operationName; }
         
-        /**
-         * دریافت حافظه استفاده شده بر حسب مگابایت
-         * 
-         * @return حافظه استفاده شده (MB)
-         */
-        public double getMemoryUsedMB() { return memoryUsedBytes / 1024.0 / 1024.0; }
-        
-        /**
-         * نمایش فرمت شده نتایج عملکرد
-         * 
-         * @return رشته فرمت شده نتایج
-         */
         @Override
         public String toString() {
-            return String.format("Performance[%s]: %dms, %.2fMB", 
-                operationName, executionTimeMs, getMemoryUsedMB());
+            return String.format("PerformanceResult{executionTime=%dms, success=%s, operation=%s}", 
+                executionTime, success, operationName);
         }
     }
     
-    // ==================== پاکسازی و خاتمه (CLEANUP) ====================
+    // ==================== متدهای جدید برای فاز 33 ====================
     
     /**
-     * خاتمه و پاکسازی ابزارهای عملکرد
-     * این متد تمام منابع استفاده شده توسط کلاس را آزاد می‌کند
-     * باید در shutdown hook یا پایان برنامه فراخوانی شود
+     * بهینه‌سازی خودکار سیستم
+     */
+    public static void autoOptimize() {
+        // بهینه‌سازی حافظه
+        optimizeMemory();
+        
+        // پاک‌سازی کش
+        cleanExpiredEntries();
+        
+        // بررسی اندازه کش
+        if (cache.size() > MAX_CACHE_SIZE * 0.8) {
+            cleanupLRU();
+        }
+    }
+    
+    /**
+     * دریافت گزارش کامل عملکرد
+     */
+    public static Map<String, Object> getCompletePerformanceReport() {
+        Map<String, Object> report = new ConcurrentHashMap<>();
+        report.put("timestamp", LocalDateTime.now().toString());
+        report.put("cacheStats", getAdvancedCacheStats());
+        report.put("memoryStats", getAdvancedMemoryStats());
+        report.put("performanceStats", getAllPerformanceStats());
+        
+        return report;
+    }
+    
+    /**
+     * تنظیم مجدد آمار عملکرد
+     */
+    public static void resetPerformanceStats() {
+        performanceCache.clear();
+    }
+    
+    /**
+     * خاموش کردن سیستم
      */
     public static void shutdown() {
+        executor.shutdown();
+        ioExecutor.shutdown();
         try {
-            // خاتمه ExecutorService به صورت graceful
-            executor.shutdown();
-            if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
-                // اگر بعد از 5 ثانیه هنوز تکمیل نشده، force shutdown
+            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
                 executor.shutdownNow();
             }
+            if (!ioExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
+                ioExecutor.shutdownNow();
+            }
         } catch (InterruptedException e) {
-            // در صورت interrupt، فوری shutdown کن
             executor.shutdownNow();
+            ioExecutor.shutdownNow();
             Thread.currentThread().interrupt();
         }
-        
-        // پاکسازی کش
-        clearCache();
     }
 } 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NavigationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">food-ordering-frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.common</a> &gt; <span class="el_source">NavigationController.java</span></div><h1>NavigationController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.common;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NavigationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.common</a> &gt; <span class="el_source">NavigationController.java</span></div><h1>NavigationController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.common;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -47,7 +47,7 @@ public class NavigationController {
     private Stage primaryStage;
     
     /** Cache برای Scene ها جهت بهبود performance */
-<span class="nc" id="L50">    private Map&lt;String, Scene&gt; sceneCache = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L50">    private Map&lt;String, Scene&gt; sceneCache = new HashMap&lt;&gt;();</span>
     
     /** نام صفحه فعلی */
     private String currentScene;
@@ -74,6 +74,9 @@ public class NavigationController {
     
     /** صفحه پروفایل کاربر */
     public static final String PROFILE_SCENE = &quot;Profile&quot;;
+    
+    /** صفحه پروفایل و تاریخچه کاربر (فاز 28) */
+    public static final String USER_PROFILE_SCENE = &quot;UserProfile&quot;;
     
     /** صفحه پرداخت */
     public static final String PAYMENT_SCENE = &quot;Payment&quot;;
@@ -114,7 +117,7 @@ public class NavigationController {
     /**
      * سازنده private برای پیاده‌سازی Singleton
      */
-<span class="nc" id="L117">    private NavigationController() {}</span>
+<span class="fc" id="L120">    private NavigationController() {}</span>
     
     /**
      * دریافت instance singleton
@@ -122,18 +125,18 @@ public class NavigationController {
      * @return instance NavigationController
      */
     public static NavigationController getInstance() {
-<span class="nc bnc" id="L125" title="All 2 branches missed.">        if (instance == null) {</span>
-<span class="nc" id="L126">            instance = new NavigationController();</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">        if (instance == null) {</span>
+<span class="fc" id="L129">            instance = new NavigationController();</span>
         }
-<span class="nc" id="L128">        return instance;</span>
+<span class="fc" id="L131">        return instance;</span>
     }
     
     /**
      * ریست کردن instance singleton (فقط برای تست)
      */
     public static void resetInstance() {
-<span class="nc" id="L135">        instance = null;</span>
-<span class="nc" id="L136">    }</span>
+<span class="fc" id="L138">        instance = null;</span>
+<span class="fc" id="L139">    }</span>
     
     /**
      * مقداردهی اولیه Navigation با Stage اصلی
@@ -142,31 +145,31 @@ public class NavigationController {
      * @throws NullPointerException اگر primaryStage null باشد
      */
     public void initialize(Stage primaryStage) {
-<span class="nc bnc" id="L145" title="All 2 branches missed.">        if (primaryStage == null) {</span>
-<span class="nc" id="L146">            throw new NullPointerException(&quot;Primary stage cannot be null&quot;);</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">        if (primaryStage == null) {</span>
+<span class="fc" id="L149">            throw new NullPointerException(&quot;Primary stage cannot be null&quot;);</span>
         }
         
-<span class="nc" id="L149">        this.primaryStage = primaryStage;</span>
+<span class="fc" id="L152">        this.primaryStage = primaryStage;</span>
         
         // اطمینان از اجرا در JavaFX Application Thread
-<span class="nc bnc" id="L152" title="All 2 branches missed.">        if (Platform.isFxApplicationThread()) {</span>
-<span class="nc" id="L153">            initializeStageProperties();</span>
-<span class="nc" id="L154">        } else {</span>
-<span class="nc" id="L155">            Platform.runLater(this::initializeStageProperties);</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">        if (Platform.isFxApplicationThread()) {</span>
+<span class="nc" id="L156">            initializeStageProperties();</span>
+        } else {
+<span class="fc" id="L158">            Platform.runLater(this::initializeStageProperties);</span>
         }
-<span class="nc" id="L157">    }</span>
+<span class="fc" id="L160">    }</span>
     
     /**
      * مقداردهی ویژگی‌های Stage (باید در JavaFX thread اجرا شود)
      */
     private void initializeStageProperties() {
-<span class="nc bnc" id="L163" title="All 2 branches missed.">        if (this.primaryStage != null) {</span>
-<span class="nc" id="L164">            this.primaryStage.setTitle(&quot;Food Ordering System&quot;);</span>
-<span class="nc" id="L165">            this.primaryStage.setResizable(true);</span>
-<span class="nc" id="L166">            this.primaryStage.setMinWidth(800);</span>
-<span class="nc" id="L167">            this.primaryStage.setMinHeight(600);</span>
+<span class="pc bpc" id="L166" title="1 of 2 branches missed.">        if (this.primaryStage != null) {</span>
+<span class="fc" id="L167">            this.primaryStage.setTitle(&quot;Food Ordering System&quot;);</span>
+<span class="fc" id="L168">            this.primaryStage.setResizable(true);</span>
+<span class="fc" id="L169">            this.primaryStage.setMinWidth(800);</span>
+<span class="fc" id="L170">            this.primaryStage.setMinHeight(600);</span>
         }
-<span class="nc" id="L169">    }</span>
+<span class="fc" id="L172">    }</span>
     
     /**
      * انتقال به صفحه مشخص شده
@@ -177,20 +180,20 @@ public class NavigationController {
      */
     public void navigateTo(String sceneName) {
         // مدیریت نام صفحه null یا خالی برای تست
-<span class="nc bnc" id="L180" title="All 4 branches missed.">        if (sceneName == null || sceneName.trim().isEmpty()) {</span>
-<span class="nc bnc" id="L181" title="All 2 branches missed.">            if (!isTestMode()) {</span>
-<span class="nc" id="L182">                showError(&quot;Navigation Error&quot;, &quot;Scene name cannot be null or empty&quot;, null);</span>
+<span class="fc bfc" id="L183" title="All 4 branches covered.">        if (sceneName == null || sceneName.trim().isEmpty()) {</span>
+<span class="pc bpc" id="L184" title="1 of 2 branches missed.">            if (!isTestMode()) {</span>
+<span class="nc" id="L185">                showError(&quot;Navigation Error&quot;, &quot;Scene name cannot be null or empty&quot;, null);</span>
             }
-<span class="nc" id="L184">            return;</span>
+<span class="fc" id="L187">            return;</span>
         }
         
         // اطمینان از اجرا در JavaFX Application Thread
-<span class="nc bnc" id="L188" title="All 2 branches missed.">        if (Platform.isFxApplicationThread()) {</span>
-<span class="nc" id="L189">            navigateToInternal(sceneName);</span>
-<span class="nc" id="L190">        } else {</span>
-<span class="nc" id="L191">            Platform.runLater(() -&gt; navigateToInternal(sceneName));</span>
+<span class="fc bfc" id="L191" title="All 2 branches covered.">        if (Platform.isFxApplicationThread()) {</span>
+<span class="fc" id="L192">            navigateToInternal(sceneName);</span>
+        } else {
+<span class="fc" id="L194">            Platform.runLater(() -&gt; navigateToInternal(sceneName));</span>
         }
-<span class="nc" id="L193">    }</span>
+<span class="fc" id="L196">    }</span>
     
     /**
      * متد داخلی navigation (باید در FX thread اجرا شود)
@@ -199,22 +202,22 @@ public class NavigationController {
      */
     private void navigateToInternal(String sceneName) {
         try {
-<span class="nc" id="L202">            Scene scene = getScene(sceneName);</span>
-<span class="nc bnc" id="L203" title="All 2 branches missed.">            if (scene != null) {</span>
-<span class="nc" id="L204">                primaryStage.setScene(scene);</span>
-<span class="nc" id="L205">                primaryStage.show();</span>
-<span class="nc" id="L206">                currentScene = sceneName;</span>
+<span class="fc" id="L205">            Scene scene = getScene(sceneName);</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">            if (scene != null) {</span>
+<span class="fc" id="L207">                primaryStage.setScene(scene);</span>
+<span class="fc" id="L208">                primaryStage.show();</span>
+<span class="fc" id="L209">                currentScene = sceneName;</span>
                 
                 // به‌روزرسانی عنوان پنجره
-<span class="nc" id="L209">                updateWindowTitle(sceneName);</span>
+<span class="fc" id="L212">                updateWindowTitle(sceneName);</span>
             }
-<span class="nc" id="L211">        } catch (IOException e) {</span>
-<span class="nc bnc" id="L212" title="All 2 branches missed.">            if (!isTestMode()) {</span>
-<span class="nc" id="L213">                showError(&quot;Navigation Error&quot;, &quot;Could not load scene: &quot; + sceneName, e);</span>
+<span class="nc" id="L214">        } catch (IOException e) {</span>
+<span class="nc bnc" id="L215" title="All 2 branches missed.">            if (!isTestMode()) {</span>
+<span class="nc" id="L216">                showError(&quot;Navigation Error&quot;, &quot;Could not load scene: &quot; + sceneName, e);</span>
             }
             // در حالت تست، خطا را بی‌سروصدا مدیریت کن
-        }
-<span class="nc" id="L217">    }</span>
+<span class="fc" id="L219">        }</span>
+<span class="fc" id="L220">    }</span>
     
     /**
      * انتقال به صفحه با داده
@@ -225,8 +228,8 @@ public class NavigationController {
     public void navigateTo(String sceneName, Object data) {
         // فعلاً فقط به صفحه منتقل می‌شود
         // در آینده می‌توان مکانیسم انتقال داده پیاده‌سازی کرد
-<span class="nc" id="L228">        navigateTo(sceneName);</span>
-<span class="nc" id="L229">    }</span>
+<span class="fc" id="L231">        navigateTo(sceneName);</span>
+<span class="fc" id="L232">    }</span>
     
     /**
      * دریافت Scene از cache یا بارگذاری آن
@@ -237,44 +240,44 @@ public class NavigationController {
      */
     private Scene getScene(String sceneName) throws IOException {
         // بررسی وجود در cache
-<span class="nc bnc" id="L240" title="All 2 branches missed.">        if (sceneCache.containsKey(sceneName)) {</span>
-<span class="nc" id="L241">            return sceneCache.get(sceneName);</span>
+<span class="pc bpc" id="L243" title="1 of 2 branches missed.">        if (sceneCache.containsKey(sceneName)) {</span>
+<span class="nc" id="L244">            return sceneCache.get(sceneName);</span>
         }
         
         // بارگذاری فایل FXML
-<span class="nc" id="L245">        String fxmlPath = &quot;/fxml/&quot; + sceneName + &quot;.fxml&quot;;</span>
-<span class="nc" id="L246">        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));</span>
+<span class="fc" id="L248">        String fxmlPath = &quot;/fxml/&quot; + sceneName + &quot;.fxml&quot;;</span>
+<span class="fc" id="L249">        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));</span>
         
-<span class="nc bnc" id="L248" title="All 2 branches missed.">        if (loader.getLocation() == null) {</span>
+<span class="fc bfc" id="L251" title="All 2 branches covered.">        if (loader.getLocation() == null) {</span>
             // در حالت تست، exception نمی‌اندازیم
-<span class="nc bnc" id="L250" title="All 2 branches missed.">            if (isTestMode()) {</span>
-<span class="nc" id="L251">                return null;</span>
+<span class="pc bpc" id="L253" title="1 of 2 branches missed.">            if (isTestMode()) {</span>
+<span class="fc" id="L254">                return null;</span>
             }
-<span class="nc" id="L253">            throw new IOException(&quot;FXML file not found: &quot; + fxmlPath);</span>
+<span class="nc" id="L256">            throw new IOException(&quot;FXML file not found: &quot; + fxmlPath);</span>
         }
         
-<span class="nc" id="L256">        Parent root = loader.load();</span>
-<span class="nc" id="L257">        Scene scene = new Scene(root);</span>
+<span class="fc" id="L259">        Parent root = loader.load();</span>
+<span class="fc" id="L260">        Scene scene = new Scene(root);</span>
         
         // اعمال CSS در صورت وجود
-<span class="nc" id="L260">        String cssPath = &quot;/css/&quot; + sceneName + &quot;.css&quot;;</span>
-<span class="nc bnc" id="L261" title="All 2 branches missed.">        if (getClass().getResource(cssPath) != null) {</span>
-<span class="nc" id="L262">            scene.getStylesheets().add(getClass().getResource(cssPath).toExternalForm());</span>
+<span class="fc" id="L263">        String cssPath = &quot;/css/&quot; + sceneName + &quot;.css&quot;;</span>
+<span class="pc bpc" id="L264" title="1 of 2 branches missed.">        if (getClass().getResource(cssPath) != null) {</span>
+<span class="nc" id="L265">            scene.getStylesheets().add(getClass().getResource(cssPath).toExternalForm());</span>
         }
         
         // cache کردن Scene
-<span class="nc" id="L266">        sceneCache.put(sceneName, scene);</span>
+<span class="fc" id="L269">        sceneCache.put(sceneName, scene);</span>
         
-<span class="nc" id="L268">        return scene;</span>
+<span class="fc" id="L271">        return scene;</span>
     }
     
     /**
      * پاک کردن تمام cache صفحات (برای reload مفید است)
      */
     public void clearCache() {
-<span class="nc" id="L275">        sceneCache.clear();</span>
-<span class="nc" id="L276">        currentScene = null; // ریست صفحه فعلی برای تست</span>
-<span class="nc" id="L277">    }</span>
+<span class="fc" id="L278">        sceneCache.clear();</span>
+<span class="fc" id="L279">        currentScene = null; // ریست صفحه فعلی برای تست</span>
+<span class="fc" id="L280">    }</span>
     
     /**
      * پاک کردن صفحه خاص از cache
@@ -282,8 +285,8 @@ public class NavigationController {
      * @param sceneName نام صفحه
      */
     public void clearCache(String sceneName) {
-<span class="nc" id="L285">        sceneCache.remove(sceneName);</span>
-<span class="nc" id="L286">    }</span>
+<span class="fc" id="L288">        sceneCache.remove(sceneName);</span>
+<span class="fc" id="L289">    }</span>
     
     /**
      * دریافت نام صفحه فعلی
@@ -291,38 +294,38 @@ public class NavigationController {
      * @return نام صفحه فعلی
      */
     public String getCurrentScene() {
-<span class="nc" id="L294">        return currentScene;</span>
+<span class="fc" id="L297">        return currentScene;</span>
     }
     
     /**
      * بررسی احراز هویت کاربر و هدایت مناسب
      */
     public void checkAuthenticationAndRedirect() {
-<span class="nc bnc" id="L301" title="All 2 branches missed.">        if (HttpClientUtil.isAuthenticated()) {</span>
+<span class="fc bfc" id="L304" title="All 2 branches covered.">        if (HttpClientUtil.isAuthenticated()) {</span>
             // کاربر احراز هویت شده، انتقال به صفحه اصلی
-<span class="nc" id="L303">            navigateTo(RESTAURANT_LIST_SCENE);</span>
-<span class="nc" id="L304">        } else {</span>
+<span class="fc" id="L306">            navigateTo(RESTAURANT_LIST_SCENE);</span>
+        } else {
             // کاربر احراز هویت نشده، انتقال به صفحه ورود
-<span class="nc" id="L306">            navigateTo(LOGIN_SCENE);</span>
+<span class="fc" id="L309">            navigateTo(LOGIN_SCENE);</span>
         }
-<span class="nc" id="L308">    }</span>
+<span class="fc" id="L311">    }</span>
     
     /**
      * خروج از حساب کاربری و انتقال به صفحه ورود
      */
     public void logout() {
         // فراخوانی API خروج (token ها را پاک می‌کند)
-<span class="nc" id="L315">        HttpClientUtil.logout();</span>
+<span class="fc" id="L318">        HttpClientUtil.logout();</span>
         
         // اطمینان از پاک شدن token ها محلی (اضافه ولی ایمن)
-<span class="nc" id="L318">        HttpClientUtil.clearTokens();</span>
+<span class="fc" id="L321">        HttpClientUtil.clearTokens();</span>
         
         // پاک کردن تمام cache صفحات
-<span class="nc" id="L321">        clearCache();</span>
+<span class="fc" id="L324">        clearCache();</span>
         
         // انتقال به صفحه ورود
-<span class="nc" id="L324">        navigateTo(LOGIN_SCENE);</span>
-<span class="nc" id="L325">    }</span>
+<span class="fc" id="L327">        navigateTo(LOGIN_SCENE);</span>
+<span class="fc" id="L328">    }</span>
     
     /**
      * نمایش dialog خطا
@@ -334,12 +337,12 @@ public class NavigationController {
     public void showError(String title, String message, Exception exception) {
         // فعلاً در console چاپ می‌شود
         // در پیاده‌سازی کامل، dialog مناسب نمایش داده می‌شود
-<span class="nc" id="L337">        System.err.println(&quot;ERROR: &quot; + title);</span>
-<span class="nc" id="L338">        System.err.println(&quot;Message: &quot; + message);</span>
-<span class="nc bnc" id="L339" title="All 2 branches missed.">        if (exception != null) {</span>
-<span class="nc" id="L340">            exception.printStackTrace();</span>
+<span class="fc" id="L340">        System.err.println(&quot;ERROR: &quot; + title);</span>
+<span class="fc" id="L341">        System.err.println(&quot;Message: &quot; + message);</span>
+<span class="fc bfc" id="L342" title="All 2 branches covered.">        if (exception != null) {</span>
+<span class="fc" id="L343">            exception.printStackTrace();</span>
         }
-<span class="nc" id="L342">    }</span>
+<span class="fc" id="L345">    }</span>
     
     /**
      * نمایش dialog اطلاعات
@@ -350,8 +353,8 @@ public class NavigationController {
     public void showInfo(String title, String message) {
         // فعلاً در console چاپ می‌شود
         // در پیاده‌سازی کامل، dialog مناسب نمایش داده می‌شود
-<span class="nc" id="L353">        System.out.println(&quot;INFO: &quot; + title + &quot; - &quot; + message);</span>
-<span class="nc" id="L354">    }</span>
+<span class="fc" id="L356">        System.out.println(&quot;INFO: &quot; + title + &quot; - &quot; + message);</span>
+<span class="fc" id="L357">    }</span>
     
     /**
      * نمایش dialog موفقیت
@@ -362,8 +365,8 @@ public class NavigationController {
     public void showSuccess(String title, String message) {
         // فعلاً در console چاپ می‌شود
         // در پیاده‌سازی کامل، dialog مناسب نمایش داده می‌شود
-<span class="nc" id="L365">        System.out.println(&quot;SUCCESS: &quot; + title + &quot; - &quot; + message);</span>
-<span class="nc" id="L366">    }</span>
+<span class="fc" id="L368">        System.out.println(&quot;SUCCESS: &quot; + title + &quot; - &quot; + message);</span>
+<span class="fc" id="L369">    }</span>
     
     /**
      * به‌روزرسانی عنوان پنجره بر اساس صفحه فعلی
@@ -371,71 +374,74 @@ public class NavigationController {
      * @param sceneName نام صفحه
      */
     private void updateWindowTitle(String sceneName) {
-<span class="nc" id="L374">        String title = &quot;Food Ordering System&quot;;</span>
+<span class="fc" id="L377">        String title = &quot;Food Ordering System&quot;;</span>
         
-<span class="nc bnc" id="L376" title="All 19 branches missed.">        switch (sceneName) {</span>
+<span class="pc bpc" id="L379" title="18 of 20 branches missed.">        switch (sceneName) {</span>
             case LOGIN_SCENE:
-<span class="nc" id="L378">                title += &quot; - ورود&quot;;</span>
-<span class="nc" id="L379">                break;</span>
+<span class="fc" id="L381">                title += &quot; - ورود&quot;;</span>
+<span class="fc" id="L382">                break;</span>
             case REGISTER_SCENE:
-<span class="nc" id="L381">                title += &quot; - ثبت نام&quot;;</span>
-<span class="nc" id="L382">                break;</span>
-            case RESTAURANT_LIST_SCENE:
-<span class="nc" id="L384">                title += &quot; - رستوران‌ها&quot;;</span>
+<span class="nc" id="L384">                title += &quot; - ثبت نام&quot;;</span>
 <span class="nc" id="L385">                break;</span>
+            case RESTAURANT_LIST_SCENE:
+<span class="fc" id="L387">                title += &quot; - رستوران‌ها&quot;;</span>
+<span class="fc" id="L388">                break;</span>
             case CART_SCENE:
-<span class="nc" id="L387">                title += &quot; - سبد خرید&quot;;</span>
-<span class="nc" id="L388">                break;</span>
-            case ORDER_HISTORY_SCENE:
-<span class="nc" id="L390">                title += &quot; - تاریخچه سفارشات&quot;;</span>
+<span class="nc" id="L390">                title += &quot; - سبد خرید&quot;;</span>
 <span class="nc" id="L391">                break;</span>
-            case PROFILE_SCENE:
-<span class="nc" id="L393">                title += &quot; - پروفایل&quot;;</span>
+            case ORDER_HISTORY_SCENE:
+<span class="nc" id="L393">                title += &quot; - تاریخچه سفارشات&quot;;</span>
 <span class="nc" id="L394">                break;</span>
-            case PAYMENT_SCENE:
-<span class="nc" id="L396">                title += &quot; - پرداخت&quot;;</span>
+            case PROFILE_SCENE:
+<span class="nc" id="L396">                title += &quot; - پروفایل&quot;;</span>
 <span class="nc" id="L397">                break;</span>
-            case WALLET_SCENE:
-<span class="nc" id="L399">                title += &quot; - کیف پول&quot;;</span>
+            case USER_PROFILE_SCENE:
+<span class="nc" id="L399">                title += &quot; - مدیریت پروفایل و تاریخچه&quot;;</span>
 <span class="nc" id="L400">                break;</span>
-            case ADMIN_DASHBOARD_SCENE:
-<span class="nc" id="L402">                title += &quot; - داشبورد مدیر&quot;;</span>
+            case PAYMENT_SCENE:
+<span class="nc" id="L402">                title += &quot; - پرداخت&quot;;</span>
 <span class="nc" id="L403">                break;</span>
-            case CREATE_RESTAURANT_SCENE:
-<span class="nc" id="L405">                title += &quot; - ایجاد رستوران&quot;;</span>
+            case WALLET_SCENE:
+<span class="nc" id="L405">                title += &quot; - کیف پول&quot;;</span>
 <span class="nc" id="L406">                break;</span>
-            case EDIT_RESTAURANT_SCENE:
-<span class="nc" id="L408">                title += &quot; - ویرایش رستوران&quot;;</span>
+            case ADMIN_DASHBOARD_SCENE:
+<span class="nc" id="L408">                title += &quot; - داشبورد مدیر&quot;;</span>
 <span class="nc" id="L409">                break;</span>
-            case ITEM_MANAGEMENT_SCENE:
-<span class="nc" id="L411">                title += &quot; - مدیریت آیتم‌ها&quot;;</span>
+            case CREATE_RESTAURANT_SCENE:
+<span class="nc" id="L411">                title += &quot; - ایجاد رستوران&quot;;</span>
 <span class="nc" id="L412">                break;</span>
-            case MENU_MANAGEMENT_SCENE:
-<span class="nc" id="L414">                title += &quot; - مدیریت منو&quot;;</span>
+            case EDIT_RESTAURANT_SCENE:
+<span class="nc" id="L414">                title += &quot; - ویرایش رستوران&quot;;</span>
 <span class="nc" id="L415">                break;</span>
-            case COURIER_AVAILABLE_SCENE:
-<span class="nc" id="L417">                title += &quot; - سفارشات موجود&quot;;</span>
+            case ITEM_MANAGEMENT_SCENE:
+<span class="nc" id="L417">                title += &quot; - مدیریت آیتم‌ها&quot;;</span>
 <span class="nc" id="L418">                break;</span>
-            case COURIER_HISTORY_SCENE:
-<span class="nc" id="L420">                title += &quot; - تاریخچه تحویل&quot;;</span>
+            case MENU_MANAGEMENT_SCENE:
+<span class="nc" id="L420">                title += &quot; - مدیریت منو&quot;;</span>
 <span class="nc" id="L421">                break;</span>
-            case VENDOR_SEARCH_SCENE:
-<span class="nc" id="L423">                title += &quot; - جستجوی فروشندگان&quot;;</span>
+            case COURIER_AVAILABLE_SCENE:
+<span class="nc" id="L423">                title += &quot; - سفارشات موجود&quot;;</span>
 <span class="nc" id="L424">                break;</span>
-            case REVIEW_SCENE:
-<span class="nc" id="L426">                title += &quot; - نظرات&quot;;</span>
+            case COURIER_HISTORY_SCENE:
+<span class="nc" id="L426">                title += &quot; - تاریخچه تحویل&quot;;</span>
 <span class="nc" id="L427">                break;</span>
-            case COUPON_VALIDATION_SCENE:
-<span class="nc" id="L429">                title += &quot; - اعتبارسنجی کد تخفیف&quot;;</span>
+            case VENDOR_SEARCH_SCENE:
+<span class="nc" id="L429">                title += &quot; - جستجوی فروشندگان&quot;;</span>
 <span class="nc" id="L430">                break;</span>
+            case REVIEW_SCENE:
+<span class="nc" id="L432">                title += &quot; - نظرات&quot;;</span>
+<span class="nc" id="L433">                break;</span>
+            case COUPON_VALIDATION_SCENE:
+<span class="nc" id="L435">                title += &quot; - اعتبارسنجی کد تخفیف&quot;;</span>
+<span class="nc" id="L436">                break;</span>
             default:
-<span class="nc" id="L432">                title += &quot; - &quot; + sceneName;</span>
+<span class="nc" id="L438">                title += &quot; - &quot; + sceneName;</span>
         }
         
-<span class="nc bnc" id="L435" title="All 2 branches missed.">        if (primaryStage != null) {</span>
-<span class="nc" id="L436">            primaryStage.setTitle(title);</span>
+<span class="pc bpc" id="L441" title="1 of 2 branches missed.">        if (primaryStage != null) {</span>
+<span class="fc" id="L442">            primaryStage.setTitle(title);</span>
         }
-<span class="nc" id="L438">    }</span>
+<span class="fc" id="L444">    }</span>
     
     /**
      * دریافت Stage اصلی
@@ -443,7 +449,7 @@ public class NavigationController {
      * @return primary stage
      */
     public Stage getPrimaryStage() {
-<span class="nc" id="L446">        return primaryStage;</span>
+<span class="fc" id="L452">        return primaryStage;</span>
     }
     
     /**
@@ -453,17 +459,17 @@ public class NavigationController {
      */
     private boolean isTestMode() {
         // بررسی property مربوط به TestFX
-<span class="nc" id="L456">        String testMode = System.getProperty(&quot;testfx.robot&quot;);</span>
-<span class="nc bnc" id="L457" title="All 2 branches missed.">        if (testMode != null) {</span>
-<span class="nc" id="L458">            return true;</span>
+<span class="fc" id="L462">        String testMode = System.getProperty(&quot;testfx.robot&quot;);</span>
+<span class="pc bpc" id="L463" title="1 of 2 branches missed.">        if (testMode != null) {</span>
+<span class="fc" id="L464">            return true;</span>
         }
         
         // بررسی وجود کلاس‌های TestFX در classpath
         try {
-<span class="nc" id="L463">            Class.forName(&quot;org.testfx.framework.junit5.ApplicationTest&quot;);</span>
-<span class="nc" id="L464">            return true;</span>
-<span class="nc" id="L465">        } catch (ClassNotFoundException e) {</span>
-<span class="nc" id="L466">            return false;</span>
+<span class="nc" id="L469">            Class.forName(&quot;org.testfx.framework.junit5.ApplicationTest&quot;);</span>
+<span class="nc" id="L470">            return true;</span>
+<span class="nc" id="L471">        } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L472">            return false;</span>
         }
     }
 }

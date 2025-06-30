@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RegisterController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">food-ordering-frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.auth</a> &gt; <span class="el_source">RegisterController.java</span></div><h1>RegisterController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.auth;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RegisterController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.auth</a> &gt; <span class="el_source">RegisterController.java</span></div><h1>RegisterController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.auth;
 
 import com.myapp.ui.common.HttpClientUtil;
 import com.myapp.ui.common.NavigationController;
@@ -33,7 +33,7 @@ import java.util.ResourceBundle;
  * @version 1.0
  * @since 2024
  */
-<span class="nc" id="L36">public class RegisterController implements Initializable {</span>
+<span class="fc" id="L36">public class RegisterController implements Initializable {</span>
 
     /** فیلد ورودی نام کامل کاربر */
     @FXML private TextField fullNameField;
@@ -80,14 +80,14 @@ import java.util.ResourceBundle;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // دریافت instance singleton NavigationController
-<span class="nc" id="L83">        this.navigationController = NavigationController.getInstance();</span>
+<span class="fc" id="L83">        this.navigationController = NavigationController.getInstance();</span>
         
         // راه‌اندازی کامپوننت‌های UI
-<span class="nc" id="L86">        setupUI();</span>
+<span class="fc" id="L86">        setupUI();</span>
         
         // پر کردن لیست نقش‌های کاربری
-<span class="nc" id="L89">        populateRoles();</span>
-<span class="nc" id="L90">    }</span>
+<span class="fc" id="L89">        populateRoles();</span>
+<span class="fc" id="L90">    }</span>
 
     /**
      * تنظیم NavigationController (مخصوص تست)
@@ -96,8 +96,8 @@ import java.util.ResourceBundle;
      * @param navigationController instance جدید NavigationController
      */
     public void setNavigationController(NavigationController navigationController) {
-<span class="nc" id="L99">        this.navigationController = navigationController;</span>
-<span class="nc" id="L100">    }</span>
+<span class="fc" id="L99">        this.navigationController = navigationController;</span>
+<span class="fc" id="L100">    }</span>
 
     /**
      * راه‌اندازی کامپوننت‌های UI و event handler ها
@@ -109,21 +109,21 @@ import java.util.ResourceBundle;
      */
     private void setupUI() {
         // فعال/غیرفعال کردن دکمه ثبت نام بر اساس پر بودن فیلدها
-<span class="nc" id="L112">        fullNameField.textProperty().addListener((obs, oldText, newText) -&gt; updateRegisterButtonState());</span>
-<span class="nc" id="L113">        phoneField.textProperty().addListener((obs, oldText, newText) -&gt; updateRegisterButtonState());</span>
-<span class="nc" id="L114">        passwordField.textProperty().addListener((obs, oldText, newText) -&gt; updateRegisterButtonState());</span>
-<span class="nc" id="L115">        confirmPasswordField.textProperty().addListener((obs, oldText, newText) -&gt; updateRegisterButtonState());</span>
-<span class="nc" id="L116">        addressField.textProperty().addListener((obs, oldText, newText) -&gt; updateRegisterButtonState());</span>
-<span class="nc" id="L117">        roleComboBox.valueProperty().addListener((obs, oldValue, newValue) -&gt; updateRegisterButtonState());</span>
+<span class="fc" id="L112">        fullNameField.textProperty().addListener((obs, oldText, newText) -&gt; updateRegisterButtonState());</span>
+<span class="fc" id="L113">        phoneField.textProperty().addListener((obs, oldText, newText) -&gt; updateRegisterButtonState());</span>
+<span class="fc" id="L114">        passwordField.textProperty().addListener((obs, oldText, newText) -&gt; updateRegisterButtonState());</span>
+<span class="fc" id="L115">        confirmPasswordField.textProperty().addListener((obs, oldText, newText) -&gt; updateRegisterButtonState());</span>
+<span class="fc" id="L116">        addressField.textProperty().addListener((obs, oldText, newText) -&gt; updateRegisterButtonState());</span>
+<span class="fc" id="L117">        roleComboBox.valueProperty().addListener((obs, oldValue, newValue) -&gt; updateRegisterButtonState());</span>
         
         // تنظیم action handler ها برای تست‌های unit (FXML runtime را پوشش می‌دهد)
-<span class="nc" id="L120">        registerButton.setOnAction(e -&gt; handleRegister());</span>
-<span class="nc" id="L121">        loginLink.setOnAction(e -&gt; handleLoginLink());</span>
+<span class="pc" id="L120">        registerButton.setOnAction(e -&gt; handleRegister());</span>
+<span class="fc" id="L121">        loginLink.setOnAction(e -&gt; handleLoginLink());</span>
         
         // تنظیم حالت اولیه
-<span class="nc" id="L124">        updateRegisterButtonState();</span>
-<span class="nc" id="L125">        clearStatus();</span>
-<span class="nc" id="L126">    }</span>
+<span class="fc" id="L124">        updateRegisterButtonState();</span>
+<span class="fc" id="L125">        clearStatus();</span>
+<span class="fc" id="L126">    }</span>
 
     /**
      * پر کردن ComboBox نقش‌های کاربری
@@ -134,9 +134,9 @@ import java.util.ResourceBundle;
      * - COURIER: پیک (تحویل‌دهنده سفارشات)
      */
     private void populateRoles() {
-<span class="nc" id="L137">        roleComboBox.getItems().addAll(&quot;BUYER&quot;, &quot;SELLER&quot;, &quot;COURIER&quot;);</span>
-<span class="nc" id="L138">        roleComboBox.setValue(&quot;BUYER&quot;); // انتخاب پیش‌فرض: خریدار</span>
-<span class="nc" id="L139">    }</span>
+<span class="fc" id="L137">        roleComboBox.getItems().addAll(&quot;BUYER&quot;, &quot;SELLER&quot;, &quot;COURIER&quot;);</span>
+<span class="fc" id="L138">        roleComboBox.setValue(&quot;BUYER&quot;); // انتخاب پیش‌فرض: خریدار</span>
+<span class="fc" id="L139">    }</span>
 
     /**
      * پردازش کلیک روی دکمه ثبت نام
@@ -312,7 +312,7 @@ import java.util.ResourceBundle;
 <span class="nc" id="L312">                new Thread(delayTask).start();</span>
 <span class="nc" id="L313">            });</span>
             
-<span class="nc" id="L315">        } else {</span>
+        } else {
             // نمایش پیام خطا دریافت شده از سرور
 <span class="nc" id="L317">            String errorMessage = response.getMessage();</span>
 <span class="nc bnc" id="L318" title="All 4 branches missed.">            if (errorMessage == null || errorMessage.isEmpty()) {</span>
@@ -349,8 +349,8 @@ import java.util.ResourceBundle;
      */
     @FXML
     public void handleLoginLink() {
-<span class="nc" id="L352">        navigationController.navigateTo(NavigationController.LOGIN_SCENE);</span>
-<span class="nc" id="L353">    }</span>
+<span class="fc" id="L352">        navigationController.navigateTo(NavigationController.LOGIN_SCENE);</span>
+<span class="fc" id="L353">    }</span>
 
     /**
      * به‌روزرسانی وضعیت دکمه ثبت نام بر اساس پر بودن فیلدها
@@ -364,14 +364,14 @@ import java.util.ResourceBundle;
      * - نقش کاربری
      */
     private void updateRegisterButtonState() {
-<span class="nc bnc" id="L367" title="All 2 branches missed.">        boolean hasInput = !fullNameField.getText().trim().isEmpty() &amp;&amp; </span>
-<span class="nc bnc" id="L368" title="All 2 branches missed.">                          !phoneField.getText().trim().isEmpty() &amp;&amp;</span>
-<span class="nc bnc" id="L369" title="All 2 branches missed.">                          !passwordField.getText().isEmpty() &amp;&amp;</span>
-<span class="nc bnc" id="L370" title="All 2 branches missed.">                          !confirmPasswordField.getText().isEmpty() &amp;&amp;</span>
-<span class="nc bnc" id="L371" title="All 2 branches missed.">                          !addressField.getText().trim().isEmpty() &amp;&amp;</span>
-<span class="nc bnc" id="L372" title="All 2 branches missed.">                          roleComboBox.getValue() != null;</span>
-<span class="nc bnc" id="L373" title="All 2 branches missed.">        registerButton.setDisable(!hasInput);</span>
-<span class="nc" id="L374">    }</span>
+<span class="fc bfc" id="L367" title="All 2 branches covered.">        boolean hasInput = !fullNameField.getText().trim().isEmpty() &amp;&amp; </span>
+<span class="fc bfc" id="L368" title="All 2 branches covered.">                          !phoneField.getText().trim().isEmpty() &amp;&amp;</span>
+<span class="fc bfc" id="L369" title="All 2 branches covered.">                          !passwordField.getText().isEmpty() &amp;&amp;</span>
+<span class="fc bfc" id="L370" title="All 2 branches covered.">                          !confirmPasswordField.getText().isEmpty() &amp;&amp;</span>
+<span class="fc bfc" id="L371" title="All 2 branches covered.">                          !addressField.getText().trim().isEmpty() &amp;&amp;</span>
+<span class="fc bfc" id="L372" title="All 2 branches covered.">                          roleComboBox.getValue() != null;</span>
+<span class="fc bfc" id="L373" title="All 2 branches covered.">        registerButton.setDisable(!hasInput);</span>
+<span class="fc" id="L374">    }</span>
 
     /**
      * تنظیم حالت loading برای UI
@@ -384,21 +384,21 @@ import java.util.ResourceBundle;
      * @param loading true برای فعال کردن loading
      */
     public void setLoading(boolean loading) {
-<span class="nc" id="L387">        loadingIndicator.setVisible(loading);</span>
-<span class="nc" id="L388">        registerButton.setDisable(loading);</span>
-<span class="nc" id="L389">        fullNameField.setDisable(loading);</span>
-<span class="nc" id="L390">        phoneField.setDisable(loading);</span>
-<span class="nc" id="L391">        emailField.setDisable(loading);</span>
-<span class="nc" id="L392">        passwordField.setDisable(loading);</span>
-<span class="nc" id="L393">        confirmPasswordField.setDisable(loading);</span>
-<span class="nc" id="L394">        addressField.setDisable(loading);</span>
-<span class="nc" id="L395">        roleComboBox.setDisable(loading);</span>
-<span class="nc" id="L396">        loginLink.setDisable(loading);</span>
+<span class="fc" id="L387">        loadingIndicator.setVisible(loading);</span>
+<span class="fc" id="L388">        registerButton.setDisable(loading);</span>
+<span class="fc" id="L389">        fullNameField.setDisable(loading);</span>
+<span class="fc" id="L390">        phoneField.setDisable(loading);</span>
+<span class="fc" id="L391">        emailField.setDisable(loading);</span>
+<span class="fc" id="L392">        passwordField.setDisable(loading);</span>
+<span class="fc" id="L393">        confirmPasswordField.setDisable(loading);</span>
+<span class="fc" id="L394">        addressField.setDisable(loading);</span>
+<span class="fc" id="L395">        roleComboBox.setDisable(loading);</span>
+<span class="fc" id="L396">        loginLink.setDisable(loading);</span>
         
-<span class="nc bnc" id="L398" title="All 2 branches missed.">        if (loading) {</span>
-<span class="nc" id="L399">            statusLabel.setText(&quot;در حال ثبت‌نام...&quot;);</span>
+<span class="fc bfc" id="L398" title="All 2 branches covered.">        if (loading) {</span>
+<span class="fc" id="L399">            statusLabel.setText(&quot;در حال ثبت‌نام...&quot;);</span>
         }
-<span class="nc" id="L401">    }</span>
+<span class="fc" id="L401">    }</span>
 
     /**
      * نمایش پیام خطا با رنگ قرمز
@@ -406,9 +406,9 @@ import java.util.ResourceBundle;
      * @param message متن پیام خطا
      */
     public void showError(String message) {
-<span class="nc" id="L409">        statusLabel.setText(message);</span>
-<span class="nc" id="L410">        statusLabel.setStyle(&quot;-fx-text-fill: red;&quot;);</span>
-<span class="nc" id="L411">    }</span>
+<span class="fc" id="L409">        statusLabel.setText(message);</span>
+<span class="fc" id="L410">        statusLabel.setStyle(&quot;-fx-text-fill: red;&quot;);</span>
+<span class="fc" id="L411">    }</span>
 
     /**
      * نمایش پیام موفقیت با رنگ سبز
@@ -416,17 +416,17 @@ import java.util.ResourceBundle;
      * @param message متن پیام موفقیت
      */
     public void showSuccess(String message) {
-<span class="nc" id="L419">        statusLabel.setText(message);</span>
-<span class="nc" id="L420">        statusLabel.setStyle(&quot;-fx-text-fill: green;&quot;);</span>
-<span class="nc" id="L421">    }</span>
+<span class="fc" id="L419">        statusLabel.setText(message);</span>
+<span class="fc" id="L420">        statusLabel.setStyle(&quot;-fx-text-fill: green;&quot;);</span>
+<span class="fc" id="L421">    }</span>
 
     /**
      * پاک کردن پیام وضعیت
      */
     public void clearStatus() {
-<span class="nc" id="L427">        statusLabel.setText(&quot;&quot;);</span>
-<span class="nc" id="L428">        statusLabel.setStyle(&quot;&quot;);</span>
-<span class="nc" id="L429">    }</span>
+<span class="fc" id="L427">        statusLabel.setText(&quot;&quot;);</span>
+<span class="fc" id="L428">        statusLabel.setStyle(&quot;&quot;);</span>
+<span class="fc" id="L429">    }</span>
 
     // ==================== PUBLIC METHODS FOR TESTING ====================
 

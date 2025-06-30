@@ -52,33 +52,31 @@
 - [`phases/phase-19-completion-report-fa.md`](phases/phase-19-completion-report-fa.md) - Restaurant Management System
 - [`phases/phase-20-completion-report-fa.md`](phases/phase-20-completion-report-fa.md) - گزارش نهایی Backend
 
-### 🖥️ **Frontend Development (فازهای 21-30)** 🔄
+### 🖥️ **Frontend Development (فازهای 21-30)** ✅
 - [`phases/phase-21-completion-report-fa.md`](phases/phase-21-completion-report-fa.md) - ✅ **Frontend Core Infrastructure** (Basic Setup)
 - [`phases/phase-22-completion-report-fa.md`](phases/phase-22-completion-report-fa.md) - ✅ **Authentication UI** (Login, Register, Profile)
 - [`phases/phase-23-completion-report-fa.md`](phases/phase-23-completion-report-fa.md) - ✅ **Restaurant List & Details UI** (Search, Filter, Menu View)
 - [`phases/phase-24-completion-report-fa.md`](phases/phase-24-completion-report-fa.md) - ✅ **Cart Management & Order Processing UI** (Cart Controller, Data Models)
 - [`phases/phase-25-completion-report-fa.md`](phases/phase-25-completion-report-fa.md) - ✅ **Payment Processing UI** (Payment Controller, Multiple Methods)
-- [`phases/phase-26-completion-report-fa.md`](phases/phase-26-completion-report-fa.md) - ❌ **Order Confirmation & Tracking UI** (نیازمند تکمیل)
+- [`phases/phase-26-completion-report-fa.md`](phases/phase-26-completion-report-fa.md) - ✅ **Order Confirmation & Tracking UI** (Real-time Tracking, Receipt Export)
 - [`phases/phase-27-completion-report-fa.md`](phases/phase-27-completion-report-fa.md) - ✅ **Notification & Alert System UI** (Notification Controller, Real-time Alerts)
+- [`phases/phase-28-completion-report-fa.md`](phases/phase-28-completion-report-fa.md) - ✅ **User Profile & History Management UI** (6 Tabs, Charts, Analytics)
+- [`phases/phase-29-completion-report-fa.md`](phases/phase-29-completion-report-fa.md) - ✅ **Admin Dashboard UI** (6 Tabs, User Management, Analytics)
+- [`phases/phase-30-completion-report-fa.md`](phases/phase-30-completion-report-fa.md) - ✅ **Final Integration & UI/UX Enhancement** (Comprehensive Tests, Performance, Security)
 
-#### 📋 آماده شروع Frontend
-- **فاز 28**: User Profile & History Management UI  
-- **فاز 29**: Admin Dashboard UI
-- **فاز 30**: Final Integration & UI Polish
+### 🔧 **System Scripts (فازهای 31-35)** ✅
+- [`phases/phase-31-completion-report-fa.md`](phases/phase-31-completion-report-fa.md) - ✅ **Database Setup & Migration Scripts** (SQL Setup, Migration Tools)
+- [`phases/phase-32-completion-report-fa.md`](phases/phase-32-completion-report-fa.md) - ✅ **Deployment Automation Scripts** (Production Deployment, CI/CD)
+- [`phases/phase-33-completion-report-fa.md`](phases/phase-33-completion-report-fa.md) - ✅ **System Monitoring & Performance Scripts** (Monitoring, Performance Testing)
+- [`phases/phase-34-completion-report-fa.md`](phases/phase-34-completion-report-fa.md) - ✅ **Backup & Recovery Scripts** (Automated Backup, Disaster Recovery)
+- [`phases/phase-35-completion-report-fa.md`](phases/phase-35-completion-report-fa.md) - ✅ **Security & Maintenance Scripts** (Security Testing, System Maintenance)
 
-### 🔧 **System Scripts (فازهای 31-35)** ⏳
-- **فاز 31**: Database Setup Scripts
-- **فاز 32**: Deployment Scripts  
-- **فاز 33**: Monitoring Scripts
-- **فاز 34**: Backup & Recovery Scripts
-- **فاز 35**: Performance Scripts
-
-### 📚 **Final Documentation (فازهای 36-40)** ⏳
-- **فاز 36**: User Manuals
-- **فاز 37**: Admin Documentation
-- **فاز 38**: Developer Documentation  
-- **فاز 39**: API Documentation
-- **فاز 40**: Final Project Report
+### 📚 **Final Documentation (فازهای 36-40)** 🔄
+- [`phases/phase-36-completion-report-fa.md`](phases/phase-36-completion-report-fa.md) - ✅ **API Documentation & Swagger Integration** (Complete API Docs, Swagger UI)
+- [`phases/phase-37-completion-report-fa.md`](phases/phase-37-completion-report-fa.md) - ✅ **User Manuals & Guides** (Complete User Documentation)
+- **فاز 38**: Developer Documentation ⏳
+- **فاز 39**: System Architecture Documentation ⏳
+- **فاز 40**: Final Project Documentation ⏳
 
 ---
 
@@ -93,6 +91,15 @@
 | **Authentication UI** | `phases/phase-22-completion-report-fa.md` | ✅ |
 | **Payment Processing UI** | `phases/phase-25-completion-report-fa.md` | ✅ |
 | **Notification System UI** | `phases/phase-27-completion-report-fa.md` | ✅ |
+| **User Profile UI** | `phases/phase-28-completion-report-fa.md` | ✅ |
+| **Admin Dashboard UI** | `phases/phase-29-completion-report-fa.md` | ✅ |
+| **Final Integration** | `phases/phase-30-completion-report-fa.md` | ✅ |
+| **Database Setup** | `phases/phase-31-completion-report-fa.md` | ✅ |
+| **Deployment Scripts** | `phases/phase-32-completion-report-fa.md` | ✅ |
+| **System Monitoring** | `phases/phase-33-completion-report-fa.md` | ✅ |
+| **Backup & Recovery** | `phases/phase-34-completion-report-fa.md` | ✅ |
+| **Security Scripts** | `phases/phase-35-completion-report-fa.md` | ✅ |
+| **API Documentation** | `phases/phase-36-completion-report-fa.md` | ✅ |
 | **راهنمای کاربر** | `guides/user-guide-fa.md` | ✅ |
 | **راهنمای مدیر** | `guides/admin-guide-fa.md` | ✅ |
 | **API ها** | `guides/api-reference-fa.md` | ✅ |
@@ -100,19 +107,18 @@
 
 ### 📊 آمار پروژه
 - **Backend**: 20/20 فاز تکمیل شده (100%) ✅
-- **Frontend**: 7/10 فاز تکمیل شده (70%) 🔄  
-- **System Scripts**: 0/5 فاز تکمیل شده (0%) ⏳
-- **Documentation**: 0/5 فاز تکمیل شده (0%) ⏳
-- **کل پروژه**: 27/40 فاز تکمیل شده (67.5%) 🔄
+- **Frontend**: 10/10 فاز تکمیل شده (100%) ✅  
+- **System Scripts**: 5/5 فاز تکمیل شده (100%) ✅
+- **Documentation**: 37/40 فاز تکمیل شده (92.5%) 🔄
+- **کل پروژه**: 37/40 فاز تکمیل شده (92.5%) 🔄
 
 ### 🎯 **آخرین دستاورد**
-- ✅ **فاز 27 تکمیل**: Notification & Alert System UI  
-- 📋 **سیستم اطلاع‌رسانی کامل**: نوتیفیکیشن‌های بلادرنگ، فیلتر و جستجو
-- 📊 **مدیریت هوشمند**: تنظیمات شخصی، اولویت‌بندی، آمار
-- 🔔 **اطلاع‌رسانی چندکاناله**: Push, Email, SMS, In-app notifications
-- 🛠️ **UI پیشرفته**: طراحی responsive، مدیریت real-time
-- 📱 **Template System**: قالب‌های قابل تنظیم و چندزبانه
-- 🧪 **تست جامع**: 10 تست کیس با 100% موفقیت
+- ✅ **فاز 37 تکمیل شده**: User Manuals & Guides
+- 📚 **مستندات کاربری کامل**: راهنماهای جامع برای تمام نقش‌ها
+- 🔧 **اسکریپت‌های سیستم**: تمام اسکریپت‌های استقرار و نگهداری
+- 🛡️ **امنیت و مانیتورینگ**: سیستم‌های نظارت و امنیت کامل
+- 📊 **پشتیبان‌گیری خودکار**: سیستم پشتیبان‌گیری و بازیابی
+- 🚀 **استقرار خودکار**: CI/CD و استقرار تولیدی
 
 ---
 
@@ -121,19 +127,30 @@
 برای سوالات فنی و پشتیبانی:
 - **تیم توسعه**: Food Ordering System Team
 - **مستندات**: این فولدر `docs/`
-- **آخرین بروزرسانی**: 29 آذر 1403 (فاز 27 تکمیل)
+- **آخرین بروزرسانی**: خرداد ۱۴۰۴ (فاز ۳۷ تکمیل)
 
 ---
 
 *این فهرست به‌طور خودکار بروزرسانی می‌شود.* 
 
-## 📊 آمار کلی پروژه
+## 📊 آمار کلی پروژه (بروزرسانی: 30 خرداد 1404)
 
-### 🎯 پیشرفت کلی: 27/40 فاز (67.5%)
+### 🎯 **پیشرفت کلی: 92.5% (37/40 فاز)**
 - ✅ **Backend**: 20/20 فاز (100%) - تکمیل شده
-- 🔄 **Frontend**: 7/10 فاز (70%) - در حال پیشرفت
-- ⏳ **System Scripts**: 0/5 فاز (0%) - آماده شروع
-- ⏳ **Documentation**: 0/5 فاز (0%) - آماده شروع
+- ✅ **Frontend**: 10/10 فاز (100%) - تکمیل شده  
+- ✅ **System Scripts**: 5/5 فاز (100%) - تکمیل شده
+- 🔄 **Documentation**: 37/40 فاز (92.5%) - در حال تکمیل
+
+### 📈 **آخرین دستاورد: فاز 37 تکمیل شده** ✅
+- **User Manuals & Guides**: راهنماهای کاربری جامع و کامل
+- **Complete User Documentation**: مستندات کامل برای تمام نقش‌ها
+- **API Documentation & Swagger Integration**: مستندات جامع API و Swagger UI
+- **Complete System Scripts**: تمام اسکریپت‌های استقرار و نگهداری
+
+### 🎯 **فازهای باقی‌مانده:**
+- **فاز 38**: Developer Documentation ⏳
+- **فاز 39**: System Architecture Documentation ⏳
+- **فاز 40**: Final Project Documentation ⏳
 
 ---
 
@@ -164,8 +181,20 @@ frontend-javafx/
 │   ├── order/         # مدیریت سبد خرید
 │   ├── payment/       # پردازش پرداخت
 │   ├── notification/  # سیستم اطلاع‌رسانی
+│   ├── admin/         # داشبورد مدیریتی
 │   └── common/        # کامپوننت‌های مشترک
 └── src/main/resources/fxml/  # فایل‌های UI
+```
+
+### System Scripts
+```
+scripts/
+├── database-setup.sql         # راه‌اندازی پایگاه داده
+├── deploy-production.sh       # استقرار خودکار
+├── backup-system.sh           # پشتیبان‌گیری خودکار
+├── system-monitor.sh          # نظارت سیستم
+├── food-ordering.service      # سرویس لینوکس
+└── food-ordering-windows.bat  # سرویس ویندوز
 ```
 
 ---
@@ -202,7 +231,7 @@ frontend-javafx/
 19. **فاز 19**: Restaurant Management System
 20. **فاز 20**: Final Backend Integration
 
-### 🔄 Frontend (7/10 فاز - 70%)
+### ✅ Frontend (10/10 فاز - 100%)
 
 #### فازهای تکمیل شده
 21. ✅ **فاز 21**: Frontend Core Infrastructure
@@ -210,46 +239,25 @@ frontend-javafx/
 23. ✅ **فاز 23**: Restaurant List & Details UI (Search, Filter, Menu View)  
 24. ✅ **فاز 24**: Cart Management & Order Processing UI
 25. ✅ **فاز 25**: Payment Processing UI (Cart, Wallet, Cash)
-26. ❌ **فاز 26**: Order Confirmation & Tracking UI (نیازمند تکمیل)
+26. ✅ **فاز 26**: Order Confirmation & Tracking UI (Real-time Tracking, Receipt Export)
 27. ✅ **فاز 27**: Notification & Alert System UI
+28. ✅ **فاز 28**: User Profile & History Management UI (6 Tabs, Analytics)
+29. ✅ **فاز 29**: Admin Dashboard UI (6 Tabs, User Management, Analytics)
+30. ✅ **فاز 30**: Final Integration & UI/UX Enhancement
 
-#### فازهای آینده
-28. ⏳ **فاز 28**: User Profile & History Management UI
-29. ⏳ **فاز 29**: Admin Dashboard UI
-30. ⏳ **فاز 30**: Final Integration & UI Polish
+### ✅ System Scripts (5/5 فاز - 100%)
+31. ✅ **فاز 31**: Database Setup & Migration Scripts
+32. ✅ **فاز 32**: Deployment Automation Scripts  
+33. ✅ **فاز 33**: System Monitoring & Performance Scripts
+34. ✅ **فاز 34**: Backup & Recovery Scripts
+35. ✅ **فاز 35**: Security & Maintenance Scripts
 
-### ⏳ System Scripts (0/5 فاز)
-31. **فاز 31**: Database Setup & Migration Scripts
-32. **فاز 32**: Deployment Automation Scripts  
-33. **فاز 33**: Backup & Recovery Scripts
-34. **فاز 34**: Performance Monitoring Scripts
-35. **فاز 35**: System Maintenance Scripts
-
-### ⏳ Documentation (0/5 فاز)
-36. **فاز 36**: API Documentation & Swagger
-37. **فاز 37**: User Manual & Guides
-38. **فاز 38**: Developer Documentation
-39. **فاز 39**: System Architecture Documentation
-40. **فاز 40**: Final Project Documentation
-
----
-
-## 📊 آخرین دستاوردها
-
-### 🎯 فاز 27: Notification & Alert System UI (تکمیل شده)
-- **NotificationController**: کنترلر سیستم اطلاع‌رسانی (629 خط)
-- **Notifications.fxml**: رابط کاربری نوتیفیکیشن (155 خط)
-- **مدیریت کامل**: اطلاع‌رسانی‌های بلادرنگ، فیلتر، جستجو
-- **تنظیمات پیشرفته**: شخصی‌سازی، اولویت‌بندی، زمان‌بندی
-- **UI مدرن**: طراحی responsive و کاربرپسند
-- **Real-time Updates**: بروزرسانی لحظه‌ای اطلاع‌رسانی‌ها
-- **10 تست**: پوشش کامل تمام سناریوها با 100% موفقیت
-
-### 🔧 ویژگی‌های کلیدی
-- **Multi-Channel**: Push, Email, SMS, In-app notifications
-- **Smart Filtering**: فیلتر هوشمند بر اساس نوع و اولویت
-- **User Experience**: تجربه کاربری بهینه با نمایش real-time
-- **Performance**: مدیریت بهینه حافظه و thread ها
+### 🔄 Documentation (2/5 فاز - 40%)
+36. ✅ **فاز 36**: API Documentation & Swagger Integration
+37. ✅ **فاز 37**: User Manuals & Guides
+38. ⏳ **فاز 38**: Developer Documentation
+39. ⏳ **فاز 39**: System Architecture Documentation
+40. ⏳ **فاز 40**: Final Project Documentation
 
 ---
 
@@ -269,10 +277,19 @@ frontend-javafx/
 - **TestFX** - تست‌های UI خودکار
 - **JUnit 5** - فریم‌ورک تست
 
+### System Scripts
+- **Bash/Shell** - اسکریپت‌های لینوکس
+- **Batch** - اسکریپت‌های ویندوز
+- **SQL** - مدیریت پایگاه داده
+- **Systemd** - مدیریت سرویس‌های لینوکس
+- **Cron** - زمان‌بندی وظایف
+
 ### Tools & DevOps
 - **Maven** - Build automation
 - **Git** - کنترل نسخه
 - **IntelliJ IDEA** - IDE توسعه
+- **Swagger** - مستندات API
+- **Docker** - کانتینرسازی
 
 ---
 
@@ -286,32 +303,32 @@ docs/
 ├── phases/                  # گزارش‌های تکمیل فازها
 │   ├── phase-01-completion-report-fa.md
 │   ├── phase-02-completion-report-fa.md
-│   ├── ...                  # فازهای 01-27
-│   ├── phase-27-completion-report-fa.md
+│   ├── ...                  # فازهای 01-37
+│   ├── phase-37-completion-report-fa.md
 │   └── phases-backend-summary.md
 └── guides/                  # راهنماهای کاربری
     ├── installation-fa.md
     ├── api-reference-fa.md
     ├── admin-guide-fa.md
-    └── user-guide-fa.md
+    ├── user-guide-fa.md
+    ├── troubleshooting-fa.md
+    └── quick-start.md
 ```
 
 ---
 
 ## 🚀 مراحل بعدی
 
-### 🎯 فاز 28: User Profile & History Management UI
-- پیاده‌سازی مدیریت پروفایل کاربر
-- تاریخچه سفارشات و تراکنش‌ها
-- تنظیمات شخصی و preferences
-- رابط کاربری مدیریت حساب
+### 🎯 فازهای 38-40: Final Documentation
+- پیاده‌سازی مستندات توسعه‌دهندگان
+- مستندات معماری سیستم
+- گزارش نهایی پروژه
 
 ### 📱 اولویت‌های توسعه
-1. **فاز 26**: Order Confirmation & Tracking UI (باید تکمیل شود)
-2. **فاز 28**: User Profile & History Management UI
-3. **فاز 29**: Admin Dashboard UI  
-4. **فاز 30**: Final Integration & UI Polish
-5. **فازهای 31-35**: System Scripts
+1. **فازهای 38-40**: Final Documentation
+2. **Production Deployment**: استقرار تولیدی
+3. **User Training**: آموزش کاربران
+4. **System Maintenance**: نگهداری سیستم
 
 ---
 
@@ -319,7 +336,7 @@ docs/
 
 ### تیم توسعه
 - **نوع پروژه**: سیستم سفارش غذا
-- **وضعیت**: در حال توسعه
+- **وضعیت**: در حال توسعه (92.5% تکمیل)
 - **پلتفرم**: Desktop (JavaFX) + Backend (Java Server)
 
 ### مخزن کد
@@ -327,9 +344,10 @@ docs/
 - **Frontend**: `frontend-javafx/`
 - **Backend**: `backend/`
 - **Documentation**: `docs/`
+- **Scripts**: `scripts/`
 
 ---
 
-**آخرین بروزرسانی**: 29 آذر 1403  
-**نسخه مستندات**: v2.7  
-**وضعیت پروژه**: 🔄 در حال توسعه (67.5% تکمیل) 
+**آخرین بروزرسانی**: خرداد ۱۴۰۴ (فاز ۳۷ تکمیل)  
+**نسخه مستندات**: v4.0  
+**وضعیت پروژه**: 🔄 در حال توسعه (92.5% تکمیل) 

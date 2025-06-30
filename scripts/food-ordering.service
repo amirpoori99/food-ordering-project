@@ -1,52 +1,56 @@
 [Unit]
-Description=Food Ordering System Backend Service
-Documentation=https://github.com/yourcompany/food-ordering-system
-After=network.target postgresql.service
-Wants=postgresql.service
-Requires=network.target
+# ================================================================
+# سیستم سفارش غذا - فایل سرویس systemd
+# این فایل سرویس backend را به عنوان سرویس سیستمی تعریف می‌کند
+# ================================================================
+Description=Food Ordering System Backend Service  # توضیحات سرویس
+Documentation=https://github.com/yourcompany/food-ordering-system  # مستندات پروژه
+After=network.target postgresql.service  # وابستگی‌ها: شبکه و دیتابیس
+Wants=postgresql.service  # سرویس مورد نیاز
+Requires=network.target  # سرویس اجباری
 
 [Service]
-Type=simple
-User=food-ordering
-Group=food-ordering
-WorkingDirectory=/opt/food-ordering
-ExecStart=/usr/bin/java -jar /opt/food-ordering/food-ordering-backend.jar --spring.profiles.active=production
-ExecReload=/bin/kill -HUP $MAINPID
-ExecStop=/bin/kill -TERM $MAINPID
+Type=simple  # نوع سرویس: ساده
+User=food-ordering  # کاربر اجراکننده سرویس
+Group=food-ordering  # گروه کاربری
+WorkingDirectory=/opt/food-ordering  # دایرکتوری کاری
+ExecStart=/usr/bin/java -jar /opt/food-ordering/food-ordering-backend.jar --spring.profiles.active=production  # دستور شروع
+ExecReload=/bin/kill -HUP $MAINPID  # دستور reload
+ExecStop=/bin/kill -TERM $MAINPID  # دستور توقف
 
-# Environment variables
-Environment=JAVA_OPTS="-Xmx2g -Xms1g -XX:+UseG1GC -XX:+UseStringDeduplication"
-Environment=SERVER_HOST=0.0.0.0
-Environment=SERVER_PORT=8081
-Environment=SPRING_PROFILES_ACTIVE=production
+# متغیرهای محیطی
+Environment=JAVA_OPTS="-Xmx2g -Xms1g -XX:+UseG1GC -XX:+UseStringDeduplication"  # تنظیمات JVM
+Environment=SERVER_HOST=0.0.0.0  # آدرس سرور
+Environment=SERVER_PORT=8081  # پورت سرور
+Environment=SPRING_PROFILES_ACTIVE=production  # پروفایل Spring
 
-# Security settings
-NoNewPrivileges=true
-PrivateTmp=true
-ProtectSystem=strict
-ProtectHome=true
-ReadWritePaths=/opt/food-ordering/logs /opt/food-ordering/uploads /tmp
+# تنظیمات امنیتی
+NoNewPrivileges=true  # عدم افزایش امتیازات
+PrivateTmp=true  # دایرکتوری موقت خصوصی
+ProtectSystem=strict  # محافظت شدید از سیستم
+ProtectHome=true  # محافظت از home directory
+ReadWritePaths=/opt/food-ordering/logs /opt/food-ordering/uploads /tmp  # مسیرهای قابل نوشتن
 
-# Resource limits
-LimitNOFILE=65536
-LimitNPROC=4096
+# محدودیت‌های منابع
+LimitNOFILE=65536  # حداکثر تعداد فایل‌های باز
+LimitNPROC=4096  # حداکثر تعداد process
 
-# Restart policy
-Restart=always
-RestartSec=30
-StartLimitInterval=350
-StartLimitBurst=10
+# سیاست restart
+Restart=always  # همیشه restart شود
+RestartSec=30  # فاصله زمانی restart
+StartLimitInterval=350  # بازه زمانی محدودیت شروع
+StartLimitBurst=10  # حداکثر تعداد restart
 
-# Logging
-StandardOutput=journal
-StandardError=journal
-SyslogIdentifier=food-ordering
+# لاگ‌گیری
+StandardOutput=journal  # خروجی استاندارد به journal
+StandardError=journal  # خطاها به journal
+SyslogIdentifier=food-ordering  # شناسه syslog
 
-# Process management
-KillMode=mixed
-KillSignal=SIGTERM
-TimeoutStartSec=60
-TimeoutStopSec=30
+# مدیریت process
+KillMode=mixed  # حالت kill
+KillSignal=SIGTERM  # سیگنال kill
+TimeoutStartSec=60  # زمان timeout شروع
+TimeoutStopSec=30  # زمان timeout توقف
 
 [Install]
-WantedBy=multi-user.target 
+WantedBy=multi-user.target  # نصب در سطح multi-user 

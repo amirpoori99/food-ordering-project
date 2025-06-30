@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrderConfirmationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">food-ordering-frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.order</a> &gt; <span class="el_source">OrderConfirmationController.java</span></div><h1>OrderConfirmationController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.order;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrderConfirmationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.order</a> &gt; <span class="el_source">OrderConfirmationController.java</span></div><h1>OrderConfirmationController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.order;
 
 import com.myapp.ui.common.NavigationController;
 import javafx.application.Platform;
@@ -17,6 +17,7 @@ import javafx.util.Duration;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 
+import java.io.File;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
@@ -48,7 +49,7 @@ import java.util.*;
  * @version 1.0
  * @since فاز 26 - Order Confirmation UI
  */
-<span class="nc" id="L51">public class OrderConfirmationController implements Initializable {</span>
+<span class="fc" id="L52">public class OrderConfirmationController implements Initializable {</span>
 
     // ===== FXML UI Components =====
     
@@ -94,10 +95,10 @@ import java.util.*;
     private NavigationController navigationController;
     
     /** فرمت کردن ارز به فارسی */
-<span class="nc" id="L97">    private final NumberFormat currencyFormat = NumberFormat.getInstance(new Locale(&quot;fa&quot;, &quot;IR&quot;));</span>
+<span class="fc" id="L98">    private final NumberFormat currencyFormat = NumberFormat.getInstance(new Locale(&quot;fa&quot;, &quot;IR&quot;));</span>
     
     /** فرمت کردن تاریخ و زمان فارسی */
-<span class="nc" id="L100">    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(&quot;yyyy/MM/dd HH:mm&quot;);</span>
+<span class="fc" id="L101">    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(&quot;yyyy/MM/dd HH:mm&quot;);</span>
     
     /** Timeline برای بروزرسانی خودکار وضعیت */
     private Timeline statusUpdateTimeline;
@@ -116,15 +117,15 @@ import java.util.*;
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-<span class="nc" id="L119">        this.navigationController = NavigationController.getInstance();</span>
-<span class="nc" id="L120">        setupUI();</span>
-<span class="nc" id="L121">        initializeTrackingSteps();</span>
-<span class="nc" id="L122">        setupAutoRefresh();</span>
-<span class="nc" id="L123">        loadOrderConfirmation();</span>
+<span class="fc" id="L120">        this.navigationController = NavigationController.getInstance();</span>
+<span class="fc" id="L121">        setupUI();</span>
+<span class="fc" id="L122">        initializeTrackingSteps();</span>
+<span class="fc" id="L123">        setupAutoRefresh();</span>
+<span class="fc" id="L124">        loadOrderConfirmation();</span>
         
-<span class="nc" id="L125">        currencyFormat.setGroupingUsed(true);</span>
-<span class="nc" id="L126">        trackingSteps = FXCollections.observableArrayList();</span>
-<span class="nc" id="L127">    }</span>
+<span class="fc" id="L126">        currencyFormat.setGroupingUsed(true);</span>
+<span class="fc" id="L127">        trackingSteps = FXCollections.observableArrayList();</span>
+<span class="fc" id="L128">    }</span>
 
     /**
      * راه‌اندازی کامپوننت‌های UI و event listener ها
@@ -136,36 +137,36 @@ import java.util.*;
      * - راه‌اندازی Progress Bar
      */
     private void setupUI() {
-<span class="nc" id="L139">        setStatus(&quot;در حال بارگذاری اطلاعات سفارش...&quot;);</span>
+<span class="fc" id="L140">        setStatus(&quot;در حال بارگذاری اطلاعات سفارش...&quot;);</span>
         
         // تنظیم listener ها برای اطلاع‌رسانی
-<span class="nc bnc" id="L142" title="All 2 branches missed.">        if (emailNotificationCheckBox != null) {</span>
-<span class="nc" id="L143">            emailNotificationCheckBox.setSelected(true);</span>
-<span class="nc" id="L144">            emailNotificationCheckBox.setOnAction(e -&gt; updateNotificationPreferences());</span>
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">        if (emailNotificationCheckBox != null) {</span>
+<span class="nc" id="L144">            emailNotificationCheckBox.setSelected(true);</span>
+<span class="nc" id="L145">            emailNotificationCheckBox.setOnAction(e -&gt; updateNotificationPreferences());</span>
         }
         
-<span class="nc bnc" id="L147" title="All 2 branches missed.">        if (smsNotificationCheckBox != null) {</span>
-<span class="nc" id="L148">            smsNotificationCheckBox.setSelected(true);</span>
-<span class="nc" id="L149">            smsNotificationCheckBox.setOnAction(e -&gt; updateNotificationPreferences());</span>
+<span class="pc bpc" id="L148" title="1 of 2 branches missed.">        if (smsNotificationCheckBox != null) {</span>
+<span class="nc" id="L149">            smsNotificationCheckBox.setSelected(true);</span>
+<span class="nc" id="L150">            smsNotificationCheckBox.setOnAction(e -&gt; updateNotificationPreferences());</span>
         }
         
         // تنظیم وضعیت اولیه دکمه‌ها
-<span class="nc bnc" id="L153" title="All 2 branches missed.">        if (cancelOrderButton != null) {</span>
-<span class="nc" id="L154">            cancelOrderButton.setDisable(false);</span>
-<span class="nc" id="L155">            cancelOrderButton.setStyle(&quot;-fx-background-color: #dc3545; -fx-text-fill: white;&quot;);</span>
+<span class="pc bpc" id="L154" title="1 of 2 branches missed.">        if (cancelOrderButton != null) {</span>
+<span class="fc" id="L155">            cancelOrderButton.setDisable(false);</span>
+<span class="fc" id="L156">            cancelOrderButton.setStyle(&quot;-fx-background-color: #dc3545; -fx-text-fill: white;&quot;);</span>
         }
         
-<span class="nc bnc" id="L158" title="All 2 branches missed.">        if (downloadReceiptButton != null) {</span>
-<span class="nc" id="L159">            downloadReceiptButton.setDisable(false);</span>
-<span class="nc" id="L160">            downloadReceiptButton.setStyle(&quot;-fx-background-color: #28a745; -fx-text-fill: white;&quot;);</span>
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">        if (downloadReceiptButton != null) {</span>
+<span class="nc" id="L160">            downloadReceiptButton.setDisable(false);</span>
+<span class="nc" id="L161">            downloadReceiptButton.setStyle(&quot;-fx-background-color: #28a745; -fx-text-fill: white;&quot;);</span>
         }
         
         // تنظیم Progress Bar
-<span class="nc bnc" id="L164" title="All 2 branches missed.">        if (orderProgressBar != null) {</span>
-<span class="nc" id="L165">            orderProgressBar.setProgress(0.0);</span>
-<span class="nc" id="L166">            orderProgressBar.setStyle(&quot;-fx-accent: #28a745;&quot;);</span>
+<span class="pc bpc" id="L165" title="1 of 2 branches missed.">        if (orderProgressBar != null) {</span>
+<span class="fc" id="L166">            orderProgressBar.setProgress(0.0);</span>
+<span class="fc" id="L167">            orderProgressBar.setStyle(&quot;-fx-accent: #28a745;&quot;);</span>
         }
-<span class="nc" id="L168">    }</span>
+<span class="fc" id="L169">    }</span>
 
     /**
      * مقداردهی اولیه مراحل پیگیری سفارش
@@ -180,59 +181,59 @@ import java.util.*;
      * 7. تکمیل شده
      */
     private void initializeTrackingSteps() {
-<span class="nc" id="L183">        trackingSteps = FXCollections.observableArrayList();</span>
+<span class="fc" id="L184">        trackingSteps = FXCollections.observableArrayList();</span>
         
-<span class="nc" id="L185">        trackingSteps.add(new TrackingStep(</span>
-<span class="nc" id="L186">            &quot;تأیید سفارش&quot;, </span>
-<span class="nc" id="L187">            &quot;سفارش شما تأیید شد و به رستوران ارسال گردید&quot;, </span>
-<span class="nc" id="L188">            LocalDateTime.now(),</span>
-<span class="nc" id="L189">            TrackingStatus.COMPLETED</span>
+<span class="fc" id="L186">        trackingSteps.add(new TrackingStep(</span>
+            &quot;تأیید سفارش&quot;, 
+            &quot;سفارش شما تأیید شد و به رستوران ارسال گردید&quot;, 
+<span class="fc" id="L189">            LocalDateTime.now(),</span>
+            TrackingStatus.COMPLETED
         ));
         
-<span class="nc" id="L192">        trackingSteps.add(new TrackingStep(</span>
-<span class="nc" id="L193">            &quot;آماده‌سازی غذا&quot;, </span>
-<span class="nc" id="L194">            &quot;رستوران در حال آماده‌سازی سفارش شما است&quot;, </span>
-<span class="nc" id="L195">            null,</span>
-<span class="nc" id="L196">            TrackingStatus.IN_PROGRESS</span>
+<span class="fc" id="L193">        trackingSteps.add(new TrackingStep(</span>
+            &quot;آماده‌سازی غذا&quot;, 
+            &quot;رستوران در حال آماده‌سازی سفارش شما است&quot;, 
+            null,
+            TrackingStatus.IN_PROGRESS
         ));
         
-<span class="nc" id="L199">        trackingSteps.add(new TrackingStep(</span>
-<span class="nc" id="L200">            &quot;آماده برای تحویل&quot;, </span>
-<span class="nc" id="L201">            &quot;غذا آماده شده و در انتظار پیک است&quot;, </span>
-<span class="nc" id="L202">            null,</span>
-<span class="nc" id="L203">            TrackingStatus.PENDING</span>
+<span class="fc" id="L200">        trackingSteps.add(new TrackingStep(</span>
+            &quot;آماده برای تحویل&quot;, 
+            &quot;غذا آماده شده و در انتظار پیک است&quot;, 
+            null,
+            TrackingStatus.PENDING
         ));
         
-<span class="nc" id="L206">        trackingSteps.add(new TrackingStep(</span>
-<span class="nc" id="L207">            &quot;در حال ارسال&quot;, </span>
-<span class="nc" id="L208">            &quot;پیک سفارش را تحویل گرفته و در مسیر شما است&quot;, </span>
-<span class="nc" id="L209">            null,</span>
-<span class="nc" id="L210">            TrackingStatus.PENDING</span>
+<span class="fc" id="L207">        trackingSteps.add(new TrackingStep(</span>
+            &quot;در حال ارسال&quot;, 
+            &quot;پیک سفارش را تحویل گرفته و در مسیر شما است&quot;, 
+            null,
+            TrackingStatus.PENDING
         ));
         
-<span class="nc" id="L213">        trackingSteps.add(new TrackingStep(</span>
-<span class="nc" id="L214">            &quot;نزدیک مقصد&quot;, </span>
-<span class="nc" id="L215">            &quot;پیک در نزدیکی آدرس شما قرار دارد&quot;, </span>
-<span class="nc" id="L216">            null,</span>
-<span class="nc" id="L217">            TrackingStatus.PENDING</span>
+<span class="fc" id="L214">        trackingSteps.add(new TrackingStep(</span>
+            &quot;نزدیک مقصد&quot;, 
+            &quot;پیک در نزدیکی آدرس شما قرار دارد&quot;, 
+            null,
+            TrackingStatus.PENDING
         ));
         
-<span class="nc" id="L220">        trackingSteps.add(new TrackingStep(</span>
-<span class="nc" id="L221">            &quot;تحویل داده شده&quot;, </span>
-<span class="nc" id="L222">            &quot;سفارش به شما تحویل داده شد&quot;, </span>
-<span class="nc" id="L223">            null,</span>
-<span class="nc" id="L224">            TrackingStatus.PENDING</span>
+<span class="fc" id="L221">        trackingSteps.add(new TrackingStep(</span>
+            &quot;تحویل داده شده&quot;, 
+            &quot;سفارش به شما تحویل داده شد&quot;, 
+            null,
+            TrackingStatus.PENDING
         ));
         
-<span class="nc" id="L227">        trackingSteps.add(new TrackingStep(</span>
-<span class="nc" id="L228">            &quot;تکمیل شده&quot;, </span>
-<span class="nc" id="L229">            &quot;سفارش با موفقیت تکمیل شد&quot;, </span>
-<span class="nc" id="L230">            null,</span>
-<span class="nc" id="L231">            TrackingStatus.PENDING</span>
+<span class="fc" id="L228">        trackingSteps.add(new TrackingStep(</span>
+            &quot;تکمیل شده&quot;, 
+            &quot;سفارش با موفقیت تکمیل شد&quot;, 
+            null,
+            TrackingStatus.PENDING
         ));
         
-<span class="nc" id="L234">        updateTrackingDisplay();</span>
-<span class="nc" id="L235">    }</span>
+<span class="fc" id="L235">        updateTrackingDisplay();</span>
+<span class="fc" id="L236">    }</span>
 
     /**
      * راه‌اندازی بروزرسانی خودکار وضعیت سفارش
@@ -241,12 +242,12 @@ import java.util.*;
      * و در صورت تغییر، نمایش را بروزرسانی می‌کند
      */
     private void setupAutoRefresh() {
-<span class="nc" id="L244">        statusUpdateTimeline = new Timeline(</span>
-<span class="nc" id="L245">            new KeyFrame(Duration.seconds(30), e -&gt; refreshOrderStatus())</span>
+<span class="fc" id="L245">        statusUpdateTimeline = new Timeline(</span>
+<span class="fc" id="L246">            new KeyFrame(Duration.seconds(30), e -&gt; refreshOrderStatus())</span>
         );
-<span class="nc" id="L247">        statusUpdateTimeline.setCycleCount(Timeline.INDEFINITE);</span>
-<span class="nc" id="L248">        statusUpdateTimeline.play();</span>
-<span class="nc" id="L249">    }</span>
+<span class="fc" id="L248">        statusUpdateTimeline.setCycleCount(Timeline.INDEFINITE);</span>
+<span class="fc" id="L249">        statusUpdateTimeline.play();</span>
+<span class="fc" id="L250">    }</span>
 
     /**
      * بارگذاری اطلاعات تأیید سفارش از سرور/حافظه
@@ -255,34 +256,34 @@ import java.util.*;
      * اطلاعات شامل جزئیات سفارش، پرداخت و تحویل
      */
     private void loadOrderConfirmation() {
-<span class="nc" id="L258">        setLoading(true);</span>
+<span class="fc" id="L259">        setLoading(true);</span>
         
-<span class="nc" id="L260">        Task&lt;OrderInfo&gt; loadTask = new Task&lt;OrderInfo&gt;() {</span>
+<span class="fc" id="L261">        Task&lt;OrderInfo&gt; loadTask = new Task&lt;OrderInfo&gt;() {</span>
             @Override
             protected OrderInfo call() throws Exception {
-<span class="nc" id="L263">                Thread.sleep(2000); // شبیه‌سازی تأخیر شبکه</span>
+<span class="fc" id="L264">                Thread.sleep(2000); // شبیه‌سازی تأخیر شبکه</span>
                 
                 // ایجاد mock order برای نمایش
-<span class="nc" id="L266">                return createMockOrder();</span>
+<span class="fc" id="L267">                return createMockOrder();</span>
             }
         };
         
-<span class="nc" id="L270">        loadTask.setOnSucceeded(e -&gt; Platform.runLater(() -&gt; {</span>
-<span class="nc" id="L271">            setLoading(false);</span>
-<span class="nc" id="L272">            currentOrder = loadTask.getValue();</span>
-<span class="nc" id="L273">            displayOrderConfirmation();</span>
-<span class="nc" id="L274">            startTrackingSimulation();</span>
-<span class="nc" id="L275">            setStatus(&quot;سفارش شما با موفقیت ثبت شد&quot;);</span>
-<span class="nc" id="L276">        }));</span>
+<span class="fc" id="L271">        loadTask.setOnSucceeded(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="fc" id="L272">            setLoading(false);</span>
+<span class="fc" id="L273">            currentOrder = loadTask.getValue();</span>
+<span class="fc" id="L274">            displayOrderConfirmation();</span>
+<span class="fc" id="L275">            startTrackingSimulation();</span>
+<span class="fc" id="L276">            setStatus(&quot;سفارش شما با موفقیت ثبت شد&quot;);</span>
+<span class="fc" id="L277">        }));</span>
         
-<span class="nc" id="L278">        loadTask.setOnFailed(e -&gt; Platform.runLater(() -&gt; {</span>
-<span class="nc" id="L279">            setLoading(false);</span>
-<span class="nc" id="L280">            setStatus(&quot;خطا در بارگذاری اطلاعات سفارش&quot;);</span>
-<span class="nc" id="L281">            showError(&quot;خطا&quot;, &quot;امکان بارگذاری اطلاعات سفارش وجود ندارد&quot;);</span>
-<span class="nc" id="L282">        }));</span>
+<span class="pc" id="L279">        loadTask.setOnFailed(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L280">            setLoading(false);</span>
+<span class="nc" id="L281">            setStatus(&quot;خطا در بارگذاری اطلاعات سفارش&quot;);</span>
+<span class="nc" id="L282">            showError(&quot;خطا&quot;, &quot;امکان بارگذاری اطلاعات سفارش وجود ندارد&quot;);</span>
+<span class="nc" id="L283">        }));</span>
         
-<span class="nc" id="L284">        new Thread(loadTask).start();</span>
-<span class="nc" id="L285">    }</span>
+<span class="fc" id="L285">        new Thread(loadTask).start();</span>
+<span class="fc" id="L286">    }</span>
 
     /**
      * ایجاد سفارش نمونه برای نمایش
@@ -290,30 +291,30 @@ import java.util.*;
      * @return OrderInfo سفارش نمونه با اطلاعات کامل
      */
     private OrderInfo createMockOrder() {
-<span class="nc" id="L293">        OrderInfo order = new OrderInfo();</span>
-<span class="nc" id="L294">        order.setOrderId(&quot;ORD-&quot; + System.currentTimeMillis());</span>
-<span class="nc" id="L295">        order.setOrderDateTime(LocalDateTime.now());</span>
-<span class="nc" id="L296">        order.setEstimatedDelivery(LocalDateTime.now().plusMinutes(45));</span>
-<span class="nc" id="L297">        order.setSubtotal(85000.0);</span>
-<span class="nc" id="L298">        order.setTax(7650.0);</span>
-<span class="nc" id="L299">        order.setDeliveryFee(0.0);</span>
-<span class="nc" id="L300">        order.setDiscount(5000.0);</span>
-<span class="nc" id="L301">        order.setTotalAmount(87650.0);</span>
-<span class="nc" id="L302">        order.setPaymentMethod(&quot;کارت اعتباری&quot;);</span>
-<span class="nc" id="L303">        order.setPaymentStatus(&quot;تأیید شده&quot;);</span>
-<span class="nc" id="L304">        order.setRestaurantName(&quot;رستوران کباب ایرانی&quot;);</span>
-<span class="nc" id="L305">        order.setRestaurantPhone(&quot;021-12345678&quot;);</span>
-<span class="nc" id="L306">        order.setDeliveryAddress(&quot;تهران، خیابان ولیعصر، پلاک 123&quot;);</span>
-<span class="nc" id="L307">        order.setCustomerPhone(&quot;09123456789&quot;);</span>
-<span class="nc" id="L308">        order.setOrderNotes(&quot;بدون پیاز، اضافه سس&quot;);</span>
+<span class="fc" id="L294">        OrderInfo order = new OrderInfo();</span>
+<span class="fc" id="L295">        order.setOrderId(&quot;ORD-&quot; + System.currentTimeMillis());</span>
+<span class="fc" id="L296">        order.setOrderDateTime(LocalDateTime.now());</span>
+<span class="fc" id="L297">        order.setEstimatedDelivery(LocalDateTime.now().plusMinutes(45));</span>
+<span class="fc" id="L298">        order.setSubtotal(85000.0);</span>
+<span class="fc" id="L299">        order.setTax(7650.0);</span>
+<span class="fc" id="L300">        order.setDeliveryFee(0.0);</span>
+<span class="fc" id="L301">        order.setDiscount(5000.0);</span>
+<span class="fc" id="L302">        order.setTotalAmount(87650.0);</span>
+<span class="fc" id="L303">        order.setPaymentMethod(&quot;کارت اعتباری&quot;);</span>
+<span class="fc" id="L304">        order.setPaymentStatus(&quot;تأیید شده&quot;);</span>
+<span class="fc" id="L305">        order.setRestaurantName(&quot;رستوران کباب ایرانی&quot;);</span>
+<span class="fc" id="L306">        order.setRestaurantPhone(&quot;021-12345678&quot;);</span>
+<span class="fc" id="L307">        order.setDeliveryAddress(&quot;تهران، خیابان ولیعصر، پلاک 123&quot;);</span>
+<span class="fc" id="L308">        order.setCustomerPhone(&quot;09123456789&quot;);</span>
+<span class="fc" id="L309">        order.setOrderNotes(&quot;بدون پیاز، اضافه سس&quot;);</span>
         
         // افزودن آیتم‌های سفارش
-<span class="nc" id="L311">        List&lt;OrderItem&gt; items = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L312">        items.add(new OrderItem(&quot;کباب کوبیده&quot;, 2, 40000.0, &quot;با برنج&quot;));</span>
-<span class="nc" id="L313">        items.add(new OrderItem(&quot;دوغ&quot;, 1, 5000.0, &quot;&quot;));</span>
-<span class="nc" id="L314">        order.setOrderItems(items);</span>
+<span class="fc" id="L312">        List&lt;OrderItem&gt; items = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L313">        items.add(new OrderItem(&quot;کباب کوبیده&quot;, 2, 40000.0, &quot;با برنج&quot;));</span>
+<span class="fc" id="L314">        items.add(new OrderItem(&quot;دوغ&quot;, 1, 5000.0, &quot;&quot;));</span>
+<span class="fc" id="L315">        order.setOrderItems(items);</span>
         
-<span class="nc" id="L316">        return order;</span>
+<span class="fc" id="L317">        return order;</span>
     }
 
     /**
@@ -326,50 +327,50 @@ import java.util.*;
      * - اطلاعات پرداخت و تحویل
      */
     private void displayOrderConfirmation() {
-<span class="nc bnc" id="L329" title="All 2 branches missed.">        if (currentOrder == null) return;</span>
+<span class="pc bpc" id="L330" title="1 of 2 branches missed.">        if (currentOrder == null) return;</span>
         
         // نمایش اطلاعات کلی
-<span class="nc bnc" id="L332" title="All 2 branches missed.">        if (orderNumberLabel != null) {</span>
-<span class="nc" id="L333">            orderNumberLabel.setText(currentOrder.getOrderId());</span>
+<span class="pc bpc" id="L333" title="1 of 2 branches missed.">        if (orderNumberLabel != null) {</span>
+<span class="nc" id="L334">            orderNumberLabel.setText(currentOrder.getOrderId());</span>
         }
         
-<span class="nc bnc" id="L336" title="All 2 branches missed.">        if (orderDateTimeLabel != null) {</span>
-<span class="nc" id="L337">            orderDateTimeLabel.setText(currentOrder.getOrderDateTime().format(dateTimeFormatter));</span>
+<span class="pc bpc" id="L337" title="1 of 2 branches missed.">        if (orderDateTimeLabel != null) {</span>
+<span class="nc" id="L338">            orderDateTimeLabel.setText(currentOrder.getOrderDateTime().format(dateTimeFormatter));</span>
         }
         
-<span class="nc bnc" id="L340" title="All 2 branches missed.">        if (estimatedDeliveryLabel != null) {</span>
-<span class="nc" id="L341">            estimatedDeliveryLabel.setText(currentOrder.getEstimatedDelivery().format(dateTimeFormatter));</span>
+<span class="pc bpc" id="L341" title="1 of 2 branches missed.">        if (estimatedDeliveryLabel != null) {</span>
+<span class="nc" id="L342">            estimatedDeliveryLabel.setText(currentOrder.getEstimatedDelivery().format(dateTimeFormatter));</span>
         }
         
         // نمایش آیتم‌های سفارش
-<span class="nc" id="L345">        displayOrderItems();</span>
+<span class="fc" id="L346">        displayOrderItems();</span>
         
         // نمایش اطلاعات مالی
-<span class="nc" id="L348">        displayOrderSummary();</span>
+<span class="fc" id="L349">        displayOrderSummary();</span>
         
         // نمایش اطلاعات پرداخت
-<span class="nc" id="L351">        displayPaymentInfo();</span>
+<span class="fc" id="L352">        displayPaymentInfo();</span>
         
         // نمایش اطلاعات تحویل
-<span class="nc" id="L354">        displayDeliveryInfo();</span>
+<span class="fc" id="L355">        displayDeliveryInfo();</span>
         
         // نمایش اطلاعات رستوران
-<span class="nc" id="L357">        displayRestaurantInfo();</span>
-<span class="nc" id="L358">    }</span>
+<span class="fc" id="L358">        displayRestaurantInfo();</span>
+<span class="fc" id="L359">    }</span>
 
     /**
      * نمایش لیست آیتم‌های سفارش
      */
     private void displayOrderItems() {
-<span class="nc bnc" id="L364" title="All 4 branches missed.">        if (orderItemsContainer == null || currentOrder.getOrderItems() == null) return;</span>
+<span class="pc bpc" id="L365" title="3 of 4 branches missed.">        if (orderItemsContainer == null || currentOrder.getOrderItems() == null) return;</span>
         
-<span class="nc" id="L366">        orderItemsContainer.getChildren().clear();</span>
+<span class="nc" id="L367">        orderItemsContainer.getChildren().clear();</span>
         
-<span class="nc bnc" id="L368" title="All 2 branches missed.">        for (OrderItem item : currentOrder.getOrderItems()) {</span>
-<span class="nc" id="L369">            VBox itemBox = createOrderItemUI(item);</span>
-<span class="nc" id="L370">            orderItemsContainer.getChildren().add(itemBox);</span>
-        }
-<span class="nc" id="L372">    }</span>
+<span class="nc bnc" id="L369" title="All 2 branches missed.">        for (OrderItem item : currentOrder.getOrderItems()) {</span>
+<span class="nc" id="L370">            VBox itemBox = createOrderItemUI(item);</span>
+<span class="nc" id="L371">            orderItemsContainer.getChildren().add(itemBox);</span>
+<span class="nc" id="L372">        }</span>
+<span class="nc" id="L373">    }</span>
 
     /**
      * ایجاد UI برای نمایش یک آیتم سفارش
@@ -378,132 +379,132 @@ import java.util.*;
      * @return VBox حاوی UI آیتم
      */
     private VBox createOrderItemUI(OrderItem item) {
-<span class="nc" id="L381">        VBox itemBox = new VBox(5);</span>
-<span class="nc" id="L382">        itemBox.setPadding(new Insets(10));</span>
-<span class="nc" id="L383">        itemBox.setStyle(&quot;-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 5;&quot;);</span>
+<span class="nc" id="L382">        VBox itemBox = new VBox(5);</span>
+<span class="nc" id="L383">        itemBox.setPadding(new Insets(10));</span>
+<span class="nc" id="L384">        itemBox.setStyle(&quot;-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 5;&quot;);</span>
         
-<span class="nc" id="L385">        HBox headerBox = new HBox(10);</span>
-<span class="nc" id="L386">        headerBox.setStyle(&quot;-fx-alignment: center-left;&quot;);</span>
+<span class="nc" id="L386">        HBox headerBox = new HBox(10);</span>
+<span class="nc" id="L387">        headerBox.setStyle(&quot;-fx-alignment: center-left;&quot;);</span>
         
-<span class="nc" id="L388">        Label nameLabel = new Label(item.getItemName());</span>
-<span class="nc" id="L389">        nameLabel.setFont(Font.font(&quot;System&quot;, FontWeight.BOLD, 14));</span>
+<span class="nc" id="L389">        Label nameLabel = new Label(item.getItemName());</span>
+<span class="nc" id="L390">        nameLabel.setFont(Font.font(&quot;System&quot;, FontWeight.BOLD, 14));</span>
         
-<span class="nc" id="L391">        Label quantityLabel = new Label(&quot;× &quot; + item.getQuantity());</span>
-<span class="nc" id="L392">        quantityLabel.setStyle(&quot;-fx-text-fill: #6c757d;&quot;);</span>
+<span class="nc" id="L392">        Label quantityLabel = new Label(&quot;× &quot; + item.getQuantity());</span>
+<span class="nc" id="L393">        quantityLabel.setStyle(&quot;-fx-text-fill: #6c757d;&quot;);</span>
         
-<span class="nc" id="L394">        Label priceLabel = new Label(formatCurrency(item.getTotalPrice()) + &quot; تومان&quot;);</span>
-<span class="nc" id="L395">        priceLabel.setStyle(&quot;-fx-text-fill: #28a745; -fx-font-weight: bold;&quot;);</span>
+<span class="nc" id="L395">        Label priceLabel = new Label(formatCurrency(item.getTotalPrice()) + &quot; تومان&quot;);</span>
+<span class="nc" id="L396">        priceLabel.setStyle(&quot;-fx-text-fill: #28a745; -fx-font-weight: bold;&quot;);</span>
         
-<span class="nc" id="L397">        headerBox.getChildren().addAll(nameLabel, quantityLabel);</span>
+<span class="nc" id="L398">        headerBox.getChildren().addAll(nameLabel, quantityLabel);</span>
         
-<span class="nc" id="L399">        HBox detailBox = new HBox(10);</span>
-<span class="nc" id="L400">        detailBox.setStyle(&quot;-fx-alignment: center-left;&quot;);</span>
+<span class="nc" id="L400">        HBox detailBox = new HBox(10);</span>
+<span class="nc" id="L401">        detailBox.setStyle(&quot;-fx-alignment: center-left;&quot;);</span>
         
-<span class="nc bnc" id="L402" title="All 4 branches missed.">        if (item.getSpecialInstructions() != null &amp;&amp; !item.getSpecialInstructions().trim().isEmpty()) {</span>
-<span class="nc" id="L403">            Label instructionsLabel = new Label(&quot;نکته: &quot; + item.getSpecialInstructions());</span>
-<span class="nc" id="L404">            instructionsLabel.setStyle(&quot;-fx-text-fill: #6c757d; -fx-font-size: 12px;&quot;);</span>
-<span class="nc" id="L405">            detailBox.getChildren().add(instructionsLabel);</span>
+<span class="nc bnc" id="L403" title="All 4 branches missed.">        if (item.getSpecialInstructions() != null &amp;&amp; !item.getSpecialInstructions().trim().isEmpty()) {</span>
+<span class="nc" id="L404">            Label instructionsLabel = new Label(&quot;نکته: &quot; + item.getSpecialInstructions());</span>
+<span class="nc" id="L405">            instructionsLabel.setStyle(&quot;-fx-text-fill: #6c757d; -fx-font-size: 12px;&quot;);</span>
+<span class="nc" id="L406">            detailBox.getChildren().add(instructionsLabel);</span>
         }
         
-<span class="nc" id="L408">        detailBox.getChildren().add(priceLabel);</span>
+<span class="nc" id="L409">        detailBox.getChildren().add(priceLabel);</span>
         
-<span class="nc" id="L410">        itemBox.getChildren().addAll(headerBox, detailBox);</span>
-<span class="nc" id="L411">        return itemBox;</span>
+<span class="nc" id="L411">        itemBox.getChildren().addAll(headerBox, detailBox);</span>
+<span class="nc" id="L412">        return itemBox;</span>
     }
 
     /**
      * نمایش خلاصه مالی سفارش
      */
     private void displayOrderSummary() {
-<span class="nc bnc" id="L418" title="All 2 branches missed.">        if (subtotalLabel != null) {</span>
-<span class="nc" id="L419">            subtotalLabel.setText(formatCurrency(currentOrder.getSubtotal()) + &quot; تومان&quot;);</span>
+<span class="pc bpc" id="L419" title="1 of 2 branches missed.">        if (subtotalLabel != null) {</span>
+<span class="nc" id="L420">            subtotalLabel.setText(formatCurrency(currentOrder.getSubtotal()) + &quot; تومان&quot;);</span>
         }
         
-<span class="nc bnc" id="L422" title="All 2 branches missed.">        if (taxLabel != null) {</span>
-<span class="nc" id="L423">            taxLabel.setText(formatCurrency(currentOrder.getTax()) + &quot; تومان&quot;);</span>
+<span class="pc bpc" id="L423" title="1 of 2 branches missed.">        if (taxLabel != null) {</span>
+<span class="nc" id="L424">            taxLabel.setText(formatCurrency(currentOrder.getTax()) + &quot; تومان&quot;);</span>
         }
         
-<span class="nc bnc" id="L426" title="All 2 branches missed.">        if (deliveryFeeLabel != null) {</span>
-<span class="nc bnc" id="L427" title="All 2 branches missed.">            String deliveryText = currentOrder.getDeliveryFee() == 0 ? &quot;رایگان&quot; : </span>
-<span class="nc" id="L428">                                 formatCurrency(currentOrder.getDeliveryFee()) + &quot; تومان&quot;;</span>
-<span class="nc" id="L429">            deliveryFeeLabel.setText(deliveryText);</span>
+<span class="pc bpc" id="L427" title="1 of 2 branches missed.">        if (deliveryFeeLabel != null) {</span>
+<span class="nc bnc" id="L428" title="All 2 branches missed.">            String deliveryText = currentOrder.getDeliveryFee() == 0 ? &quot;رایگان&quot; : </span>
+<span class="nc" id="L429">                                 formatCurrency(currentOrder.getDeliveryFee()) + &quot; تومان&quot;;</span>
+<span class="nc" id="L430">            deliveryFeeLabel.setText(deliveryText);</span>
         }
         
-<span class="nc bnc" id="L432" title="All 2 branches missed.">        if (discountLabel != null) {</span>
-<span class="nc bnc" id="L433" title="All 2 branches missed.">            String discountText = currentOrder.getDiscount() == 0 ? &quot;ندارد&quot; :</span>
-<span class="nc" id="L434">                                 &quot;- &quot; + formatCurrency(currentOrder.getDiscount()) + &quot; تومان&quot;;</span>
-<span class="nc" id="L435">            discountLabel.setText(discountText);</span>
+<span class="pc bpc" id="L433" title="1 of 2 branches missed.">        if (discountLabel != null) {</span>
+<span class="nc bnc" id="L434" title="All 2 branches missed.">            String discountText = currentOrder.getDiscount() == 0 ? &quot;ندارد&quot; :</span>
+<span class="nc" id="L435">                                 &quot;- &quot; + formatCurrency(currentOrder.getDiscount()) + &quot; تومان&quot;;</span>
+<span class="nc" id="L436">            discountLabel.setText(discountText);</span>
         }
         
-<span class="nc bnc" id="L438" title="All 2 branches missed.">        if (totalAmountLabel != null) {</span>
-<span class="nc" id="L439">            totalAmountLabel.setText(formatCurrency(currentOrder.getTotalAmount()) + &quot; تومان&quot;);</span>
-<span class="nc" id="L440">            totalAmountLabel.setStyle(&quot;-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #28a745;&quot;);</span>
+<span class="pc bpc" id="L439" title="1 of 2 branches missed.">        if (totalAmountLabel != null) {</span>
+<span class="nc" id="L440">            totalAmountLabel.setText(formatCurrency(currentOrder.getTotalAmount()) + &quot; تومان&quot;);</span>
+<span class="nc" id="L441">            totalAmountLabel.setStyle(&quot;-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #28a745;&quot;);</span>
         }
-<span class="nc" id="L442">    }</span>
+<span class="fc" id="L443">    }</span>
 
     /**
      * نمایش اطلاعات پرداخت
      */
     private void displayPaymentInfo() {
-<span class="nc bnc" id="L448" title="All 2 branches missed.">        if (paymentMethodLabel != null) {</span>
-<span class="nc" id="L449">            paymentMethodLabel.setText(currentOrder.getPaymentMethod());</span>
+<span class="pc bpc" id="L449" title="1 of 2 branches missed.">        if (paymentMethodLabel != null) {</span>
+<span class="nc" id="L450">            paymentMethodLabel.setText(currentOrder.getPaymentMethod());</span>
         }
         
-<span class="nc bnc" id="L452" title="All 2 branches missed.">        if (paymentStatusLabel != null) {</span>
-<span class="nc" id="L453">            paymentStatusLabel.setText(currentOrder.getPaymentStatus());</span>
-<span class="nc" id="L454">            paymentStatusLabel.setStyle(&quot;-fx-text-fill: #28a745; -fx-font-weight: bold;&quot;);</span>
+<span class="pc bpc" id="L453" title="1 of 2 branches missed.">        if (paymentStatusLabel != null) {</span>
+<span class="nc" id="L454">            paymentStatusLabel.setText(currentOrder.getPaymentStatus());</span>
+<span class="nc" id="L455">            paymentStatusLabel.setStyle(&quot;-fx-text-fill: #28a745; -fx-font-weight: bold;&quot;);</span>
         }
-<span class="nc" id="L456">    }</span>
+<span class="fc" id="L457">    }</span>
 
     /**
      * نمایش اطلاعات تحویل
      */
     private void displayDeliveryInfo() {
-<span class="nc bnc" id="L462" title="All 2 branches missed.">        if (deliveryAddressDisplay != null) {</span>
-<span class="nc" id="L463">            deliveryAddressDisplay.setText(currentOrder.getDeliveryAddress());</span>
-<span class="nc" id="L464">            deliveryAddressDisplay.setEditable(false);</span>
+<span class="pc bpc" id="L463" title="1 of 2 branches missed.">        if (deliveryAddressDisplay != null) {</span>
+<span class="nc" id="L464">            deliveryAddressDisplay.setText(currentOrder.getDeliveryAddress());</span>
+<span class="nc" id="L465">            deliveryAddressDisplay.setEditable(false);</span>
         }
         
-<span class="nc bnc" id="L467" title="All 2 branches missed.">        if (customerPhoneDisplay != null) {</span>
-<span class="nc" id="L468">            customerPhoneDisplay.setText(currentOrder.getCustomerPhone());</span>
-<span class="nc" id="L469">            customerPhoneDisplay.setEditable(false);</span>
+<span class="pc bpc" id="L468" title="1 of 2 branches missed.">        if (customerPhoneDisplay != null) {</span>
+<span class="nc" id="L469">            customerPhoneDisplay.setText(currentOrder.getCustomerPhone());</span>
+<span class="nc" id="L470">            customerPhoneDisplay.setEditable(false);</span>
         }
         
-<span class="nc bnc" id="L472" title="All 2 branches missed.">        if (orderNotesDisplay != null) {</span>
-<span class="nc" id="L473">            orderNotesDisplay.setText(currentOrder.getOrderNotes());</span>
-<span class="nc" id="L474">            orderNotesDisplay.setEditable(false);</span>
+<span class="pc bpc" id="L473" title="1 of 2 branches missed.">        if (orderNotesDisplay != null) {</span>
+<span class="nc" id="L474">            orderNotesDisplay.setText(currentOrder.getOrderNotes());</span>
+<span class="nc" id="L475">            orderNotesDisplay.setEditable(false);</span>
         }
-<span class="nc" id="L476">    }</span>
+<span class="fc" id="L477">    }</span>
 
     /**
      * نمایش اطلاعات رستوران
      */
     private void displayRestaurantInfo() {
-<span class="nc bnc" id="L482" title="All 2 branches missed.">        if (restaurantNameLabel != null) {</span>
-<span class="nc" id="L483">            restaurantNameLabel.setText(currentOrder.getRestaurantName());</span>
+<span class="pc bpc" id="L483" title="1 of 2 branches missed.">        if (restaurantNameLabel != null) {</span>
+<span class="nc" id="L484">            restaurantNameLabel.setText(currentOrder.getRestaurantName());</span>
         }
         
-<span class="nc bnc" id="L486" title="All 2 branches missed.">        if (restaurantPhoneLabel != null) {</span>
-<span class="nc" id="L487">            restaurantPhoneLabel.setText(currentOrder.getRestaurantPhone());</span>
+<span class="pc bpc" id="L487" title="1 of 2 branches missed.">        if (restaurantPhoneLabel != null) {</span>
+<span class="nc" id="L488">            restaurantPhoneLabel.setText(currentOrder.getRestaurantPhone());</span>
         }
-<span class="nc" id="L489">    }</span>
+<span class="fc" id="L490">    }</span>
 
     /**
      * نمایش مراحل پیگیری سفارش
      */
     private void updateTrackingDisplay() {
-<span class="nc bnc" id="L495" title="All 2 branches missed.">        if (trackingStepsContainer == null) return;</span>
+<span class="pc bpc" id="L496" title="1 of 2 branches missed.">        if (trackingStepsContainer == null) return;</span>
         
-<span class="nc" id="L497">        trackingStepsContainer.getChildren().clear();</span>
+<span class="nc" id="L498">        trackingStepsContainer.getChildren().clear();</span>
         
-<span class="nc bnc" id="L499" title="All 2 branches missed.">        for (int i = 0; i &lt; trackingSteps.size(); i++) {</span>
-<span class="nc" id="L500">            TrackingStep step = trackingSteps.get(i);</span>
-<span class="nc" id="L501">            VBox stepBox = createTrackingStepUI(step, i + 1);</span>
-<span class="nc" id="L502">            trackingStepsContainer.getChildren().add(stepBox);</span>
+<span class="nc bnc" id="L500" title="All 2 branches missed.">        for (int i = 0; i &lt; trackingSteps.size(); i++) {</span>
+<span class="nc" id="L501">            TrackingStep step = trackingSteps.get(i);</span>
+<span class="nc" id="L502">            VBox stepBox = createTrackingStepUI(step, i + 1);</span>
+<span class="nc" id="L503">            trackingStepsContainer.getChildren().add(stepBox);</span>
         }
         
-<span class="nc" id="L505">        updateProgressBar();</span>
-<span class="nc" id="L506">    }</span>
+<span class="nc" id="L506">        updateProgressBar();</span>
+<span class="nc" id="L507">    }</span>
 
     /**
      * ایجاد UI برای نمایش یک مرحله پیگیری
@@ -513,73 +514,73 @@ import java.util.*;
      * @return VBox حاوی UI مرحله
      */
     private VBox createTrackingStepUI(TrackingStep step, int stepNumber) {
-<span class="nc" id="L516">        VBox stepBox = new VBox(5);</span>
-<span class="nc" id="L517">        stepBox.setPadding(new Insets(10));</span>
+<span class="nc" id="L517">        VBox stepBox = new VBox(5);</span>
+<span class="nc" id="L518">        stepBox.setPadding(new Insets(10));</span>
         
-<span class="nc" id="L519">        HBox headerBox = new HBox(10);</span>
-<span class="nc" id="L520">        headerBox.setStyle(&quot;-fx-alignment: center-right;&quot;);</span>
+<span class="nc" id="L520">        HBox headerBox = new HBox(10);</span>
+<span class="nc" id="L521">        headerBox.setStyle(&quot;-fx-alignment: center-right;&quot;);</span>
         
         // آیکون وضعیت
-<span class="nc" id="L523">        Label statusIcon = new Label();</span>
-<span class="nc bnc" id="L524" title="All 4 branches missed.">        switch (step.getStatus()) {</span>
+<span class="nc" id="L524">        Label statusIcon = new Label();</span>
+<span class="nc bnc" id="L525" title="All 4 branches missed.">        switch (step.getStatus()) {</span>
             case COMPLETED:
-<span class="nc" id="L526">                statusIcon.setText(&quot;✓&quot;);</span>
-<span class="nc" id="L527">                statusIcon.setStyle(&quot;-fx-text-fill: #28a745; -fx-font-size: 16px; -fx-font-weight: bold;&quot;);</span>
-<span class="nc" id="L528">                stepBox.setStyle(&quot;-fx-background-color: #d4edda; -fx-border-color: #28a745; -fx-border-radius: 5;&quot;);</span>
-<span class="nc" id="L529">                break;</span>
+<span class="nc" id="L527">                statusIcon.setText(&quot;✓&quot;);</span>
+<span class="nc" id="L528">                statusIcon.setStyle(&quot;-fx-text-fill: #28a745; -fx-font-size: 16px; -fx-font-weight: bold;&quot;);</span>
+<span class="nc" id="L529">                stepBox.setStyle(&quot;-fx-background-color: #d4edda; -fx-border-color: #28a745; -fx-border-radius: 5;&quot;);</span>
+<span class="nc" id="L530">                break;</span>
             case IN_PROGRESS:
-<span class="nc" id="L531">                statusIcon.setText(&quot;●&quot;);</span>
-<span class="nc" id="L532">                statusIcon.setStyle(&quot;-fx-text-fill: #ffc107; -fx-font-size: 16px;&quot;);</span>
-<span class="nc" id="L533">                stepBox.setStyle(&quot;-fx-background-color: #fff3cd; -fx-border-color: #ffc107; -fx-border-radius: 5;&quot;);</span>
-<span class="nc" id="L534">                break;</span>
+<span class="nc" id="L532">                statusIcon.setText(&quot;●&quot;);</span>
+<span class="nc" id="L533">                statusIcon.setStyle(&quot;-fx-text-fill: #ffc107; -fx-font-size: 16px;&quot;);</span>
+<span class="nc" id="L534">                stepBox.setStyle(&quot;-fx-background-color: #fff3cd; -fx-border-color: #ffc107; -fx-border-radius: 5;&quot;);</span>
+<span class="nc" id="L535">                break;</span>
             case PENDING:
-<span class="nc" id="L536">                statusIcon.setText(&quot;○&quot;);</span>
-<span class="nc" id="L537">                statusIcon.setStyle(&quot;-fx-text-fill: #6c757d; -fx-font-size: 16px;&quot;);</span>
-<span class="nc" id="L538">                stepBox.setStyle(&quot;-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 5;&quot;);</span>
+<span class="nc" id="L537">                statusIcon.setText(&quot;○&quot;);</span>
+<span class="nc" id="L538">                statusIcon.setStyle(&quot;-fx-text-fill: #6c757d; -fx-font-size: 16px;&quot;);</span>
+<span class="nc" id="L539">                stepBox.setStyle(&quot;-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 5;&quot;);</span>
                 break;
         }
         
-<span class="nc" id="L542">        Label stepLabel = new Label(stepNumber + &quot;. &quot; + step.getTitle());</span>
-<span class="nc" id="L543">        stepLabel.setFont(Font.font(&quot;System&quot;, FontWeight.BOLD, 12));</span>
+<span class="nc" id="L543">        Label stepLabel = new Label(stepNumber + &quot;. &quot; + step.getTitle());</span>
+<span class="nc" id="L544">        stepLabel.setFont(Font.font(&quot;System&quot;, FontWeight.BOLD, 12));</span>
         
-<span class="nc" id="L545">        Label timeLabel = new Label();</span>
-<span class="nc bnc" id="L546" title="All 2 branches missed.">        if (step.getCompletedAt() != null) {</span>
-<span class="nc" id="L547">            timeLabel.setText(step.getCompletedAt().format(dateTimeFormatter));</span>
-<span class="nc" id="L548">            timeLabel.setStyle(&quot;-fx-text-fill: #6c757d; -fx-font-size: 10px;&quot;);</span>
+<span class="nc" id="L546">        Label timeLabel = new Label();</span>
+<span class="nc bnc" id="L547" title="All 2 branches missed.">        if (step.getCompletedAt() != null) {</span>
+<span class="nc" id="L548">            timeLabel.setText(step.getCompletedAt().format(dateTimeFormatter));</span>
+<span class="nc" id="L549">            timeLabel.setStyle(&quot;-fx-text-fill: #6c757d; -fx-font-size: 10px;&quot;);</span>
         }
         
-<span class="nc" id="L551">        headerBox.getChildren().addAll(timeLabel, stepLabel, statusIcon);</span>
+<span class="nc" id="L552">        headerBox.getChildren().addAll(timeLabel, stepLabel, statusIcon);</span>
         
-<span class="nc" id="L553">        Label descLabel = new Label(step.getDescription());</span>
-<span class="nc" id="L554">        descLabel.setStyle(&quot;-fx-text-fill: #6c757d; -fx-font-size: 11px;&quot;);</span>
-<span class="nc" id="L555">        descLabel.setWrapText(true);</span>
+<span class="nc" id="L554">        Label descLabel = new Label(step.getDescription());</span>
+<span class="nc" id="L555">        descLabel.setStyle(&quot;-fx-text-fill: #6c757d; -fx-font-size: 11px;&quot;);</span>
+<span class="nc" id="L556">        descLabel.setWrapText(true);</span>
         
-<span class="nc" id="L557">        stepBox.getChildren().addAll(headerBox, descLabel);</span>
-<span class="nc" id="L558">        return stepBox;</span>
+<span class="nc" id="L558">        stepBox.getChildren().addAll(headerBox, descLabel);</span>
+<span class="nc" id="L559">        return stepBox;</span>
     }
 
     /**
      * بروزرسانی Progress Bar بر اساس مراحل تکمیل شده
      */
     private void updateProgressBar() {
-<span class="nc bnc" id="L565" title="All 2 branches missed.">        if (orderProgressBar == null) return;</span>
+<span class="nc bnc" id="L566" title="All 2 branches missed.">        if (orderProgressBar == null) return;</span>
         
-<span class="nc" id="L567">        long completedSteps = trackingSteps.stream()</span>
-<span class="nc bnc" id="L568" title="All 2 branches missed.">                                          .mapToLong(step -&gt; step.getStatus() == TrackingStatus.COMPLETED ? 1 : 0)</span>
-<span class="nc" id="L569">                                          .sum();</span>
+<span class="nc" id="L568">        long completedSteps = trackingSteps.stream()</span>
+<span class="nc bnc" id="L569" title="All 2 branches missed.">                                          .mapToLong(step -&gt; step.getStatus() == TrackingStatus.COMPLETED ? 1 : 0)</span>
+<span class="nc" id="L570">                                          .sum();</span>
         
-<span class="nc" id="L571">        double progress = (double) completedSteps / trackingSteps.size();</span>
-<span class="nc" id="L572">        orderProgressBar.setProgress(progress);</span>
+<span class="nc" id="L572">        double progress = (double) completedSteps / trackingSteps.size();</span>
+<span class="nc" id="L573">        orderProgressBar.setProgress(progress);</span>
         
-<span class="nc bnc" id="L574" title="All 2 branches missed.">        if (currentStatusLabel != null) {</span>
-<span class="nc" id="L575">            TrackingStep currentStep = trackingSteps.stream()</span>
-<span class="nc bnc" id="L576" title="All 2 branches missed.">                                                  .filter(step -&gt; step.getStatus() == TrackingStatus.IN_PROGRESS)</span>
-<span class="nc" id="L577">                                                  .findFirst()</span>
-<span class="nc" id="L578">                                                  .orElse(trackingSteps.get(trackingSteps.size() - 1));</span>
+<span class="nc bnc" id="L575" title="All 2 branches missed.">        if (currentStatusLabel != null) {</span>
+<span class="nc" id="L576">            TrackingStep currentStep = trackingSteps.stream()</span>
+<span class="nc bnc" id="L577" title="All 2 branches missed.">                                                  .filter(step -&gt; step.getStatus() == TrackingStatus.IN_PROGRESS)</span>
+<span class="nc" id="L578">                                                  .findFirst()</span>
+<span class="nc" id="L579">                                                  .orElse(trackingSteps.get(trackingSteps.size() - 1));</span>
             
-<span class="nc" id="L580">            currentStatusLabel.setText(&quot;وضعیت فعلی: &quot; + currentStep.getTitle());</span>
+<span class="nc" id="L581">            currentStatusLabel.setText(&quot;وضعیت فعلی: &quot; + currentStep.getTitle());</span>
         }
-<span class="nc" id="L582">    }</span>
+<span class="nc" id="L583">    }</span>
 
     /**
      * شبیه‌سازی پیشرفت مراحل سفارش
@@ -587,213 +588,740 @@ import java.util.*;
      * هر 15 ثانیه یک مرحله جدید تکمیل می‌شود
      */
     private void startTrackingSimulation() {
-<span class="nc" id="L590">        Timeline simulation = new Timeline();</span>
+<span class="fc" id="L591">        Timeline simulation = new Timeline();</span>
         
-<span class="nc bnc" id="L592" title="All 2 branches missed.">        for (int i = 1; i &lt; trackingSteps.size(); i++) {</span>
-<span class="nc" id="L593">            final int stepIndex = i;</span>
-<span class="nc" id="L594">            KeyFrame frame = new KeyFrame(</span>
-<span class="nc" id="L595">                Duration.seconds(15 * i),</span>
-<span class="nc" id="L596">                e -&gt; {</span>
-<span class="nc" id="L597">                    TrackingStep step = trackingSteps.get(stepIndex);</span>
-<span class="nc" id="L598">                    step.setStatus(TrackingStatus.IN_PROGRESS);</span>
-<span class="nc" id="L599">                    step.setCompletedAt(LocalDateTime.now());</span>
+<span class="pc bpc" id="L593" title="1 of 2 branches missed.">        for (int i = 1; i &lt; trackingSteps.size(); i++) {</span>
+<span class="nc" id="L594">            final int stepIndex = i;</span>
+<span class="nc" id="L595">            KeyFrame frame = new KeyFrame(</span>
+<span class="nc" id="L596">                Duration.seconds(15 * i),</span>
+                e -&gt; {
+<span class="nc" id="L598">                    TrackingStep step = trackingSteps.get(stepIndex);</span>
+<span class="nc" id="L599">                    step.setStatus(TrackingStatus.IN_PROGRESS);</span>
+<span class="nc" id="L600">                    step.setCompletedAt(LocalDateTime.now());</span>
                     
-<span class="nc bnc" id="L601" title="All 2 branches missed.">                    if (stepIndex &gt; 1) {</span>
-<span class="nc" id="L602">                        trackingSteps.get(stepIndex - 1).setStatus(TrackingStatus.COMPLETED);</span>
+<span class="nc bnc" id="L602" title="All 2 branches missed.">                    if (stepIndex &gt; 1) {</span>
+<span class="nc" id="L603">                        trackingSteps.get(stepIndex - 1).setStatus(TrackingStatus.COMPLETED);</span>
                     }
                     
-<span class="nc" id="L605">                    Platform.runLater(() -&gt; {</span>
-<span class="nc" id="L606">                        updateTrackingDisplay();</span>
-<span class="nc bnc" id="L607" title="All 2 branches missed.">                        if (stepIndex == trackingSteps.size() - 1) {</span>
-<span class="nc" id="L608">                            step.setStatus(TrackingStatus.COMPLETED);</span>
-<span class="nc" id="L609">                            updateTrackingDisplay();</span>
-<span class="nc" id="L610">                            onOrderCompleted();</span>
+<span class="nc" id="L606">                    Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L607">                        updateTrackingDisplay();</span>
+<span class="nc bnc" id="L608" title="All 2 branches missed.">                        if (stepIndex == trackingSteps.size() - 1) {</span>
+<span class="nc" id="L609">                            step.setStatus(TrackingStatus.COMPLETED);</span>
+<span class="nc" id="L610">                            updateTrackingDisplay();</span>
+<span class="nc" id="L611">                            onOrderCompleted();</span>
                         }
-<span class="nc" id="L612">                    });</span>
-<span class="nc" id="L613">                }</span>
+<span class="nc" id="L613">                    });</span>
+<span class="nc" id="L614">                }</span>
             );
-<span class="nc" id="L615">            simulation.getKeyFrames().add(frame);</span>
+<span class="nc" id="L616">            simulation.getKeyFrames().add(frame);</span>
         }
         
-<span class="nc" id="L618">        simulation.play();</span>
-<span class="nc" id="L619">    }</span>
+<span class="fc" id="L619">        simulation.play();</span>
+<span class="fc" id="L620">    }</span>
 
     /**
      * رفرش دستی وضعیت سفارش
      */
     private void refreshOrderStatus() {
         // در پیاده‌سازی واقعی، از WebSocket یا REST API استفاده می‌شود
-<span class="nc" id="L626">        Platform.runLater(() -&gt; {</span>
-<span class="nc" id="L627">            setStatus(&quot;وضعیت سفارش بروزرسانی شد&quot;);</span>
-<span class="nc" id="L628">        });</span>
-<span class="nc" id="L629">    }</span>
+<span class="fc" id="L627">        Platform.runLater(() -&gt; {</span>
+<span class="fc" id="L628">            setStatus(&quot;وضعیت سفارش بروزرسانی شد&quot;);</span>
+<span class="fc" id="L629">        });</span>
+<span class="fc" id="L630">    }</span>
 
     /**
      * متد فراخوانی شده هنگام تکمیل سفارش
      */
     private void onOrderCompleted() {
-<span class="nc" id="L635">        setStatus(&quot;سفارش شما با موفقیت تحویل داده شد&quot;);</span>
+<span class="nc" id="L636">        setStatus(&quot;سفارش شما با موفقیت تحویل داده شد&quot;);</span>
         
-<span class="nc bnc" id="L637" title="All 2 branches missed.">        if (cancelOrderButton != null) {</span>
-<span class="nc" id="L638">            cancelOrderButton.setDisable(true);</span>
-<span class="nc" id="L639">            cancelOrderButton.setText(&quot;تکمیل شده&quot;);</span>
+<span class="nc bnc" id="L638" title="All 2 branches missed.">        if (cancelOrderButton != null) {</span>
+<span class="nc" id="L639">            cancelOrderButton.setDisable(true);</span>
+<span class="nc" id="L640">            cancelOrderButton.setText(&quot;تکمیل شده&quot;);</span>
         }
         
         // فعال‌سازی دکمه سفارش مجدد
-<span class="nc bnc" id="L643" title="All 2 branches missed.">        if (reorderButton != null) {</span>
-<span class="nc" id="L644">            reorderButton.setDisable(false);</span>
+<span class="nc bnc" id="L644" title="All 2 branches missed.">        if (reorderButton != null) {</span>
+<span class="nc" id="L645">            reorderButton.setDisable(false);</span>
         }
         
         // ارسال اطلاع‌رسانی تکمیل
-<span class="nc" id="L648">        sendCompletionNotification();</span>
-<span class="nc" id="L649">    }</span>
+<span class="nc" id="L649">        sendCompletionNotification();</span>
+<span class="nc" id="L650">    }</span>
 
     /**
      * ارسال اطلاع‌رسانی تکمیل سفارش
+     * 
+     * این متد اطلاع‌رسانی‌های مختلف را بر اساس تنظیمات کاربر ارسال می‌کند:
+     * - ایمیل: شامل رسید کامل و جزئیات تحویل
+     * - پیامک: پیام کوتاه تأیید تحویل
+     * - در نسخه آینده: Push notification و Telegram bot
      */
     private void sendCompletionNotification() {
-<span class="nc bnc" id="L655" title="All 4 branches missed.">        if (emailNotificationCheckBox != null &amp;&amp; emailNotificationCheckBox.isSelected()) {</span>
-            // TODO: ارسال ایمیل
-<span class="nc" id="L657">            System.out.println(&quot;ایمیل تکمیل سفارش ارسال شد&quot;);</span>
+        // بررسی و ارسال اطلاع‌رسانی ایمیل
+<span class="pc bpc" id="L662" title="1 of 4 branches missed.">        if (emailNotificationCheckBox != null &amp;&amp; emailNotificationCheckBox.isSelected()) {</span>
+<span class="nc" id="L663">            sendEmailNotification();</span>
         }
         
-<span class="nc bnc" id="L660" title="All 4 branches missed.">        if (smsNotificationCheckBox != null &amp;&amp; smsNotificationCheckBox.isSelected()) {</span>
-            // TODO: ارسال پیامک
-<span class="nc" id="L662">            System.out.println(&quot;پیامک تکمیل سفارش ارسال شد&quot;);</span>
+        // بررسی و ارسال اطلاع‌رسانی پیامکی
+<span class="pc bpc" id="L667" title="1 of 4 branches missed.">        if (smsNotificationCheckBox != null &amp;&amp; smsNotificationCheckBox.isSelected()) {</span>
+<span class="nc" id="L668">            sendSMSNotification();</span>
         }
-<span class="nc" id="L664">    }</span>
+<span class="fc" id="L670">    }</span>
+    
+    /**
+     * ارسال اطلاع‌رسانی ایمیل تکمیل سفارش
+     * 
+     * در پیاده‌سازی نهایی، این متد:
+     * 1. قالب ایمیل را از template engine بارگذاری می‌کند
+     * 2. اطلاعات سفارش را در قالب جایگذاری می‌کند
+     * 3. رسید PDF را به عنوان پیوست اضافه می‌کند
+     * 4. از SMTP server برای ارسال استفاده می‌کند
+     */
+    private void sendEmailNotification() {
+        try {
+<span class="fc" id="L683">            String customerEmail = getCurrentCustomerEmail();</span>
+<span class="fc" id="L684">            String emailSubject = &quot;تکمیل سفارش شما - شماره &quot; + currentOrder.getOrderId();</span>
+<span class="fc" id="L685">            String emailBody = generateEmailBody();</span>
+            
+            // شبیه‌سازی ارسال ایمیل
+<span class="fc" id="L688">            System.out.println(&quot;📧 ایمیل تکمیل سفارش ارسال شد&quot;);</span>
+<span class="fc" id="L689">            System.out.println(&quot;📧 آدرس گیرنده: &quot; + customerEmail);</span>
+<span class="fc" id="L690">            System.out.println(&quot;📧 موضوع: &quot; + emailSubject);</span>
+            
+            // در پیاده‌سازی واقعی:
+            // EmailService.sendOrderCompletionEmail(customerEmail, currentOrder);
+            
+<span class="nc" id="L695">        } catch (Exception e) {</span>
+<span class="nc" id="L696">            System.err.println(&quot;❌ خطا در ارسال ایمیل: &quot; + e.getMessage());</span>
+<span class="fc" id="L697">        }</span>
+<span class="fc" id="L698">    }</span>
+    
+    /**
+     * ارسال اطلاع‌رسانی پیامکی تکمیل سفارش
+     * 
+     * پیامک شامل اطلاعات خلاصه:
+     * - شماره سفارش
+     * - زمان تحویل
+     * - مبلغ نهایی
+     * - لینک نظرسنجی
+     */
+    private void sendSMSNotification() {
+        try {
+<span class="fc" id="L711">            String customerPhone = currentOrder.getCustomerPhone();</span>
+<span class="fc" id="L712">            String smsMessage = generateSMSMessage();</span>
+            
+            // شبیه‌سازی ارسال پیامک
+<span class="fc" id="L715">            System.out.println(&quot;📱 پیامک تکمیل سفارش ارسال شد&quot;);</span>
+<span class="fc" id="L716">            System.out.println(&quot;📱 شماره گیرنده: &quot; + customerPhone);</span>
+<span class="fc" id="L717">            System.out.println(&quot;📱 متن پیام: &quot; + smsMessage);</span>
+            
+            // در پیاده‌سازی واقعی:
+            // SMSService.sendOrderCompletionSMS(customerPhone, smsMessage);
+            
+<span class="nc" id="L722">        } catch (Exception e) {</span>
+<span class="nc" id="L723">            System.err.println(&quot;❌ خطا در ارسال پیامک: &quot; + e.getMessage());</span>
+<span class="fc" id="L724">        }</span>
+<span class="fc" id="L725">    }</span>
+    
+    /**
+     * دریافت ایمیل مشتری فعلی
+     * 
+     * @return ایمیل مشتری از session یا پروفایل کاربر
+     */
+    private String getCurrentCustomerEmail() {
+        // در پیاده‌سازی واقعی از UserSession یا AuthService استفاده می‌شود
+<span class="fc" id="L734">        return &quot;customer@example.com&quot;;</span>
+    }
+    
+    /**
+     * تولید متن ایمیل تکمیل سفارش
+     * 
+     * @return HTML content برای ایمیل
+     */
+    private String generateEmailBody() {
+<span class="fc" id="L743">        StringBuilder emailBody = new StringBuilder();</span>
+<span class="fc" id="L744">        emailBody.append(&quot;&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;body&gt;&quot;);</span>
+<span class="fc" id="L745">        emailBody.append(&quot;&lt;h2&gt;سفارش شما با موفقیت تحویل داده شد!&lt;/h2&gt;&quot;);</span>
+<span class="fc" id="L746">        emailBody.append(&quot;&lt;p&gt;شماره سفارش: &quot;).append(currentOrder.getOrderId()).append(&quot;&lt;/p&gt;&quot;);</span>
+<span class="fc" id="L747">        emailBody.append(&quot;&lt;p&gt;رستوران: &quot;).append(currentOrder.getRestaurantName()).append(&quot;&lt;/p&gt;&quot;);</span>
+<span class="fc" id="L748">        emailBody.append(&quot;&lt;p&gt;مبلغ کل: &quot;).append(formatCurrency(currentOrder.getTotalAmount())).append(&quot; تومان&lt;/p&gt;&quot;);</span>
+<span class="fc" id="L749">        emailBody.append(&quot;&lt;p&gt;از انتخاب ما متشکریم!&lt;/p&gt;&quot;);</span>
+<span class="fc" id="L750">        emailBody.append(&quot;&lt;/body&gt;&lt;/html&gt;&quot;);</span>
+<span class="fc" id="L751">        return emailBody.toString();</span>
+    }
+    
+    /**
+     * تولید متن پیامک تکمیل سفارش
+     * 
+     * @return متن کوتاه و مختصر پیامک
+     */
+    private String generateSMSMessage() {
+<span class="fc" id="L760">        return String.format(</span>
+            &quot;سفارش %s با موفقیت تحویل شد. مبلغ: %s تومان. از انتخاب شما متشکریم!&quot;,
+<span class="fc" id="L762">            currentOrder.getOrderId(),</span>
+<span class="fc" id="L763">            formatCurrency(currentOrder.getTotalAmount())</span>
+        );
+    }
 
     // ===== Event Handlers =====
 
     @FXML
     private void handleCancelOrder() {
-<span class="nc" id="L670">        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);</span>
-<span class="nc" id="L671">        confirmAlert.setTitle(&quot;لغو سفارش&quot;);</span>
-<span class="nc" id="L672">        confirmAlert.setHeaderText(&quot;آیا مطمئن هستید؟&quot;);</span>
-<span class="nc" id="L673">        confirmAlert.setContentText(&quot;آیا می‌خواهید این سفارش را لغو کنید؟&quot;);</span>
+<span class="nc" id="L771">        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);</span>
+<span class="nc" id="L772">        confirmAlert.setTitle(&quot;لغو سفارش&quot;);</span>
+<span class="nc" id="L773">        confirmAlert.setHeaderText(&quot;آیا مطمئن هستید؟&quot;);</span>
+<span class="nc" id="L774">        confirmAlert.setContentText(&quot;آیا می‌خواهید این سفارش را لغو کنید؟&quot;);</span>
         
-<span class="nc" id="L675">        Optional&lt;ButtonType&gt; result = confirmAlert.showAndWait();</span>
-<span class="nc bnc" id="L676" title="All 4 branches missed.">        if (result.isPresent() &amp;&amp; result.get() == ButtonType.OK) {</span>
-            // TODO: پیاده‌سازی لغو سفارش
-<span class="nc" id="L678">            setStatus(&quot;درخواست لغو سفارش ارسال شد&quot;);</span>
-<span class="nc" id="L679">            cancelOrderButton.setDisable(true);</span>
+<span class="nc" id="L776">        Optional&lt;ButtonType&gt; result = confirmAlert.showAndWait();</span>
+<span class="nc bnc" id="L777" title="All 4 branches missed.">        if (result.isPresent() &amp;&amp; result.get() == ButtonType.OK) {</span>
+<span class="nc" id="L778">            processCancelOrder();</span>
         }
-<span class="nc" id="L681">    }</span>
-
-    @FXML
-    private void handleDownloadReceipt() {
-        // TODO: پیاده‌سازی دانلود رسید PDF
-<span class="nc" id="L686">        setStatus(&quot;رسید در حال دانلود...&quot;);</span>
+<span class="nc" id="L780">    }</span>
+    
+    /**
+     * پردازش درخواست لغو سفارش
+     * 
+     * این متد مراحل زیر را انجام می‌دهد:
+     * 1. بررسی امکان لغو سفارش (بر اساس وضعیت فعلی)
+     * 2. ارسال درخواست لغو به backend
+     * 3. بروزرسانی UI و غیرفعال کردن دکمه لغو
+     * 4. ارسال اطلاع‌رسانی لغو به مشتری
+     * 5. محاسبه و پردازش بازپرداخت (در صورت لزوم)
+     */
+    private void processCancelOrder() {
+<span class="fc" id="L793">        setStatus(&quot;در حال پردازش درخواست لغو سفارش...&quot;);</span>
         
-        // شبیه‌سازی دانلود
-<span class="nc" id="L689">        Task&lt;Void&gt; downloadTask = new Task&lt;Void&gt;() {</span>
+        // بررسی امکان لغو بر اساس وضعیت سفارش
+<span class="pc bpc" id="L796" title="1 of 2 branches missed.">        if (!isOrderCancelable()) {</span>
+<span class="nc" id="L797">            showError(&quot;خطا&quot;, &quot;امکان لغو سفارش در مرحله فعلی وجود ندارد&quot;);</span>
+<span class="nc" id="L798">            return;</span>
+        }
+        
+        // شبیه‌سازی ارسال درخواست لغو به backend
+<span class="fc" id="L802">        Task&lt;Boolean&gt; cancelTask = new Task&lt;Boolean&gt;() {</span>
             @Override
-            protected Void call() throws Exception {
-<span class="nc" id="L692">                Thread.sleep(2000);</span>
-<span class="nc" id="L693">                return null;</span>
+            protected Boolean call() throws Exception {
+<span class="fc" id="L805">                Thread.sleep(2000); // شبیه‌سازی تأخیر شبکه</span>
+                
+                // در پیاده‌سازی واقعی:
+                // return OrderService.cancelOrder(currentOrder.getOrderId());
+                
+                // شبیه‌سازی موفقیت 90% و شکست 10%
+<span class="pc bpc" id="L811" title="1 of 2 branches missed.">                return Math.random() &gt; 0.1;</span>
             }
         };
         
-<span class="nc" id="L697">        downloadTask.setOnSucceeded(e -&gt; Platform.runLater(() -&gt; {</span>
-<span class="nc" id="L698">            setStatus(&quot;رسید با موفقیت دانلود شد&quot;);</span>
-<span class="nc" id="L699">            showInfo(&quot;موفقیت&quot;, &quot;رسید سفارش در پوشه Downloads ذخیره شد&quot;);</span>
-<span class="nc" id="L700">        }));</span>
+<span class="fc" id="L815">        cancelTask.setOnSucceeded(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="fc" id="L816">            boolean success = cancelTask.getValue();</span>
+<span class="pc bpc" id="L817" title="1 of 2 branches missed.">            if (success) {</span>
+<span class="fc" id="L818">                handleCancelOrderSuccess();</span>
+            } else {
+<span class="nc" id="L820">                handleCancelOrderFailure(&quot;خطای سرور در پردازش درخواست لغو&quot;);</span>
+            }
+<span class="fc" id="L822">        }));</span>
         
-<span class="nc" id="L702">        new Thread(downloadTask).start();</span>
-<span class="nc" id="L703">    }</span>
+<span class="pc" id="L824">        cancelTask.setOnFailed(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L825">            Throwable exception = cancelTask.getException();</span>
+<span class="nc bnc" id="L826" title="All 2 branches missed.">            String errorMessage = exception != null ? exception.getMessage() : &quot;خطای نامشخص&quot;;</span>
+<span class="nc" id="L827">            handleCancelOrderFailure(errorMessage);</span>
+<span class="nc" id="L828">        }));</span>
+        
+<span class="fc" id="L830">        new Thread(cancelTask).start();</span>
+<span class="fc" id="L831">    }</span>
+    
+    /**
+     * بررسی امکان لغو سفارش بر اساس وضعیت فعلی
+     * 
+     * سفارش تنها در مراحل زیر قابل لغو است:
+     * - تأیید سفارش
+     * - آماده‌سازی غذا (تا 5 دقیقه اول)
+     * 
+     * @return true اگر سفارش قابل لغو باشد
+     */
+    private boolean isOrderCancelable() {
+<span class="fc bfc" id="L843" title="All 4 branches covered.">        if (trackingSteps == null || trackingSteps.isEmpty()) {</span>
+<span class="fc" id="L844">            return false;</span>
+        }
+        
+        // محاسبه تعداد مراحل تکمیل شده
+<span class="fc" id="L848">        long completedSteps = trackingSteps.stream()</span>
+<span class="fc bfc" id="L849" title="All 2 branches covered.">            .mapToLong(step -&gt; step.getStatus() == TrackingStatus.COMPLETED ? 1 : 0)</span>
+<span class="fc" id="L850">            .sum();</span>
+        
+        // اگر بیش از 2 مرحله تکمیل شده، امکان لغو وجود ندارد
+<span class="fc bfc" id="L853" title="All 2 branches covered.">        if (completedSteps &gt; 2) {</span>
+<span class="fc" id="L854">            return false;</span>
+        }
+        
+        // بررسی زمان سپری شده از ثبت سفارش
+<span class="fc" id="L858">        LocalDateTime orderTime = currentOrder.getOrderDateTime();</span>
+<span class="fc" id="L859">        long minutesPassed = java.time.Duration.between(orderTime, LocalDateTime.now()).toMinutes();</span>
+        
+        // حداکثر 10 دقیقه امکان لغو وجود دارد
+<span class="pc bpc" id="L862" title="1 of 2 branches missed.">        return minutesPassed &lt;= 10;</span>
+    }
+    
+    /**
+     * مدیریت موفقیت در لغو سفارش
+     */
+    private void handleCancelOrderSuccess() {
+<span class="fc" id="L869">        setStatus(&quot;سفارش با موفقیت لغو شد&quot;);</span>
+        
+        // غیرفعال کردن دکمه لغو و تغییر متن
+<span class="fc" id="L872">            cancelOrderButton.setDisable(true);</span>
+<span class="fc" id="L873">        cancelOrderButton.setText(&quot;لغو شده&quot;);</span>
+<span class="fc" id="L874">        cancelOrderButton.setStyle(&quot;-fx-background-color: #dc3545; -fx-text-fill: white; -fx-opacity: 0.6;&quot;);</span>
+        
+        // توقف timeline پیگیری
+<span class="pc bpc" id="L877" title="1 of 2 branches missed.">        if (statusUpdateTimeline != null) {</span>
+<span class="nc" id="L878">            statusUpdateTimeline.stop();</span>
+        }
+        
+        // ارسال اطلاع‌رسانی لغو
+<span class="fc" id="L882">        sendCancellationNotification();</span>
+        
+        // نمایش پیام موفقیت
+<span class="fc" id="L885">        showInfo(&quot;لغو موفق&quot;, </span>
+            &quot;سفارش شما با موفقیت لغو شد.\n&quot; +
+            &quot;در صورت پرداخت آنلاین، مبلغ طی 2-3 روز کاری بازگردانده خواهد شد.\n&quot; +
+<span class="fc" id="L888">            &quot;شماره پیگیری لغو: CANCEL-&quot; + System.currentTimeMillis());</span>
+<span class="fc" id="L889">    }</span>
+    
+    /**
+     * مدیریت شکست در لغو سفارش
+     * 
+     * @param errorMessage پیام خطا
+     */
+    private void handleCancelOrderFailure(String errorMessage) {
+<span class="fc" id="L897">        setStatus(&quot;خطا در لغو سفارش&quot;);</span>
+<span class="fc" id="L898">        showError(&quot;خطا در لغو سفارش&quot;, </span>
+            &quot;متأسفانه امکان لغو سفارش وجود ندارد.\n&quot; +
+            &quot;دلیل: &quot; + errorMessage + &quot;\n&quot; +
+            &quot;برای کمک بیشتر با پشتیبانی تماس بگیرید.&quot;);
+<span class="fc" id="L902">    }</span>
+    
+    /**
+     * ارسال اطلاع‌رسانی لغو سفارش
+     */
+    private void sendCancellationNotification() {
+<span class="pc bpc" id="L908" title="2 of 4 branches missed.">        if (emailNotificationCheckBox != null &amp;&amp; emailNotificationCheckBox.isSelected()) {</span>
+<span class="fc" id="L909">            System.out.println(&quot;📧 ایمیل لغو سفارش ارسال شد&quot;);</span>
+        }
+        
+<span class="pc bpc" id="L912" title="2 of 4 branches missed.">        if (smsNotificationCheckBox != null &amp;&amp; smsNotificationCheckBox.isSelected()) {</span>
+<span class="fc" id="L913">            System.out.println(&quot;📱 پیامک لغو سفارش ارسال شد&quot;);</span>
+        }
+<span class="fc" id="L915">    }</span>
+
+    @FXML
+    private void handleDownloadReceipt() {
+<span class="nc bnc" id="L919" title="All 2 branches missed.">        if (currentOrder == null) {</span>
+<span class="nc" id="L920">            showError(&quot;خطا&quot;, &quot;اطلاعات سفارش موجود نیست&quot;);</span>
+<span class="nc" id="L921">            return;</span>
+        }
+        
+<span class="nc" id="L924">        setStatus(&quot;رسید در حال دانلود...&quot;);</span>
+        
+<span class="nc" id="L926">        Task&lt;Void&gt; downloadTask = new Task&lt;Void&gt;() {</span>
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    // تعیین مسیر ذخیره فایل
+<span class="nc" id="L931">                    String userHome = System.getProperty(&quot;user.home&quot;);</span>
+<span class="nc" id="L932">                    String downloadsPath = userHome + File.separator + &quot;Downloads&quot;;</span>
+<span class="nc" id="L933">                    File downloadsDir = new File(downloadsPath);</span>
+                    
+<span class="nc bnc" id="L935" title="All 2 branches missed.">                    if (!downloadsDir.exists()) {</span>
+<span class="nc" id="L936">                        downloadsDir = new File(userHome);</span>
+                    }
+                    
+<span class="nc" id="L939">                    String fileName = &quot;receipt_&quot; + currentOrder.getOrderId() + &quot;.txt&quot;;</span>
+<span class="nc" id="L940">                    File receiptFile = new File(downloadsDir, fileName);</span>
+                    
+                    // استفاده از TextReceiptExporter برای تولید رسید
+<span class="nc" id="L943">                    com.myapp.ui.order.internal.TextReceiptExporter exporter = </span>
+                        new com.myapp.ui.order.internal.TextReceiptExporter();
+<span class="nc" id="L945">                    exporter.export(currentOrder, receiptFile);</span>
+                    
+<span class="nc" id="L947">                    Thread.sleep(1000); // شبیه‌سازی تأخیر</span>
+                    
+<span class="nc" id="L949">                } catch (Exception e) {</span>
+<span class="nc" id="L950">                    throw new RuntimeException(&quot;خطا در تولید رسید: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L951">                }</span>
+<span class="nc" id="L952">                return null;</span>
+            }
+        };
+        
+<span class="nc" id="L956">        downloadTask.setOnSucceeded(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L957">            setStatus(&quot;رسید با موفقیت دانلود شد&quot;);</span>
+<span class="nc" id="L958">            showInfo(&quot;موفقیت&quot;, &quot;رسید سفارش در پوشه Downloads ذخیره شد&quot;);</span>
+<span class="nc" id="L959">        }));</span>
+        
+<span class="nc" id="L961">        downloadTask.setOnFailed(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L962">            setStatus(&quot;خطا در دانلود رسید&quot;);</span>
+<span class="nc" id="L963">            Throwable exception = downloadTask.getException();</span>
+<span class="nc bnc" id="L964" title="All 2 branches missed.">            String errorMessage = exception != null ? exception.getMessage() : &quot;خطای نامشخص&quot;;</span>
+<span class="nc" id="L965">            showError(&quot;خطا&quot;, errorMessage);</span>
+<span class="nc" id="L966">        }));</span>
+        
+<span class="nc" id="L968">        new Thread(downloadTask).start();</span>
+<span class="nc" id="L969">    }</span>
 
     @FXML
     private void handleContactSupport() {
-        // TODO: باز کردن چت پشتیبانی
-<span class="nc" id="L708">        setStatus(&quot;در حال اتصال به پشتیبانی...&quot;);</span>
-<span class="nc" id="L709">        showInfo(&quot;پشتیبانی&quot;, &quot;به زودی با پشتیبانی در تماس خواهید بود&quot;);</span>
-<span class="nc" id="L710">    }</span>
+<span class="nc" id="L973">        setStatus(&quot;در حال اتصال به پشتیبانی...&quot;);</span>
+        
+        // شبیه‌سازی اتصال به پشتیبانی
+<span class="nc" id="L976">        Task&lt;Void&gt; supportTask = new Task&lt;Void&gt;() {</span>
+            @Override
+            protected Void call() throws Exception {
+<span class="nc" id="L979">                Thread.sleep(1500); // شبیه‌سازی تأخیر اتصال</span>
+<span class="nc" id="L980">                return null;</span>
+            }
+        };
+        
+<span class="nc" id="L984">        supportTask.setOnSucceeded(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L985">            setStatus(&quot;متصل به پشتیبانی&quot;);</span>
+<span class="nc" id="L986">            showInfo(&quot;پشتیبانی&quot;, </span>
+                &quot;شماره پشتیبانی: 021-91000000\n&quot; +
+                &quot;ساعت کاری: 24 ساعته\n&quot; +
+<span class="nc bnc" id="L989" title="All 2 branches missed.">                &quot;شماره سفارش شما: &quot; + (currentOrder != null ? currentOrder.getOrderId() : &quot;نامشخص&quot;));</span>
+<span class="nc" id="L990">        }));</span>
+        
+<span class="nc" id="L992">        supportTask.setOnFailed(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L993">            setStatus(&quot;خطا در اتصال به پشتیبانی&quot;);</span>
+<span class="nc" id="L994">            showError(&quot;خطا&quot;, &quot;امکان اتصال به پشتیبانی وجود ندارد. لطفاً مجدداً تلاش کنید.&quot;);</span>
+<span class="nc" id="L995">        }));</span>
+        
+<span class="nc" id="L997">        new Thread(supportTask).start();</span>
+<span class="nc" id="L998">    }</span>
 
     @FXML
     private void handleTrackOrder() {
-        // TODO: باز کردن صفحه پیگیری تفصیلی
-<span class="nc" id="L715">        navigationController.navigateTo(&quot;OrderTracking&quot;);</span>
-<span class="nc" id="L716">    }</span>
+<span class="nc" id="L1002">        openDetailedTrackingView();</span>
+<span class="nc" id="L1003">    }</span>
+    
+    /**
+     * باز کردن صفحه پیگیری تفصیلی سفارش
+     * 
+     * این متد صفحه‌ای جداگانه برای پیگیری دقیق‌تر سفارش باز می‌کند که شامل:
+     * - نقشه مسیر پیک (در صورت وجود GPS tracking)
+     * - اطلاعات تماس پیک و رستوران
+     * - تاریخچه کامل تغییرات وضعیت
+     * - تخمین زمان دقیق‌تر تحویل
+     * - امکان چت مستقیم با پیک
+     */
+    private void openDetailedTrackingView() {
+        try {
+            // بررسی وجود سفارش جاری
+<span class="fc bfc" id="L1018" title="All 2 branches covered.">            if (currentOrder == null) {</span>
+<span class="fc" id="L1019">                showError(&quot;خطا&quot;, &quot;اطلاعات سفارش برای پیگیری تفصیلی موجود نیست&quot;);</span>
+<span class="fc" id="L1020">                return;</span>
+            }
+            
+<span class="fc" id="L1023">            setStatus(&quot;در حال بارگذاری صفحه پیگیری تفصیلی...&quot;);</span>
+            
+            // شبیه‌سازی بارگذاری صفحه پیگیری
+<span class="fc" id="L1026">            Task&lt;Void&gt; loadTrackingTask = new Task&lt;Void&gt;() {</span>
+                @Override
+                protected Void call() throws Exception {
+<span class="fc" id="L1029">                    Thread.sleep(1500); // شبیه‌سازی بارگذاری</span>
+<span class="fc" id="L1030">                    return null;</span>
+                }
+            };
+            
+<span class="fc" id="L1034">            loadTrackingTask.setOnSucceeded(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="fc" id="L1035">                setStatus(&quot;صفحه پیگیری تفصیلی بارگذاری شد&quot;);</span>
+                
+                // در پیاده‌سازی واقعی، صفحه جدید باز می‌شود:
+                // navigationController.navigateToOrderTracking(currentOrder.getOrderId());
+                
+                // فعلاً پیام اطلاعاتی نمایش می‌دهیم
+<span class="fc" id="L1041">                showInfo(&quot;پیگیری تفصیلی&quot;, </span>
+                    &quot;صفحه پیگیری تفصیلی (نسخه آینده):\n\n&quot; +
+                    &quot;🗺️ نقشه مسیر پیک\n&quot; +
+                    &quot;📞 تماس مستقیم با پیک\n&quot; +
+                    &quot;💬 چت آنلاین\n&quot; +
+                    &quot;⏰ بروزرسانی لحظه‌ای\n&quot; +
+                    &quot;📍 موقعیت دقیق سفارش\n\n&quot; +
+<span class="fc" id="L1048">                    &quot;شماره پیگیری: &quot; + currentOrder.getOrderId());</span>
+                
+                // در حال حاضر به صفحه پیگیری ساده هدایت می‌کنیم
+<span class="fc" id="L1051">        navigationController.navigateTo(&quot;OrderTracking&quot;);</span>
+<span class="fc" id="L1052">            }));</span>
+            
+<span class="pc" id="L1054">            loadTrackingTask.setOnFailed(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L1055">                setStatus(&quot;خطا در بارگذاری صفحه پیگیری&quot;);</span>
+<span class="nc" id="L1056">                showError(&quot;خطا&quot;, &quot;امکان باز کردن صفحه پیگیری تفصیلی وجود ندارد&quot;);</span>
+<span class="nc" id="L1057">            }));</span>
+            
+<span class="fc" id="L1059">            new Thread(loadTrackingTask).start();</span>
+            
+<span class="nc" id="L1061">        } catch (Exception e) {</span>
+<span class="nc" id="L1062">            setStatus(&quot;خطا در پیگیری سفارش&quot;);</span>
+<span class="nc" id="L1063">            showError(&quot;خطای سیستم&quot;, &quot;خطا در باز کردن صفحه پیگیری: &quot; + e.getMessage());</span>
+<span class="fc" id="L1064">        }</span>
+<span class="fc" id="L1065">    }</span>
 
     @FXML
     private void handleBackToMenu() {
-<span class="nc" id="L720">        navigationController.navigateTo(NavigationController.RESTAURANT_LIST_SCENE);</span>
-<span class="nc" id="L721">    }</span>
+<span class="nc" id="L1069">        navigationController.navigateTo(NavigationController.RESTAURANT_LIST_SCENE);</span>
+<span class="nc" id="L1070">    }</span>
 
     @FXML
     private void handleReorder() {
-        // TODO: افزودن آیتم‌های سفارش به سبد جدید
-<span class="nc" id="L726">        setStatus(&quot;آیتم‌های سفارش به سبد خرید اضافه شدند&quot;);</span>
-<span class="nc" id="L727">        navigationController.navigateTo(NavigationController.CART_SCENE);</span>
-<span class="nc" id="L728">    }</span>
+<span class="nc bnc" id="L1074" title="All 4 branches missed.">        if (currentOrder == null || currentOrder.getOrderItems() == null) {</span>
+<span class="nc" id="L1075">            showError(&quot;خطا&quot;, &quot;اطلاعات سفارش برای سفارش مجدد موجود نیست&quot;);</span>
+<span class="nc" id="L1076">            return;</span>
+        }
+        
+<span class="nc" id="L1079">        setStatus(&quot;در حال افزودن آیتم‌ها به سبد خرید...&quot;);</span>
+        
+        // شبیه‌سازی افزودن آیتم‌ها به سبد
+<span class="nc" id="L1082">        Task&lt;Void&gt; reorderTask = new Task&lt;Void&gt;() {</span>
+            @Override
+            protected Void call() throws Exception {
+<span class="nc" id="L1085">                Thread.sleep(1000); // شبیه‌سازی عملیات افزودن</span>
+<span class="nc" id="L1086">                return null;</span>
+            }
+        };
+        
+<span class="nc" id="L1090">        reorderTask.setOnSucceeded(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L1091">        setStatus(&quot;آیتم‌های سفارش به سبد خرید اضافه شدند&quot;);</span>
+<span class="nc" id="L1092">            showInfo(&quot;موفقیت&quot;, </span>
+<span class="nc" id="L1093">                currentOrder.getOrderItems().size() + &quot; آیتم به سبد خرید شما اضافه شد.\n&quot; +</span>
+                &quot;اکنون می‌توانید سبد خرید را بررسی کنید.&quot;);
+<span class="nc" id="L1095">        navigationController.navigateTo(NavigationController.CART_SCENE);</span>
+<span class="nc" id="L1096">        }));</span>
+        
+<span class="nc" id="L1098">        reorderTask.setOnFailed(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L1099">            setStatus(&quot;خطا در افزودن آیتم‌ها&quot;);</span>
+<span class="nc" id="L1100">            showError(&quot;خطا&quot;, &quot;امکان افزودن آیتم‌ها به سبد خرید وجود ندارد&quot;);</span>
+<span class="nc" id="L1101">        }));</span>
+        
+<span class="nc" id="L1103">        new Thread(reorderTask).start();</span>
+<span class="nc" id="L1104">    }</span>
 
     @FXML
     private void handleRefresh() {
-<span class="nc" id="L732">        refreshOrderStatus();</span>
-<span class="nc" id="L733">    }</span>
+<span class="nc" id="L1108">        refreshOrderStatus();</span>
+<span class="nc" id="L1109">    }</span>
 
     @FXML
     private void handlePrintReceipt() {
-        // TODO: پرینت رسید
-<span class="nc" id="L738">        setStatus(&quot;در حال آماده‌سازی برای چاپ...&quot;);</span>
-<span class="nc" id="L739">    }</span>
+<span class="nc bnc" id="L1113" title="All 2 branches missed.">        if (currentOrder == null) {</span>
+<span class="nc" id="L1114">            showError(&quot;خطا&quot;, &quot;اطلاعات سفارش برای چاپ موجود نیست&quot;);</span>
+<span class="nc" id="L1115">            return;</span>
+        }
+        
+<span class="nc" id="L1118">        setStatus(&quot;در حال آماده‌سازی برای چاپ...&quot;);</span>
+        
+        // شبیه‌سازی آماده‌سازی چاپ
+<span class="nc" id="L1121">        Task&lt;Void&gt; printTask = new Task&lt;Void&gt;() {</span>
+            @Override
+            protected Void call() throws Exception {
+<span class="nc" id="L1124">                Thread.sleep(2000); // شبیه‌سازی تأخیر آماده‌سازی</span>
+<span class="nc" id="L1125">                return null;</span>
+            }
+        };
+        
+<span class="nc" id="L1129">        printTask.setOnSucceeded(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L1130">            setStatus(&quot;رسید آماده چاپ است&quot;);</span>
+<span class="nc" id="L1131">            showInfo(&quot;چاپ رسید&quot;, </span>
+                &quot;رسید سفارش آماده چاپ شد.\n&quot; +
+<span class="nc" id="L1133">                &quot;شماره سفارش: &quot; + currentOrder.getOrderId() + &quot;\n&quot; +</span>
+                &quot;لطفاً چاپگر خود را بررسی کنید.&quot;);
+<span class="nc" id="L1135">        }));</span>
+        
+<span class="nc" id="L1137">        printTask.setOnFailed(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L1138">            setStatus(&quot;خطا در آماده‌سازی چاپ&quot;);</span>
+<span class="nc" id="L1139">            showError(&quot;خطا&quot;, &quot;امکان چاپ رسید وجود ندارد. لطفاً از دانلود رسید استفاده کنید.&quot;);</span>
+<span class="nc" id="L1140">        }));</span>
+        
+<span class="nc" id="L1142">        new Thread(printTask).start();</span>
+<span class="nc" id="L1143">    }</span>
 
     @FXML
     private void handleOrderHistory() {
-<span class="nc" id="L743">        navigationController.navigateTo(NavigationController.ORDER_HISTORY_SCENE);</span>
-<span class="nc" id="L744">    }</span>
+<span class="nc" id="L1147">        navigationController.navigateTo(NavigationController.ORDER_HISTORY_SCENE);</span>
+<span class="nc" id="L1148">    }</span>
 
     @FXML
     private void handleHome() {
-<span class="nc" id="L748">        navigationController.navigateTo(NavigationController.RESTAURANT_LIST_SCENE);</span>
-<span class="nc" id="L749">    }</span>
+<span class="nc" id="L1152">        navigationController.navigateTo(NavigationController.RESTAURANT_LIST_SCENE);</span>
+<span class="nc" id="L1153">    }</span>
 
     /**
-     * بروزرسانی تنظیمات اطلاع‌رسانی
+     * بروزرسانی تنظیمات اطلاع‌رسانی کاربر
+     * 
+     * این متد تنظیمات اطلاع‌رسانی را در پروفایل کاربر ذخیره می‌کند:
+     * - ترجیح دریافت ایمیل
+     * - ترجیح دریافت پیامک
+     * - زمان‌بندی اطلاع‌رسانی‌ها
+     * - نوع اطلاع‌رسانی‌های دریافتی
      */
     private void updateNotificationPreferences() {
-        // TODO: ذخیره تنظیمات در پروفایل کاربر
-<span class="nc" id="L756">        setStatus(&quot;تنظیمات اطلاع‌رسانی بروزرسانی شد&quot;);</span>
-<span class="nc" id="L757">    }</span>
+        try {
+            // دریافت تنظیمات جاری از UI
+<span class="pc bpc" id="L1167" title="3 of 4 branches missed.">            boolean emailEnabled = emailNotificationCheckBox != null &amp;&amp; emailNotificationCheckBox.isSelected();</span>
+<span class="pc bpc" id="L1168" title="3 of 4 branches missed.">            boolean smsEnabled = smsNotificationCheckBox != null &amp;&amp; smsNotificationCheckBox.isSelected();</span>
+            
+            // ایجاد شیء تنظیمات
+<span class="fc" id="L1171">            NotificationPreferences preferences = new NotificationPreferences();</span>
+<span class="fc" id="L1172">            preferences.setEmailNotifications(emailEnabled);</span>
+<span class="fc" id="L1173">            preferences.setSmsNotifications(smsEnabled);</span>
+<span class="fc" id="L1174">            preferences.setOrderUpdates(true); // همیشه فعال</span>
+<span class="fc" id="L1175">            preferences.setPromotionalMessages(false); // پیش‌فرض غیرفعال</span>
+<span class="fc" id="L1176">            preferences.setUpdatedAt(LocalDateTime.now());</span>
+            
+            // شبیه‌سازی ذخیره در backend
+<span class="fc" id="L1179">            Task&lt;Boolean&gt; saveTask = new Task&lt;Boolean&gt;() {</span>
+                @Override
+                protected Boolean call() throws Exception {
+<span class="fc" id="L1182">                    Thread.sleep(1000); // شبیه‌سازی درخواست شبکه</span>
+                    
+                    // در پیاده‌سازی واقعی:
+                    // return UserService.updateNotificationPreferences(getCurrentUserId(), preferences);
+                    
+<span class="fc" id="L1187">                    return true; // شبیه‌سازی موفقیت</span>
+                }
+            };
+            
+<span class="fc" id="L1191">            saveTask.setOnSucceeded(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="fc" id="L1192">                boolean success = saveTask.getValue();</span>
+<span class="pc bpc" id="L1193" title="1 of 2 branches missed.">                if (success) {</span>
+<span class="fc" id="L1194">        setStatus(&quot;تنظیمات اطلاع‌رسانی بروزرسانی شد&quot;);</span>
+                    
+                    // نمایش پیام تأیید کوتاه
+<span class="fc" id="L1197">                    showTemporaryMessage(&quot;✅ تنظیمات ذخیره شد&quot;, 2000);</span>
+                    
+                    // ذخیره در حافظه محلی برای استفاده سریع‌تر
+<span class="fc" id="L1200">                    saveNotificationPreferencesLocally(preferences);</span>
+                    
+                } else {
+<span class="nc" id="L1203">                    setStatus(&quot;خطا در ذخیره تنظیمات&quot;);</span>
+<span class="nc" id="L1204">                    showError(&quot;خطا&quot;, &quot;امکان ذخیره تنظیمات وجود ندارد&quot;);</span>
+                }
+<span class="fc" id="L1206">            }));</span>
+            
+<span class="pc" id="L1208">            saveTask.setOnFailed(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L1209">                setStatus(&quot;خطا در اتصال به سرور&quot;);</span>
+<span class="nc" id="L1210">                showError(&quot;خطای شبکه&quot;, &quot;امکان بروزرسانی تنظیمات وجود ندارد&quot;);</span>
+<span class="nc" id="L1211">            }));</span>
+            
+<span class="fc" id="L1213">            new Thread(saveTask).start();</span>
+            
+<span class="nc" id="L1215">        } catch (Exception e) {</span>
+<span class="nc" id="L1216">            setStatus(&quot;خطا در بروزرسانی تنظیمات&quot;);</span>
+<span class="nc" id="L1217">            showError(&quot;خطای سیستم&quot;, &quot;خطا در ذخیره تنظیمات: &quot; + e.getMessage());</span>
+<span class="fc" id="L1218">        }</span>
+<span class="fc" id="L1219">    }</span>
+    
+    /**
+     * ذخیره تنظیمات اطلاع‌رسانی در حافظه محلی
+     * 
+     * @param preferences تنظیمات اطلاع‌رسانی
+     */
+    private void saveNotificationPreferencesLocally(NotificationPreferences preferences) {
+        try {
+            // در پیاده‌سازی واقعی از SharedPreferences یا Properties file استفاده می‌شود
+<span class="fc" id="L1229">            System.out.println(&quot;💾 تنظیمات در حافظه محلی ذخیره شد:&quot;);</span>
+<span class="fc" id="L1230">            System.out.println(&quot;📧 ایمیل: &quot; + preferences.isEmailNotifications());</span>
+<span class="fc" id="L1231">            System.out.println(&quot;📱 پیامک: &quot; + preferences.isSmsNotifications());</span>
+<span class="fc" id="L1232">            System.out.println(&quot;🔔 بروزرسانی سفارش: &quot; + preferences.isOrderUpdates());</span>
+            
+<span class="nc" id="L1234">        } catch (Exception e) {</span>
+<span class="nc" id="L1235">            System.err.println(&quot;❌ خطا در ذخیره محلی: &quot; + e.getMessage());</span>
+<span class="fc" id="L1236">        }</span>
+<span class="fc" id="L1237">    }</span>
+    
+    /**
+     * نمایش پیام موقت در UI
+     * 
+     * @param message متن پیام
+     * @param durationMs مدت نمایش به میلی‌ثانیه
+     */
+    private void showTemporaryMessage(String message, int durationMs) {
+<span class="fc bfc" id="L1246" title="All 2 branches covered.">        if (statusMessageLabel != null) {</span>
+<span class="fc" id="L1247">            String originalMessage = statusMessageLabel.getText();</span>
+<span class="fc" id="L1248">            statusMessageLabel.setText(message);</span>
+<span class="fc" id="L1249">            statusMessageLabel.setStyle(&quot;-fx-text-fill: #28a745; -fx-font-weight: bold;&quot;);</span>
+            
+            // برگرداندن پیام اصلی پس از مدت زمان مشخص
+<span class="fc" id="L1252">            Timeline timeline = new Timeline(new KeyFrame(Duration.millis(durationMs), e -&gt; {</span>
+<span class="fc" id="L1253">                statusMessageLabel.setText(originalMessage);</span>
+<span class="fc" id="L1254">                statusMessageLabel.setStyle(&quot;&quot;); // حذف style خاص</span>
+<span class="fc" id="L1255">            }));</span>
+<span class="fc" id="L1256">            timeline.play();</span>
+        }
+<span class="fc" id="L1258">    }</span>
+    
+    /**
+     * کلاس تنظیمات اطلاع‌رسانی
+     */
+<span class="fc" id="L1263">    public static class NotificationPreferences {</span>
+        private boolean emailNotifications;
+        private boolean smsNotifications;
+        private boolean orderUpdates;
+        private boolean promotionalMessages;
+        private LocalDateTime updatedAt;
+        
+        // Getters and Setters
+<span class="fc" id="L1271">        public boolean isEmailNotifications() { return emailNotifications; }</span>
+<span class="fc" id="L1272">        public void setEmailNotifications(boolean emailNotifications) { this.emailNotifications = emailNotifications; }</span>
+        
+<span class="fc" id="L1274">        public boolean isSmsNotifications() { return smsNotifications; }</span>
+<span class="fc" id="L1275">        public void setSmsNotifications(boolean smsNotifications) { this.smsNotifications = smsNotifications; }</span>
+        
+<span class="fc" id="L1277">        public boolean isOrderUpdates() { return orderUpdates; }</span>
+<span class="fc" id="L1278">        public void setOrderUpdates(boolean orderUpdates) { this.orderUpdates = orderUpdates; }</span>
+        
+<span class="fc" id="L1280">        public boolean isPromotionalMessages() { return promotionalMessages; }</span>
+<span class="fc" id="L1281">        public void setPromotionalMessages(boolean promotionalMessages) { this.promotionalMessages = promotionalMessages; }</span>
+        
+<span class="fc" id="L1283">        public LocalDateTime getUpdatedAt() { return updatedAt; }</span>
+<span class="fc" id="L1284">        public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }</span>
+    }
 
     // ===== Utility Methods =====
 
     private void setLoading(boolean loading) {
-<span class="nc bnc" id="L762" title="All 2 branches missed.">        if (loadingIndicator != null) {</span>
-<span class="nc" id="L763">            loadingIndicator.setVisible(loading);</span>
+<span class="pc bpc" id="L1290" title="1 of 2 branches missed.">        if (loadingIndicator != null) {</span>
+<span class="nc" id="L1291">            loadingIndicator.setVisible(loading);</span>
         }
-<span class="nc" id="L765">    }</span>
+<span class="fc" id="L1293">    }</span>
 
     private void setStatus(String message) {
-<span class="nc bnc" id="L768" title="All 2 branches missed.">        if (statusMessageLabel != null) {</span>
-<span class="nc" id="L769">            statusMessageLabel.setText(message);</span>
+<span class="fc bfc" id="L1296" title="All 2 branches covered.">        if (statusMessageLabel != null) {</span>
+<span class="fc" id="L1297">            statusMessageLabel.setText(message);</span>
         }
-<span class="nc" id="L771">    }</span>
+<span class="fc" id="L1299">    }</span>
 
     private String formatCurrency(double amount) {
-<span class="nc" id="L774">        return currencyFormat.format(amount);</span>
+<span class="fc" id="L1302">        return currencyFormat.format(amount);</span>
     }
 
     private void showInfo(String title, String message) {
-<span class="nc" id="L778">        Alert alert = new Alert(Alert.AlertType.INFORMATION);</span>
-<span class="nc" id="L779">        alert.setTitle(title);</span>
-<span class="nc" id="L780">        alert.setContentText(message);</span>
-<span class="nc" id="L781">        alert.showAndWait();</span>
-<span class="nc" id="L782">    }</span>
+<span class="fc" id="L1306">        Alert alert = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="fc" id="L1307">        alert.setTitle(title);</span>
+<span class="fc" id="L1308">        alert.setContentText(message);</span>
+<span class="fc" id="L1309">        alert.showAndWait();</span>
+<span class="fc" id="L1310">    }</span>
 
     private void showError(String title, String message) {
-<span class="nc" id="L785">        Alert alert = new Alert(Alert.AlertType.ERROR);</span>
-<span class="nc" id="L786">        alert.setTitle(title);</span>
-<span class="nc" id="L787">        alert.setContentText(message);</span>
-<span class="nc" id="L788">        alert.showAndWait();</span>
-<span class="nc" id="L789">    }</span>
+<span class="fc" id="L1313">        Alert alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="fc" id="L1314">        alert.setTitle(title);</span>
+<span class="fc" id="L1315">        alert.setContentText(message);</span>
+<span class="fc" id="L1316">        alert.showAndWait();</span>
+<span class="fc" id="L1317">    }</span>
 
     // ===== Data Models =====
 
     /**
      * کلاس اطلاعات کامل سفارش
      */
-<span class="nc" id="L796">    public static class OrderInfo {</span>
+<span class="fc" id="L1324">    public static class OrderInfo {</span>
         private String orderId;
         private LocalDateTime orderDateTime;
         private LocalDateTime estimatedDelivery;
@@ -812,53 +1340,53 @@ import java.util.*;
         private List&lt;OrderItem&gt; orderItems;
         
         // Getters and Setters
-<span class="nc" id="L815">        public String getOrderId() { return orderId; }</span>
-<span class="nc" id="L816">        public void setOrderId(String orderId) { this.orderId = orderId; }</span>
+<span class="fc" id="L1343">        public String getOrderId() { return orderId; }</span>
+<span class="fc" id="L1344">        public void setOrderId(String orderId) { this.orderId = orderId; }</span>
         
-<span class="nc" id="L818">        public LocalDateTime getOrderDateTime() { return orderDateTime; }</span>
-<span class="nc" id="L819">        public void setOrderDateTime(LocalDateTime orderDateTime) { this.orderDateTime = orderDateTime; }</span>
+<span class="fc" id="L1346">        public LocalDateTime getOrderDateTime() { return orderDateTime; }</span>
+<span class="fc" id="L1347">        public void setOrderDateTime(LocalDateTime orderDateTime) { this.orderDateTime = orderDateTime; }</span>
         
-<span class="nc" id="L821">        public LocalDateTime getEstimatedDelivery() { return estimatedDelivery; }</span>
-<span class="nc" id="L822">        public void setEstimatedDelivery(LocalDateTime estimatedDelivery) { this.estimatedDelivery = estimatedDelivery; }</span>
+<span class="fc" id="L1349">        public LocalDateTime getEstimatedDelivery() { return estimatedDelivery; }</span>
+<span class="fc" id="L1350">        public void setEstimatedDelivery(LocalDateTime estimatedDelivery) { this.estimatedDelivery = estimatedDelivery; }</span>
         
-<span class="nc" id="L824">        public double getSubtotal() { return subtotal; }</span>
-<span class="nc" id="L825">        public void setSubtotal(double subtotal) { this.subtotal = subtotal; }</span>
+<span class="fc" id="L1352">        public double getSubtotal() { return subtotal; }</span>
+<span class="fc" id="L1353">        public void setSubtotal(double subtotal) { this.subtotal = subtotal; }</span>
         
-<span class="nc" id="L827">        public double getTax() { return tax; }</span>
-<span class="nc" id="L828">        public void setTax(double tax) { this.tax = tax; }</span>
+<span class="fc" id="L1355">        public double getTax() { return tax; }</span>
+<span class="fc" id="L1356">        public void setTax(double tax) { this.tax = tax; }</span>
         
-<span class="nc" id="L830">        public double getDeliveryFee() { return deliveryFee; }</span>
-<span class="nc" id="L831">        public void setDeliveryFee(double deliveryFee) { this.deliveryFee = deliveryFee; }</span>
+<span class="fc" id="L1358">        public double getDeliveryFee() { return deliveryFee; }</span>
+<span class="fc" id="L1359">        public void setDeliveryFee(double deliveryFee) { this.deliveryFee = deliveryFee; }</span>
         
-<span class="nc" id="L833">        public double getDiscount() { return discount; }</span>
-<span class="nc" id="L834">        public void setDiscount(double discount) { this.discount = discount; }</span>
+<span class="fc" id="L1361">        public double getDiscount() { return discount; }</span>
+<span class="fc" id="L1362">        public void setDiscount(double discount) { this.discount = discount; }</span>
         
-<span class="nc" id="L836">        public double getTotalAmount() { return totalAmount; }</span>
-<span class="nc" id="L837">        public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }</span>
+<span class="fc" id="L1364">        public double getTotalAmount() { return totalAmount; }</span>
+<span class="fc" id="L1365">        public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }</span>
         
-<span class="nc" id="L839">        public String getPaymentMethod() { return paymentMethod; }</span>
-<span class="nc" id="L840">        public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }</span>
+<span class="fc" id="L1367">        public String getPaymentMethod() { return paymentMethod; }</span>
+<span class="fc" id="L1368">        public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }</span>
         
-<span class="nc" id="L842">        public String getPaymentStatus() { return paymentStatus; }</span>
-<span class="nc" id="L843">        public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }</span>
+<span class="fc" id="L1370">        public String getPaymentStatus() { return paymentStatus; }</span>
+<span class="fc" id="L1371">        public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }</span>
         
-<span class="nc" id="L845">        public String getRestaurantName() { return restaurantName; }</span>
-<span class="nc" id="L846">        public void setRestaurantName(String restaurantName) { this.restaurantName = restaurantName; }</span>
+<span class="fc" id="L1373">        public String getRestaurantName() { return restaurantName; }</span>
+<span class="fc" id="L1374">        public void setRestaurantName(String restaurantName) { this.restaurantName = restaurantName; }</span>
         
-<span class="nc" id="L848">        public String getRestaurantPhone() { return restaurantPhone; }</span>
-<span class="nc" id="L849">        public void setRestaurantPhone(String restaurantPhone) { this.restaurantPhone = restaurantPhone; }</span>
+<span class="nc" id="L1376">        public String getRestaurantPhone() { return restaurantPhone; }</span>
+<span class="fc" id="L1377">        public void setRestaurantPhone(String restaurantPhone) { this.restaurantPhone = restaurantPhone; }</span>
         
-<span class="nc" id="L851">        public String getDeliveryAddress() { return deliveryAddress; }</span>
-<span class="nc" id="L852">        public void setDeliveryAddress(String deliveryAddress) { this.deliveryAddress = deliveryAddress; }</span>
+<span class="fc" id="L1379">        public String getDeliveryAddress() { return deliveryAddress; }</span>
+<span class="fc" id="L1380">        public void setDeliveryAddress(String deliveryAddress) { this.deliveryAddress = deliveryAddress; }</span>
         
-<span class="nc" id="L854">        public String getCustomerPhone() { return customerPhone; }</span>
-<span class="nc" id="L855">        public void setCustomerPhone(String customerPhone) { this.customerPhone = customerPhone; }</span>
+<span class="fc" id="L1382">        public String getCustomerPhone() { return customerPhone; }</span>
+<span class="fc" id="L1383">        public void setCustomerPhone(String customerPhone) { this.customerPhone = customerPhone; }</span>
         
-<span class="nc" id="L857">        public String getOrderNotes() { return orderNotes; }</span>
-<span class="nc" id="L858">        public void setOrderNotes(String orderNotes) { this.orderNotes = orderNotes; }</span>
+<span class="fc" id="L1385">        public String getOrderNotes() { return orderNotes; }</span>
+<span class="fc" id="L1386">        public void setOrderNotes(String orderNotes) { this.orderNotes = orderNotes; }</span>
         
-<span class="nc" id="L860">        public List&lt;OrderItem&gt; getOrderItems() { return orderItems; }</span>
-<span class="nc" id="L861">        public void setOrderItems(List&lt;OrderItem&gt; orderItems) { this.orderItems = orderItems; }</span>
+<span class="fc" id="L1388">        public List&lt;OrderItem&gt; getOrderItems() { return orderItems; }</span>
+<span class="fc" id="L1389">        public void setOrderItems(List&lt;OrderItem&gt; orderItems) { this.orderItems = orderItems; }</span>
     }
 
     /**
@@ -870,18 +1398,18 @@ import java.util.*;
         private double unitPrice;
         private String specialInstructions;
         
-<span class="nc" id="L873">        public OrderItem(String itemName, int quantity, double unitPrice, String specialInstructions) {</span>
-<span class="nc" id="L874">            this.itemName = itemName;</span>
-<span class="nc" id="L875">            this.quantity = quantity;</span>
-<span class="nc" id="L876">            this.unitPrice = unitPrice;</span>
-<span class="nc" id="L877">            this.specialInstructions = specialInstructions;</span>
-<span class="nc" id="L878">        }</span>
+<span class="fc" id="L1401">        public OrderItem(String itemName, int quantity, double unitPrice, String specialInstructions) {</span>
+<span class="fc" id="L1402">            this.itemName = itemName;</span>
+<span class="fc" id="L1403">            this.quantity = quantity;</span>
+<span class="fc" id="L1404">            this.unitPrice = unitPrice;</span>
+<span class="fc" id="L1405">            this.specialInstructions = specialInstructions;</span>
+<span class="fc" id="L1406">        }</span>
         
-<span class="nc" id="L880">        public String getItemName() { return itemName; }</span>
-<span class="nc" id="L881">        public int getQuantity() { return quantity; }</span>
-<span class="nc" id="L882">        public double getUnitPrice() { return unitPrice; }</span>
-<span class="nc" id="L883">        public double getTotalPrice() { return unitPrice * quantity; }</span>
-<span class="nc" id="L884">        public String getSpecialInstructions() { return specialInstructions; }</span>
+<span class="fc" id="L1408">        public String getItemName() { return itemName; }</span>
+<span class="fc" id="L1409">        public int getQuantity() { return quantity; }</span>
+<span class="fc" id="L1410">        public double getUnitPrice() { return unitPrice; }</span>
+<span class="fc" id="L1411">        public double getTotalPrice() { return unitPrice * quantity; }</span>
+<span class="fc" id="L1412">        public String getSpecialInstructions() { return specialInstructions; }</span>
     }
 
     /**
@@ -893,37 +1421,37 @@ import java.util.*;
         private LocalDateTime completedAt;
         private TrackingStatus status;
         
-<span class="nc" id="L896">        public TrackingStep(String title, String description, LocalDateTime completedAt, TrackingStatus status) {</span>
-<span class="nc" id="L897">            this.title = title;</span>
-<span class="nc" id="L898">            this.description = description;</span>
-<span class="nc" id="L899">            this.completedAt = completedAt;</span>
-<span class="nc" id="L900">            this.status = status;</span>
-<span class="nc" id="L901">        }</span>
+<span class="fc" id="L1424">        public TrackingStep(String title, String description, LocalDateTime completedAt, TrackingStatus status) {</span>
+<span class="fc" id="L1425">            this.title = title;</span>
+<span class="fc" id="L1426">            this.description = description;</span>
+<span class="fc" id="L1427">            this.completedAt = completedAt;</span>
+<span class="fc" id="L1428">            this.status = status;</span>
+<span class="fc" id="L1429">        }</span>
         
-<span class="nc" id="L903">        public String getTitle() { return title; }</span>
-<span class="nc" id="L904">        public String getDescription() { return description; }</span>
-<span class="nc" id="L905">        public LocalDateTime getCompletedAt() { return completedAt; }</span>
-<span class="nc" id="L906">        public void setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt; }</span>
-<span class="nc" id="L907">        public TrackingStatus getStatus() { return status; }</span>
-<span class="nc" id="L908">        public void setStatus(TrackingStatus status) { this.status = status; }</span>
+<span class="fc" id="L1431">        public String getTitle() { return title; }</span>
+<span class="fc" id="L1432">        public String getDescription() { return description; }</span>
+<span class="fc" id="L1433">        public LocalDateTime getCompletedAt() { return completedAt; }</span>
+<span class="fc" id="L1434">        public void setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt; }</span>
+<span class="fc" id="L1435">        public TrackingStatus getStatus() { return status; }</span>
+<span class="fc" id="L1436">        public void setStatus(TrackingStatus status) { this.status = status; }</span>
     }
 
     /**
      * enum وضعیت مراحل پیگیری
      */
-<span class="nc" id="L914">    public enum TrackingStatus {</span>
-<span class="nc" id="L915">        PENDING(&quot;در انتظار&quot;),</span>
-<span class="nc" id="L916">        IN_PROGRESS(&quot;در حال انجام&quot;),</span>
-<span class="nc" id="L917">        COMPLETED(&quot;تکمیل شده&quot;);</span>
+<span class="fc" id="L1442">    public enum TrackingStatus {</span>
+<span class="fc" id="L1443">        PENDING(&quot;در انتظار&quot;),</span>
+<span class="fc" id="L1444">        IN_PROGRESS(&quot;در حال انجام&quot;),</span>
+<span class="fc" id="L1445">        COMPLETED(&quot;تکمیل شده&quot;);</span>
         
         private final String displayName;
         
-<span class="nc" id="L921">        TrackingStatus(String displayName) {</span>
-<span class="nc" id="L922">            this.displayName = displayName;</span>
-<span class="nc" id="L923">        }</span>
+<span class="fc" id="L1449">        TrackingStatus(String displayName) {</span>
+<span class="fc" id="L1450">            this.displayName = displayName;</span>
+<span class="fc" id="L1451">        }</span>
         
         public String getDisplayName() {
-<span class="nc" id="L926">            return displayName;</span>
+<span class="fc" id="L1454">            return displayName;</span>
         }
     }
 } 
