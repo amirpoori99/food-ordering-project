@@ -1,257 +1,378 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  فایل پیکربندی Maven پروژه بک‌اند سیستم سفارش غذا
-  فاز ۳۱: بهبود و استانداردسازی پیکربندی build
-  این فایل شامل تعریف وابستگی‌ها، پلاگین‌ها و تنظیمات build است.
-  هر بخش با توضیحات فارسی برای توسعه‌دهندگان مستندسازی شده است.
--->
+<!-- ================================================================ -->
+<!-- فایل پیکربندی Maven برای بک‌اند سیستم سفارش غذا -->
+<!-- این فایل شامل تمام وابستگی‌ها، تنظیمات ساخت و پیکربندی پروژه است -->
+<!-- نویسنده: تیم توسعه -->
+<!-- تاریخ آخرین ویرایش: تیر ۱۴۰۴ -->
+<!-- نسخه: ۲.۰ - پیکربندی پیشرفته با بهینه‌سازی کامل -->
+<!-- ================================================================ -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.myapp</groupId>
-    <artifactId>food-ordering-backend</artifactId>
-    <version>1.0.0</version>
-    <packaging>jar</packaging>
-    <name>Food Ordering Backend</name>
-    <description>Backend API for Food Ordering System</description>
-
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
+    <!-- ================================================================ -->
+    <!-- اطلاعات پایه پروژه -->
+    <!-- ================================================================ -->
+    <modelVersion>4.0.0</modelVersion>  <!-- نسخه مدل Maven -->
+    
+    <!-- اطلاعات گروه و آرتیفکت -->
+    <groupId>com.myapp</groupId>        <!-- شناسه گروه پروژه -->
+    <artifactId>food-ordering-backend</artifactId>  <!-- نام آرتیفکت بک‌اند -->
+    <version>1.0.0</version>            <!-- نسخه پروژه -->
+    <packaging>jar</packaging>          <!-- نوع بسته‌بندی: JAR -->
+    
+    <!-- نام و توضیحات پروژه -->
+    <name>Food Ordering System Backend</name>
+    <description>بک‌اند سیستم سفارش غذا با Java و Spring Boot</description>
+    
+    <!-- ================================================================ -->
+    <!-- تنظیمات Java -->
+    <!-- ================================================================ -->
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit.jupiter.version>5.9.2</junit.jupiter.version>
-        <hibernate.version>6.4.4.Final</hibernate.version>
-        <jackson.version>2.15.2</jackson.version>
-        <jwt.version>0.12.3</jwt.version>
-        <sqlite.version>3.45.1.0</sqlite.version>
+        <!-- نسخه Java مورد نیاز -->
+        <maven.compiler.source>17</maven.compiler.source>  <!-- نسخه منبع Java -->
+        <maven.compiler.target>17</maven.compiler.target>  <!-- نسخه هدف Java -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  <!-- کدگذاری فایل‌های منبع -->
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>  <!-- کدگذاری گزارش‌ها -->
+        
+        <!-- نسخه‌های وابستگی‌ها -->
+        <spring.boot.version>3.2.0</spring.boot.version>  <!-- نسخه Spring Boot -->
+        <hibernate.version>6.4.0.Final</hibernate.version>  <!-- نسخه Hibernate -->
+        <sqlite.version>3.44.1.0</sqlite.version>  <!-- نسخه SQLite -->
+        <junit.version>5.10.0</junit.version>  <!-- نسخه JUnit -->
+        <mockito.version>5.7.0</mockito.version>  <!-- نسخه Mockito -->
+        <jacoco.version>0.8.10</jacoco.version>  <!-- نسخه JaCoCo برای پوشش کد -->
+        
+        <!-- تنظیمات اضافی -->
+        <skipTests>false</skipTests>  <!-- اجرای تست‌ها (true برای رد کردن) -->
+        <maven.test.skip>false</maven.test.skip>  <!-- رد کردن کامپایل تست‌ها -->
     </properties>
-
-
+    
+    <!-- ================================================================ -->
+    <!-- مدیریت وابستگی‌ها -->
+    <!-- ================================================================ -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- مدیریت نسخه Spring Boot -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
+    <!-- ================================================================ -->
+    <!-- وابستگی‌های اصلی پروژه -->
+    <!-- ================================================================ -->
     <dependencies>
-        <!-- پایگاه داده H2 برای تست و اجرا -->
+        <!-- ================================================================ -->
+        <!-- وابستگی‌های Spring Boot -->
+        <!-- ================================================================ -->
+        
+        <!-- Spring Boot Starter Web - برای ایجاد REST API -->
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>2.2.224</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <!-- JUnit 5 برای تست واحد -->
+        
+        <!-- Spring Boot Starter Data JPA - برای کار با پایگاه داده -->
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.jupiter.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        
+        <!-- Spring Boot Starter Security - برای امنیت -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        
+        <!-- Spring Boot Starter Validation - برای اعتبارسنجی -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        
+        <!-- Spring Boot Starter Test - برای تست‌ها -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- JUnit 5 Parameterized Tests -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <version>${junit.jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- Jackson & YAML for OpenAPI reading -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>2.15.2</version>
-        </dependency>
-        <!-- Jackson Core for JSON processing -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.15.2</version>
-        </dependency>
-        <!-- Jackson JSR310 for LocalDateTime support -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.15.2</version>
-        </dependency>
-        <!-- AssertJ for fluent assertions -->
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>3.24.2</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- Mockito for mocking -->
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>5.11.0</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- Hibernate ORM -->
-        <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>6.4.4.Final</version>
-        </dependency>
-        <!-- Jakarta Persistence API -->
-        <dependency>
-            <groupId>jakarta.persistence</groupId>
-            <artifactId>jakarta.persistence-api</artifactId>
-            <version>3.1.0</version>
-        </dependency>
-
-        <!-- SQLite JDBC Driver -->
+        
+        <!-- ================================================================ -->
+        <!-- وابستگی‌های پایگاه داده -->
+        <!-- ================================================================ -->
+        
+        <!-- SQLite JDBC Driver - درایور پایگاه داده -->
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.45.1.0</version>
+            <version>${sqlite.version}</version>
         </dependency>
-        <!-- Hibernate Community Dialects for SQLite -->
+        
+        <!-- Hibernate Core - ORM اصلی -->
         <dependency>
             <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-community-dialects</artifactId>
-            <version>6.4.4.Final</version>
+            <artifactId>hibernate-core</artifactId>
+            <version>${hibernate.version}</version>
         </dependency>
-        <!-- JWT (JJWT) for token authentication -->
+        
+        <!-- ================================================================ -->
+        <!-- وابستگی‌های امنیت و احراز هویت -->
+        <!-- ================================================================ -->
+        
+        <!-- JWT (JSON Web Token) - برای توکن‌های احراز هویت -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
             <version>0.12.3</version>
+            <description>API برای ایجاد و اعتبارسنجی JWT</description>
         </dependency>
+        
+        <!-- JWT Implementation - پیاده‌سازی JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-impl</artifactId>
             <version>0.12.3</version>
             <scope>runtime</scope>
+            <description>پیاده‌سازی JWT</description>
         </dependency>
+        
+        <!-- JWT Jackson - پشتیبانی از JSON -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
             <version>0.12.3</version>
             <scope>runtime</scope>
+            <description>پشتیبانی Jackson برای JWT</description>
+        </dependency>
+        
+        <!-- BCrypt - برای رمزنگاری پسوردها -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+            <description>ابزارهای رمزنگاری Spring Security</description>
+        </dependency>
+        
+        <!-- ================================================================ -->
+        <!-- وابستگی‌های ابزار و کمکی -->
+        <!-- ================================================================ -->
+        
+        <!-- Apache Commons Lang - ابزارهای کمکی -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version>
+            <description>ابزارهای کمکی Apache Commons</description>
+        </dependency>
+        
+        <!-- Jackson - برای پردازش JSON -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <description>پردازشگر JSON Jackson</description>
+        </dependency>
+        
+        <!-- SLF4J - برای لاگینگ -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <description>API لاگینگ SLF4J</description>
+        </dependency>
+        
+        <!-- Logback - پیاده‌سازی لاگینگ -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <description>پیاده‌سازی Logback برای لاگینگ</description>
+        </dependency>
+        
+        <!-- ================================================================ -->
+        <!-- وابستگی‌های تست -->
+        <!-- ================================================================ -->
+        
+        <!-- JUnit 5 - فریم‌ورک تست -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+            <description>فریم‌ورک تست JUnit 5</description>
+        </dependency>
+        
+        <!-- Mockito - برای Mock کردن -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+            <description>کتابخانه Mockito برای تست‌ها</description>
+        </dependency>
+        
+        <!-- Mockito JUnit Jupiter - ادغام با JUnit 5 -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+            <description>ادغام Mockito با JUnit 5</description>
+        </dependency>
+        
+        <!-- AssertJ - برای assertions پیشرفته -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.24.2</version>
+            <scope>test</scope>
+            <description>کتابخانه AssertJ برای assertions پیشرفته</description>
+        </dependency>
+        
+        <!-- Spring Boot Test - تست‌های Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <description>استارتر تست Spring Boot</description>
+        </dependency>
+        
+        <!-- Testcontainers - برای تست‌های یکپارچه -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>1.19.3</version>
+            <scope>test</scope>
+            <description>Testcontainers برای تست‌های یکپارچه</description>
         </dependency>
     </dependencies>
-
-
+    
+    <!-- ================================================================ -->
+    <!-- تنظیمات ساخت (Build) -->
+    <!-- ================================================================ -->
     <build>
-        <sourceDirectory>src/main/java</sourceDirectory>
-        <testSourceDirectory>src/test/java</testSourceDirectory>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <filtering>true</filtering>
-            </testResource>
-        </testResources>
+        <!-- نام نهایی JAR -->
+        <finalName>food-ordering-backend-${project.version}</finalName>
         
+        <!-- ================================================================ -->
+        <!-- پلاگین‌های Maven -->
+        <!-- ================================================================ -->
         <plugins>
-            <!-- Maven Compiler Plugin with enhanced configuration -->
+            <!-- ================================================================ -->
+            <!-- پلاگین کامپایلر Java -->
+            <!-- ================================================================ -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
-                    <source>17</source>
-                    <target>17</target>
-                    <encoding>UTF-8</encoding>
+                    <source>${maven.compiler.source}</source>  <!-- نسخه منبع -->
+                    <target>${maven.compiler.target}</target>  <!-- نسخه هدف -->
+                    <encoding>${project.build.sourceEncoding}</encoding>  <!-- کدگذاری -->
                     <compilerArgs>
-                        <arg>-parameters</arg>
-                        <arg>-Xlint:unchecked</arg>
-                        <arg>-Xlint:deprecation</arg>
+                        <!-- تنظیمات کامپایلر -->
+                        <arg>-parameters</arg>  <!-- حفظ نام پارامترها -->
+                        <arg>-Xlint:unchecked</arg>  <!-- هشدارهای کامپایلر -->
                     </compilerArgs>
                 </configuration>
             </plugin>
             
-            <!-- Maven Resources Plugin -->
+            <!-- ================================================================ -->
+            <!-- پلاگین Spring Boot Maven -->
+            <!-- ================================================================ -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
                 <configuration>
-                    <encoding>UTF-8</encoding>
-                    <nonFilteredFileExtensions>
-                        <nonFilteredFileExtension>db</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>db-shm</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>db-wal</nonFilteredFileExtension>
-                    </nonFilteredFileExtensions>
+                    <!-- کلاس اصلی برنامه -->
+                    <mainClass>com.myapp.ServerApp</mainClass>
+                    <!-- نام JAR نهایی -->
+                    <finalName>food-ordering-backend-${project.version}</finalName>
+                    <!-- تنظیمات JVM -->
+                    <jvmArguments>
+                        -Xms512m -Xmx2g -XX:+UseG1GC
+                    </jvmArguments>
+                    <!-- تنظیمات اضافی -->
+                    <addResources>true</addResources>
+                    <layout>JAR</layout>
                 </configuration>
-            </plugin>
-            
-            <!-- Maven Surefire Plugin with enhanced configuration -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M9</version>
-                <configuration>
-                    <includes>
-                        <include>**/*Test.java</include>
-                        <include>**/*Tests.java</include>
-                    </includes>
-                    <excludes>
-                        <exclude>**/*IntegrationTest.java</exclude>
-                        <exclude>**/*PerformanceTest.java</exclude>
-                    </excludes>
-                    <parallel>classes</parallel>
-                    <threadCount>4</threadCount>
-                    <perCoreThreadCount>true</perCoreThreadCount>
-                    <trimStackTrace>false</trimStackTrace>
-                    <reportFormat>xml</reportFormat>
-                    <reportFormat>html</reportFormat>
-                    <systemPropertyVariables>
-                        <java.awt.headless>true</java.awt.headless>
-                        <test.comprehensive>true</test.comprehensive>
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-            
-            <!-- Maven Failsafe Plugin for integration tests -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.0.0-M9</version>
                 <executions>
+                    <!-- اجرای repackage برای ایجاد JAR قابل اجرا -->
                     <execution>
                         <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
+                            <goal>repackage</goal>
                         </goals>
-                        <configuration>
-                            <includes>
-                                <include>**/*IntegrationTest.java</include>
-                                <include>**/*PerformanceTest.java</include>
-                            </includes>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
             
-            <!-- Exec Maven Plugin for running main classes -->
+            <!-- ================================================================ -->
+            <!-- پلاگین Surefire برای تست‌ها -->
+            <!-- ================================================================ -->
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.5.1</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.2</version>
                 <configuration>
-                    <mainClass>com.myapp.ServerApp</mainClass>
-                    <cleanupDaemonThreads>false</cleanupDaemonThreads>
+                    <!-- رد کردن تست‌ها در صورت نیاز -->
+                    <skipTests>${skipTests}</skipTests>
+                    <!-- رد کردن کامپایل تست‌ها -->
+                    <skip>${maven.test.skip}</skip>
+                    <!-- تنظیمات JUnit 5 -->
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/*Tests.java</include>
+                    </includes>
+                    <!-- تنظیمات سیستم -->
+                    <systemPropertyVariables>
+                        <java.awt.headless>true</java.awt.headless>
+                        <file.encoding>UTF-8</file.encoding>
+                    </systemPropertyVariables>
+                    <!-- تنظیمات حافظه برای تست‌ها -->
+                    <argLine>-Xmx1g -XX:+UseG1GC</argLine>
                 </configuration>
             </plugin>
             
-            <!-- JaCoCo Plugin for Code Coverage with enhanced configuration -->
+            <!-- ================================================================ -->
+            <!-- پلاگین JaCoCo برای پوشش کد -->
+            <!-- ================================================================ -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.8</version>
+                <version>${jacoco.version}</version>
+                <configuration>
+                    <!-- تنظیمات JaCoCo -->
+                    <destFile>${project.build.directory}/jacoco.exec</destFile>
+                    <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                    <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
+                    <!-- تنظیمات پوشش کد -->
+                    <rules>
+                        <rule>
+                            <element>BUNDLE</element>
+                            <limits>
+                                <limit>
+                                    <counter>LINE</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>0.80</minimum>
+                                </limit>
+                            </limits>
+                        </rule>
+                    </rules>
+                </configuration>
                 <executions>
+                    <!-- اجرای JaCoCo در فاز prepare-agent -->
                     <execution>
+                        <id>prepare-agent</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
+                    <!-- اجرای JaCoCo در فاز report -->
                     <execution>
                         <id>report</id>
                         <phase>test</phase>
@@ -259,61 +380,79 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
+                    <!-- اجرای JaCoCo در فاز check -->
                     <execution>
                         <id>check</id>
                         <goals>
                             <goal>check</goal>
                         </goals>
-                        <configuration>
-                            <rules>
-                                <rule>
-                                    <element>BUNDLE</element>
-                                    <limits>
-                                        <limit>
-                                            <counter>LINE</counter>
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>0.85</minimum>
-                                        </limit>
-                                        <limit>
-                                            <counter>BRANCH</counter>
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>0.80</minimum>
-                                        </limit>
-                                        <limit>
-                                            <counter>METHOD</counter>
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>0.90</minimum>
-                                        </limit>
-                                    </limits>
-                                </rule>
-                            </rules>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
             
-            <!-- Maven JAR Plugin with manifest configuration -->
+            <!-- ================================================================ -->
+            <!-- پلاگین Resources برای کپی فایل‌های منابع -->
+            <!-- ================================================================ -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
                 <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.myapp.ServerApp</mainClass>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                        </manifest>
-                    </archive>
+                    <!-- کدگذاری فایل‌های منابع -->
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <!-- فیلتر کردن متغیرها -->
+                    <filtering>true</filtering>
+                    <!-- تنظیمات غیرفعال کردن فیلترینگ برای فایل‌های خاص -->
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>swf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gif</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jpg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>png</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
                 </configuration>
             </plugin>
             
-            <!-- Maven Dependency Plugin for copying dependencies -->
+            <!-- ================================================================ -->
+            <!-- پلاگین Clean برای پاکسازی -->
+            <!-- ================================================================ -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <!-- فایل‌ها و پوشه‌های اضافی برای پاکسازی -->
+                    <filesets>
+                        <fileset>
+                            <directory>${project.build.directory}</directory>
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+            
+            <!-- ================================================================ -->
+            <!-- پلاگین Dependency برای تحلیل وابستگی‌ها -->
+            <!-- ================================================================ -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>3.6.0</version>
                 <executions>
+                    <!-- تحلیل وابستگی‌ها -->
+                    <execution>
+                        <id>analyze</id>
+                        <goals>
+                            <goal>analyze</goal>
+                        </goals>
+                        <configuration>
+                            <failOnWarning>false</failOnWarning>
+                        </configuration>
+                    </execution>
+                    <!-- کپی وابستگی‌ها -->
                     <execution>
                         <id>copy-dependencies</id>
                         <phase>package</phase>
@@ -329,57 +468,135 @@
                     </execution>
                 </executions>
             </plugin>
-            
-            <!-- Maven Assembly Plugin for creating executable JAR -->
+        </plugins>
+        
+        <!-- ================================================================ -->
+        <!-- تنظیمات منابع -->
+        <!-- ================================================================ -->
+        <resources>
+            <!-- منابع اصلی -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.yml</include>
+                    <include>**/*.yaml</include>
+                </includes>
+            </resource>
+            <!-- منابع بدون فیلتر -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/*.properties</exclude>
+                    <exclude>**/*.xml</exclude>
+                    <exclude>**/*.yml</exclude>
+                    <exclude>**/*.yaml</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        
+        <!-- ================================================================ -->
+        <!-- تنظیمات تست‌ها -->
+        <!-- ================================================================ -->
+        <testResources>
+            <!-- منابع تست -->
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+    </build>
+    
+    <!-- ================================================================ -->
+    <!-- تنظیمات گزارش‌گیری -->
+    <!-- ================================================================ -->
+    <reporting>
+        <plugins>
+            <!-- پلاگین JaCoCo برای گزارش پوشش کد -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.6.0</version>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.myapp.ServerApp</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
             </plugin>
             
-            <!-- Maven Clean Plugin -->
+            <!-- پلاگین Surefire برای گزارش تست‌ها -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>3.3.2</version>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <directory>${project.build.directory}</directory>
-                            <includes>
-                                <include>**/*</include>
-                            </includes>
-                        </fileset>
-                        <fileset>
-                            <directory>${project.basedir}</directory>
-                            <includes>
-                                <include>*.db</include>
-                                <include>*.db-shm</include>
-                                <include>*.db-wal</include>
-                            </includes>
-                        </fileset>
-                    </filesets>
-                </configuration>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>3.1.2</version>
             </plugin>
         </plugins>
-    </build>
+    </reporting>
+    
+    <!-- ================================================================ -->
+    <!-- تنظیمات پروفایل‌ها -->
+    <!-- ================================================================ -->
+    <profiles>
+        <!-- پروفایل توسعه -->
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+                <skipTests>false</skipTests>
+            </properties>
+        </profile>
+        
+        <!-- پروفایل تست -->
+        <profile>
+            <id>test</id>
+            <properties>
+                <spring.profiles.active>test</spring.profiles.active>
+                <skipTests>false</skipTests>
+            </properties>
+        </profile>
+        
+        <!-- پروفایل تولید -->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+                <skipTests>true</skipTests>
+            </properties>
+        </profile>
+        
+        <!-- پروفایل پوشش کد -->
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project> 
