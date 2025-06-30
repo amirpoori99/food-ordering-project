@@ -1,0 +1,647 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProfileController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.auth</a> &gt; <span class="el_source">ProfileController.java</span></div><h1>ProfileController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.auth;
+
+import com.myapp.ui.common.HttpClientUtil;
+import com.myapp.ui.common.NavigationController;
+import com.fasterxml.jackson.databind.JsonNode;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
+
+/**
+ * کنترلر صفحه مدیریت پروفایل کاربر
+ * 
+ * این کلاس مسئول مدیریت رابط کاربری پروفایل شامل:
+ * - مشاهده اطلاعات کاربر
+ * - ویرایش اطلاعات شخصی
+ * - تغییر رمز عبور
+ * - مدیریت وضعیت حساب
+ * - navigation به صفحات مختلف
+ * - بارگذاری و ذخیره اطلاعات
+ * 
+ * Pattern های استفاده شده:
+ * - MVC Pattern: Controller جدا از View
+ * - Observer Pattern: event listeners برای UI components
+ * - Task Pattern: background processing برای API calls
+ * - DTO Pattern: UserProfile data model
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+<span class="fc" id="L37">public class ProfileController implements Initializable {</span>
+
+    /** فیلد ورودی نام کامل کاربر */
+    @FXML private TextField fullNameField;
+    
+    /** فیلد نمایش شماره تلفن (غیرقابل ویرایش) */
+    @FXML private TextField phoneField;
+    
+    /** فیلد ورودی آدرس ایمیل */
+    @FXML private TextField emailField;
+    
+    /** فیلد ورودی آدرس کاربر */
+    @FXML private TextArea addressField;
+    
+    /** برچسب نمایش نقش کاربری */
+    @FXML private Label roleLabel;
+    
+    /** برچسب نمایش وضعیت حساب */
+    @FXML private Label accountStatusLabel;
+    
+    /** برچسب نمایش تاریخ عضویت */
+    @FXML private Label memberSinceLabel;
+    
+    /** فیلد ورودی رمز عبور فعلی */
+    @FXML private PasswordField currentPasswordField;
+    
+    /** فیلد ورودی رمز عبور جدید */
+    @FXML private PasswordField newPasswordField;
+    
+    /** فیلد تأیید رمز عبور جدید */
+    @FXML private PasswordField confirmPasswordField;
+    
+    /** دکمه ذخیره تغییرات */
+    @FXML private Button saveButton;
+    
+    /** دکمه لغو تغییرات */
+    @FXML private Button cancelButton;
+    
+    /** دکمه بروزرسانی اطلاعات */
+    @FXML private Button refreshButton;
+    
+    /** دکمه تغییر رمز عبور */
+    @FXML private Button changePasswordButton;
+    
+    /** دکمه پاک کردن فیلدهای رمز عبور */
+    @FXML private Button clearPasswordButton;
+    
+    /** منوی بازگشت به صفحه اصلی */
+    @FXML private MenuItem backMenuItem;
+    
+    /** منوی تاریخچه سفارشات */
+    @FXML private MenuItem orderHistoryMenuItem;
+    
+    /** منوی سبد خرید */
+    @FXML private MenuItem cartMenuItem;
+    
+    /** منوی خروج از حساب */
+    @FXML private MenuItem logoutMenuItem;
+    
+    /** برچسب نمایش وضعیت و پیام‌ها */
+    @FXML private Label statusLabel;
+    
+    /** نشانگر loading در زمان پردازش */
+    @FXML private ProgressIndicator loadingIndicator;
+
+    /** کنترلر navigation برای تغییر صفحات */
+    private NavigationController navigationController;
+    
+    /** کپی اطلاعات اولیه کاربر برای بررسی تغییرات */
+    private UserProfile originalProfile;
+
+    /**
+     * متد مقداردهی اولیه که بعد از load شدن FXML اجرا می‌شود
+     * 
+     * @param location URL location مربوط به FXML
+     * @param resources منابع زبان و localization
+     */
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+<span class="fc" id="L116">        this.navigationController = NavigationController.getInstance();</span>
+        
+<span class="fc" id="L118">        setupUI();</span>
+<span class="fc" id="L119">        loadProfile();</span>
+<span class="fc" id="L120">    }</span>
+
+    /**
+     * راه‌اندازی کامپوننت‌های UI و event handler ها
+     * 
+     * شامل:
+     * - تنظیم فیلد شماره تلفن به حالت فقط‌خواندنی
+     * - راه‌اندازی validation listener ها
+     * - تنظیم وضعیت اولیه
+     */
+    private void setupUI() {
+        // تنظیم فیلد شماره تلفن به حالت فقط‌خواندنی (غیرقابل تغییر)
+<span class="fc" id="L132">        phoneField.setEditable(false);</span>
+<span class="fc" id="L133">        phoneField.setStyle(&quot;-fx-background-color: #e9ecef;&quot;);</span>
+        
+        // راه‌اندازی listener های اعتبارسنجی
+<span class="fc" id="L136">        setupValidationListeners();</span>
+        
+        // تنظیم وضعیت اولیه
+<span class="fc" id="L139">        setStatus(&quot;در حال بارگذاری پروفایل...&quot;);</span>
+<span class="fc" id="L140">    }</span>
+
+    /**
+     * راه‌اندازی listener های اعتبارسنجی برای فیلدهای فرم
+     * 
+     * شامل:
+     * - بررسی تغییرات برای فعال کردن دکمه ذخیره
+     * - اعتبارسنجی فیلدهای رمز عبور
+     */
+    private void setupValidationListeners() {
+        // فعال کردن دکمه ذخیره فقط زمانی که تغییراتی انجام شده باشد
+<span class="pc" id="L151">        fullNameField.textProperty().addListener((obs, oldVal, newVal) -&gt; checkForChanges());</span>
+<span class="pc" id="L152">        emailField.textProperty().addListener((obs, oldVal, newVal) -&gt; checkForChanges());</span>
+<span class="pc" id="L153">        addressField.textProperty().addListener((obs, oldVal, newVal) -&gt; checkForChanges());</span>
+        
+        // اعتبارسنجی فیلدهای رمز عبور
+<span class="pc" id="L156">        newPasswordField.textProperty().addListener((obs, oldVal, newVal) -&gt; validatePasswordFields());</span>
+<span class="pc" id="L157">        confirmPasswordField.textProperty().addListener((obs, oldVal, newVal) -&gt; validatePasswordFields());</span>
+<span class="fc" id="L158">    }</span>
+
+    /**
+     * بارگذاری اطلاعات پروفایل کاربر از بک‌اند
+     * 
+     * این متد در background thread اجرا می‌شود تا UI freeze نشود
+     */
+    private void loadProfile() {
+<span class="fc" id="L166">        setLoading(true);</span>
+        
+<span class="fc" id="L168">        Task&lt;UserProfile&gt; loadTask = new Task&lt;UserProfile&gt;() {</span>
+            @Override
+            protected UserProfile call() throws Exception {
+<span class="fc" id="L171">                HttpClientUtil.ApiResponse response = HttpClientUtil.get(&quot;/auth/profile&quot;);</span>
+                
+<span class="pc bpc" id="L173" title="3 of 4 branches missed.">                if (response.isSuccess() &amp;&amp; response.getData() != null) {</span>
+<span class="nc" id="L174">                    return parseUserProfile(response.getData());</span>
+                } else {
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">                    throw new RuntimeException(response.getMessage() != null ? </span>
+<span class="pc" id="L177">                                               response.getMessage() : &quot;خطا در بارگذاری پروفایل&quot;);</span>
+                }
+            }
+        };
+        
+<span class="fc" id="L182">        loadTask.setOnSucceeded(e -&gt; {</span>
+<span class="nc" id="L183">            Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L184">                setLoading(false);</span>
+<span class="nc" id="L185">                UserProfile profile = loadTask.getValue();</span>
+<span class="nc" id="L186">                displayProfile(profile);</span>
+<span class="nc" id="L187">                originalProfile = profile.copy();</span>
+<span class="nc" id="L188">                setStatus(&quot;پروفایل بارگذاری شد&quot;);</span>
+<span class="nc" id="L189">            });</span>
+<span class="nc" id="L190">        });</span>
+        
+<span class="fc" id="L192">        loadTask.setOnFailed(e -&gt; {</span>
+<span class="fc" id="L193">            Platform.runLater(() -&gt; {</span>
+<span class="fc" id="L194">                setLoading(false);</span>
+<span class="fc" id="L195">                Throwable exception = loadTask.getException();</span>
+<span class="fc" id="L196">                String errorMessage = &quot;خطا در بارگذاری پروفایل&quot;;</span>
+<span class="pc bpc" id="L197" title="2 of 4 branches missed.">                if (exception != null &amp;&amp; exception.getMessage() != null) {</span>
+<span class="fc" id="L198">                    errorMessage = exception.getMessage();</span>
+                }
+<span class="fc" id="L200">                setStatus(errorMessage);</span>
+<span class="fc" id="L201">                showError(&quot;خطا&quot;, errorMessage);</span>
+<span class="fc" id="L202">            });</span>
+<span class="fc" id="L203">        });</span>
+        
+<span class="fc" id="L205">        Thread loadThread = new Thread(loadTask);</span>
+<span class="fc" id="L206">        loadThread.setDaemon(true);</span>
+<span class="fc" id="L207">        loadThread.start();</span>
+<span class="fc" id="L208">    }</span>
+
+    /**
+     * تجزیه اطلاعات پروفایل کاربر از پاسخ JSON
+     * 
+     * @param data داده JSON دریافت شده از سرور
+     * @return شیء UserProfile
+     */
+    private UserProfile parseUserProfile(JsonNode data) {
+<span class="nc" id="L217">        UserProfile profile = new UserProfile();</span>
+<span class="nc" id="L218">        profile.setId(data.get(&quot;userId&quot;).asLong());</span>
+<span class="nc" id="L219">        profile.setFullName(data.get(&quot;fullName&quot;).asText());</span>
+<span class="nc" id="L220">        profile.setPhone(data.get(&quot;phone&quot;).asText());</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">        profile.setEmail(data.has(&quot;email&quot;) ? data.get(&quot;email&quot;).asText() : &quot;&quot;);</span>
+<span class="nc bnc" id="L222" title="All 2 branches missed.">        profile.setAddress(data.has(&quot;address&quot;) ? data.get(&quot;address&quot;).asText() : &quot;&quot;);</span>
+<span class="nc" id="L223">        profile.setRole(data.get(&quot;role&quot;).asText());</span>
+<span class="nc bnc" id="L224" title="All 2 branches missed.">        profile.setActive(data.has(&quot;isActive&quot;) ? data.get(&quot;isActive&quot;).asBoolean() : true);</span>
+<span class="nc" id="L225">        return profile;</span>
+    }
+
+    /**
+     * نمایش اطلاعات پروفایل کاربر در فیلدهای فرم
+     * 
+     * @param profile اطلاعات پروفایل کاربر
+     */
+    private void displayProfile(UserProfile profile) {
+<span class="nc" id="L234">        fullNameField.setText(profile.getFullName());</span>
+<span class="nc" id="L235">        phoneField.setText(profile.getPhone());</span>
+<span class="nc" id="L236">        emailField.setText(profile.getEmail());</span>
+<span class="nc" id="L237">        addressField.setText(profile.getAddress());</span>
+<span class="nc" id="L238">        roleLabel.setText(getRoleText(profile.getRole()));</span>
+<span class="nc bnc" id="L239" title="All 2 branches missed.">        accountStatusLabel.setText(profile.isActive() ? &quot;فعال&quot; : &quot;غیرفعال&quot;);</span>
+<span class="nc bnc" id="L240" title="All 2 branches missed.">        accountStatusLabel.setStyle(&quot;-fx-text-fill: &quot; + (profile.isActive() ? &quot;#28a745&quot; : &quot;#dc3545&quot;));</span>
+<span class="nc" id="L241">        memberSinceLabel.setText(&quot;کاربر سیستم&quot;);</span>
+<span class="nc" id="L242">    }</span>
+
+    /**
+     * دریافت متن فارسی نقش کاربری
+     * 
+     * @param role نقش کاربری به انگلیسی
+     * @return متن فارسی نقش
+     */
+    private String getRoleText(String role) {
+<span class="nc bnc" id="L251" title="All 5 branches missed.">        switch (role.toUpperCase()) {</span>
+<span class="nc" id="L252">            case &quot;BUYER&quot;: return &quot;خریدار&quot;;</span>
+<span class="nc" id="L253">            case &quot;SELLER&quot;: return &quot;فروشنده&quot;;</span>
+<span class="nc" id="L254">            case &quot;COURIER&quot;: return &quot;پیک&quot;;</span>
+<span class="nc" id="L255">            case &quot;ADMIN&quot;: return &quot;مدیر&quot;;</span>
+<span class="nc" id="L256">            default: return role;</span>
+        }
+    }
+
+    /**
+     * بررسی وجود تغییرات در پروفایل
+     * 
+     * این متد دکمه‌های ذخیره و لغو را فعال/غیرفعال می‌کند
+     */
+    private void checkForChanges() {
+<span class="nc bnc" id="L266" title="All 2 branches missed.">        if (originalProfile == null) return;</span>
+        
+<span class="nc bnc" id="L268" title="All 2 branches missed.">        boolean hasChanges = !fullNameField.getText().equals(originalProfile.getFullName()) ||</span>
+<span class="nc bnc" id="L269" title="All 2 branches missed.">                           !emailField.getText().equals(originalProfile.getEmail()) ||</span>
+<span class="nc bnc" id="L270" title="All 2 branches missed.">                           !addressField.getText().equals(originalProfile.getAddress());</span>
+        
+<span class="nc bnc" id="L272" title="All 2 branches missed.">        saveButton.setDisable(!hasChanges);</span>
+<span class="nc bnc" id="L273" title="All 2 branches missed.">        cancelButton.setDisable(!hasChanges);</span>
+<span class="nc" id="L274">    }</span>
+
+    /**
+     * اعتبارسنجی فیلدهای رمز عبور برای تغییر رمز
+     * 
+     * شامل بررسی:
+     * - تطابق رمز جدید و تکرار آن
+     * - وجود رمز فعلی
+     * - حداقل طول رمز جدید
+     */
+    private void validatePasswordFields() {
+<span class="nc" id="L285">        String newPassword = newPasswordField.getText();</span>
+<span class="nc" id="L286">        String confirmPassword = confirmPasswordField.getText();</span>
+<span class="nc" id="L287">        String currentPassword = currentPasswordField.getText();</span>
+        
+<span class="nc" id="L289">        boolean passwordsMatch = newPassword.equals(confirmPassword);</span>
+<span class="nc bnc" id="L290" title="All 2 branches missed.">        boolean hasCurrentPassword = !currentPassword.trim().isEmpty();</span>
+<span class="nc bnc" id="L291" title="All 2 branches missed.">        boolean hasNewPassword = !newPassword.trim().isEmpty();</span>
+<span class="nc bnc" id="L292" title="All 2 branches missed.">        boolean passwordLengthValid = newPassword.length() &gt;= 4;</span>
+        
+<span class="nc bnc" id="L294" title="All 8 branches missed.">        boolean canChangePassword = hasCurrentPassword &amp;&amp; hasNewPassword &amp;&amp; </span>
+                                  passwordsMatch &amp;&amp; passwordLengthValid;
+        
+<span class="nc bnc" id="L297" title="All 2 branches missed.">        changePasswordButton.setDisable(!canChangePassword);</span>
+<span class="nc" id="L298">    }</span>
+
+    /**
+     * پردازش ذخیره تغییرات پروفایل
+     * 
+     * مراحل:
+     * 1. اعتبارسنجی داده‌ها
+     * 2. ارسال به سرور در background thread
+     * 3. بروزرسانی UI
+     */
+    @FXML
+    private void handleSave() {
+<span class="nc bnc" id="L310" title="All 2 branches missed.">        if (!validateProfileData()) {</span>
+<span class="nc" id="L311">            return;</span>
+        }
+        
+<span class="nc" id="L314">        setLoading(true);</span>
+<span class="nc" id="L315">        setStatus(&quot;در حال ذخیره تغییرات...&quot;);</span>
+        
+<span class="nc" id="L317">        Task&lt;Void&gt; saveTask = new Task&lt;Void&gt;() {</span>
+            @Override
+            protected Void call() throws Exception {
+<span class="nc" id="L320">                UserProfile updatedProfile = new UserProfile();</span>
+<span class="nc" id="L321">                updatedProfile.setFullName(fullNameField.getText().trim());</span>
+<span class="nc" id="L322">                updatedProfile.setEmail(emailField.getText().trim());</span>
+<span class="nc" id="L323">                updatedProfile.setAddress(addressField.getText().trim());</span>
+                
+<span class="nc" id="L325">                HttpClientUtil.ApiResponse response = HttpClientUtil.put(&quot;/auth/profile&quot;, updatedProfile);</span>
+                
+<span class="nc bnc" id="L327" title="All 2 branches missed.">                if (!response.isSuccess()) {</span>
+<span class="nc bnc" id="L328" title="All 2 branches missed.">                    throw new RuntimeException(response.getMessage() != null ? </span>
+<span class="nc" id="L329">                                               response.getMessage() : &quot;خطا در ذخیره تغییرات&quot;);</span>
+                }
+                
+<span class="nc" id="L332">                return null;</span>
+            }
+        };
+        
+<span class="nc" id="L336">        saveTask.setOnSucceeded(e -&gt; {</span>
+<span class="nc" id="L337">            Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L338">                setLoading(false);</span>
+<span class="nc" id="L339">                setStatus(&quot;تغییرات با موفقیت ذخیره شد&quot;);</span>
+<span class="nc" id="L340">                showSuccess(&quot;موفقیت&quot;, &quot;اطلاعات پروفایل با موفقیت به‌روزرسانی شد&quot;);</span>
+<span class="nc" id="L341">                loadProfile(); // بارگذاری مجدد برای دریافت داده‌های به‌روزرسانی شده</span>
+<span class="nc" id="L342">            });</span>
+<span class="nc" id="L343">        });</span>
+        
+<span class="nc" id="L345">        saveTask.setOnFailed(e -&gt; {</span>
+<span class="nc" id="L346">            Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L347">                setLoading(false);</span>
+<span class="nc" id="L348">                Throwable exception = saveTask.getException();</span>
+<span class="nc" id="L349">                String errorMessage = &quot;خطا در ذخیره تغییرات&quot;;</span>
+<span class="nc bnc" id="L350" title="All 4 branches missed.">                if (exception != null &amp;&amp; exception.getMessage() != null) {</span>
+<span class="nc" id="L351">                    errorMessage = exception.getMessage();</span>
+                }
+<span class="nc" id="L353">                setStatus(errorMessage);</span>
+<span class="nc" id="L354">                showError(&quot;خطا&quot;, errorMessage);</span>
+<span class="nc" id="L355">            });</span>
+<span class="nc" id="L356">        });</span>
+        
+<span class="nc" id="L358">        Thread saveThread = new Thread(saveTask);</span>
+<span class="nc" id="L359">        saveThread.setDaemon(true);</span>
+<span class="nc" id="L360">        saveThread.start();</span>
+<span class="nc" id="L361">    }</span>
+
+    /**
+     * اعتبارسنجی داده‌های پروفایل قبل از ذخیره
+     * 
+     * @return true اگر تمام داده‌ها معتبر باشند
+     */
+    private boolean validateProfileData() {
+<span class="nc" id="L369">        String fullName = fullNameField.getText().trim();</span>
+<span class="nc" id="L370">        String email = emailField.getText().trim();</span>
+        
+<span class="nc bnc" id="L372" title="All 2 branches missed.">        if (fullName.isEmpty()) {</span>
+<span class="nc" id="L373">            showError(&quot;خطای اعتبارسنجی&quot;, &quot;نام کامل نمی‌تواند خالی باشد&quot;);</span>
+<span class="nc" id="L374">            fullNameField.requestFocus();</span>
+<span class="nc" id="L375">            return false;</span>
+        }
+        
+<span class="nc bnc" id="L378" title="All 4 branches missed.">        if (!email.isEmpty() &amp;&amp; !isValidEmail(email)) {</span>
+<span class="nc" id="L379">            showError(&quot;خطای اعتبارسنجی&quot;, &quot;فرمت ایمیل صحیح نیست&quot;);</span>
+<span class="nc" id="L380">            emailField.requestFocus();</span>
+<span class="nc" id="L381">            return false;</span>
+        }
+        
+<span class="nc" id="L384">        return true;</span>
+    }
+
+    /**
+     * اعتبارسنجی ساده ایمیل
+     * 
+     * @param email آدرس ایمیل
+     * @return true اگر فرمت صحیح باشد
+     */
+    private boolean isValidEmail(String email) {
+<span class="nc" id="L394">        return email.matches(&quot;^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$&quot;);</span>
+    }
+
+    /**
+     * پردازش تغییر رمز عبور
+     * 
+     * شامل اعتبارسنجی و ارسال درخواست به سرور
+     */
+    @FXML
+    private void handleChangePassword() {
+<span class="nc" id="L404">        String currentPassword = currentPasswordField.getText();</span>
+<span class="nc" id="L405">        String newPassword = newPasswordField.getText();</span>
+<span class="nc" id="L406">        String confirmPassword = confirmPasswordField.getText();</span>
+        
+<span class="nc bnc" id="L408" title="All 2 branches missed.">        if (!newPassword.equals(confirmPassword)) {</span>
+<span class="nc" id="L409">            showError(&quot;خطا&quot;, &quot;رمز عبور جدید و تکرار آن یکسان نیستند&quot;);</span>
+<span class="nc" id="L410">            return;</span>
+        }
+        
+<span class="nc bnc" id="L413" title="All 2 branches missed.">        if (newPassword.length() &lt; 4) {</span>
+<span class="nc" id="L414">            showError(&quot;خطا&quot;, &quot;رمز عبور جدید باید حداقل 4 کاراکتر باشد&quot;);</span>
+<span class="nc" id="L415">            return;</span>
+        }
+        
+<span class="nc" id="L418">        setLoading(true);</span>
+<span class="nc" id="L419">        setStatus(&quot;در حال تغییر رمز عبور...&quot;);</span>
+        
+        // TODO: پیاده‌سازی API تغییر رمز عبور
+        // فعلاً پیام placeholder نمایش داده می‌شود
+<span class="nc" id="L423">        Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L424">            setLoading(false);</span>
+<span class="nc" id="L425">            setStatus(&quot;تغییر رمز عبور در نسخه آینده پیاده‌سازی خواهد شد&quot;);</span>
+<span class="nc" id="L426">            showInfo(&quot;اطلاع&quot;, &quot;قابلیت تغییر رمز عبور در نسخه بعدی اضافه خواهد شد&quot;);</span>
+<span class="nc" id="L427">            handleClearPasswordFields();</span>
+<span class="nc" id="L428">        });</span>
+<span class="nc" id="L429">    }</span>
+
+    /**
+     * پاک کردن فیلدهای رمز عبور
+     */
+    @FXML
+    private void handleClearPasswordFields() {
+<span class="nc" id="L436">        currentPasswordField.clear();</span>
+<span class="nc" id="L437">        newPasswordField.clear();</span>
+<span class="nc" id="L438">        confirmPasswordField.clear();</span>
+<span class="nc" id="L439">    }</span>
+
+    /**
+     * پردازش لغو تغییرات
+     * بازگرداندن فیلدها به حالت اولیه
+     */
+    @FXML
+    private void handleCancel() {
+<span class="nc bnc" id="L447" title="All 2 branches missed.">        if (originalProfile != null) {</span>
+<span class="nc" id="L448">            displayProfile(originalProfile);</span>
+<span class="nc" id="L449">            setStatus(&quot;تغییرات لغو شد&quot;);</span>
+        }
+<span class="nc" id="L451">    }</span>
+
+    /**
+     * پردازش بروزرسانی پروفایل
+     * بارگذاری مجدد اطلاعات از سرور
+     */
+    @FXML
+    private void handleRefresh() {
+<span class="nc" id="L459">        loadProfile();</span>
+<span class="nc" id="L460">    }</span>
+
+    /**
+     * پردازش بازگشت به منوی اصلی
+     */
+    @FXML
+    private void handleBack() {
+<span class="nc" id="L467">        navigationController.navigateTo(NavigationController.RESTAURANT_LIST_SCENE);</span>
+<span class="nc" id="L468">    }</span>
+
+    /**
+     * پردازش انتقال به تاریخچه سفارشات
+     */
+    @FXML
+    private void handleOrderHistory() {
+<span class="nc" id="L475">        navigationController.navigateTo(NavigationController.ORDER_HISTORY_SCENE);</span>
+<span class="nc" id="L476">    }</span>
+
+    /**
+     * پردازش انتقال به سبد خرید
+     */
+    @FXML
+    private void handleCart() {
+<span class="nc" id="L483">        navigationController.navigateTo(NavigationController.CART_SCENE);</span>
+<span class="nc" id="L484">    }</span>
+
+    /**
+     * پردازش خروج از حساب کاربری
+     * نمایش دیالوگ تأیید قبل از خروج
+     */
+    @FXML
+    private void handleLogout() {
+<span class="nc" id="L492">        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);</span>
+<span class="nc" id="L493">        confirmAlert.setTitle(&quot;تأیید خروج&quot;);</span>
+<span class="nc" id="L494">        confirmAlert.setHeaderText(&quot;آیا مطمئن هستید؟&quot;);</span>
+<span class="nc" id="L495">        confirmAlert.setContentText(&quot;آیا می‌خواهید از حساب کاربری خود خارج شوید؟&quot;);</span>
+        
+<span class="nc" id="L497">        confirmAlert.showAndWait().ifPresent(response -&gt; {</span>
+<span class="nc bnc" id="L498" title="All 2 branches missed.">            if (response == ButtonType.OK) {</span>
+<span class="nc" id="L499">                navigationController.logout();</span>
+            }
+<span class="nc" id="L501">        });</span>
+<span class="nc" id="L502">    }</span>
+
+    /**
+     * تنظیم حالت loading برای UI
+     * 
+     * در حالت loading تمام کنترل‌ها غیرفعال می‌شوند
+     * 
+     * @param loading true برای فعال کردن loading
+     */
+    private void setLoading(boolean loading) {
+<span class="fc" id="L512">        loadingIndicator.setVisible(loading);</span>
+<span class="fc" id="L513">        saveButton.setDisable(loading);</span>
+<span class="fc" id="L514">        refreshButton.setDisable(loading);</span>
+<span class="fc" id="L515">        changePasswordButton.setDisable(loading);</span>
+<span class="fc" id="L516">        fullNameField.setDisable(loading);</span>
+<span class="fc" id="L517">        emailField.setDisable(loading);</span>
+<span class="fc" id="L518">        addressField.setDisable(loading);</span>
+<span class="fc" id="L519">        currentPasswordField.setDisable(loading);</span>
+<span class="fc" id="L520">        newPasswordField.setDisable(loading);</span>
+<span class="fc" id="L521">        confirmPasswordField.setDisable(loading);</span>
+<span class="fc" id="L522">    }</span>
+
+    /**
+     * تنظیم پیام وضعیت
+     * 
+     * @param message متن پیام
+     */
+    private void setStatus(String message) {
+<span class="pc bpc" id="L530" title="1 of 2 branches missed.">        if (statusLabel != null) {</span>
+<span class="fc" id="L531">            statusLabel.setText(message);</span>
+        }
+<span class="fc" id="L533">    }</span>
+
+    /**
+     * نمایش دیالوگ خطا
+     * 
+     * @param title عنوان دیالوگ
+     * @param message متن پیام خطا
+     */
+    private void showError(String title, String message) {
+<span class="fc" id="L542">        Alert alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="fc" id="L543">        alert.setTitle(title);</span>
+<span class="fc" id="L544">        alert.setHeaderText(null);</span>
+<span class="fc" id="L545">        alert.setContentText(message);</span>
+<span class="fc" id="L546">        alert.showAndWait();</span>
+<span class="fc" id="L547">    }</span>
+
+    /**
+     * نمایش دیالوگ موفقیت
+     * 
+     * @param title عنوان دیالوگ
+     * @param message متن پیام موفقیت
+     */
+    private void showSuccess(String title, String message) {
+<span class="nc" id="L556">        Alert alert = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L557">        alert.setTitle(title);</span>
+<span class="nc" id="L558">        alert.setHeaderText(null);</span>
+<span class="nc" id="L559">        alert.setContentText(message);</span>
+<span class="nc" id="L560">        alert.showAndWait();</span>
+<span class="nc" id="L561">    }</span>
+
+    /**
+     * نمایش دیالوگ اطلاعات
+     * 
+     * @param title عنوان دیالوگ
+     * @param message متن پیام اطلاعاتی
+     */
+    private void showInfo(String title, String message) {
+<span class="nc" id="L570">        Alert alert = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L571">        alert.setTitle(title);</span>
+<span class="nc" id="L572">        alert.setHeaderText(null);</span>
+<span class="nc" id="L573">        alert.setContentText(message);</span>
+<span class="nc" id="L574">        alert.showAndWait();</span>
+<span class="nc" id="L575">    }</span>
+
+    // ==================== DATA MODEL ====================
+
+    /**
+     * مدل داده‌ای پروفایل کاربر
+     * 
+     * این کلاس شامل تمام اطلاعات مربوط به کاربر است
+     * و امکان کپی‌برداری از اطلاعات را فراهم می‌کند
+     */
+<span class="nc" id="L585">    public static class UserProfile {</span>
+        /** شناسه منحصربه‌فرد کاربر */
+        private Long id;
+        
+        /** نام کامل کاربر */
+        private String fullName;
+        
+        /** شماره تلفن کاربر */
+        private String phone;
+        
+        /** آدرس ایمیل کاربر */
+        private String email;
+        
+        /** آدرس کاربر */
+        private String address;
+        
+        /** نقش کاربری */
+        private String role;
+        
+        /** وضعیت فعالیت حساب */
+        private boolean active;
+
+        // Getter و Setter ها
+<span class="nc" id="L608">        public Long getId() { return id; }</span>
+<span class="nc" id="L609">        public void setId(Long id) { this.id = id; }</span>
+
+<span class="nc" id="L611">        public String getFullName() { return fullName; }</span>
+<span class="nc" id="L612">        public void setFullName(String fullName) { this.fullName = fullName; }</span>
+
+<span class="nc" id="L614">        public String getPhone() { return phone; }</span>
+<span class="nc" id="L615">        public void setPhone(String phone) { this.phone = phone; }</span>
+
+<span class="nc" id="L617">        public String getEmail() { return email; }</span>
+<span class="nc" id="L618">        public void setEmail(String email) { this.email = email; }</span>
+
+<span class="nc" id="L620">        public String getAddress() { return address; }</span>
+<span class="nc" id="L621">        public void setAddress(String address) { this.address = address; }</span>
+
+<span class="nc" id="L623">        public String getRole() { return role; }</span>
+<span class="nc" id="L624">        public void setRole(String role) { this.role = role; }</span>
+
+<span class="nc" id="L626">        public boolean isActive() { return active; }</span>
+<span class="nc" id="L627">        public void setActive(boolean active) { this.active = active; }</span>
+
+        /**
+         * ایجاد کپی از این پروفایل
+         * 
+         * @return کپی جدید از پروفایل
+         */
+        public UserProfile copy() {
+<span class="nc" id="L635">            UserProfile copy = new UserProfile();</span>
+<span class="nc" id="L636">            copy.setId(this.id);</span>
+<span class="nc" id="L637">            copy.setFullName(this.fullName);</span>
+<span class="nc" id="L638">            copy.setPhone(this.phone);</span>
+<span class="nc" id="L639">            copy.setEmail(this.email);</span>
+<span class="nc" id="L640">            copy.setAddress(this.address);</span>
+<span class="nc" id="L641">            copy.setRole(this.role);</span>
+<span class="nc" id="L642">            copy.setActive(this.active);</span>
+<span class="nc" id="L643">            return copy;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

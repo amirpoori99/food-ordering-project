@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LoginController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.auth</a> &gt; <span class="el_source">LoginController.java</span></div><h1>LoginController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.auth;
+
+import com.myapp.ui.common.HttpClientUtil;
+import com.myapp.ui.common.NavigationController;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
+
+/**
+ * کنترلر صفحه ورود به سیستم
+ * 
+ * این کلاس مسئول مدیریت رابط کاربری ورود شامل:
+ * - اعتبارسنجی ورودی‌های کاربر
+ * - ارتباط با backend برای احراز هویت
+ * - مدیریت حالت‌های loading و error
+ * - ذخیره اطلاعات کاربر (remember me)
+ * - navigation به صفحات مختلف
+ * 
+ * Pattern های استفاده شده:
+ * - MVC Pattern: Controller جدا از View
+ * - Observer Pattern: event listeners برای UI components
+ * - Task Pattern: background processing برای API calls
+ * - Singleton Pattern: NavigationController
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+<span class="fc" id="L36">public class LoginController implements Initializable {</span>
+
+    /** فیلد ورودی شماره تلفن */
+    @FXML private TextField phoneField;
+    
+    /** فیلد ورودی رمز عبور */
+    @FXML private PasswordField passwordField;
+    
+    /** چک‌باکس &quot;مرا به خاطر بسپار&quot; */
+    @FXML private CheckBox rememberMeCheckbox;
+    
+    /** دکمه ورود */
+    @FXML private Button loginButton;
+    
+    /** لینک ثبت نام */
+    @FXML private Hyperlink registerLink;
+    
+    /** برچسب نمایش وضعیت و پیام‌های خطا */
+    @FXML private Label statusLabel;
+    
+    /** نشانگر loading در زمان پردازش درخواست */
+    @FXML private ProgressIndicator loadingIndicator;
+
+    /** کنترلر navigation برای تغییر صفحات */
+    private NavigationController navigationController;
+    
+    /** Preferences برای ذخیره اطلاعات کاربر */
+    private Preferences preferences;
+    
+    /** flag برای جلوگیری از درخواست‌های همزمان ورود */
+<span class="fc" id="L66">    private boolean isLoginInProgress = false;</span>
+
+    /**
+     * متد مقداردهی اولیه که بعد از load شدن FXML اجرا می‌شود
+     * 
+     * @param location URL location مربوط به FXML
+     * @param resources منابع زبان و localization
+     */
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        // دریافت instance های singleton
+<span class="fc" id="L77">        this.navigationController = NavigationController.getInstance();</span>
+<span class="fc" id="L78">        this.preferences = Preferences.userNodeForPackage(LoginController.class);</span>
+        
+        // راه‌اندازی رابط کاربری
+<span class="fc" id="L81">        setupUI();</span>
+        
+        // بارگذاری اطلاعات ذخیره شده قبلی
+<span class="fc" id="L84">        loadSavedCredentials();</span>
+<span class="fc" id="L85">    }</span>
+
+    /**
+     * راه‌اندازی کامپوننت‌های UI و event handler ها
+     * 
+     * شامل:
+     * - تنظیم listener ها برای enable/disable کردن دکمه ورود
+     * - تنظیم keyboard navigation (Enter key)
+     * - تنظیم حالت اولیه فیلدها
+     */
+    private void setupUI() {
+        // فعال/غیرفعال کردن دکمه ورود بر اساس پر بودن فیلدها
+<span class="fc" id="L97">        phoneField.textProperty().addListener((obs, oldText, newText) -&gt; updateLoginButtonState());</span>
+<span class="fc" id="L98">        passwordField.textProperty().addListener((obs, oldText, newText) -&gt; updateLoginButtonState());</span>
+        
+        // تنظیم enter key handler ها برای بهبود UX
+<span class="pc" id="L101">        phoneField.setOnAction(e -&gt; passwordField.requestFocus()); // انتقال focus به فیلد رمز</span>
+<span class="fc" id="L102">        passwordField.setOnAction(e -&gt; handleLogin()); // اجرای ورود با enter</span>
+        
+        // تنظیم حالت اولیه
+<span class="fc" id="L105">        updateLoginButtonState();</span>
+<span class="fc" id="L106">        clearStatus();</span>
+<span class="fc" id="L107">    }</span>
+
+    /**
+     * بارگذاری اطلاعات ذخیره شده کاربر
+     * 
+     * اگر قبلاً گزینه &quot;مرا به خاطر بسپار&quot; انتخاب شده بود،
+     * شماره تلفن و وضعیت checkbox بارگذاری می‌شود
+     */
+    public void loadSavedCredentials() {
+<span class="fc" id="L116">        String savedPhone = preferences.get(&quot;saved_phone&quot;, &quot;&quot;);</span>
+<span class="fc" id="L117">        boolean rememberMe = preferences.getBoolean(&quot;remember_me&quot;, false);</span>
+        
+<span class="pc bpc" id="L119" title="3 of 4 branches missed.">        if (rememberMe &amp;&amp; !savedPhone.isEmpty()) {</span>
+<span class="nc" id="L120">            phoneField.setText(savedPhone);</span>
+<span class="nc" id="L121">            rememberMeCheckbox.setSelected(true);</span>
+        }
+<span class="fc" id="L123">    }</span>
+
+    /**
+     * پردازش کلیک روی دکمه ورود
+     * 
+     * مراحل:
+     * 1. جلوگیری از درخواست‌های همزمان
+     * 2. اعتبارسنجی ورودی‌ها
+     * 3. اجرای background task برای ارتباط با API
+     * 4. پردازش نتیجه و navigation
+     */
+    @FXML
+    private void handleLogin() {
+        // جلوگیری از چندین درخواست همزمان
+<span class="fc bfc" id="L137" title="All 2 branches covered.">        if (isLoginInProgress) {</span>
+<span class="fc" id="L138">            return;</span>
+        }
+        
+        // دریافت مقادیر فیلدها
+<span class="fc" id="L142">        String phone = phoneField.getText().trim();</span>
+<span class="fc" id="L143">        String password = passwordField.getText();</span>
+        
+        // اعتبارسنجی ورودی‌ها
+<span class="fc bfc" id="L146" title="All 2 branches covered.">        if (!validateInput(phone, password)) {</span>
+<span class="fc" id="L147">            return;</span>
+        }
+        
+        // شروع فرآیند ورود
+<span class="fc" id="L151">        isLoginInProgress = true;</span>
+<span class="fc" id="L152">        setLoading(true);</span>
+<span class="fc" id="L153">        clearStatus();</span>
+        
+        // ایجاد background task برای جلوگیری از freeze شدن UI
+<span class="fc" id="L156">        Task&lt;HttpClientUtil.ApiResponse&gt; loginTask = new Task&lt;HttpClientUtil.ApiResponse&gt;() {</span>
+            @Override
+            protected HttpClientUtil.ApiResponse call() throws Exception {
+                // فراخوانی API ورود
+<span class="fc" id="L160">                return HttpClientUtil.login(phone, password);</span>
+            }
+        };
+        
+        // پردازش نتیجه موفق
+<span class="fc" id="L165">        loginTask.setOnSucceeded(e -&gt; {</span>
+<span class="fc" id="L166">            Platform.runLater(() -&gt; {</span>
+<span class="fc" id="L167">                isLoginInProgress = false;</span>
+<span class="fc" id="L168">                setLoading(false);</span>
+<span class="fc" id="L169">                HttpClientUtil.ApiResponse response = loginTask.getValue();</span>
+<span class="fc" id="L170">                handleLoginResponse(response, phone);</span>
+<span class="fc" id="L171">            });</span>
+<span class="fc" id="L172">        });</span>
+        
+        // پردازش خطا
+<span class="fc" id="L175">        loginTask.setOnFailed(e -&gt; {</span>
+<span class="nc" id="L176">            Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L177">                isLoginInProgress = false;</span>
+<span class="nc" id="L178">                setLoading(false);</span>
+<span class="nc" id="L179">                Throwable exception = loginTask.getException();</span>
+<span class="nc" id="L180">                handleLoginError(exception);</span>
+<span class="nc" id="L181">            });</span>
+<span class="nc" id="L182">        });</span>
+        
+        // اجرای task در thread جداگانه
+<span class="fc" id="L185">        Thread loginThread = new Thread(loginTask);</span>
+<span class="fc" id="L186">        loginThread.setDaemon(true); // daemon thread تا با بسته شدن برنامه تمام شود</span>
+<span class="fc" id="L187">        loginThread.start();</span>
+<span class="fc" id="L188">    }</span>
+
+    /**
+     * اعتبارسنجی ورودی‌های کاربر
+     * 
+     * بررسی‌های انجام شده:
+     * - خالی نبودن فیلدها
+     * - فرمت صحیح شماره تلفن (09xxxxxxxxx)
+     * - حداقل طول رمز عبور
+     * 
+     * @param phone شماره تلفن وارد شده
+     * @param password رمز عبور وارد شده
+     * @return true اگر ورودی‌ها معتبر باشند
+     */
+    private boolean validateInput(String phone, String password) {
+        // بررسی خالی نبودن شماره تلفن
+<span class="fc bfc" id="L204" title="All 2 branches covered.">        if (phone.isEmpty()) {</span>
+<span class="fc" id="L205">            showError(&quot;لطفاً شماره تلفن را وارد کنید&quot;);</span>
+<span class="fc" id="L206">            phoneField.requestFocus();</span>
+<span class="fc" id="L207">            return false;</span>
+        }
+        
+        // بررسی خالی نبودن رمز عبور
+<span class="fc bfc" id="L211" title="All 2 branches covered.">        if (password.isEmpty()) {</span>
+<span class="fc" id="L212">            showError(&quot;لطفاً رمز عبور را وارد کنید&quot;);</span>
+<span class="fc" id="L213">            passwordField.requestFocus();</span>
+<span class="fc" id="L214">            return false;</span>
+        }
+        
+        // بررسی فرمت شماره تلفن (11 رقم، شروع با 09)
+<span class="fc bfc" id="L218" title="All 2 branches covered.">        if (!phone.matches(&quot;^09\\d{9}$&quot;)) {</span>
+<span class="fc" id="L219">            showError(&quot;شماره تلفن باید با 09 شروع شود و 11 رقم باشد&quot;);</span>
+<span class="fc" id="L220">            phoneField.requestFocus();</span>
+<span class="fc" id="L221">            return false;</span>
+        }
+        
+        // بررسی حداقل طول رمز عبور
+<span class="fc bfc" id="L225" title="All 2 branches covered.">        if (password.length() &lt; 4) {</span>
+<span class="fc" id="L226">            showError(&quot;رمز عبور باید حداقل 4 کاراکتر باشد&quot;);</span>
+<span class="fc" id="L227">            passwordField.requestFocus();</span>
+<span class="fc" id="L228">            return false;</span>
+        }
+        
+<span class="fc" id="L231">        return true;</span>
+    }
+
+    /**
+     * پردازش پاسخ دریافت شده از API ورود
+     * 
+     * @param response پاسخ API
+     * @param phone شماره تلفن برای ذخیره در صورت موفقیت
+     */
+    public void handleLoginResponse(HttpClientUtil.ApiResponse response, String phone) {
+<span class="pc bpc" id="L241" title="1 of 2 branches missed.">        if (response.isSuccess()) {</span>
+            // نمایش پیام موفقیت
+<span class="nc" id="L243">            showSuccess(&quot;ورود موفقیت‌آمیز بود!&quot;);</span>
+            
+            // ذخیره اطلاعات در صورت انتخاب &quot;مرا به خاطر بسپار&quot;
+<span class="nc bnc" id="L246" title="All 2 branches missed.">            if (rememberMeCheckbox.isSelected()) {</span>
+<span class="nc" id="L247">                preferences.put(&quot;saved_phone&quot;, phone);</span>
+<span class="nc" id="L248">                preferences.putBoolean(&quot;remember_me&quot;, true);</span>
+            } else {
+                // پاک کردن اطلاعات ذخیره شده
+<span class="nc" id="L251">                preferences.remove(&quot;saved_phone&quot;);</span>
+<span class="nc" id="L252">                preferences.putBoolean(&quot;remember_me&quot;, false);</span>
+            }
+            
+            // انتقال به صفحه اصلی (لیست رستوران‌ها)
+<span class="nc" id="L256">            navigationController.navigateTo(NavigationController.RESTAURANT_LIST_SCENE);</span>
+            
+        } else {
+            // نمایش پیام خطا دریافت شده از سرور
+<span class="fc" id="L260">            String errorMessage = response.getMessage();</span>
+<span class="pc bpc" id="L261" title="1 of 4 branches missed.">            if (errorMessage == null || errorMessage.isEmpty()) {</span>
+<span class="fc" id="L262">                errorMessage = &quot;خطا در ورود به سیستم&quot;;</span>
+            }
+<span class="fc" id="L264">            showError(errorMessage);</span>
+        }
+<span class="fc" id="L266">    }</span>
+
+    /**
+     * پردازش خطاهای ارتباط با سرور
+     * 
+     * انواع خطاهای پردازش شده:
+     * - Timeout: خطای زمان انتظار
+     * - Connection: خطای اتصال
+     * - Unknown Host: عدم دسترسی به سرور
+     * - IO Exception: خطاهای عمومی شبکه
+     * 
+     * @param exception خطای رخ داده
+     */
+    public void handleLoginError(Throwable exception) {
+<span class="fc" id="L280">        String errorMessage = &quot;خطا در اتصال به سرور&quot;;</span>
+        
+<span class="fc bfc" id="L282" title="All 2 branches covered.">        if (exception == null) {</span>
+<span class="fc" id="L283">            errorMessage = &quot;خطا در اتصال به سرور&quot;;</span>
+<span class="fc bfc" id="L284" title="All 2 branches covered.">        } else if (exception instanceof java.net.SocketTimeoutException || </span>
+<span class="pc bpc" id="L285" title="2 of 4 branches missed.">                   exception.getMessage() != null &amp;&amp; exception.getMessage().contains(&quot;timeout&quot;)) {</span>
+<span class="fc" id="L286">            errorMessage = &quot;خطا در اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید&quot;;</span>
+<span class="fc bfc" id="L287" title="All 2 branches covered.">        } else if (exception instanceof java.net.UnknownHostException ||</span>
+<span class="pc bpc" id="L288" title="2 of 4 branches missed.">                   exception.getMessage() != null &amp;&amp; exception.getMessage().contains(&quot;connection&quot;)) {</span>
+<span class="fc" id="L289">            errorMessage = &quot;خطا در اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید&quot;;</span>
+<span class="pc bpc" id="L290" title="1 of 2 branches missed.">        } else if (exception instanceof IOException) {</span>
+<span class="fc" id="L291">            errorMessage = &quot;خطا در اتصال به سرور. لطفاً اتصال اینترنت خود را بررسی کنید&quot;;</span>
+<span class="nc bnc" id="L292" title="All 2 branches missed.">        } else if (exception.getMessage() != null) {</span>
+<span class="nc" id="L293">            errorMessage = exception.getMessage();</span>
+        }
+        
+<span class="fc" id="L296">        showError(errorMessage);</span>
+<span class="fc" id="L297">    }</span>
+
+    /**
+     * پردازش کلیک روی لینک ثبت نام
+     * انتقال کاربر به صفحه ثبت نام
+     */
+    @FXML
+    private void handleRegisterLink() {
+<span class="fc" id="L305">        navigationController.navigateTo(NavigationController.REGISTER_SCENE);</span>
+<span class="fc" id="L306">    }</span>
+
+    /**
+     * به‌روزرسانی وضعیت دکمه ورود بر اساس پر بودن فیلدها
+     * 
+     * دکمه ورود فقط زمانی فعال است که هر دو فیلد پر باشند
+     */
+    private void updateLoginButtonState() {
+<span class="fc bfc" id="L314" title="All 2 branches covered.">        boolean hasInput = !phoneField.getText().trim().isEmpty() &amp;&amp; </span>
+<span class="fc bfc" id="L315" title="All 2 branches covered.">                          !passwordField.getText().isEmpty();</span>
+<span class="fc bfc" id="L316" title="All 2 branches covered.">        loginButton.setDisable(!hasInput);</span>
+<span class="fc" id="L317">    }</span>
+
+    /**
+     * تنظیم حالت loading برای UI
+     * 
+     * در حالت loading:
+     * - نشانگر loading نمایش داده می‌شود
+     * - تمام کنترل‌ها غیرفعال می‌شوند
+     * - پیام &quot;در حال ورود...&quot; نمایش داده می‌شود
+     * 
+     * @param loading true برای فعال کردن loading
+     */
+    public void setLoading(boolean loading) {
+<span class="fc" id="L330">        loadingIndicator.setVisible(loading);</span>
+<span class="fc" id="L331">        loginButton.setDisable(loading);</span>
+<span class="fc" id="L332">        phoneField.setDisable(loading);</span>
+<span class="fc" id="L333">        passwordField.setDisable(loading);</span>
+<span class="fc" id="L334">        rememberMeCheckbox.setDisable(loading);</span>
+<span class="fc" id="L335">        registerLink.setDisable(loading);</span>
+        
+<span class="fc bfc" id="L337" title="All 2 branches covered.">        if (loading) {</span>
+<span class="fc" id="L338">            statusLabel.setText(&quot;در حال ورود...&quot;);</span>
+        }
+<span class="fc" id="L340">    }</span>
+
+    /**
+     * نمایش پیام خطا با رنگ قرمز
+     * 
+     * @param message متن پیام خطا
+     */
+    private void showError(String message) {
+<span class="fc" id="L348">        statusLabel.setText(message);</span>
+<span class="fc" id="L349">        statusLabel.setStyle(&quot;-fx-text-fill: red;&quot;);</span>
+<span class="fc" id="L350">    }</span>
+
+    /**
+     * نمایش پیام موفقیت با رنگ سبز
+     * 
+     * @param message متن پیام موفقیت
+     */
+    private void showSuccess(String message) {
+<span class="nc" id="L358">        statusLabel.setText(message);</span>
+<span class="nc" id="L359">        statusLabel.setStyle(&quot;-fx-text-fill: green;&quot;);</span>
+<span class="nc" id="L360">    }</span>
+
+    /**
+     * پاک کردن پیام وضعیت
+     */
+    private void clearStatus() {
+<span class="fc" id="L366">        statusLabel.setText(&quot;&quot;);</span>
+<span class="fc" id="L367">        statusLabel.setStyle(&quot;&quot;);</span>
+<span class="fc" id="L368">    }</span>
+
+    // ==================== PUBLIC METHODS FOR TESTING ====================
+
+    /**
+     * دریافت متن فیلد شماره تلفن (برای تست)
+     * @return متن فیلد شماره تلفن
+     */
+    public String getPhoneFieldText() {
+<span class="fc bfc" id="L377" title="All 2 branches covered.">        return phoneField != null ? phoneField.getText() : &quot;&quot;;</span>
+    }
+
+    /**
+     * تنظیم متن فیلد شماره تلفن (برای تست)
+     * @param text متن جدید
+     */
+    public void setPhoneFieldText(String text) {
+<span class="pc bpc" id="L385" title="1 of 2 branches missed.">        if (phoneField != null) {</span>
+<span class="fc" id="L386">            phoneField.setText(text);</span>
+        }
+<span class="fc" id="L388">    }</span>
+
+    /**
+     * دریافت متن فیلد رمز عبور (برای تست)
+     * @return متن فیلد رمز عبور
+     */
+    public String getPasswordFieldText() {
+<span class="fc bfc" id="L395" title="All 2 branches covered.">        return passwordField != null ? passwordField.getText() : &quot;&quot;;</span>
+    }
+
+    /**
+     * تنظیم متن فیلد رمز عبور (برای تست)
+     * @param text متن جدید
+     */
+    public void setPasswordFieldText(String text) {
+<span class="pc bpc" id="L403" title="1 of 2 branches missed.">        if (passwordField != null) {</span>
+<span class="fc" id="L404">            passwordField.setText(text);</span>
+        }
+<span class="fc" id="L406">    }</span>
+
+    /**
+     * دریافت وضعیت چک‌باکس &quot;مرا به خاطر بسپار&quot; (برای تست)
+     * @return true اگر انتخاب شده باشد
+     */
+    public boolean isRememberMeSelected() {
+<span class="fc bfc" id="L413" title="All 4 branches covered.">        return rememberMeCheckbox != null &amp;&amp; rememberMeCheckbox.isSelected();</span>
+    }
+
+    /**
+     * تنظیم وضعیت چک‌باکس &quot;مرا به خاطر بسپار&quot; (برای تست)
+     * @param selected وضعیت جدید
+     */
+    public void setRememberMeSelected(boolean selected) {
+<span class="pc bpc" id="L421" title="1 of 2 branches missed.">        if (rememberMeCheckbox != null) {</span>
+<span class="fc" id="L422">            rememberMeCheckbox.setSelected(selected);</span>
+        }
+<span class="fc" id="L424">    }</span>
+
+    /**
+     * دریافت متن برچسب وضعیت (برای تست)
+     * @return متن وضعیت
+     */
+    public String getStatusText() {
+<span class="fc bfc" id="L431" title="All 2 branches covered.">        return statusLabel != null ? statusLabel.getText() : &quot;&quot;;</span>
+    }
+
+    /**
+     * بررسی غیرفعال بودن دکمه ورود (برای تست)
+     * @return true اگر دکمه غیرفعال باشد
+     */
+    public boolean isLoginButtonDisabled() {
+<span class="fc bfc" id="L439" title="All 4 branches covered.">        return loginButton != null &amp;&amp; loginButton.isDisabled();</span>
+    }
+
+    /**
+     * بررسی نمایش نشانگر loading (برای تست)
+     * @return true اگر loading نمایش داده شود
+     */
+    public boolean isLoadingVisible() {
+<span class="fc bfc" id="L447" title="All 4 branches covered.">        return loadingIndicator != null &amp;&amp; loadingIndicator.isVisible();</span>
+    }
+
+    /**
+     * اجرای ورود به صورت برنامه‌نویسی (برای تست)
+     */
+    public void triggerLogin() {
+<span class="fc" id="L454">        handleLogin();</span>
+<span class="fc" id="L455">    }</span>
+
+    /**
+     * اجرای لینک ثبت نام به صورت برنامه‌نویسی (برای تست)
+     */
+    public void triggerRegisterLink() {
+<span class="fc" id="L461">        handleRegisterLink();</span>
+<span class="fc" id="L462">    }</span>
+
+    /**
+     * دریافت view اصلی (مخصوص تست)
+     * 
+     * @return Parent node از view
+     */
+    public javafx.scene.Parent getView() {
+<span class="nc" id="L470">        return phoneField.getScene().getRoot();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

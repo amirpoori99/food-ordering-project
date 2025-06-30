@@ -29,11 +29,11 @@
 - **Backend**: ✅ 100% Complete (20/20 phases)
 - **Frontend**: ✅ 100% Complete (10/10 phases)  
 - **System Scripts**: ✅ 100% Complete (5/5 phases)
-- **Documentation**: 🔄 92.5% Complete (37/40 phase reports done)
-- **Overall Progress**: **92.5%** (37/40 phases)
+- **Documentation**: 🔄 95% Complete (38/40 phase reports done)
+- **Overall Progress**: **95%** (38/40 phases)
 
-### **آخرین دستاورد: فاز 37 تکمیل شده** ✅
-- **User Manuals & Guides**: راهنماهای کاربری جامع و کامل
+### **آخرین دستاورد: فاز 38 تکمیل شده** ✅
+- **Developer Documentation**: مستندات کامل توسعه‌دهندگان
 - **Complete User Documentation**: مستندات کامل برای تمام نقش‌ها
 - **API Documentation & Swagger Integration**: مستندات جامع API و Swagger UI
 - **Complete System Scripts**: تمام اسکریپت‌های استقرار و نگهداری
@@ -335,7 +335,7 @@ food-ordering-project/
 │   └── food-ordering-windows.bat ✅ (2.5KB, 99 lines) [Phase 35]
 │
 ├── 📁 docs/ (Complete Documentation - 50+ files total)
-│   ├── INDEX.md ✅ (15KB+) [Documentation Index - Updated Phase 37]
+│   ├── INDEX.md ✅ (15KB+) [Documentation Index - Updated Phase 38]
 │   ├── project-phases.md ✅ (12KB+) [Phase Planning - Updated]
 │   ├── project-structure.md ✅ [This File - Updated]
 │   ├── README.md ✅ (5.9KB+) [Documentation Overview]
@@ -346,7 +346,11 @@ food-ordering-project/
 │   │   ├── installation-fa.md ✅ (6.1KB+) [راهنمای نصب]
 │   │   ├── quick-start.md ✅ [راهنمای شروع سریع]
 │   │   ├── troubleshooting-fa.md ✅ (3.6KB+) [راهنمای عیب‌یابی]
-│   │   └── user-guide-fa.md ✅ (11KB+) [راهنمای کاربر]
+│   │   ├── user-guide-fa.md ✅ (11KB+) [راهنمای کاربر]
+│   │   ├── developer-guide-fa.md ✅ (15KB+) [راهنمای توسعه‌دهندگان]
+│   │   ├── technical-architecture-fa.md ✅ (12KB+) [معماری فنی]
+│   │   ├── system-architecture-fa.md ✅ (جدید)
+│   │   └── coding-standards-fa.md ✅ (8KB+) [استانداردهای کدنویسی]
 │   │
 │   └── 📁 phases/ (Phase Completion Reports - Standardized Naming)
 │       ├── phase-01-completion-report-fa.md ✅ (1.2KB+)
@@ -386,6 +390,7 @@ food-ordering-project/
 │       ├── phase-35-completion-report-fa.md ✅ (6.7KB+) [NEW]
 │       ├── phase-36-completion-report-fa.md ✅ (7.9KB+) [NEW]
 │       ├── phase-37-completion-report-fa.md ✅ (8.2KB+) [NEW]
+│       ├── phase-38-completion-report-fa.md ✅ (10KB+) [NEW]
 │       └── phases-backend-summary.md ✅ (13KB+) [Backend Complete Summary]
 │
 ├── 📁 .idea/ (IntelliJ IDEA Configuration) ✅
@@ -453,8 +458,8 @@ food-ordering-project/
 - **Backend Files**: ✅ 100% تکمیل شده (93+ Java + 87+ Test files)
 - **Frontend Files**: ✅ 100% تکمیل شده (36+ Java + 43+ Test files)
 - **System Scripts**: ✅ 100% تکمیل شده (9+ deployment scripts)
-- **Phase Reports**: ✅ 92.5% تکمیل شده (37/40 phase reports)
-- **Documentation**: ✅ 92.5% تکمیل شده (guides done، phase reports complete)
+- **Phase Reports**: ✅ 95% تکمیل شده (38/40 phase reports)
+- **Documentation**: ✅ 95% تکمیل شده (guides done، phase reports complete)
 
 ---
 
@@ -474,7 +479,7 @@ food-ordering-project/
 
 ## 📈 وضعیت تکمیل پروژه
 
-### **پیشرفت کلی: 92.5% تکمیل شده (37/40 فاز)**
+### **پیشرفت کلی: 95% تکمیل شده (38/40 فاز)**
 
 #### ✅ **تکمیل شده (Backend - 20 فاز)**
 - Foundation & Core Infrastructure ✅
@@ -504,19 +509,30 @@ food-ordering-project/
 - ✅ Backup & Recovery Scripts (Phase 34)
 - ✅ Security & Maintenance Scripts (Phase 35)
 
-#### 🔄 **در انتظار (Documentation - 3 فاز)**
+#### 🔄 **در انتظار (Documentation - 2 فاز)**
 - ✅ API Documentation & Swagger Integration (Phase 36)
 - ✅ User Manuals & Guides (Phase 37)
-- Developer Documentation ⏳ (Phase 38)
+- ✅ Developer Documentation (Phase 38)
 - System Architecture Documentation ⏳ (Phase 39)
 - Final Project Documentation ⏳ (Phase 40)
 
-### **اولویت فعلی: فازهای 38-40**
-- **فازهای 38-40**: Final Documentation
+### **اولویت فعلی: فازهای 39-40**
+- **فازهای 39-40**: Final Documentation
 
 ---
 
 ## 🎯 آخرین دستاوردها
+
+### **فاز 38: Developer Documentation** ✅
+- **Developer Documentation**: مستندات کامل توسعه‌دهندگان
+- **Technical Architecture**: راهنمای معماری فنی
+- **Coding Standards**: استانداردهای کدنویسی
+- **Development Workflow**: فرآیند توسعه و مشارکت
+- **Testing Guidelines**: راهنمای تست‌نویسی
+- **Performance Optimization**: بهینه‌سازی عملکرد
+- **Security Best Practices**: بهترین شیوه‌های امنیتی
+- **Deployment Guide**: راهنمای استقرار
+- **Contribution Guidelines**: راهنمای مشارکت
 
 ### **فاز 37: User Manuals & Guides** ✅
 - **Complete User Documentation**: مستندات کامل برای تمام نقش‌ها
@@ -572,7 +588,7 @@ food-ordering-project/
 ## 🚨 نکات مهم و اولویت‌ها
 
 ### **🟢 اولویت فوری**
-1. **فازهای 38-40**: Final Documentation
+1. **فازهای 39-40**: Final Documentation
 
 ### **🟡 اولویت بالا**
 2. **Production Deployment**: استقرار تولیدی و CI/CD
@@ -590,8 +606,8 @@ food-ordering-project/
 **آخرین بروزرسانی**: 30 خرداد 1404  
 **ساختار تأیید شده**: ✅ کامل (tree command verified)  
 **تعداد فایل‌ها تأیید شده**: ✅ دقیق (manual count verified)  
-**نسخه پروژه**: 1.0.0 (92.5% تکمیل شده)  
-**فاز فعلی**: 37 (User Manuals & Guides تکمیل شده)
+**نسخه پروژه**: 1.0.0 (95% تکمیل شده)  
+**فاز فعلی**: 38 (Developer Documentation تکمیل شده)
 
 ### 🧪 تست‌ها و کیفیت
 - تمام تست‌های frontend و امنیتی به صورت unit و بدون وابستگی به JavaFX بازنویسی شده‌اند و هیچ تستی قفل نمی‌کند.

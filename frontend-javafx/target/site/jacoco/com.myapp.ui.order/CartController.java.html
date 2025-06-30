@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CartController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.order</a> &gt; <span class="el_source">CartController.java</span></div><h1>CartController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.order;
+
+import com.myapp.ui.common.NavigationController;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import java.net.URL;
+import java.text.NumberFormat;
+import java.util.*;
+
+/**
+ * کنترلر سبد خرید
+ * 
+ * این کلاس مسئول مدیریت رابط کاربری سبد خرید شامل:
+ * - نمایش آیتم‌های اضافه شده به سبد
+ * - مدیریت تعداد و انتخاب آیتم‌ها
+ * - محاسبه مبلغ کل و هزینه ارسال
+ * - اعمال کد تخفیف
+ * - اعتبارسنجی اطلاعات تحویل
+ * - انتقال به صفحه پرداخت
+ * 
+ * ویژگی‌ها:
+ * - Real-time calculation مبلغ
+ * - Dynamic UI creation برای cart items
+ * - Validation برای checkout
+ * - Currency formatting فارسی
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+<span class="fc" id="L42">public class CartController implements Initializable {</span>
+
+    @FXML private Label itemCountLabel;
+    @FXML private VBox cartItemsContainer;
+    @FXML private Label emptyCartLabel;
+    @FXML private Button selectAllButton;
+    @FXML private Button removeSelectedButton;
+    @FXML private Label totalItemsLabel;
+    @FXML private Label subtotalLabel;
+    @FXML private Label deliveryFeeLabel;
+    @FXML private Label discountLabel;
+    @FXML private Label totalAmountLabel;
+    @FXML private TextField couponCodeField;
+    @FXML private Button applyCouponButton;
+    @FXML private Label couponStatusLabel;
+    @FXML private TextArea deliveryAddressField;
+    @FXML private TextField deliveryPhoneField;
+    @FXML private TextArea orderNotesField;
+    @FXML private Button checkoutButton;
+    @FXML private Button saveForLaterButton;
+    @FXML private MenuItem backMenuItem;
+    @FXML private MenuItem profileMenuItem;
+    @FXML private MenuItem orderHistoryMenuItem;
+    @FXML private MenuItem logoutMenuItem;
+    @FXML private MenuItem clearCartMenuItem;
+    @FXML private MenuItem refreshMenuItem;
+    @FXML private Label statusLabel;
+    @FXML private ProgressIndicator loadingIndicator;
+    @FXML private TableView&lt;CartItem&gt; cartTableView;
+
+    /** کنترلر navigation برای تغییر صفحات */
+    private NavigationController navigationController;
+    
+    /** لیست آیتم‌های موجود در سبد خرید */
+    private ObservableList&lt;CartItem&gt; cartItems;
+    
+    /** فرمت کردن ارز به فارسی */
+<span class="fc" id="L79">    private final NumberFormat currencyFormat = NumberFormat.getInstance(new Locale(&quot;fa&quot;, &quot;IR&quot;));</span>
+
+    /**
+     * متد مقداردهی اولیه کنترلر
+     * 
+     * @param location URL location
+     * @param resources منابع زبان
+     */
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+<span class="nc" id="L89">        this.navigationController = NavigationController.getInstance();</span>
+<span class="nc" id="L90">        setupUI();</span>
+<span class="nc" id="L91">        loadCart();</span>
+<span class="nc" id="L92">        cartItems = FXCollections.observableArrayList();</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">        if (cartTableView != null) {</span>
+<span class="nc" id="L94">            cartTableView.setItems(cartItems);</span>
+        }
+<span class="nc" id="L96">    }</span>
+
+    /**
+     * راه‌اندازی کامپوننت‌های UI و event listener ها
+     * 
+     * تنظیمات:
+     * - فرمت کردن ارز
+     * - listener ها برای اعتبارسنجی فیلدها
+     * - فعال/غیرفعال کردن دکمه تسویه حساب
+     */
+    private void setupUI() {
+<span class="nc" id="L107">        currencyFormat.setGroupingUsed(true);</span>
+<span class="nc" id="L108">        setStatus(&quot;در حال بارگذاری سبد خرید...&quot;);</span>
+        
+        // تنظیم listener ها برای اعتبارسنجی realtime
+<span class="nc" id="L111">        deliveryAddressField.textProperty().addListener((obs, oldVal, newVal) -&gt; validateCheckoutButton());</span>
+<span class="nc" id="L112">        deliveryPhoneField.textProperty().addListener((obs, oldVal, newVal) -&gt; validateCheckoutButton());</span>
+<span class="nc" id="L113">        couponCodeField.textProperty().addListener((obs, oldVal, newVal) -&gt; </span>
+<span class="nc" id="L114">            applyCouponButton.setDisable(newVal.trim().isEmpty()));</span>
+<span class="nc" id="L115">    }</span>
+
+    /**
+     * بارگذاری آیتم‌های سبد خرید از سرور
+     * 
+     * از background task استفاده می‌کند تا UI freeze نشود
+     * در حال حاضر از mock data استفاده می‌کند
+     */
+    private void loadCart() {
+<span class="nc" id="L124">        setLoading(true);</span>
+        
+        // background task برای بارگذاری داده‌ها
+<span class="nc" id="L127">        Task&lt;List&lt;CartItem&gt;&gt; loadTask = new Task&lt;List&lt;CartItem&gt;&gt;() {</span>
+            @Override
+            protected List&lt;CartItem&gt; call() throws Exception {
+<span class="nc" id="L130">                Thread.sleep(1000); // شبیه‌سازی تأخیر شبکه</span>
+                // ایجاد mock data برای نمایش
+<span class="nc" id="L132">                List&lt;CartItem&gt; mockItems = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L133">                mockItems.add(new CartItem(1L, &quot;پیتزا مارگاریتا&quot;, 25000.0, 2, &quot;رستوران ایتالیایی&quot;));</span>
+<span class="nc" id="L134">                mockItems.add(new CartItem(2L, &quot;برگر کلاسیک&quot;, 18000.0, 1, &quot;فست فود سارا&quot;));</span>
+<span class="nc" id="L135">                return mockItems;</span>
+            }
+        };
+        
+        // پردازش نتیجه موفق
+<span class="nc" id="L140">        loadTask.setOnSucceeded(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L141">            setLoading(false);</span>
+<span class="nc" id="L142">            cartItems.clear();</span>
+<span class="nc" id="L143">            cartItems.addAll(loadTask.getValue());</span>
+<span class="nc" id="L144">            displayCartItems();</span>
+<span class="nc" id="L145">            updateCartSummary();</span>
+<span class="nc" id="L146">            setStatus(&quot;سبد خرید بارگذاری شد&quot;);</span>
+<span class="nc" id="L147">        }));</span>
+        
+        // پردازش خطا
+<span class="nc" id="L150">        loadTask.setOnFailed(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L151">            setLoading(false);</span>
+<span class="nc" id="L152">            setStatus(&quot;خطا در بارگذاری سبد خرید&quot;);</span>
+<span class="nc" id="L153">        }));</span>
+        
+<span class="nc" id="L155">        new Thread(loadTask).start();</span>
+<span class="nc" id="L156">    }</span>
+
+    private void displayCartItems() {
+<span class="nc" id="L159">        cartItemsContainer.getChildren().clear();</span>
+        
+<span class="nc bnc" id="L161" title="All 2 branches missed.">        if (cartItems.isEmpty()) {</span>
+<span class="nc" id="L162">            emptyCartLabel.setVisible(true);</span>
+<span class="nc" id="L163">            itemCountLabel.setText(&quot;(0 آیتم)&quot;);</span>
+<span class="nc" id="L164">            return;</span>
+        }
+        
+<span class="nc" id="L167">        emptyCartLabel.setVisible(false);</span>
+<span class="nc" id="L168">        itemCountLabel.setText(&quot;(&quot; + cartItems.size() + &quot; آیتم)&quot;);</span>
+        
+<span class="nc bnc" id="L170" title="All 2 branches missed.">        for (CartItem item : cartItems) {</span>
+<span class="nc" id="L171">            cartItemsContainer.getChildren().add(createCartItemUI(item));</span>
+<span class="nc" id="L172">        }</span>
+<span class="nc" id="L173">    }</span>
+
+    private VBox createCartItemUI(CartItem item) {
+<span class="nc" id="L176">        VBox itemBox = new VBox(10);</span>
+<span class="nc" id="L177">        itemBox.setPadding(new Insets(15));</span>
+<span class="nc" id="L178">        itemBox.setStyle(&quot;-fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-radius: 5;&quot;);</span>
+        
+<span class="nc" id="L180">        HBox headerBox = new HBox(10);</span>
+<span class="nc" id="L181">        CheckBox selectCheckBox = new CheckBox();</span>
+<span class="nc" id="L182">        selectCheckBox.setSelected(item.isSelected());</span>
+<span class="nc" id="L183">        selectCheckBox.setOnAction(e -&gt; {</span>
+<span class="nc" id="L184">            item.setSelected(selectCheckBox.isSelected());</span>
+<span class="nc" id="L185">            updateCartSummary();</span>
+<span class="nc" id="L186">        });</span>
+        
+<span class="nc" id="L188">        Label nameLabel = new Label(item.getName());</span>
+<span class="nc" id="L189">        nameLabel.setFont(Font.font(&quot;System&quot;, FontWeight.BOLD, 16));</span>
+        
+<span class="nc" id="L191">        headerBox.getChildren().addAll(selectCheckBox, nameLabel);</span>
+        
+<span class="nc" id="L193">        HBox detailsBox = new HBox(20);</span>
+<span class="nc" id="L194">        Label priceLabel = new Label(formatCurrency(item.getPrice()) + &quot; تومان&quot;);</span>
+        
+<span class="nc" id="L196">        HBox quantityBox = new HBox(5);</span>
+<span class="nc" id="L197">        Button decreaseButton = new Button(&quot;-&quot;);</span>
+<span class="nc" id="L198">        decreaseButton.setOnAction(e -&gt; {</span>
+<span class="nc bnc" id="L199" title="All 2 branches missed.">            if (item.getQuantity() &gt; 1) {</span>
+<span class="nc" id="L200">                item.setQuantity(item.getQuantity() - 1);</span>
+<span class="nc" id="L201">                updateCartSummary();</span>
+<span class="nc" id="L202">                displayCartItems();</span>
+            }
+<span class="nc" id="L204">        });</span>
+        
+<span class="nc" id="L206">        Label quantityLabel = new Label(String.valueOf(item.getQuantity()));</span>
+<span class="nc" id="L207">        Button increaseButton = new Button(&quot;+&quot;);</span>
+<span class="nc" id="L208">        increaseButton.setOnAction(e -&gt; {</span>
+<span class="nc" id="L209">            item.setQuantity(item.getQuantity() + 1);</span>
+<span class="nc" id="L210">            updateCartSummary();</span>
+<span class="nc" id="L211">            displayCartItems();</span>
+<span class="nc" id="L212">        });</span>
+        
+<span class="nc" id="L214">        quantityBox.getChildren().addAll(decreaseButton, quantityLabel, increaseButton);</span>
+        
+<span class="nc" id="L216">        Button removeButton = new Button(&quot;حذف&quot;);</span>
+<span class="nc" id="L217">        removeButton.setOnAction(e -&gt; {</span>
+<span class="nc" id="L218">            cartItems.remove(item);</span>
+<span class="nc" id="L219">            displayCartItems();</span>
+<span class="nc" id="L220">            updateCartSummary();</span>
+<span class="nc" id="L221">        });</span>
+        
+<span class="nc" id="L223">        detailsBox.getChildren().addAll(priceLabel, quantityBox, removeButton);</span>
+<span class="nc" id="L224">        itemBox.getChildren().addAll(headerBox, detailsBox);</span>
+        
+<span class="nc" id="L226">        return itemBox;</span>
+    }
+
+    private void updateCartSummary() {
+<span class="nc" id="L230">        double subtotal = cartItems.stream()</span>
+<span class="nc" id="L231">                .filter(CartItem::isSelected)</span>
+<span class="nc" id="L232">                .mapToDouble(item -&gt; item.getPrice() * item.getQuantity())</span>
+<span class="nc" id="L233">                .sum();</span>
+        
+<span class="nc bnc" id="L235" title="All 2 branches missed.">        double deliveryFee = subtotal &gt;= 50000 ? 0.0 : 5000.0;</span>
+<span class="nc" id="L236">        double total = subtotal + deliveryFee;</span>
+        
+<span class="nc" id="L238">        int selectedItemCount = (int) cartItems.stream().filter(CartItem::isSelected).count();</span>
+<span class="nc" id="L239">        totalItemsLabel.setText(String.valueOf(selectedItemCount));</span>
+<span class="nc" id="L240">        subtotalLabel.setText(formatCurrency(subtotal) + &quot; تومان&quot;);</span>
+<span class="nc bnc" id="L241" title="All 2 branches missed.">        deliveryFeeLabel.setText(deliveryFee == 0 ? &quot;رایگان&quot; : formatCurrency(deliveryFee) + &quot; تومان&quot;);</span>
+<span class="nc" id="L242">        totalAmountLabel.setText(formatCurrency(total) + &quot; تومان&quot;);</span>
+        
+<span class="nc" id="L244">        validateCheckoutButton();</span>
+<span class="nc" id="L245">    }</span>
+
+    private void validateCheckoutButton() {
+<span class="nc bnc" id="L248" title="All 4 branches missed.">        boolean hasSelectedItems = !cartItems.isEmpty() &amp;&amp; cartItems.stream().anyMatch(CartItem::isSelected);</span>
+<span class="nc bnc" id="L249" title="All 2 branches missed.">        boolean hasDeliveryAddress = !deliveryAddressField.getText().trim().isEmpty();</span>
+<span class="nc bnc" id="L250" title="All 2 branches missed.">        boolean hasDeliveryPhone = !deliveryPhoneField.getText().trim().isEmpty();</span>
+        
+<span class="nc bnc" id="L252" title="All 6 branches missed.">        checkoutButton.setDisable(!hasSelectedItems || !hasDeliveryAddress || !hasDeliveryPhone);</span>
+<span class="nc" id="L253">    }</span>
+
+    private String formatCurrency(double amount) {
+<span class="nc" id="L256">        return currencyFormat.format(amount);</span>
+    }
+
+    @FXML
+    private void handleSelectAll() {
+<span class="nc bnc" id="L261" title="All 4 branches missed.">        boolean allSelected = !cartItems.isEmpty() &amp;&amp; cartItems.stream().allMatch(CartItem::isSelected);</span>
+<span class="nc bnc" id="L262" title="All 2 branches missed.">        cartItems.forEach(item -&gt; item.setSelected(!allSelected));</span>
+<span class="nc" id="L263">        displayCartItems();</span>
+<span class="nc" id="L264">        updateCartSummary();</span>
+<span class="nc" id="L265">    }</span>
+
+    @FXML
+    private void handleRemoveSelected() {
+<span class="nc" id="L269">        cartItems.removeIf(CartItem::isSelected);</span>
+<span class="nc" id="L270">        displayCartItems();</span>
+<span class="nc" id="L271">        updateCartSummary();</span>
+<span class="nc" id="L272">    }</span>
+
+    @FXML
+    private void handleApplyCoupon() {
+<span class="nc" id="L276">        String couponCode = couponCodeField.getText().trim();</span>
+        // TODO: Implement coupon validation
+<span class="nc" id="L278">        couponStatusLabel.setText(&quot;کد تخفیف اعمال شد&quot;);</span>
+<span class="nc" id="L279">    }</span>
+
+    @FXML
+    private void handleCheckout() {
+<span class="nc" id="L283">        navigationController.navigateTo(NavigationController.PAYMENT_SCENE);</span>
+<span class="nc" id="L284">    }</span>
+
+    @FXML
+    private void handleSaveForLater() {
+<span class="nc" id="L288">        showInfo(&quot;اطلاع&quot;, &quot;سبد خرید ذخیره شد&quot;);</span>
+<span class="nc" id="L289">    }</span>
+
+    @FXML
+    private void handleClearCart() {
+<span class="nc" id="L293">        cartItems.clear();</span>
+<span class="nc" id="L294">        displayCartItems();</span>
+<span class="nc" id="L295">        updateCartSummary();</span>
+<span class="nc" id="L296">    }</span>
+
+    @FXML
+    private void handleRefresh() {
+<span class="nc" id="L300">        loadCart();</span>
+<span class="nc" id="L301">    }</span>
+
+    @FXML
+    private void handleBack() {
+<span class="nc" id="L305">        navigationController.navigateTo(NavigationController.RESTAURANT_LIST_SCENE);</span>
+<span class="nc" id="L306">    }</span>
+
+    @FXML
+    private void handleProfile() {
+<span class="nc" id="L310">        navigationController.navigateTo(NavigationController.PROFILE_SCENE);</span>
+<span class="nc" id="L311">    }</span>
+
+    @FXML
+    private void handleOrderHistory() {
+<span class="nc" id="L315">        navigationController.navigateTo(NavigationController.ORDER_HISTORY_SCENE);</span>
+<span class="nc" id="L316">    }</span>
+
+    @FXML
+    private void handleLogout() {
+<span class="nc" id="L320">        navigationController.logout();</span>
+<span class="nc" id="L321">    }</span>
+
+    private void setLoading(boolean loading) {
+<span class="nc" id="L324">        loadingIndicator.setVisible(loading);</span>
+<span class="nc" id="L325">    }</span>
+
+    private void setStatus(String message) {
+<span class="nc bnc" id="L328" title="All 2 branches missed.">        if (statusLabel != null) {</span>
+<span class="nc" id="L329">            statusLabel.setText(message);</span>
+        }
+<span class="nc" id="L331">    }</span>
+
+    private void showInfo(String title, String message) {
+<span class="nc" id="L334">        Alert alert = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L335">        alert.setTitle(title);</span>
+<span class="nc" id="L336">        alert.setContentText(message);</span>
+<span class="nc" id="L337">        alert.showAndWait();</span>
+<span class="nc" id="L338">    }</span>
+
+    public void addItemToCart(Long itemId, String itemName, Double price, Integer quantity) {
+<span class="nc" id="L341">        CartItem item = new CartItem();</span>
+<span class="nc" id="L342">        item.setItemId(itemId);</span>
+<span class="nc" id="L343">        item.setItemName(itemName);</span>
+<span class="nc" id="L344">        item.setPrice(price);</span>
+<span class="nc" id="L345">        item.setQuantity(quantity);</span>
+        
+<span class="nc" id="L347">        cartItems.add(item);</span>
+<span class="nc" id="L348">        updateTotal();</span>
+<span class="nc" id="L349">    }</span>
+    
+    private void updateTotal() {
+<span class="nc" id="L352">        double total = cartItems.stream()</span>
+<span class="nc" id="L353">            .mapToDouble(item -&gt; item.getPrice() * item.getQuantity())</span>
+<span class="nc" id="L354">            .sum();</span>
+        
+<span class="nc bnc" id="L356" title="All 2 branches missed.">        if (totalAmountLabel != null) {</span>
+<span class="nc" id="L357">            totalAmountLabel.setText(String.format(&quot;%,.0f تومان&quot;, total));</span>
+        }
+<span class="nc" id="L359">    }</span>
+
+    /**
+     * کلاس خلاصه سبد خرید
+     * شامل جمع کل، مالیات، هزینه ارسال و مبلغ نهایی
+     */
+    public static class CartSummary {
+        private double subtotal;
+        private double tax;
+        private double deliveryFee;
+        private double discount;
+        private double finalAmount;
+        private double totalAmount;
+        private int itemCount;
+        
+<span class="nc" id="L374">        public CartSummary() {</span>
+<span class="nc" id="L375">            this.subtotal = 0.0;</span>
+<span class="nc" id="L376">            this.tax = 0.0;</span>
+<span class="nc" id="L377">            this.deliveryFee = 0.0;</span>
+<span class="nc" id="L378">            this.discount = 0.0;</span>
+<span class="nc" id="L379">            this.finalAmount = 0.0;</span>
+<span class="nc" id="L380">            this.totalAmount = 0.0;</span>
+<span class="nc" id="L381">            this.itemCount = 0;</span>
+<span class="nc" id="L382">        }</span>
+        
+<span class="nc" id="L384">        public double getSubtotal() { return subtotal; }</span>
+<span class="nc" id="L385">        public void setSubtotal(double subtotal) { this.subtotal = subtotal; }</span>
+        
+<span class="nc" id="L387">        public double getTax() { return tax; }</span>
+<span class="nc" id="L388">        public void setTax(double tax) { this.tax = tax; }</span>
+        
+<span class="nc" id="L390">        public double getDeliveryFee() { return deliveryFee; }</span>
+<span class="nc" id="L391">        public void setDeliveryFee(double deliveryFee) { this.deliveryFee = deliveryFee; }</span>
+        
+<span class="nc" id="L393">        public double getDiscount() { return discount; }</span>
+<span class="nc" id="L394">        public void setDiscount(double discount) { this.discount = discount; }</span>
+        
+<span class="nc" id="L396">        public double getFinalAmount() { return finalAmount; }</span>
+<span class="nc" id="L397">        public void setFinalAmount(double finalAmount) { this.finalAmount = finalAmount; }</span>
+        
+<span class="nc" id="L399">        public double getTotalAmount() { return totalAmount; }</span>
+<span class="nc" id="L400">        public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }</span>
+        
+<span class="nc" id="L402">        public int getItemCount() { return itemCount; }</span>
+<span class="nc" id="L403">        public void setItemCount(int itemCount) { this.itemCount = itemCount; }</span>
+    }
+
+    public static class CartItem {
+        private Long itemId;
+        private String itemName;
+        private Double price;
+        private Integer quantity;
+        private String restaurantName;
+<span class="nc" id="L412">        private boolean selected = true;</span>
+
+        // Constructor پیش‌فرض
+<span class="nc" id="L415">        public CartItem() {</span>
+<span class="nc" id="L416">            this.selected = true;</span>
+<span class="nc" id="L417">        }</span>
+
+        // Constructor کامل
+<span class="nc" id="L420">        public CartItem(Long itemId, String itemName, Double price, Integer quantity, String restaurantName) {</span>
+<span class="nc" id="L421">            this.itemId = itemId;</span>
+<span class="nc" id="L422">            this.itemName = itemName;</span>
+<span class="nc" id="L423">            this.price = price;</span>
+<span class="nc" id="L424">            this.quantity = quantity;</span>
+<span class="nc" id="L425">            this.restaurantName = restaurantName;</span>
+<span class="nc" id="L426">            this.selected = true;</span>
+<span class="nc" id="L427">        }</span>
+
+        // Getters and setters
+<span class="nc" id="L430">        public Long getItemId() { return itemId; }</span>
+<span class="nc" id="L431">        public void setItemId(Long itemId) { this.itemId = itemId; }</span>
+        
+<span class="nc" id="L433">        public String getItemName() { return itemName; }</span>
+<span class="nc" id="L434">        public void setItemName(String itemName) { this.itemName = itemName; }</span>
+        
+        // Alias for getName()
+<span class="nc" id="L437">        public String getName() { return itemName; }</span>
+<span class="nc" id="L438">        public Long getId() { return itemId; }</span>
+        
+<span class="nc" id="L440">        public Double getPrice() { return price; }</span>
+<span class="nc" id="L441">        public void setPrice(Double price) { this.price = price; }</span>
+        
+<span class="nc" id="L443">        public Integer getQuantity() { return quantity; }</span>
+<span class="nc" id="L444">        public void setQuantity(Integer quantity) { this.quantity = quantity; }</span>
+        
+<span class="nc" id="L446">        public String getRestaurantName() { return restaurantName; }</span>
+<span class="nc" id="L447">        public void setRestaurantName(String restaurantName) { this.restaurantName = restaurantName; }</span>
+        
+<span class="nc" id="L449">        public boolean isSelected() { return selected; }</span>
+<span class="nc" id="L450">        public void setSelected(boolean selected) { this.selected = selected; }</span>
+        
+        /**
+         * محاسبه قیمت کل آیتم (قیمت × تعداد)
+         */
+        public Double getTotalPrice() {
+<span class="nc bnc" id="L456" title="All 4 branches missed.">            if (price == null || quantity == null) {</span>
+<span class="nc" id="L457">                return 0.0;</span>
+            }
+<span class="nc" id="L459">            return price * quantity;</span>
+        }
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

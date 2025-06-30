@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RestaurantDetailsController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.restaurant</a> &gt; <span class="el_source">RestaurantDetailsController.java</span></div><h1>RestaurantDetailsController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.restaurant;
+
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import java.net.URL;
+import java.util.ResourceBundle;
+import java.util.List;
+import java.util.ArrayList;
+
+/**
+ * کنترلر مدیریت جزئیات رستوران
+ * 
+ * این کلاس مسئول:
+ * - نمایش اطلاعات کامل رستوران
+ * - مدیریت منوی رستوران  
+ * - عملکرد سبد خرید
+ * - جستجو و فیلتر در منو
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since فاز 23
+ */
+<span class="fc" id="L27">public class RestaurantDetailsController implements Initializable {</span>
+
+    // UI Components - Restaurant Info
+    @FXML private Label restaurantNameLabel;
+    @FXML private Label restaurantAddressLabel;
+    @FXML private Label restaurantRatingLabel;
+    @FXML private Label restaurantPhoneLabel;
+    
+    // UI Components - Menu Section
+    @FXML private TabPane menuTabPane;
+    @FXML private TextField menuSearchField;
+    @FXML private VBox menuContainer;
+    
+    // UI Components - Cart Section
+    @FXML private VBox cartSummaryBox;
+    @FXML private Label cartTotalLabel;
+    @FXML private Button checkoutButton;
+    
+    // Data
+    private Restaurant currentRestaurant;
+    private ObservableList&lt;CartItem&gt; cartItems;
+    private List&lt;MenuCategory&gt; menuCategories;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        // مقداردهی اولیه
+<span class="nc" id="L53">        cartItems = FXCollections.observableArrayList();</span>
+<span class="nc" id="L54">        menuCategories = new ArrayList&lt;&gt;();</span>
+        
+        // اتصال event handlers
+<span class="nc" id="L57">        setupEventHandlers();</span>
+        
+        // بارگذاری اطلاعات اولیه
+<span class="nc" id="L60">        loadRestaurantData();</span>
+<span class="nc" id="L61">    }</span>
+    
+    /**
+     * تنظیم event handlers
+     */
+    private void setupEventHandlers() {
+<span class="nc bnc" id="L67" title="All 2 branches missed.">        if (menuSearchField != null) {</span>
+<span class="nc" id="L68">            menuSearchField.textProperty().addListener((obs, oldVal, newVal) -&gt; {</span>
+<span class="nc" id="L69">                filterMenuItems(newVal);</span>
+<span class="nc" id="L70">            });</span>
+        }
+        
+<span class="nc bnc" id="L73" title="All 2 branches missed.">        if (checkoutButton != null) {</span>
+<span class="nc" id="L74">            checkoutButton.setOnAction(e -&gt; handleCheckout());</span>
+        }
+<span class="nc" id="L76">    }</span>
+    
+    /**
+     * بارگذاری اطلاعات رستوران
+     */
+    private void loadRestaurantData() {
+        // TODO: اتصال به backend برای دریافت اطلاعات رستوران
+<span class="nc" id="L83">    }</span>
+    
+    /**
+     * فیلتر آیتم‌های منو
+     */
+    private void filterMenuItems(String searchText) {
+        // TODO: پیاده‌سازی فیلتر
+<span class="nc" id="L90">    }</span>
+    
+    /**
+     * مدیریت checkout سبد خرید
+     */
+    private void handleCheckout() {
+        // TODO: پیاده‌سازی checkout
+<span class="nc" id="L97">    }</span>
+
+    // Getter و Setter برای currentRestaurant
+    public Restaurant getCurrentRestaurant() {
+<span class="fc" id="L101">        return currentRestaurant;</span>
+    }
+
+    public void setCurrentRestaurant(Restaurant restaurant) {
+<span class="fc" id="L105">        this.currentRestaurant = restaurant;</span>
+<span class="fc" id="L106">    }</span>
+
+    /**
+     * کلاس مدل داده رستوران
+     */
+    public static class Restaurant {
+        private Long id;
+        private String name;
+        private String address;
+        private String phone;
+        private Double rating;
+        private Integer reviewCount;
+        private String description;
+        private String imageUrl;
+        private boolean isOpen;
+        private String openingHours;
+        
+        // Constructors
+<span class="fc" id="L124">        public Restaurant() {}</span>
+        
+<span class="fc" id="L126">        public Restaurant(Long id, String name, String address, String phone) {</span>
+<span class="fc" id="L127">            this.id = id;</span>
+<span class="fc" id="L128">            this.name = name;</span>
+<span class="fc" id="L129">            this.address = address;</span>
+<span class="fc" id="L130">            this.phone = phone;</span>
+<span class="fc" id="L131">        }</span>
+        
+        // Getters and Setters
+<span class="fc" id="L134">        public Long getId() { return id; }</span>
+<span class="fc" id="L135">        public void setId(Long id) { this.id = id; }</span>
+        
+<span class="fc" id="L137">        public String getName() { return name; }</span>
+<span class="fc" id="L138">        public void setName(String name) { this.name = name; }</span>
+        
+<span class="fc" id="L140">        public String getAddress() { return address; }</span>
+<span class="fc" id="L141">        public void setAddress(String address) { this.address = address; }</span>
+        
+<span class="fc" id="L143">        public String getPhone() { return phone; }</span>
+<span class="fc" id="L144">        public void setPhone(String phone) { this.phone = phone; }</span>
+        
+<span class="fc" id="L146">        public Double getRating() { return rating; }</span>
+<span class="fc" id="L147">        public void setRating(Double rating) { this.rating = rating; }</span>
+        
+<span class="fc" id="L149">        public Integer getReviewCount() { return reviewCount; }</span>
+<span class="fc" id="L150">        public void setReviewCount(Integer reviewCount) { this.reviewCount = reviewCount; }</span>
+        
+<span class="fc" id="L152">        public String getDescription() { return description; }</span>
+<span class="fc" id="L153">        public void setDescription(String description) { this.description = description; }</span>
+        
+<span class="fc" id="L155">        public String getImageUrl() { return imageUrl; }</span>
+<span class="fc" id="L156">        public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }</span>
+        
+<span class="fc" id="L158">        public boolean isOpen() { return isOpen; }</span>
+<span class="fc" id="L159">        public void setOpen(boolean open) { isOpen = open; }</span>
+        
+<span class="fc" id="L161">        public String getOpeningHours() { return openingHours; }</span>
+<span class="fc" id="L162">        public void setOpeningHours(String openingHours) { this.openingHours = openingHours; }</span>
+    }
+
+    /**
+     * کلاس مدل دسته‌بندی منو
+     */
+    public static class MenuCategory {
+        private Long id;
+        private String name;
+        private String description;
+        private List&lt;MenuItem&gt; items;
+        private boolean isActive;
+        private Integer displayOrder;
+        
+        // Constructors
+<span class="fc" id="L177">        public MenuCategory() {</span>
+<span class="fc" id="L178">            this.items = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L179">        }</span>
+        
+        public MenuCategory(Long id, String name, String description) {
+<span class="fc" id="L182">            this();</span>
+<span class="fc" id="L183">            this.id = id;</span>
+<span class="fc" id="L184">            this.name = name;</span>
+<span class="fc" id="L185">            this.description = description;</span>
+<span class="fc" id="L186">        }</span>
+        
+        // Getters and Setters
+<span class="fc" id="L189">        public Long getId() { return id; }</span>
+<span class="fc" id="L190">        public void setId(Long id) { this.id = id; }</span>
+        
+<span class="fc" id="L192">        public String getName() { return name; }</span>
+<span class="fc" id="L193">        public void setName(String name) { this.name = name; }</span>
+        
+<span class="fc" id="L195">        public String getDescription() { return description; }</span>
+<span class="fc" id="L196">        public void setDescription(String description) { this.description = description; }</span>
+        
+<span class="fc" id="L198">        public List&lt;MenuItem&gt; getItems() { return items; }</span>
+<span class="fc" id="L199">        public void setItems(List&lt;MenuItem&gt; items) { this.items = items; }</span>
+        
+<span class="fc" id="L201">        public boolean isActive() { return isActive; }</span>
+<span class="fc" id="L202">        public void setActive(boolean active) { isActive = active; }</span>
+        
+<span class="fc" id="L204">        public Integer getDisplayOrder() { return displayOrder; }</span>
+<span class="fc" id="L205">        public void setDisplayOrder(Integer displayOrder) { this.displayOrder = displayOrder; }</span>
+    }
+
+    /**
+     * کلاس مدل آیتم منو
+     */
+    public static class MenuItem {
+        private Long id;
+        private String name;
+        private String description;
+        private Double price;
+        private boolean available;
+        private String imageUrl;
+        private Long categoryId;
+        private Integer preparationTime;
+        private List&lt;String&gt; ingredients;
+        private List&lt;String&gt; allergens;
+        
+        // Constructors
+<span class="fc" id="L224">        public MenuItem() {</span>
+<span class="fc" id="L225">            this.ingredients = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L226">            this.allergens = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L227">        }</span>
+        
+        public MenuItem(Long id, String name, Double price, boolean available) {
+<span class="fc" id="L230">            this();</span>
+<span class="fc" id="L231">            this.id = id;</span>
+<span class="fc" id="L232">            this.name = name;</span>
+<span class="fc" id="L233">            this.price = price;</span>
+<span class="fc" id="L234">            this.available = available;</span>
+<span class="fc" id="L235">        }</span>
+        
+        // Getters and Setters
+<span class="fc" id="L238">        public Long getId() { return id; }</span>
+<span class="fc" id="L239">        public void setId(Long id) { this.id = id; }</span>
+        
+<span class="fc" id="L241">        public String getName() { return name; }</span>
+<span class="fc" id="L242">        public void setName(String name) { this.name = name; }</span>
+        
+<span class="fc" id="L244">        public String getDescription() { return description; }</span>
+<span class="fc" id="L245">        public void setDescription(String description) { this.description = description; }</span>
+        
+<span class="fc" id="L247">        public Double getPrice() { return price; }</span>
+<span class="fc" id="L248">        public void setPrice(Double price) { this.price = price; }</span>
+        
+<span class="fc" id="L250">        public boolean isAvailable() { return available; }</span>
+<span class="fc" id="L251">        public void setAvailable(boolean available) { this.available = available; }</span>
+        
+<span class="fc" id="L253">        public String getImageUrl() { return imageUrl; }</span>
+<span class="fc" id="L254">        public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }</span>
+        
+<span class="fc" id="L256">        public Long getCategoryId() { return categoryId; }</span>
+<span class="fc" id="L257">        public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }</span>
+        
+<span class="fc" id="L259">        public Integer getPreparationTime() { return preparationTime; }</span>
+<span class="fc" id="L260">        public void setPreparationTime(Integer preparationTime) { this.preparationTime = preparationTime; }</span>
+        
+<span class="fc" id="L262">        public List&lt;String&gt; getIngredients() { return ingredients; }</span>
+<span class="fc" id="L263">        public void setIngredients(List&lt;String&gt; ingredients) { this.ingredients = ingredients; }</span>
+        
+<span class="fc" id="L265">        public List&lt;String&gt; getAllergens() { return allergens; }</span>
+<span class="fc" id="L266">        public void setAllergens(List&lt;String&gt; allergens) { this.allergens = allergens; }</span>
+    }
+
+    /**
+     * کلاس مدل آیتم سبد خرید
+     */
+    public static class CartItem {
+        private Long itemId;
+        private String itemName;
+        private Double price;
+        private Integer quantity;
+        private String specialInstructions;
+        private Double totalPrice;
+        
+        // Constructors
+<span class="fc" id="L281">        public CartItem() {}</span>
+        
+<span class="fc" id="L283">        public CartItem(Long itemId, String itemName, Double price, Integer quantity) {</span>
+<span class="fc" id="L284">            this.itemId = itemId;</span>
+<span class="fc" id="L285">            this.itemName = itemName;</span>
+<span class="fc" id="L286">            this.price = price;</span>
+<span class="fc" id="L287">            this.quantity = quantity;</span>
+<span class="fc" id="L288">            calculateTotalPrice();</span>
+<span class="fc" id="L289">        }</span>
+        
+        // Getters and Setters
+<span class="fc" id="L292">        public Long getItemId() { return itemId; }</span>
+<span class="fc" id="L293">        public void setItemId(Long itemId) { this.itemId = itemId; }</span>
+        
+<span class="fc" id="L295">        public String getItemName() { return itemName; }</span>
+<span class="fc" id="L296">        public void setItemName(String itemName) { this.itemName = itemName; }</span>
+        
+<span class="fc" id="L298">        public Double getPrice() { return price; }</span>
+        public void setPrice(Double price) { 
+<span class="fc" id="L300">            this.price = price;</span>
+<span class="fc" id="L301">            calculateTotalPrice();</span>
+<span class="fc" id="L302">        }</span>
+        
+<span class="fc" id="L304">        public Integer getQuantity() { return quantity; }</span>
+        public void setQuantity(Integer quantity) { 
+<span class="fc" id="L306">            this.quantity = quantity;</span>
+<span class="fc" id="L307">            calculateTotalPrice();</span>
+<span class="fc" id="L308">        }</span>
+        
+<span class="fc" id="L310">        public String getSpecialInstructions() { return specialInstructions; }</span>
+        public void setSpecialInstructions(String specialInstructions) { 
+<span class="fc" id="L312">            this.specialInstructions = specialInstructions; </span>
+<span class="fc" id="L313">        }</span>
+        
+<span class="fc" id="L315">        public Double getTotalPrice() { return totalPrice; }</span>
+        
+        /**
+         * محاسبه قیمت کل آیتم
+         */
+        private void calculateTotalPrice() {
+<span class="pc bpc" id="L321" title="1 of 4 branches missed.">            if (price != null &amp;&amp; quantity != null) {</span>
+<span class="fc" id="L322">                this.totalPrice = price * quantity;</span>
+            }
+<span class="fc" id="L324">        }</span>
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

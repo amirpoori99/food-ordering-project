@@ -1,0 +1,823 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.payment</a> &gt; <span class="el_source">PaymentController.java</span></div><h1>PaymentController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.payment;
+
+import com.myapp.ui.common.NavigationController;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+
+import java.net.URL;
+import java.text.NumberFormat;
+import java.util.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+/**
+ * کنترلر پردازش پرداخت و تکمیل سفارش
+ * 
+ * این کلاس مسئول:
+ * - مدیریت روش‌های پرداخت مختلف (کارت، کیف پول، نقدی)
+ * - پردازش امن اطلاعات پرداخت
+ * - تأیید نهایی سفارش و ارسال به سرور
+ * - نمایش وضعیت پرداخت و نتیجه تراکنش
+ * - مدیریت کیف پول کاربر و اعتبار
+ * - ایجاد و نمایش رسید پرداخت
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since فاز 25 - Payment Processing
+ */
+<span class="fc" id="L40">public class PaymentController implements Initializable {</span>
+
+    // ==================== UI Components - Order Summary ====================
+    
+    @FXML private VBox orderSummaryContainer;
+    @FXML private Label orderNumberLabel;
+    @FXML private Label orderDateLabel;
+    @FXML private Label restaurantNameLabel;
+    @FXML private TableView&lt;OrderItem&gt; orderItemsTable;
+    @FXML private TableColumn&lt;OrderItem, String&gt; itemNameColumn;
+    @FXML private TableColumn&lt;OrderItem, Integer&gt; itemQuantityColumn;
+    @FXML private TableColumn&lt;OrderItem, Double&gt; itemPriceColumn;
+    @FXML private TableColumn&lt;OrderItem, Double&gt; itemTotalColumn;
+    
+    // ==================== UI Components - Payment Method ====================
+    
+    @FXML private VBox paymentMethodContainer;
+    @FXML private ToggleGroup paymentMethodGroup;
+    @FXML private RadioButton creditCardRadio;
+    @FXML private RadioButton walletRadio;
+    @FXML private RadioButton cashOnDeliveryRadio;
+    
+    // ==================== UI Components - Credit Card ====================
+    
+    @FXML private VBox creditCardContainer;
+    @FXML private TextField cardNumberField;
+    @FXML private TextField cardHolderField;
+    @FXML private ComboBox&lt;String&gt; expiryMonthComboBox;
+    @FXML private ComboBox&lt;String&gt; expiryYearComboBox;
+    @FXML private PasswordField cvvField;
+    @FXML private CheckBox saveCardCheckBox;
+    @FXML private ComboBox&lt;SavedCard&gt; savedCardsComboBox;
+    @FXML private Button addNewCardButton;
+    
+    // ==================== UI Components - Wallet ====================
+    
+    @FXML private VBox walletContainer;
+    @FXML private Label walletBalanceLabel;
+    @FXML private Label walletStatusLabel;
+    @FXML private Button rechargeWalletButton;
+    @FXML private ProgressBar walletUsageBar;
+    @FXML private Label remainingBalanceLabel;
+    
+    // ==================== UI Components - Cash ====================
+    
+    @FXML private VBox cashContainer;
+    @FXML private Label cashInstructionsLabel;
+    @FXML private CheckBox exactChangeCheckBox;
+    @FXML private TextField changeRequiredField;
+    
+    // ==================== UI Components - Payment Summary ====================
+    
+    @FXML private VBox paymentSummaryContainer;
+    @FXML private Label subtotalAmountLabel;
+    @FXML private Label taxAmountLabel;
+    @FXML private Label deliveryFeeLabel;
+    @FXML private Label discountAmountLabel;
+    @FXML private Label totalAmountLabel;
+    @FXML private Label paymentMethodLabel;
+    @FXML private Label processingFeeLabel;
+    @FXML private Label finalAmountLabel;
+    
+    // ==================== UI Components - Actions ====================
+    
+    @FXML private Button backToCartButton;
+    @FXML private Button confirmPaymentButton;
+    @FXML private Button cancelOrderButton;
+    @FXML private ProgressIndicator paymentProgressIndicator;
+    @FXML private Label paymentStatusLabel;
+    
+    // ==================== Data Properties ====================
+    
+    private ObservableList&lt;OrderItem&gt; orderItems;
+    private ObservableList&lt;SavedCard&gt; savedCards;
+    private PaymentData paymentData;
+    private OrderSummary orderSummary;
+    private WalletInfo walletInfo;
+    private String currentOrderId;
+    
+    // Constants
+    private static final double CARD_PROCESSING_FEE = 0.029; // 2.9% برای کارت
+    private static final double WALLET_PROCESSING_FEE = 0.0; // رایگان برای کیف پول
+    private static final double CASH_PROCESSING_FEE = 0.0; // رایگان برای نقدی
+    private static final double MIN_WALLET_BALANCE = 10000.0; // حداقل موجودی کیف پول
+
+    private NavigationController navigationController;
+<span class="fc" id="L126">    private final NumberFormat currencyFormat = NumberFormat.getInstance(new Locale(&quot;fa&quot;, &quot;IR&quot;));</span>
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+<span class="nc" id="L130">        this.navigationController = NavigationController.getInstance();</span>
+        
+<span class="nc" id="L132">        initializeData();</span>
+        
+<span class="nc" id="L134">        setupOrderItemsTable();</span>
+<span class="nc" id="L135">        setupComboBoxes();</span>
+<span class="nc" id="L136">        setupPaymentMethods();</span>
+<span class="nc" id="L137">        setupEventHandlers();</span>
+<span class="nc" id="L138">        loadInitialData();</span>
+<span class="nc" id="L139">        setupValidation();</span>
+<span class="nc" id="L140">    }</span>
+    
+    /**
+     * مقداردهی اولیه داده‌ها
+     */
+    private void initializeData() {
+<span class="nc" id="L146">        orderItems = FXCollections.observableArrayList();</span>
+<span class="nc" id="L147">        savedCards = FXCollections.observableArrayList();</span>
+<span class="nc" id="L148">        paymentData = new PaymentData();</span>
+<span class="nc" id="L149">        orderSummary = new OrderSummary();</span>
+<span class="nc" id="L150">        walletInfo = new WalletInfo();</span>
+<span class="nc" id="L151">        currentOrderId = generateOrderId();</span>
+        
+<span class="nc bnc" id="L153" title="All 2 branches missed.">        if (paymentProgressIndicator != null) {</span>
+<span class="nc" id="L154">            paymentProgressIndicator.setVisible(false);</span>
+        }
+<span class="nc" id="L156">    }</span>
+    
+    /**
+     * تولید شماره سفارش یکتا
+     */
+    private String generateOrderId() {
+<span class="nc" id="L162">        return &quot;ORD-&quot; + System.currentTimeMillis();</span>
+    }
+    
+    /**
+     * تنظیم TableView آیتم‌های سفارش
+     */
+    private void setupOrderItemsTable() {
+<span class="nc bnc" id="L169" title="All 2 branches missed.">        if (orderItemsTable != null) {</span>
+<span class="nc" id="L170">            orderItemsTable.setItems(orderItems);</span>
+            
+<span class="nc bnc" id="L172" title="All 2 branches missed.">            if (itemNameColumn != null) {</span>
+<span class="nc" id="L173">                itemNameColumn.setCellValueFactory(cellData -&gt; </span>
+<span class="nc" id="L174">                    new SimpleStringProperty(cellData.getValue().getItemName()));</span>
+            }
+            
+<span class="nc bnc" id="L177" title="All 2 branches missed.">            if (itemQuantityColumn != null) {</span>
+<span class="nc" id="L178">                itemQuantityColumn.setCellValueFactory(cellData -&gt; </span>
+<span class="nc" id="L179">                    cellData.getValue().quantityProperty().asObject());</span>
+<span class="nc" id="L180">                itemQuantityColumn.setCellFactory(col -&gt; new TableCell&lt;OrderItem, Integer&gt;() {</span>
+                    @Override
+                    protected void updateItem(Integer quantity, boolean empty) {
+<span class="nc" id="L183">                        super.updateItem(quantity, empty);</span>
+<span class="nc bnc" id="L184" title="All 4 branches missed.">                        if (empty || quantity == null) {</span>
+<span class="nc" id="L185">                            setText(null);</span>
+                        } else {
+<span class="nc" id="L187">                            setText(quantity + &quot; عدد&quot;);</span>
+                        }
+<span class="nc" id="L189">                    }</span>
+                });
+            }
+            
+<span class="nc bnc" id="L193" title="All 2 branches missed.">            if (itemPriceColumn != null) {</span>
+<span class="nc" id="L194">                itemPriceColumn.setCellValueFactory(cellData -&gt; </span>
+<span class="nc" id="L195">                    cellData.getValue().priceProperty().asObject());</span>
+<span class="nc" id="L196">                itemPriceColumn.setCellFactory(col -&gt; new TableCell&lt;OrderItem, Double&gt;() {</span>
+                    @Override
+                    protected void updateItem(Double price, boolean empty) {
+<span class="nc" id="L199">                        super.updateItem(price, empty);</span>
+<span class="nc bnc" id="L200" title="All 4 branches missed.">                        if (empty || price == null) {</span>
+<span class="nc" id="L201">                            setText(null);</span>
+                        } else {
+<span class="nc" id="L203">                            setText(String.format(&quot;%,.0f تومان&quot;, price));</span>
+                        }
+<span class="nc" id="L205">                    }</span>
+                });
+            }
+            
+<span class="nc bnc" id="L209" title="All 2 branches missed.">            if (itemTotalColumn != null) {</span>
+<span class="nc" id="L210">                itemTotalColumn.setCellValueFactory(cellData -&gt; </span>
+<span class="nc" id="L211">                    new SimpleDoubleProperty(cellData.getValue().getTotalPrice()).asObject());</span>
+<span class="nc" id="L212">                itemTotalColumn.setCellFactory(col -&gt; new TableCell&lt;OrderItem, Double&gt;() {</span>
+                    @Override
+                    protected void updateItem(Double total, boolean empty) {
+<span class="nc" id="L215">                        super.updateItem(total, empty);</span>
+<span class="nc bnc" id="L216" title="All 4 branches missed.">                        if (empty || total == null) {</span>
+<span class="nc" id="L217">                            setText(null);</span>
+                        } else {
+<span class="nc" id="L219">                            setText(String.format(&quot;%,.0f تومان&quot;, total));</span>
+                        }
+<span class="nc" id="L221">                    }</span>
+                });
+            }
+        }
+<span class="nc" id="L225">    }</span>
+    
+    /**
+     * تنظیم ComboBox ها
+     */
+    private void setupComboBoxes() {
+<span class="nc bnc" id="L231" title="All 2 branches missed.">        if (expiryMonthComboBox != null) {</span>
+<span class="nc" id="L232">            expiryMonthComboBox.setItems(FXCollections.observableArrayList(</span>
+                &quot;01&quot;, &quot;02&quot;, &quot;03&quot;, &quot;04&quot;, &quot;05&quot;, &quot;06&quot;, 
+                &quot;07&quot;, &quot;08&quot;, &quot;09&quot;, &quot;10&quot;, &quot;11&quot;, &quot;12&quot;
+            ));
+        }
+        
+<span class="nc bnc" id="L238" title="All 2 branches missed.">        if (expiryYearComboBox != null) {</span>
+<span class="nc" id="L239">            ObservableList&lt;String&gt; years = FXCollections.observableArrayList();</span>
+<span class="nc" id="L240">            int currentYear = LocalDateTime.now().getYear();</span>
+<span class="nc bnc" id="L241" title="All 2 branches missed.">            for (int i = 0; i &lt; 10; i++) {</span>
+<span class="nc" id="L242">                years.add(String.valueOf(currentYear + i));</span>
+            }
+<span class="nc" id="L244">            expiryYearComboBox.setItems(years);</span>
+        }
+        
+<span class="nc bnc" id="L247" title="All 2 branches missed.">        if (savedCardsComboBox != null) {</span>
+<span class="nc" id="L248">            savedCardsComboBox.setItems(savedCards);</span>
+<span class="nc" id="L249">            savedCardsComboBox.setCellFactory(listView -&gt; new ListCell&lt;SavedCard&gt;() {</span>
+                @Override
+                protected void updateItem(SavedCard card, boolean empty) {
+<span class="nc" id="L252">                    super.updateItem(card, empty);</span>
+<span class="nc bnc" id="L253" title="All 4 branches missed.">                    if (empty || card == null) {</span>
+<span class="nc" id="L254">                        setText(null);</span>
+                    } else {
+<span class="nc" id="L256">                        setText(card.getMaskedNumber() + &quot; - &quot; + card.getCardHolder());</span>
+                    }
+<span class="nc" id="L258">                }</span>
+            });
+<span class="nc" id="L260">            savedCardsComboBox.setButtonCell(new ListCell&lt;SavedCard&gt;() {</span>
+                @Override
+                protected void updateItem(SavedCard card, boolean empty) {
+<span class="nc" id="L263">                    super.updateItem(card, empty);</span>
+<span class="nc bnc" id="L264" title="All 4 branches missed.">                    if (empty || card == null) {</span>
+<span class="nc" id="L265">                        setText(&quot;انتخاب کارت ذخیره شده&quot;);</span>
+                    } else {
+<span class="nc" id="L267">                        setText(card.getMaskedNumber());</span>
+                    }
+<span class="nc" id="L269">                }</span>
+            });
+        }
+<span class="nc" id="L272">    }</span>
+    
+    /**
+     * تنظیم روش‌های پرداخت
+     */
+    private void setupPaymentMethods() {
+<span class="nc bnc" id="L278" title="All 2 branches missed.">        if (paymentMethodGroup != null) {</span>
+<span class="nc" id="L279">            paymentMethodGroup.selectedToggleProperty().addListener((obs, oldToggle, newToggle) -&gt; {</span>
+<span class="nc" id="L280">                updatePaymentMethodContainers();</span>
+<span class="nc" id="L281">                updatePaymentSummary();</span>
+<span class="nc" id="L282">            });</span>
+        }
+        
+<span class="nc bnc" id="L285" title="All 2 branches missed.">        if (creditCardRadio != null) {</span>
+<span class="nc" id="L286">            creditCardRadio.setSelected(true);</span>
+<span class="nc" id="L287">            updatePaymentMethodContainers();</span>
+        }
+<span class="nc" id="L289">    }</span>
+    
+    /**
+     * به‌روزرسانی نمایش کانتینرهای روش پرداخت
+     */
+    private void updatePaymentMethodContainers() {
+<span class="nc bnc" id="L295" title="All 2 branches missed.">        if (creditCardContainer != null) creditCardContainer.setVisible(false);</span>
+<span class="nc bnc" id="L296" title="All 2 branches missed.">        if (walletContainer != null) walletContainer.setVisible(false);</span>
+<span class="nc bnc" id="L297" title="All 2 branches missed.">        if (cashContainer != null) cashContainer.setVisible(false);</span>
+        
+<span class="nc bnc" id="L299" title="All 4 branches missed.">        if (paymentMethodGroup.getSelectedToggle() == creditCardRadio &amp;&amp; creditCardContainer != null) {</span>
+<span class="nc" id="L300">            creditCardContainer.setVisible(true);</span>
+<span class="nc bnc" id="L301" title="All 4 branches missed.">        } else if (paymentMethodGroup.getSelectedToggle() == walletRadio &amp;&amp; walletContainer != null) {</span>
+<span class="nc" id="L302">            walletContainer.setVisible(true);</span>
+<span class="nc" id="L303">            updateWalletDisplay();</span>
+<span class="nc bnc" id="L304" title="All 4 branches missed.">        } else if (paymentMethodGroup.getSelectedToggle() == cashOnDeliveryRadio &amp;&amp; cashContainer != null) {</span>
+<span class="nc" id="L305">            cashContainer.setVisible(true);</span>
+        }
+<span class="nc" id="L307">    }</span>
+
+    /**
+     * تنظیم Event Handlers
+     */
+    private void setupEventHandlers() {
+<span class="nc bnc" id="L313" title="All 2 branches missed.">        if (backToCartButton != null) {</span>
+<span class="nc" id="L314">            backToCartButton.setOnAction(e -&gt; backToCart());</span>
+        }
+        
+<span class="nc bnc" id="L317" title="All 2 branches missed.">        if (confirmPaymentButton != null) {</span>
+<span class="nc" id="L318">            confirmPaymentButton.setOnAction(e -&gt; processPayment());</span>
+        }
+        
+<span class="nc bnc" id="L321" title="All 2 branches missed.">        if (cancelOrderButton != null) {</span>
+<span class="nc" id="L322">            cancelOrderButton.setOnAction(e -&gt; cancelOrder());</span>
+        }
+        
+<span class="nc bnc" id="L325" title="All 2 branches missed.">        if (rechargeWalletButton != null) {</span>
+<span class="nc" id="L326">            rechargeWalletButton.setOnAction(e -&gt; showRechargeWalletDialog());</span>
+        }
+        
+<span class="nc bnc" id="L329" title="All 2 branches missed.">        if (addNewCardButton != null) {</span>
+<span class="nc" id="L330">            addNewCardButton.setOnAction(e -&gt; clearCardForm());</span>
+        }
+        
+<span class="nc bnc" id="L333" title="All 2 branches missed.">        if (savedCardsComboBox != null) {</span>
+<span class="nc" id="L334">            savedCardsComboBox.setOnAction(e -&gt; fillCardFromSaved());</span>
+        }
+        
+<span class="nc bnc" id="L337" title="All 2 branches missed.">        if (cardNumberField != null) {</span>
+<span class="nc" id="L338">            cardNumberField.textProperty().addListener((obs, oldVal, newVal) -&gt; {</span>
+<span class="nc" id="L339">                formatCardNumber(newVal);</span>
+<span class="nc" id="L340">            });</span>
+        }
+        
+<span class="nc bnc" id="L343" title="All 2 branches missed.">        if (cvvField != null) {</span>
+<span class="nc" id="L344">            cvvField.textProperty().addListener((obs, oldVal, newVal) -&gt; {</span>
+<span class="nc bnc" id="L345" title="All 2 branches missed.">                if (newVal.length() &gt; 4) {</span>
+<span class="nc" id="L346">                    cvvField.setText(oldVal);</span>
+                }
+<span class="nc" id="L348">            });</span>
+        }
+<span class="nc" id="L350">    }</span>
+    
+    /**
+     * تنظیم validation ها
+     */
+    private void setupValidation() {
+<span class="nc" id="L356">        updateConfirmButtonState();</span>
+        
+<span class="nc bnc" id="L358" title="All 2 branches missed.">        if (cardNumberField != null) {</span>
+<span class="nc" id="L359">            cardNumberField.textProperty().addListener((obs, oldVal, newVal) -&gt; updateConfirmButtonState());</span>
+        }
+<span class="nc bnc" id="L361" title="All 2 branches missed.">        if (cardHolderField != null) {</span>
+<span class="nc" id="L362">            cardHolderField.textProperty().addListener((obs, oldVal, newVal) -&gt; updateConfirmButtonState());</span>
+        }
+<span class="nc bnc" id="L364" title="All 2 branches missed.">        if (cvvField != null) {</span>
+<span class="nc" id="L365">            cvvField.textProperty().addListener((obs, oldVal, newVal) -&gt; updateConfirmButtonState());</span>
+        }
+<span class="nc" id="L367">    }</span>
+    
+    /**
+     * بارگذاری اطلاعات اولیه
+     */
+    private void loadInitialData() {
+<span class="nc" id="L373">        loadSavedCards();</span>
+<span class="nc" id="L374">        loadWalletInfo();</span>
+<span class="nc" id="L375">        loadOrderSummary();</span>
+<span class="nc" id="L376">        updateOrderDisplay();</span>
+<span class="nc" id="L377">        updatePaymentSummary();</span>
+<span class="nc" id="L378">    }</span>
+    
+    // ==================== Payment Processing Methods ====================
+    
+    /**
+     * پردازش پرداخت
+     */
+    private void processPayment() {
+<span class="nc bnc" id="L386" title="All 2 branches missed.">        if (!validatePaymentData()) {</span>
+<span class="nc" id="L387">            return;</span>
+        }
+        
+<span class="nc" id="L390">        showLoadingIndicator(true);</span>
+<span class="nc" id="L391">        paymentData.setPaymentMethod(getSelectedPaymentMethod());</span>
+<span class="nc" id="L392">        paymentData.setAmount(orderSummary.getFinalAmount());</span>
+<span class="nc" id="L393">        paymentData.setOrderId(currentOrderId);</span>
+        
+<span class="nc" id="L395">        new Thread(() -&gt; {</span>
+            try {
+<span class="nc" id="L397">                Thread.sleep(2000);</span>
+                
+<span class="nc" id="L399">                boolean success = processPaymentWithProvider();</span>
+                
+<span class="nc" id="L401">                javafx.application.Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L402">                    showLoadingIndicator(false);</span>
+<span class="nc bnc" id="L403" title="All 2 branches missed.">                    if (success) {</span>
+<span class="nc" id="L404">                        showPaymentSuccess();</span>
+                    } else {
+<span class="nc" id="L406">                        showPaymentError(&quot;پرداخت ناموفق بود. لطفاً دوباره تلاش کنید.&quot;);</span>
+                    }
+<span class="nc" id="L408">                });</span>
+                
+<span class="nc" id="L410">            } catch (InterruptedException e) {</span>
+<span class="nc" id="L411">                javafx.application.Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L412">                    showLoadingIndicator(false);</span>
+<span class="nc" id="L413">                    showPaymentError(&quot;خطا در پردازش پرداخت.&quot;);</span>
+<span class="nc" id="L414">                });</span>
+<span class="nc" id="L415">            }</span>
+<span class="nc" id="L416">        }).start();</span>
+<span class="nc" id="L417">    }</span>
+    
+    /**
+     * اعتبارسنجی داده‌های پرداخت
+     */
+    private boolean validatePaymentData() {
+<span class="nc" id="L423">        PaymentMethod method = getSelectedPaymentMethod();</span>
+        
+<span class="nc bnc" id="L425" title="All 4 branches missed.">        switch (method) {</span>
+            case CREDIT_CARD:
+<span class="nc" id="L427">                return validateCreditCardData();</span>
+            case WALLET:
+<span class="nc" id="L429">                return validateWalletData();</span>
+            case CASH_ON_DELIVERY:
+<span class="nc" id="L431">                return true;</span>
+            default:
+<span class="nc" id="L433">                return false;</span>
+        }
+    }
+
+    /**
+     * اعتبارسنجی داده‌های کارت اعتباری
+     */
+    private boolean validateCreditCardData() {
+<span class="nc bnc" id="L441" title="All 2 branches missed.">        if (cardNumberField.getText().trim().length() &lt; 16) {</span>
+<span class="nc" id="L442">            showErrorMessage(&quot;شماره کارت نامعتبر است&quot;);</span>
+<span class="nc" id="L443">            return false;</span>
+        }
+        
+<span class="nc bnc" id="L446" title="All 2 branches missed.">        if (cardHolderField.getText().trim().isEmpty()) {</span>
+<span class="nc" id="L447">            showErrorMessage(&quot;نام دارنده کارت الزامی است&quot;);</span>
+<span class="nc" id="L448">            return false;</span>
+        }
+        
+<span class="nc bnc" id="L451" title="All 4 branches missed.">        if (expiryMonthComboBox.getValue() == null || expiryYearComboBox.getValue() == null) {</span>
+<span class="nc" id="L452">            showErrorMessage(&quot;تاریخ انقضا الزامی است&quot;);</span>
+<span class="nc" id="L453">            return false;</span>
+        }
+        
+<span class="nc bnc" id="L456" title="All 2 branches missed.">        if (cvvField.getText().trim().length() &lt; 3) {</span>
+<span class="nc" id="L457">            showErrorMessage(&quot;CVV نامعتبر است&quot;);</span>
+<span class="nc" id="L458">            return false;</span>
+        }
+        
+<span class="nc" id="L461">        return true;</span>
+    }
+    
+    /**
+     * اعتبارسنجی داده‌های کیف پول
+     */
+    private boolean validateWalletData() {
+<span class="nc bnc" id="L468" title="All 2 branches missed.">        if (walletInfo.getBalance() &lt; orderSummary.getFinalAmount()) {</span>
+<span class="nc" id="L469">            showErrorMessage(&quot;موجودی کیف پول کافی نیست&quot;);</span>
+<span class="nc" id="L470">            return false;</span>
+        }
+        
+<span class="nc" id="L473">        return true;</span>
+    }
+    
+    /**
+     * دریافت روش پرداخت انتخاب شده
+     */
+    private PaymentMethod getSelectedPaymentMethod() {
+<span class="nc bnc" id="L480" title="All 2 branches missed.">        if (paymentMethodGroup.getSelectedToggle() == creditCardRadio) {</span>
+<span class="nc" id="L481">            return PaymentMethod.CREDIT_CARD;</span>
+<span class="nc bnc" id="L482" title="All 2 branches missed.">        } else if (paymentMethodGroup.getSelectedToggle() == walletRadio) {</span>
+<span class="nc" id="L483">            return PaymentMethod.WALLET;</span>
+        } else {
+<span class="nc" id="L485">            return PaymentMethod.CASH_ON_DELIVERY;</span>
+        }
+    }
+    
+    /**
+     * پردازش پرداخت با ارائه‌دهنده خدمات
+     */
+    private boolean processPaymentWithProvider() {
+<span class="nc" id="L493">        PaymentMethod method = getSelectedPaymentMethod();</span>
+        
+<span class="nc bnc" id="L495" title="All 4 branches missed.">        switch (method) {</span>
+            case CREDIT_CARD:
+<span class="nc" id="L497">                return processCreditCardPayment();</span>
+            case WALLET:
+<span class="nc" id="L499">                return processWalletPayment();</span>
+            case CASH_ON_DELIVERY:
+<span class="nc" id="L501">                return processCashPayment();</span>
+            default:
+<span class="nc" id="L503">                return false;</span>
+        }
+    }
+    
+    /**
+     * پردازش پرداخت با کارت اعتباری
+     */
+    private boolean processCreditCardPayment() {
+<span class="nc" id="L511">        paymentData.setTransactionId(&quot;TXN-&quot; + System.currentTimeMillis());</span>
+<span class="nc" id="L512">        paymentData.setGatewayResponse(&quot;SUCCESS&quot;);</span>
+        
+<span class="nc bnc" id="L514" title="All 2 branches missed.">        if (saveCardCheckBox.isSelected()) {</span>
+<span class="nc" id="L515">            saveCurrentCard();</span>
+        }
+        
+<span class="nc" id="L518">        return true;</span>
+    }
+    
+    /**
+     * پردازش پرداخت با کیف پول
+     */
+    private boolean processWalletPayment() {
+<span class="nc" id="L525">        double newBalance = walletInfo.getBalance() - orderSummary.getFinalAmount();</span>
+<span class="nc" id="L526">        walletInfo.setBalance(newBalance);</span>
+        
+<span class="nc" id="L528">        paymentData.setTransactionId(&quot;WALLET-&quot; + System.currentTimeMillis());</span>
+<span class="nc" id="L529">        paymentData.setGatewayResponse(&quot;SUCCESS&quot;);</span>
+        
+<span class="nc" id="L531">        return true;</span>
+    }
+    
+    /**
+     * پردازش پرداخت نقدی
+     */
+    private boolean processCashPayment() {
+<span class="nc" id="L538">        paymentData.setTransactionId(&quot;CASH-&quot; + System.currentTimeMillis());</span>
+<span class="nc" id="L539">        paymentData.setGatewayResponse(&quot;PENDING&quot;);</span>
+        
+<span class="nc" id="L541">        return true;</span>
+    }
+    
+    // ==================== Data Models ====================
+    
+    /**
+     * مدل آیتم سفارش
+     */
+    public static class OrderItem {
+        private String itemName;
+        private Integer quantity;
+        private Double price;
+        private String specialInstructions;
+        
+<span class="nc" id="L555">        public OrderItem() {}</span>
+        
+<span class="fc" id="L557">        public OrderItem(String itemName, Integer quantity, Double price) {</span>
+<span class="fc" id="L558">            this.itemName = itemName;</span>
+<span class="fc" id="L559">            this.quantity = quantity;</span>
+<span class="fc" id="L560">            this.price = price;</span>
+<span class="fc" id="L561">        }</span>
+        
+        public javafx.beans.property.StringProperty itemNameProperty() {
+<span class="nc" id="L564">            return new SimpleStringProperty(itemName);</span>
+        }
+        
+        public javafx.beans.property.IntegerProperty quantityProperty() {
+<span class="nc" id="L568">            return new javafx.beans.property.SimpleIntegerProperty(quantity);</span>
+        }
+        
+        public javafx.beans.property.DoubleProperty priceProperty() {
+<span class="nc" id="L572">            return new SimpleDoubleProperty(price);</span>
+        }
+        
+        public Double getTotalPrice() {
+<span class="pc bpc" id="L576" title="2 of 4 branches missed.">            return price != null &amp;&amp; quantity != null ? price * quantity : 0.0;</span>
+        }
+        
+<span class="fc" id="L579">        public String getItemName() { return itemName; }</span>
+<span class="nc" id="L580">        public void setItemName(String itemName) { this.itemName = itemName; }</span>
+        
+<span class="fc" id="L582">        public Integer getQuantity() { return quantity; }</span>
+<span class="nc" id="L583">        public void setQuantity(Integer quantity) { this.quantity = quantity; }</span>
+        
+<span class="fc" id="L585">        public Double getPrice() { return price; }</span>
+<span class="nc" id="L586">        public void setPrice(Double price) { this.price = price; }</span>
+        
+<span class="nc" id="L588">        public String getSpecialInstructions() { return specialInstructions; }</span>
+        public void setSpecialInstructions(String specialInstructions) { 
+<span class="nc" id="L590">            this.specialInstructions = specialInstructions; </span>
+<span class="nc" id="L591">        }</span>
+    }
+    
+    /**
+     * enum روش‌های پرداخت
+     */
+<span class="fc" id="L597">    public enum PaymentMethod {</span>
+<span class="fc" id="L598">        CREDIT_CARD(&quot;کارت اعتباری&quot;),</span>
+<span class="fc" id="L599">        WALLET(&quot;کیف پول&quot;),</span>
+<span class="fc" id="L600">        CASH_ON_DELIVERY(&quot;پرداخت نقدی&quot;);</span>
+        
+        private final String displayName;
+        
+<span class="fc" id="L604">        PaymentMethod(String displayName) {</span>
+<span class="fc" id="L605">            this.displayName = displayName;</span>
+<span class="fc" id="L606">        }</span>
+        
+        public String getDisplayName() {
+<span class="fc" id="L609">            return displayName;</span>
+        }
+    }
+    
+    // ==================== Helper Methods ====================
+    
+    /**
+     * به‌روزرسانی وضعیت دکمه تأیید
+     */
+    private void updateConfirmButtonState() {
+<span class="nc bnc" id="L619" title="All 2 branches missed.">        if (confirmPaymentButton != null) {</span>
+<span class="nc" id="L620">            boolean isValid = validateCurrentPaymentMethod();</span>
+<span class="nc bnc" id="L621" title="All 2 branches missed.">            confirmPaymentButton.setDisable(!isValid);</span>
+        }
+<span class="nc" id="L623">    }</span>
+    
+    /**
+     * اعتبارسنجی روش پرداخت فعلی
+     */
+    private boolean validateCurrentPaymentMethod() {
+<span class="nc" id="L629">        PaymentMethod method = getSelectedPaymentMethod();</span>
+        
+<span class="nc bnc" id="L631" title="All 4 branches missed.">        switch (method) {</span>
+            case CREDIT_CARD:
+<span class="nc bnc" id="L633" title="All 2 branches missed.">                return !cardNumberField.getText().trim().isEmpty() &amp;&amp;</span>
+<span class="nc bnc" id="L634" title="All 2 branches missed.">                       !cardHolderField.getText().trim().isEmpty() &amp;&amp;</span>
+<span class="nc bnc" id="L635" title="All 2 branches missed.">                       !cvvField.getText().trim().isEmpty();</span>
+            case WALLET:
+<span class="nc bnc" id="L637" title="All 2 branches missed.">                return walletInfo.getBalance() &gt;= orderSummary.getFinalAmount();</span>
+            case CASH_ON_DELIVERY:
+<span class="nc" id="L639">                return true;</span>
+            default:
+<span class="nc" id="L641">                return false;</span>
+        }
+    }
+    
+    /**
+     * نمایش/مخفی کردن loading indicator
+     */
+    private void showLoadingIndicator(boolean show) {
+<span class="nc bnc" id="L649" title="All 2 branches missed.">        if (paymentProgressIndicator != null) {</span>
+<span class="nc" id="L650">            paymentProgressIndicator.setVisible(show);</span>
+        }
+<span class="nc bnc" id="L652" title="All 2 branches missed.">        if (confirmPaymentButton != null) {</span>
+<span class="nc" id="L653">            confirmPaymentButton.setDisable(show);</span>
+        }
+<span class="nc" id="L655">    }</span>
+    
+    // ==================== Placeholder Methods ====================
+    
+    private void loadSavedCards() {
+        // TODO: Load from backend
+<span class="nc" id="L661">    }</span>
+    
+    private void loadWalletInfo() {
+        // TODO: Load from backend
+<span class="nc" id="L665">        walletInfo.setBalance(150000.0);</span>
+<span class="nc" id="L666">    }</span>
+    
+    private void loadOrderSummary() {
+        // TODO: Load from previous cart data
+<span class="nc" id="L670">    }</span>
+    
+    private void updateOrderDisplay() {
+<span class="nc bnc" id="L673" title="All 2 branches missed.">        if (orderNumberLabel != null) {</span>
+<span class="nc" id="L674">            orderNumberLabel.setText(currentOrderId);</span>
+        }
+<span class="nc bnc" id="L676" title="All 2 branches missed.">        if (orderDateLabel != null) {</span>
+<span class="nc" id="L677">            orderDateLabel.setText(LocalDateTime.now().format(DateTimeFormatter.ofPattern(&quot;yyyy/MM/dd HH:mm&quot;)));</span>
+        }
+<span class="nc" id="L679">    }</span>
+    
+    private void updatePaymentSummary() {
+        // TODO: Calculate and update payment summary
+<span class="nc" id="L683">    }</span>
+    
+    private void updateWalletDisplay() {
+<span class="nc bnc" id="L686" title="All 2 branches missed.">        if (walletBalanceLabel != null) {</span>
+<span class="nc" id="L687">            walletBalanceLabel.setText(String.format(&quot;%,.0f تومان&quot;, walletInfo.getBalance()));</span>
+        }
+<span class="nc" id="L689">    }</span>
+    
+    private void formatCardNumber(String newVal) {
+        // TODO: Format card number with spaces
+<span class="nc" id="L693">    }</span>
+    
+    private void fillCardFromSaved() {
+        // TODO: Fill form from saved card
+<span class="nc" id="L697">    }</span>
+    
+    private void clearCardForm() {
+        // TODO: Clear card form fields
+<span class="nc" id="L701">    }</span>
+    
+    private void saveCurrentCard() {
+        // TODO: Save current card info
+<span class="nc" id="L705">    }</span>
+    
+    private void backToCart() {
+        // TODO: Navigate back to cart
+<span class="nc" id="L709">    }</span>
+    
+    private void cancelOrder() {
+        // TODO: Cancel order with confirmation
+<span class="nc" id="L713">    }</span>
+    
+    private void showRechargeWalletDialog() {
+        // TODO: Show wallet recharge dialog
+<span class="nc" id="L717">    }</span>
+    
+    private void showPaymentSuccess() {
+        // TODO: Show success message and navigate to order tracking
+<span class="nc" id="L721">    }</span>
+    
+    private void showPaymentError(String message) {
+        // TODO: Show error message
+<span class="nc" id="L725">    }</span>
+    
+    private void showErrorMessage(String message) {
+        // TODO: Show error message
+<span class="nc" id="L729">    }</span>
+    
+    /**
+     * مدل خلاصه سفارش
+     */
+<span class="fc" id="L734">    public static class OrderSummary {</span>
+<span class="fc" id="L735">        private Double subtotal = 0.0;</span>
+<span class="fc" id="L736">        private Double tax = 0.0;</span>
+<span class="fc" id="L737">        private Double deliveryFee = 0.0;</span>
+<span class="fc" id="L738">        private Double discount = 0.0;</span>
+<span class="fc" id="L739">        private Double processingFee = 0.0;</span>
+<span class="fc" id="L740">        private Double finalAmount = 0.0;</span>
+        
+<span class="fc" id="L742">        public Double getSubtotal() { return subtotal; }</span>
+<span class="fc" id="L743">        public void setSubtotal(Double subtotal) { this.subtotal = subtotal; }</span>
+        
+<span class="fc" id="L745">        public Double getTax() { return tax; }</span>
+<span class="fc" id="L746">        public void setTax(Double tax) { this.tax = tax; }</span>
+        
+<span class="fc" id="L748">        public Double getDeliveryFee() { return deliveryFee; }</span>
+<span class="fc" id="L749">        public void setDeliveryFee(Double deliveryFee) { this.deliveryFee = deliveryFee; }</span>
+        
+<span class="nc" id="L751">        public Double getDiscount() { return discount; }</span>
+<span class="nc" id="L752">        public void setDiscount(Double discount) { this.discount = discount; }</span>
+        
+<span class="nc" id="L754">        public Double getProcessingFee() { return processingFee; }</span>
+<span class="nc" id="L755">        public void setProcessingFee(Double processingFee) { this.processingFee = processingFee; }</span>
+        
+<span class="fc" id="L757">        public Double getFinalAmount() { return finalAmount; }</span>
+<span class="fc" id="L758">        public void setFinalAmount(Double finalAmount) { this.finalAmount = finalAmount; }</span>
+    }
+    
+    /**
+     * مدل اطلاعات کیف پول
+     */
+<span class="fc" id="L764">    public static class WalletInfo {</span>
+<span class="fc" id="L765">        private Double balance = 0.0;</span>
+<span class="fc" id="L766">        private String status = &quot;ACTIVE&quot;;</span>
+        
+<span class="fc" id="L768">        public Double getBalance() { return balance; }</span>
+<span class="fc" id="L769">        public void setBalance(Double balance) { this.balance = balance; }</span>
+        
+<span class="fc" id="L771">        public String getStatus() { return status; }</span>
+<span class="fc" id="L772">        public void setStatus(String status) { this.status = status; }</span>
+    }
+    
+    /**
+     * مدل کارت ذخیره شده
+     */
+<span class="nc" id="L778">    public static class SavedCard {</span>
+        private String maskedNumber;
+        private String cardHolder;
+        private String expiryMonth;
+        private String expiryYear;
+        
+<span class="nc" id="L784">        public String getMaskedNumber() { return maskedNumber; }</span>
+<span class="nc" id="L785">        public void setMaskedNumber(String maskedNumber) { this.maskedNumber = maskedNumber; }</span>
+        
+<span class="nc" id="L787">        public String getCardHolder() { return cardHolder; }</span>
+<span class="nc" id="L788">        public void setCardHolder(String cardHolder) { this.cardHolder = cardHolder; }</span>
+        
+<span class="nc" id="L790">        public String getExpiryMonth() { return expiryMonth; }</span>
+<span class="nc" id="L791">        public void setExpiryMonth(String expiryMonth) { this.expiryMonth = expiryMonth; }</span>
+        
+<span class="nc" id="L793">        public String getExpiryYear() { return expiryYear; }</span>
+<span class="nc" id="L794">        public void setExpiryYear(String expiryYear) { this.expiryYear = expiryYear; }</span>
+    }
+    
+    /**
+     * مدل داده‌های پرداخت
+     */
+<span class="nc" id="L800">    public static class PaymentData {</span>
+        private PaymentMethod paymentMethod;
+        private Double amount;
+        private String orderId;
+        private String transactionId;
+        private String gatewayResponse;
+        
+<span class="nc" id="L807">        public PaymentMethod getPaymentMethod() { return paymentMethod; }</span>
+<span class="nc" id="L808">        public void setPaymentMethod(PaymentMethod paymentMethod) { this.paymentMethod = paymentMethod; }</span>
+        
+<span class="nc" id="L810">        public Double getAmount() { return amount; }</span>
+<span class="nc" id="L811">        public void setAmount(Double amount) { this.amount = amount; }</span>
+        
+<span class="nc" id="L813">        public String getOrderId() { return orderId; }</span>
+<span class="nc" id="L814">        public void setOrderId(String orderId) { this.orderId = orderId; }</span>
+        
+<span class="nc" id="L816">        public String getTransactionId() { return transactionId; }</span>
+<span class="nc" id="L817">        public void setTransactionId(String transactionId) { this.transactionId = transactionId; }</span>
+        
+<span class="nc" id="L819">        public String getGatewayResponse() { return gatewayResponse; }</span>
+<span class="nc" id="L820">        public void setGatewayResponse(String gatewayResponse) { this.gatewayResponse = gatewayResponse; }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,841 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrderHistoryController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.order</a> &gt; <span class="el_source">OrderHistoryController.java</span></div><h1>OrderHistoryController.java</h1><pre class="source lang-java linenums">package com.myapp.ui.order;
+
+import com.myapp.ui.common.NavigationController;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+
+import java.net.URL;
+import java.text.NumberFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ * Controller for Order History screen
+ * Displays order history, filtering, and order details
+ */
+<span class="fc" id="L26">public class OrderHistoryController implements Initializable {</span>
+
+    // Header Components
+    @FXML private Label orderCountLabel;
+    @FXML private TextField searchField;
+    @FXML private Button searchButton;
+    @FXML private Button refreshButton;
+    
+    // Filter Components
+    @FXML private ComboBox&lt;String&gt; statusFilterCombo;
+    @FXML private ComboBox&lt;String&gt; dateFilterCombo;
+    @FXML private Button clearFiltersButton;
+    
+    // Order List
+    @FXML private VBox orderListContainer;
+    @FXML private Label emptyOrdersLabel;
+    
+    // Order Details Panel
+    @FXML private VBox orderDetailsContainer;
+    @FXML private VBox noSelectionContainer;
+    
+    // Order Detail Labels
+    @FXML private Label orderNumberLabel;
+    @FXML private Label orderDateLabel;
+    @FXML private Label orderStatusLabel;
+    @FXML private Label restaurantNameLabel;
+    @FXML private Label totalAmountLabel;
+    
+    @FXML private VBox orderItemsContainer;
+    
+    @FXML private Label deliveryAddressLabel;
+    @FXML private Label deliveryPhoneLabel;
+    @FXML private Label deliveryTimeLabel;
+    
+    @FXML private Label paymentMethodLabel;
+    @FXML private Label paymentStatusLabel;
+    @FXML private Label trackingNumberLabel;
+    
+    // Action Buttons
+    @FXML private Button reorderButton;
+    @FXML private Button trackOrderButton;
+    @FXML private Button cancelOrderButton;
+    @FXML private Button downloadReceiptButton;
+    
+    // Menu Items
+    @FXML private MenuItem backMenuItem;
+    @FXML private MenuItem profileMenuItem;
+    @FXML private MenuItem cartMenuItem;
+    @FXML private MenuItem logoutMenuItem;
+    
+    @FXML private MenuItem allOrdersMenuItem;
+    @FXML private MenuItem pendingOrdersMenuItem;
+    @FXML private MenuItem completedOrdersMenuItem;
+    @FXML private MenuItem cancelledOrdersMenuItem;
+    
+    // Status Components
+    @FXML private Label statusLabel;
+    @FXML private ProgressIndicator loadingIndicator;
+
+    private NavigationController navigationController;
+<span class="fc" id="L86">    private final NumberFormat currencyFormat = NumberFormat.getInstance(new Locale(&quot;fa&quot;, &quot;IR&quot;));</span>
+    
+    // Data
+<span class="fc" id="L89">    private List&lt;OrderHistory&gt; allOrders = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L90">    private List&lt;OrderHistory&gt; filteredOrders = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L91">    private OrderHistory selectedOrder = null;</span>
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+<span class="nc" id="L95">        this.navigationController = NavigationController.getInstance();</span>
+        
+<span class="nc" id="L97">        setupUI();</span>
+<span class="nc" id="L98">        loadOrderHistory();</span>
+<span class="nc" id="L99">    }</span>
+
+    /**
+     * Setup UI components and event handlers
+     */
+    private void setupUI() {
+        // Initialize currency format
+<span class="nc" id="L106">        currencyFormat.setGroupingUsed(true);</span>
+        
+        // Setup filter combos
+<span class="nc" id="L109">        setupFilterCombos();</span>
+        
+        // Setup search functionality
+<span class="nc" id="L112">        setupSearchFunctionality();</span>
+        
+        // Initial status
+<span class="nc" id="L115">        setStatus(&quot;در حال بارگذاری تاریخچه سفارش‌ها...&quot;);</span>
+        
+        // Initially show no selection
+<span class="nc" id="L118">        showNoSelection();</span>
+<span class="nc" id="L119">    }</span>
+
+    /**
+     * Setup filter combo boxes
+     */
+    private void setupFilterCombos() {
+        // Status filter
+<span class="nc" id="L126">        statusFilterCombo.getItems().addAll(</span>
+            &quot;همه وضعیت‌ها&quot;,
+            &quot;در انتظار تأیید&quot;, 
+            &quot;در حال آماده‌سازی&quot;, 
+            &quot;آماده ارسال&quot;, 
+            &quot;در حال ارسال&quot;, 
+            &quot;تحویل داده شده&quot;, 
+            &quot;لغو شده&quot;
+        );
+<span class="nc" id="L135">        statusFilterCombo.setValue(&quot;همه وضعیت‌ها&quot;);</span>
+        
+        // Date filter
+<span class="nc" id="L138">        dateFilterCombo.getItems().addAll(</span>
+            &quot;همه تاریخ‌ها&quot;,
+            &quot;امروز&quot;,
+            &quot;هفته گذشته&quot;, 
+            &quot;ماه گذشته&quot;,
+            &quot;3 ماه گذشته&quot;
+        );
+<span class="nc" id="L145">        dateFilterCombo.setValue(&quot;همه تاریخ‌ها&quot;);</span>
+<span class="nc" id="L146">    }</span>
+
+    /**
+     * Setup search functionality
+     */
+    private void setupSearchFunctionality() {
+<span class="nc" id="L152">        searchField.setOnAction(e -&gt; handleSearch());</span>
+<span class="nc" id="L153">        searchField.textProperty().addListener((obs, oldVal, newVal) -&gt; {</span>
+<span class="nc bnc" id="L154" title="All 2 branches missed.">            if (newVal.trim().isEmpty()) {</span>
+<span class="nc" id="L155">                applyFilters();</span>
+            }
+<span class="nc" id="L157">        });</span>
+<span class="nc" id="L158">    }</span>
+
+    /**
+     * Load order history from backend
+     */
+    private void loadOrderHistory() {
+<span class="nc" id="L164">        setLoading(true);</span>
+        
+<span class="nc" id="L166">        Task&lt;List&lt;OrderHistory&gt;&gt; loadTask = new Task&lt;List&lt;OrderHistory&gt;&gt;() {</span>
+            @Override
+            protected List&lt;OrderHistory&gt; call() throws Exception {
+<span class="nc" id="L169">                Thread.sleep(1500); // Simulate loading</span>
+                
+                // Mock order data
+<span class="nc" id="L172">                List&lt;OrderHistory&gt; mockOrders = new ArrayList&lt;&gt;();</span>
+                
+<span class="nc" id="L174">                mockOrders.add(new OrderHistory(</span>
+                    &quot;FO123456&quot;, 
+<span class="nc" id="L176">                    LocalDateTime.now().minusDays(1),</span>
+                    &quot;تحویل داده شده&quot;,
+                    &quot;رستوران ایتالیایی&quot;,
+                    68000.0,
+<span class="nc" id="L180">                    Arrays.asList(</span>
+                        new OrderItem(&quot;پیتزا مارگاریتا&quot;, 25000.0, 2),
+                        new OrderItem(&quot;نوشابه&quot;, 9000.0, 2)
+                    ),
+                    &quot;تهران، خیابان ولیعصر، پلاک 123&quot;,
+                    &quot;09123456789&quot;,
+<span class="nc" id="L186">                    LocalDateTime.now().minusDays(1).plusHours(1),</span>
+                    &quot;پرداخت با کارت&quot;,
+                    &quot;پرداخت شده&quot;,
+                    &quot;PAY789123&quot;
+                ));
+                
+<span class="nc" id="L192">                mockOrders.add(new OrderHistory(</span>
+                    &quot;FO123457&quot;,
+<span class="nc" id="L194">                    LocalDateTime.now().minusDays(3),</span>
+                    &quot;در حال ارسال&quot;,
+                    &quot;فست فود سارا&quot;,
+                    45000.0,
+<span class="nc" id="L198">                    Arrays.asList(</span>
+                        new OrderItem(&quot;برگر کلاسیک&quot;, 18000.0, 1),
+                        new OrderItem(&quot;سیب زمینی&quot;, 12000.0, 1),
+                        new OrderItem(&quot;نوشابه&quot;, 9000.0, 1)
+                    ),
+                    &quot;تهران، میدان آزادی، کوچه گل‌ها&quot;,
+                    &quot;09987654321&quot;,
+<span class="nc" id="L205">                    LocalDateTime.now().plusMinutes(30),</span>
+                    &quot;پرداخت در محل&quot;,
+                    &quot;در انتظار&quot;,
+                    &quot;COD456789&quot;
+                ));
+                
+<span class="nc" id="L211">                mockOrders.add(new OrderHistory(</span>
+                    &quot;FO123458&quot;,
+<span class="nc" id="L213">                    LocalDateTime.now().minusDays(7),</span>
+                    &quot;لغو شده&quot;,
+                    &quot;رستوران سنتی&quot;,
+                    85000.0,
+<span class="nc" id="L217">                    Arrays.asList(</span>
+                        new OrderItem(&quot;چلو کباب کوبیده&quot;, 35000.0, 1),
+                        new OrderItem(&quot;چلو کباب برگ&quot;, 45000.0, 1)
+                    ),
+                    &quot;تهران، خیابان کریمخان، پلاک 45&quot;,
+                    &quot;09334455666&quot;,
+                    null,
+                    &quot;کیف پول&quot;,
+                    &quot;لغو شده&quot;,
+                    &quot;CANCEL123&quot;
+                ));
+                
+<span class="nc" id="L229">                return mockOrders;</span>
+            }
+        };
+        
+<span class="nc" id="L233">        loadTask.setOnSucceeded(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L234">            setLoading(false);</span>
+<span class="nc" id="L235">            allOrders = loadTask.getValue();</span>
+<span class="nc" id="L236">            applyFilters();</span>
+<span class="nc" id="L237">            updateOrderCount();</span>
+<span class="nc" id="L238">            setStatus(&quot;تاریخچه سفارش‌ها بارگذاری شد&quot;);</span>
+<span class="nc" id="L239">        }));</span>
+        
+<span class="nc" id="L241">        loadTask.setOnFailed(e -&gt; Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L242">            setLoading(false);</span>
+<span class="nc" id="L243">            setStatus(&quot;خطا در بارگذاری تاریخچه سفارش‌ها&quot;);</span>
+<span class="nc" id="L244">            showError(&quot;خطا&quot;, &quot;خطا در بارگذاری تاریخچه سفارش‌ها&quot;);</span>
+<span class="nc" id="L245">        }));</span>
+        
+<span class="nc" id="L247">        new Thread(loadTask).start();</span>
+<span class="nc" id="L248">    }</span>
+
+    /**
+     * Apply current filters to order list
+     */
+    private void applyFilters() {
+<span class="nc" id="L254">        filteredOrders = allOrders.stream()</span>
+<span class="nc" id="L255">            .filter(this::matchesStatusFilter)</span>
+<span class="nc" id="L256">            .filter(this::matchesDateFilter)</span>
+<span class="nc" id="L257">            .filter(this::matchesSearchFilter)</span>
+<span class="nc" id="L258">            .collect(Collectors.toList());</span>
+        
+<span class="nc" id="L260">        displayOrders();</span>
+<span class="nc" id="L261">        updateOrderCount();</span>
+<span class="nc" id="L262">    }</span>
+
+    /**
+     * Check if order matches status filter
+     */
+    private boolean matchesStatusFilter(OrderHistory order) {
+<span class="nc" id="L268">        String selectedStatus = statusFilterCombo.getValue();</span>
+<span class="nc bnc" id="L269" title="All 2 branches missed.">        return selectedStatus == null || </span>
+<span class="nc bnc" id="L270" title="All 2 branches missed.">               selectedStatus.equals(&quot;همه وضعیت‌ها&quot;) || </span>
+<span class="nc bnc" id="L271" title="All 2 branches missed.">               order.getStatus().equals(selectedStatus);</span>
+    }
+
+    /**
+     * Check if order matches date filter
+     */
+    private boolean matchesDateFilter(OrderHistory order) {
+<span class="nc" id="L278">        String selectedDate = dateFilterCombo.getValue();</span>
+<span class="nc bnc" id="L279" title="All 4 branches missed.">        if (selectedDate == null || selectedDate.equals(&quot;همه تاریخ‌ها&quot;)) {</span>
+<span class="nc" id="L280">            return true;</span>
+        }
+        
+<span class="nc" id="L283">        LocalDateTime now = LocalDateTime.now();</span>
+<span class="nc" id="L284">        LocalDateTime orderDate = order.getOrderDate();</span>
+        
+<span class="nc bnc" id="L286" title="All 5 branches missed.">        switch (selectedDate) {</span>
+            case &quot;امروز&quot;:
+<span class="nc" id="L288">                return orderDate.toLocalDate().equals(now.toLocalDate());</span>
+            case &quot;هفته گذشته&quot;:
+<span class="nc" id="L290">                return orderDate.isAfter(now.minusWeeks(1));</span>
+            case &quot;ماه گذشته&quot;:
+<span class="nc" id="L292">                return orderDate.isAfter(now.minusMonths(1));</span>
+            case &quot;3 ماه گذشته&quot;:
+<span class="nc" id="L294">                return orderDate.isAfter(now.minusMonths(3));</span>
+            default:
+<span class="nc" id="L296">                return true;</span>
+        }
+    }
+
+    /**
+     * Check if order matches search filter
+     */
+    private boolean matchesSearchFilter(OrderHistory order) {
+<span class="nc" id="L304">        String searchText = searchField.getText().trim().toLowerCase();</span>
+<span class="nc bnc" id="L305" title="All 2 branches missed.">        if (searchText.isEmpty()) {</span>
+<span class="nc" id="L306">            return true;</span>
+        }
+        
+<span class="nc bnc" id="L309" title="All 2 branches missed.">        return order.getOrderNumber().toLowerCase().contains(searchText) ||</span>
+<span class="nc bnc" id="L310" title="All 2 branches missed.">               order.getRestaurantName().toLowerCase().contains(searchText) ||</span>
+<span class="nc bnc" id="L311" title="All 2 branches missed.">               order.getStatus().toLowerCase().contains(searchText);</span>
+    }
+
+    /**
+     * Display filtered orders
+     */
+    private void displayOrders() {
+<span class="nc" id="L318">        orderListContainer.getChildren().clear();</span>
+        
+<span class="nc bnc" id="L320" title="All 2 branches missed.">        if (filteredOrders.isEmpty()) {</span>
+<span class="nc" id="L321">            emptyOrdersLabel.setVisible(true);</span>
+<span class="nc" id="L322">            return;</span>
+        }
+        
+<span class="nc" id="L325">        emptyOrdersLabel.setVisible(false);</span>
+        
+<span class="nc bnc" id="L327" title="All 2 branches missed.">        for (OrderHistory order : filteredOrders) {</span>
+<span class="nc" id="L328">            VBox orderBox = createOrderListItem(order);</span>
+<span class="nc" id="L329">            orderListContainer.getChildren().add(orderBox);</span>
+<span class="nc" id="L330">        }</span>
+<span class="nc" id="L331">    }</span>
+
+    /**
+     * Create UI for single order list item
+     */
+    private VBox createOrderListItem(OrderHistory order) {
+<span class="nc" id="L337">        VBox orderBox = new VBox(8);</span>
+<span class="nc" id="L338">        orderBox.setPadding(new Insets(15));</span>
+<span class="nc" id="L339">        orderBox.setStyle(&quot;-fx-background-color: white; -fx-border-color: #dee2e6; &quot; +</span>
+                         &quot;-fx-border-radius: 5; -fx-background-radius: 5; &quot; +
+                         &quot;-fx-cursor: hand;&quot;);
+        
+        // Order header
+<span class="nc" id="L344">        HBox headerBox = new HBox(10);</span>
+<span class="nc" id="L345">        headerBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);</span>
+        
+<span class="nc" id="L347">        Label orderNumberLabel = new Label(&quot;#&quot; + order.getOrderNumber());</span>
+<span class="nc" id="L348">        orderNumberLabel.setFont(Font.font(&quot;System&quot;, FontWeight.BOLD, 14));</span>
+        
+<span class="nc" id="L350">        Label statusLabel = new Label(order.getStatus());</span>
+<span class="nc" id="L351">        statusLabel.setStyle(&quot;-fx-background-color: &quot; + getStatusColor(order.getStatus()) + </span>
+                           &quot;; -fx-text-fill: white; -fx-padding: 3 8; -fx-background-radius: 10;&quot;);
+        
+<span class="nc" id="L354">        headerBox.getChildren().addAll(orderNumberLabel, statusLabel);</span>
+        
+        // Restaurant and date
+<span class="nc" id="L357">        Label restaurantLabel = new Label(order.getRestaurantName());</span>
+<span class="nc" id="L358">        restaurantLabel.setStyle(&quot;-fx-text-fill: #495057; -fx-font-size: 13;&quot;);</span>
+        
+<span class="nc" id="L360">        Label dateLabel = new Label(formatDateTime(order.getOrderDate()));</span>
+<span class="nc" id="L361">        dateLabel.setStyle(&quot;-fx-text-fill: #6c757d; -fx-font-size: 12;&quot;);</span>
+        
+        // Amount
+<span class="nc" id="L364">        Label amountLabel = new Label(formatCurrency(order.getTotalAmount()) + &quot; تومان&quot;);</span>
+<span class="nc" id="L365">        amountLabel.setStyle(&quot;-fx-text-fill: #28a745; -fx-font-weight: bold;&quot;);</span>
+        
+<span class="nc" id="L367">        orderBox.getChildren().addAll(headerBox, restaurantLabel, dateLabel, amountLabel);</span>
+        
+        // Click handler
+<span class="nc" id="L370">        orderBox.setOnMouseClicked(e -&gt; selectOrder(order));</span>
+        
+        // Hover effect
+<span class="nc" id="L373">        orderBox.setOnMouseEntered(e -&gt; </span>
+<span class="nc" id="L374">            orderBox.setStyle(orderBox.getStyle() + &quot;-fx-background-color: #f8f9fa;&quot;));</span>
+<span class="nc" id="L375">        orderBox.setOnMouseExited(e -&gt; </span>
+<span class="nc" id="L376">            orderBox.setStyle(orderBox.getStyle().replace(&quot;-fx-background-color: #f8f9fa;&quot;, </span>
+                                                         &quot;-fx-background-color: white;&quot;)));
+        
+<span class="nc" id="L379">        return orderBox;</span>
+    }
+
+    /**
+     * Select and display order details
+     */
+    private void selectOrder(OrderHistory order) {
+<span class="nc" id="L386">        selectedOrder = order;</span>
+<span class="nc" id="L387">        displayOrderDetails(order);</span>
+<span class="nc" id="L388">        showOrderDetails();</span>
+<span class="nc" id="L389">    }</span>
+
+    /**
+     * Display order details in detail panel
+     */
+    private void displayOrderDetails(OrderHistory order) {
+        // Basic info
+<span class="nc" id="L396">        orderNumberLabel.setText(order.getOrderNumber());</span>
+<span class="nc" id="L397">        orderDateLabel.setText(formatDateTime(order.getOrderDate()));</span>
+<span class="nc" id="L398">        orderStatusLabel.setText(order.getStatus());</span>
+<span class="nc" id="L399">        orderStatusLabel.setStyle(&quot;-fx-text-fill: &quot; + getStatusColor(order.getStatus()) + &quot;;&quot;);</span>
+<span class="nc" id="L400">        restaurantNameLabel.setText(order.getRestaurantName());</span>
+<span class="nc" id="L401">        totalAmountLabel.setText(formatCurrency(order.getTotalAmount()) + &quot; تومان&quot;);</span>
+        
+        // Order items
+<span class="nc" id="L404">        displayOrderItems(order.getItems());</span>
+        
+        // Delivery info
+<span class="nc" id="L407">        deliveryAddressLabel.setText(order.getDeliveryAddress());</span>
+<span class="nc" id="L408">        deliveryPhoneLabel.setText(order.getDeliveryPhone());</span>
+<span class="nc bnc" id="L409" title="All 2 branches missed.">        deliveryTimeLabel.setText(order.getDeliveryTime() != null ? </span>
+<span class="nc" id="L410">                                  formatDateTime(order.getDeliveryTime()) : &quot;نامشخص&quot;);</span>
+        
+        // Payment info
+<span class="nc" id="L413">        paymentMethodLabel.setText(order.getPaymentMethod());</span>
+<span class="nc" id="L414">        paymentStatusLabel.setText(order.getPaymentStatus());</span>
+<span class="nc" id="L415">        paymentStatusLabel.setStyle(&quot;-fx-text-fill: &quot; + getPaymentStatusColor(order.getPaymentStatus()) + &quot;;&quot;);</span>
+<span class="nc" id="L416">        trackingNumberLabel.setText(order.getTrackingNumber());</span>
+        
+        // Update action buttons
+<span class="nc" id="L419">        updateActionButtons(order);</span>
+<span class="nc" id="L420">    }</span>
+
+    /**
+     * Display order items in detail panel
+     */
+    private void displayOrderItems(List&lt;OrderItem&gt; items) {
+<span class="nc" id="L426">        orderItemsContainer.getChildren().clear();</span>
+        
+<span class="nc bnc" id="L428" title="All 2 branches missed.">        for (OrderItem item : items) {</span>
+<span class="nc" id="L429">            HBox itemBox = new HBox(10);</span>
+<span class="nc" id="L430">            itemBox.setPadding(new Insets(5));</span>
+<span class="nc" id="L431">            itemBox.setStyle(&quot;-fx-border-color: #e9ecef; -fx-border-width: 0 0 1 0;&quot;);</span>
+<span class="nc" id="L432">            itemBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);</span>
+            
+<span class="nc" id="L434">            Label nameLabel = new Label(item.getName());</span>
+<span class="nc" id="L435">            nameLabel.setFont(Font.font(&quot;System&quot;, FontWeight.BOLD, 12));</span>
+            
+<span class="nc" id="L437">            Label quantityLabel = new Label(&quot;× &quot; + item.getQuantity());</span>
+<span class="nc" id="L438">            quantityLabel.setStyle(&quot;-fx-text-fill: #6c757d;&quot;);</span>
+            
+<span class="nc" id="L440">            Label priceLabel = new Label(formatCurrency(item.getPrice() * item.getQuantity()) + &quot; تومان&quot;);</span>
+<span class="nc" id="L441">            priceLabel.setStyle(&quot;-fx-text-fill: #28a745; -fx-font-weight: bold;&quot;);</span>
+            
+<span class="nc" id="L443">            itemBox.getChildren().addAll(nameLabel, quantityLabel, priceLabel);</span>
+<span class="nc" id="L444">            orderItemsContainer.getChildren().add(itemBox);</span>
+<span class="nc" id="L445">        }</span>
+<span class="nc" id="L446">    }</span>
+
+    /**
+     * Update action buttons based on order status
+     */
+    private void updateActionButtons(OrderHistory order) {
+<span class="nc" id="L452">        String status = order.getStatus();</span>
+        
+        // Show/hide cancel button based on status
+<span class="nc" id="L455">        cancelOrderButton.setVisible(</span>
+<span class="nc bnc" id="L456" title="All 2 branches missed.">            status.equals(&quot;در انتظار تأیید&quot;) || </span>
+<span class="nc bnc" id="L457" title="All 2 branches missed.">            status.equals(&quot;در حال آماده‌سازی&quot;)</span>
+        );
+        
+        // Enable/disable buttons based on status
+<span class="nc" id="L461">        reorderButton.setDisable(false); // Always enabled</span>
+<span class="nc" id="L462">        trackOrderButton.setDisable(status.equals(&quot;لغو شده&quot;));</span>
+<span class="nc" id="L463">        downloadReceiptButton.setDisable(</span>
+<span class="nc bnc" id="L464" title="All 2 branches missed.">            status.equals(&quot;لغو شده&quot;) || </span>
+<span class="nc bnc" id="L465" title="All 2 branches missed.">            !order.getPaymentStatus().equals(&quot;پرداخت شده&quot;)</span>
+        );
+<span class="nc" id="L467">    }</span>
+
+    /**
+     * Show order details panel
+     */
+    private void showOrderDetails() {
+<span class="nc" id="L473">        noSelectionContainer.setVisible(false);</span>
+<span class="nc" id="L474">        orderDetailsContainer.setVisible(true);</span>
+<span class="nc" id="L475">    }</span>
+
+    /**
+     * Show no selection message
+     */
+    private void showNoSelection() {
+<span class="nc" id="L481">        orderDetailsContainer.setVisible(false);</span>
+<span class="nc" id="L482">        noSelectionContainer.setVisible(true);</span>
+<span class="nc" id="L483">    }</span>
+
+    /**
+     * Update order count display
+     */
+    private void updateOrderCount() {
+<span class="nc" id="L489">        orderCountLabel.setText(&quot;(&quot; + filteredOrders.size() + &quot; سفارش)&quot;);</span>
+<span class="nc" id="L490">    }</span>
+
+    /**
+     * Get color for order status
+     */
+    private String getStatusColor(String status) {
+<span class="nc bnc" id="L496" title="All 7 branches missed.">        switch (status) {</span>
+<span class="nc" id="L497">            case &quot;تحویل داده شده&quot;: return &quot;#28a745&quot;;</span>
+<span class="nc" id="L498">            case &quot;در حال ارسال&quot;: return &quot;#17a2b8&quot;;</span>
+<span class="nc" id="L499">            case &quot;آماده ارسال&quot;: return &quot;#fd7e14&quot;;</span>
+<span class="nc" id="L500">            case &quot;در حال آماده‌سازی&quot;: return &quot;#ffc107&quot;;</span>
+<span class="nc" id="L501">            case &quot;در انتظار تأیید&quot;: return &quot;#6c757d&quot;;</span>
+<span class="nc" id="L502">            case &quot;لغو شده&quot;: return &quot;#dc3545&quot;;</span>
+<span class="nc" id="L503">            default: return &quot;#6c757d&quot;;</span>
+        }
+    }
+
+    /**
+     * Get color for payment status
+     */
+    private String getPaymentStatusColor(String status) {
+<span class="nc bnc" id="L511" title="All 4 branches missed.">        switch (status) {</span>
+<span class="nc" id="L512">            case &quot;پرداخت شده&quot;: return &quot;#28a745&quot;;</span>
+<span class="nc" id="L513">            case &quot;در انتظار&quot;: return &quot;#ffc107&quot;;</span>
+<span class="nc" id="L514">            case &quot;لغو شده&quot;: return &quot;#dc3545&quot;;</span>
+<span class="nc" id="L515">            default: return &quot;#6c757d&quot;;</span>
+        }
+    }
+
+    /**
+     * Format date time for display
+     */
+    private String formatDateTime(LocalDateTime dateTime) {
+<span class="nc" id="L523">        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(&quot;yyyy/MM/dd HH:mm&quot;);</span>
+<span class="nc" id="L524">        return dateTime.format(formatter);</span>
+    }
+
+    /**
+     * Format currency value
+     */
+    private String formatCurrency(double amount) {
+<span class="nc" id="L531">        return currencyFormat.format(amount);</span>
+    }
+
+    // ==================== EVENT HANDLERS ====================
+
+    /**
+     * Handle search
+     */
+    @FXML
+    private void handleSearch() {
+<span class="nc" id="L541">        applyFilters();</span>
+<span class="nc" id="L542">    }</span>
+
+    /**
+     * Handle status filter change
+     */
+    @FXML
+    private void handleStatusFilter() {
+<span class="nc" id="L549">        applyFilters();</span>
+<span class="nc" id="L550">    }</span>
+
+    /**
+     * Handle date filter change
+     */
+    @FXML
+    private void handleDateFilter() {
+<span class="nc" id="L557">        applyFilters();</span>
+<span class="nc" id="L558">    }</span>
+
+    /**
+     * Handle clear filters
+     */
+    @FXML
+    private void handleClearFilters() {
+<span class="nc" id="L565">        statusFilterCombo.setValue(&quot;همه وضعیت‌ها&quot;);</span>
+<span class="nc" id="L566">        dateFilterCombo.setValue(&quot;همه تاریخ‌ها&quot;);</span>
+<span class="nc" id="L567">        searchField.clear();</span>
+<span class="nc" id="L568">        applyFilters();</span>
+<span class="nc" id="L569">    }</span>
+
+    /**
+     * Handle show all orders
+     */
+    @FXML
+    private void handleShowAllOrders() {
+<span class="nc" id="L576">        statusFilterCombo.setValue(&quot;همه وضعیت‌ها&quot;);</span>
+<span class="nc" id="L577">        applyFilters();</span>
+<span class="nc" id="L578">    }</span>
+
+    /**
+     * Handle show pending orders
+     */
+    @FXML
+    private void handleShowPendingOrders() {
+<span class="nc" id="L585">        statusFilterCombo.setValue(&quot;در انتظار تأیید&quot;);</span>
+<span class="nc" id="L586">        applyFilters();</span>
+<span class="nc" id="L587">    }</span>
+
+    /**
+     * Handle show completed orders
+     */
+    @FXML
+    private void handleShowCompletedOrders() {
+<span class="nc" id="L594">        statusFilterCombo.setValue(&quot;تحویل داده شده&quot;);</span>
+<span class="nc" id="L595">        applyFilters();</span>
+<span class="nc" id="L596">    }</span>
+
+    /**
+     * Handle show cancelled orders
+     */
+    @FXML
+    private void handleShowCancelledOrders() {
+<span class="nc" id="L603">        statusFilterCombo.setValue(&quot;لغو شده&quot;);</span>
+<span class="nc" id="L604">        applyFilters();</span>
+<span class="nc" id="L605">    }</span>
+
+    /**
+     * Handle reorder
+     */
+    @FXML
+    private void handleReorder() {
+<span class="nc bnc" id="L612" title="All 2 branches missed.">        if (selectedOrder == null) return;</span>
+        
+<span class="nc" id="L614">        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);</span>
+<span class="nc" id="L615">        confirmAlert.setTitle(&quot;تأیید سفارش مجدد&quot;);</span>
+<span class="nc" id="L616">        confirmAlert.setHeaderText(&quot;سفارش مجدد&quot;);</span>
+<span class="nc" id="L617">        confirmAlert.setContentText(&quot;آیا می‌خواهید این سفارش را دوباره ثبت کنید؟&quot;);</span>
+        
+<span class="nc" id="L619">        confirmAlert.showAndWait().ifPresent(response -&gt; {</span>
+<span class="nc bnc" id="L620" title="All 2 branches missed.">            if (response == ButtonType.OK) {</span>
+                // Navigate to cart with pre-filled items
+<span class="nc" id="L622">                navigationController.navigateTo(NavigationController.CART_SCENE);</span>
+<span class="nc" id="L623">                showInfo(&quot;موفقیت&quot;, &quot;آیتم‌های سفارش به سبد خرید اضافه شدند&quot;);</span>
+            }
+<span class="nc" id="L625">        });</span>
+<span class="nc" id="L626">    }</span>
+
+    /**
+     * Handle track order
+     */
+    @FXML
+    private void handleTrackOrder() {
+<span class="nc bnc" id="L633" title="All 2 branches missed.">        if (selectedOrder == null) return;</span>
+        
+<span class="nc" id="L635">        showInfo(&quot;پیگیری سفارش&quot;, </span>
+<span class="nc" id="L636">                &quot;شماره پیگیری: &quot; + selectedOrder.getTrackingNumber() + &quot;\n&quot; +</span>
+<span class="nc" id="L637">                &quot;وضعیت: &quot; + selectedOrder.getStatus() + &quot;\n&quot; +</span>
+<span class="nc bnc" id="L638" title="All 2 branches missed.">                &quot;زمان تحویل: &quot; + (selectedOrder.getDeliveryTime() != null ? </span>
+<span class="nc" id="L639">                                 formatDateTime(selectedOrder.getDeliveryTime()) : &quot;نامشخص&quot;));</span>
+<span class="nc" id="L640">    }</span>
+
+    /**
+     * Handle cancel order
+     */
+    @FXML
+    private void handleCancelOrder() {
+<span class="nc bnc" id="L647" title="All 2 branches missed.">        if (selectedOrder == null) return;</span>
+        
+<span class="nc" id="L649">        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);</span>
+<span class="nc" id="L650">        confirmAlert.setTitle(&quot;تأیید لغو سفارش&quot;);</span>
+<span class="nc" id="L651">        confirmAlert.setHeaderText(&quot;لغو سفارش&quot;);</span>
+<span class="nc" id="L652">        confirmAlert.setContentText(&quot;آیا مطمئن هستید که می‌خواهید این سفارش را لغو کنید؟&quot;);</span>
+        
+<span class="nc" id="L654">        confirmAlert.showAndWait().ifPresent(response -&gt; {</span>
+<span class="nc bnc" id="L655" title="All 2 branches missed.">            if (response == ButtonType.OK) {</span>
+                // TODO: Call cancel order API
+<span class="nc" id="L657">                selectedOrder.setStatus(&quot;لغو شده&quot;);</span>
+<span class="nc" id="L658">                selectedOrder.setPaymentStatus(&quot;لغو شده&quot;);</span>
+<span class="nc" id="L659">                displayOrderDetails(selectedOrder);</span>
+<span class="nc" id="L660">                displayOrders(); // Refresh list</span>
+<span class="nc" id="L661">                showInfo(&quot;موفقیت&quot;, &quot;سفارش با موفقیت لغو شد&quot;);</span>
+            }
+<span class="nc" id="L663">        });</span>
+<span class="nc" id="L664">    }</span>
+
+    /**
+     * Handle download receipt
+     */
+    @FXML
+    private void handleDownloadReceipt() {
+<span class="nc bnc" id="L671" title="All 2 branches missed.">        if (selectedOrder == null) return;</span>
+        
+<span class="nc" id="L673">        showInfo(&quot;دانلود فاکتور&quot;, &quot;فاکتور سفارش &quot; + selectedOrder.getOrderNumber() + </span>
+                                &quot; در حال آماده‌سازی است و به زودی دانلود خواهد شد.&quot;);
+<span class="nc" id="L675">    }</span>
+
+    /**
+     * Handle refresh
+     */
+    @FXML
+    private void handleRefresh() {
+<span class="nc" id="L682">        loadOrderHistory();</span>
+<span class="nc" id="L683">    }</span>
+
+    /**
+     * Handle back navigation
+     */
+    @FXML
+    private void handleBack() {
+<span class="nc" id="L690">        navigationController.navigateTo(NavigationController.RESTAURANT_LIST_SCENE);</span>
+<span class="nc" id="L691">    }</span>
+
+    /**
+     * Handle profile navigation
+     */
+    @FXML
+    private void handleProfile() {
+<span class="nc" id="L698">        navigationController.navigateTo(NavigationController.PROFILE_SCENE);</span>
+<span class="nc" id="L699">    }</span>
+
+    /**
+     * Handle cart navigation
+     */
+    @FXML
+    private void handleCart() {
+<span class="nc" id="L706">        navigationController.navigateTo(NavigationController.CART_SCENE);</span>
+<span class="nc" id="L707">    }</span>
+
+    /**
+     * Handle logout
+     */
+    @FXML
+    private void handleLogout() {
+<span class="nc" id="L714">        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);</span>
+<span class="nc" id="L715">        confirmAlert.setTitle(&quot;تأیید خروج&quot;);</span>
+<span class="nc" id="L716">        confirmAlert.setHeaderText(&quot;آیا مطمئن هستید؟&quot;);</span>
+<span class="nc" id="L717">        confirmAlert.setContentText(&quot;آیا می‌خواهید از حساب کاربری خود خارج شوید؟&quot;);</span>
+        
+<span class="nc" id="L719">        confirmAlert.showAndWait().ifPresent(response -&gt; {</span>
+<span class="nc bnc" id="L720" title="All 2 branches missed.">            if (response == ButtonType.OK) {</span>
+<span class="nc" id="L721">                navigationController.logout();</span>
+            }
+<span class="nc" id="L723">        });</span>
+<span class="nc" id="L724">    }</span>
+
+    // ==================== UTILITY METHODS ====================
+
+    /**
+     * Set loading state
+     */
+    private void setLoading(boolean loading) {
+<span class="nc" id="L732">        loadingIndicator.setVisible(loading);</span>
+<span class="nc" id="L733">        refreshButton.setDisable(loading);</span>
+<span class="nc" id="L734">    }</span>
+
+    /**
+     * Set status message
+     */
+    private void setStatus(String message) {
+<span class="nc bnc" id="L740" title="All 2 branches missed.">        if (statusLabel != null) {</span>
+<span class="nc" id="L741">            statusLabel.setText(message);</span>
+        }
+<span class="nc" id="L743">    }</span>
+
+    /**
+     * Show error dialog
+     */
+    private void showError(String title, String message) {
+<span class="nc" id="L749">        Alert alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L750">        alert.setTitle(title);</span>
+<span class="nc" id="L751">        alert.setHeaderText(null);</span>
+<span class="nc" id="L752">        alert.setContentText(message);</span>
+<span class="nc" id="L753">        alert.showAndWait();</span>
+<span class="nc" id="L754">    }</span>
+
+    /**
+     * Show info dialog
+     */
+    private void showInfo(String title, String message) {
+<span class="nc" id="L760">        Alert alert = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L761">        alert.setTitle(title);</span>
+<span class="nc" id="L762">        alert.setHeaderText(null);</span>
+<span class="nc" id="L763">        alert.setContentText(message);</span>
+<span class="nc" id="L764">        alert.showAndWait();</span>
+<span class="nc" id="L765">    }</span>
+
+    // ==================== DATA MODELS ====================
+
+    /**
+     * Order history data model
+     */
+    public static class OrderHistory {
+        private String orderNumber;
+        private LocalDateTime orderDate;
+        private String status;
+        private String restaurantName;
+        private double totalAmount;
+        private List&lt;OrderItem&gt; items;
+        private String deliveryAddress;
+        private String deliveryPhone;
+        private LocalDateTime deliveryTime;
+        private String paymentMethod;
+        private String paymentStatus;
+        private String trackingNumber;
+
+        public OrderHistory(String orderNumber, LocalDateTime orderDate, String status, 
+                          String restaurantName, double totalAmount, List&lt;OrderItem&gt; items,
+                          String deliveryAddress, String deliveryPhone, LocalDateTime deliveryTime,
+<span class="fc" id="L789">                          String paymentMethod, String paymentStatus, String trackingNumber) {</span>
+<span class="fc" id="L790">            this.orderNumber = orderNumber;</span>
+<span class="fc" id="L791">            this.orderDate = orderDate;</span>
+<span class="fc" id="L792">            this.status = status;</span>
+<span class="fc" id="L793">            this.restaurantName = restaurantName;</span>
+<span class="fc" id="L794">            this.totalAmount = totalAmount;</span>
+<span class="fc" id="L795">            this.items = items;</span>
+<span class="fc" id="L796">            this.deliveryAddress = deliveryAddress;</span>
+<span class="fc" id="L797">            this.deliveryPhone = deliveryPhone;</span>
+<span class="fc" id="L798">            this.deliveryTime = deliveryTime;</span>
+<span class="fc" id="L799">            this.paymentMethod = paymentMethod;</span>
+<span class="fc" id="L800">            this.paymentStatus = paymentStatus;</span>
+<span class="fc" id="L801">            this.trackingNumber = trackingNumber;</span>
+<span class="fc" id="L802">        }</span>
+
+        // Getters and setters
+<span class="fc" id="L805">        public String getOrderNumber() { return orderNumber; }</span>
+<span class="fc" id="L806">        public LocalDateTime getOrderDate() { return orderDate; }</span>
+<span class="fc" id="L807">        public String getStatus() { return status; }</span>
+<span class="nc" id="L808">        public void setStatus(String status) { this.status = status; }</span>
+<span class="fc" id="L809">        public String getRestaurantName() { return restaurantName; }</span>
+<span class="fc" id="L810">        public double getTotalAmount() { return totalAmount; }</span>
+<span class="fc" id="L811">        public List&lt;OrderItem&gt; getItems() { return items; }</span>
+<span class="nc" id="L812">        public String getDeliveryAddress() { return deliveryAddress; }</span>
+<span class="nc" id="L813">        public String getDeliveryPhone() { return deliveryPhone; }</span>
+<span class="nc" id="L814">        public LocalDateTime getDeliveryTime() { return deliveryTime; }</span>
+<span class="nc" id="L815">        public String getPaymentMethod() { return paymentMethod; }</span>
+<span class="nc" id="L816">        public String getPaymentStatus() { return paymentStatus; }</span>
+<span class="nc" id="L817">        public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }</span>
+<span class="nc" id="L818">        public String getTrackingNumber() { return trackingNumber; }</span>
+    }
+
+    /**
+     * Order item data model
+     */
+    public static class OrderItem {
+        private String name;
+        private double price;
+        private int quantity;
+
+<span class="fc" id="L829">        public OrderItem(String name, double price, int quantity) {</span>
+<span class="fc" id="L830">            this.name = name;</span>
+<span class="fc" id="L831">            this.price = price;</span>
+<span class="fc" id="L832">            this.quantity = quantity;</span>
+<span class="fc" id="L833">        }</span>
+
+        // Getters
+<span class="fc" id="L836">        public String getName() { return name; }</span>
+<span class="fc" id="L837">        public double getPrice() { return price; }</span>
+<span class="fc" id="L838">        public int getQuantity() { return quantity; }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

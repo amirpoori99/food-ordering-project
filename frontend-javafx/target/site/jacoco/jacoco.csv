@@ -1,0 +1,125 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Food Ordering Frontend,default,VendorSearchController,3,0,0,0,1,0,1,0,1,0
+Food Ordering Frontend,default,ItemManagementController,3,0,0,0,1,0,1,0,1,0
+Food Ordering Frontend,default,AdminUserController,3,0,0,0,1,0,1,0,1,0
+Food Ordering Frontend,default,EditRestaurantController,3,0,0,0,1,0,1,0,1,0
+Food Ordering Frontend,default,ReviewController,3,0,0,0,1,0,1,0,1,0
+Food Ordering Frontend,default,WalletController,3,0,0,0,1,0,1,0,1,0
+Food Ordering Frontend,default,CouponController,3,0,0,0,1,0,1,0,1,0
+Food Ordering Frontend,default,CourierAvailableController,3,0,0,0,1,0,1,0,1,0
+Food Ordering Frontend,default,OrderDetailController,3,0,0,0,1,0,1,0,1,0
+Food Ordering Frontend,default,CouponManagementController,3,0,0,0,1,0,1,0,1,0
+Food Ordering Frontend,default,AdminOrderController,3,0,0,0,1,0,1,0,1,0
+Food Ordering Frontend,default,AdminTransactionController,3,0,0,0,1,0,1,0,1,0
+Food Ordering Frontend,default,CourierHistoryController,3,0,0,0,1,0,1,0,1,0
+Food Ordering Frontend,default,CreateRestaurantController,3,0,0,0,1,0,1,0,1,0
+Food Ordering Frontend,com.myapp.ui.common,FrontendConstants.FILES,5,0,0,0,1,0,1,0,1,0
+Food Ordering Frontend,com.myapp.ui.common,SessionManager,16,51,6,2,4,20,6,8,2,8
+Food Ordering Frontend,com.myapp.ui.common,FrontendConstants,7,0,0,0,2,0,1,0,1,0
+Food Ordering Frontend,com.myapp.ui.common,NotificationService.NotificationType,27,0,0,0,5,0,1,0,1,0
+Food Ordering Frontend,com.myapp.ui.common,HttpClientUtil.RegisterRequest,0,18,0,0,0,7,0,1,0,1
+Food Ordering Frontend,com.myapp.ui.common,SessionManager.User,15,18,0,0,5,7,5,1,5,1
+Food Ordering Frontend,com.myapp.ui.common,HttpClientUtil.RefreshTokenRequest,0,6,0,0,0,3,0,1,0,1
+Food Ordering Frontend,com.myapp.ui.common,HttpClientUtil.ApiResponse,0,68,0,0,0,17,0,8,0,8
+Food Ordering Frontend,com.myapp.ui.common,NotificationService,363,0,17,0,91,0,35,0,25,0
+Food Ordering Frontend,com.myapp.ui.common,UIPolishController,825,0,40,0,207,0,62,0,42,0
+Food Ordering Frontend,com.myapp.ui.common,NavigationController,119,250,28,28,47,85,27,31,0,21
+Food Ordering Frontend,com.myapp.ui.common,HttpClientUtil,260,300,48,38,59,91,41,24,7,15
+Food Ordering Frontend,com.myapp.ui.common,HttpClientUtil.LoginRequest,0,9,0,0,0,4,0,1,0,1
+Food Ordering Frontend,com.myapp.ui.common,NotificationService.NotificationBuilder,94,0,12,0,25,0,14,0,7,0
+Food Ordering Frontend,com.myapp.ui.order,CartController,684,11,36,0,154,2,56,1,38,1
+Food Ordering Frontend,com.myapp.ui.order,CartController.new Task() {...},42,0,0,0,6,0,2,0,2,0
+Food Ordering Frontend,com.myapp.ui.order,OrderHistoryController.OrderHistory,26,57,0,0,8,20,8,7,8,7
+Food Ordering Frontend,com.myapp.ui.order,OrderConfirmationController.TrackingStatus,0,35,0,0,0,8,0,3,0,3
+Food Ordering Frontend,com.myapp.ui.order,CartController.CartItem,100,0,4,0,29,0,19,0,17,0
+Food Ordering Frontend,com.myapp.ui.order,OrderConfirmationController.OrderInfo,3,112,0,0,1,32,1,32,1,32
+Food Ordering Frontend,com.myapp.ui.order,CartController.CartSummary,73,0,0,0,23,0,15,0,15,0
+Food Ordering Frontend,com.myapp.ui.order,OrderHistoryController.new Task() {...},149,0,0,0,15,0,2,0,2,0
+Food Ordering Frontend,com.myapp.ui.order,OrderConfirmationController,1092,923,95,57,246,244,111,58,44,48
+Food Ordering Frontend,com.myapp.ui.order,OrderConfirmationController.TrackingStep,0,35,0,0,0,12,0,7,0,7
+Food Ordering Frontend,com.myapp.ui.order,OrderConfirmationController.new Task() {...},0,11,0,0,0,3,0,2,0,2
+Food Ordering Frontend,com.myapp.ui.order,OrderConfirmationController.new Task() {...},10,0,0,0,3,0,2,0,2,0
+Food Ordering Frontend,com.myapp.ui.order,OrderConfirmationController.new Task() {...},10,0,0,0,3,0,2,0,2,0
+Food Ordering Frontend,com.myapp.ui.order,OrderConfirmationController.new Task() {...},0,10,0,0,0,3,0,2,0,2
+Food Ordering Frontend,com.myapp.ui.order,OrderConfirmationController.new Task() {...},10,0,0,0,3,0,2,0,2,0
+Food Ordering Frontend,com.myapp.ui.order,OrderConfirmationController.new Task() {...},62,0,2,0,15,0,3,0,2,0
+Food Ordering Frontend,com.myapp.ui.order,OrderConfirmationController.new Task() {...},0,17,0,2,0,3,0,3,0,2
+Food Ordering Frontend,com.myapp.ui.order,OrderConfirmationController.new Task() {...},0,12,0,0,0,3,0,2,0,2
+Food Ordering Frontend,com.myapp.ui.order,OrderHistoryController.OrderItem,0,21,0,0,0,8,0,4,0,4
+Food Ordering Frontend,com.myapp.ui.order,OrderHistoryController,1073,24,70,0,263,5,95,1,55,1
+Food Ordering Frontend,com.myapp.ui.order,OrderConfirmationController.OrderItem,0,34,0,0,0,11,0,6,0,6
+Food Ordering Frontend,com.myapp.ui.order,OrderConfirmationController.NotificationPreferences,0,38,0,0,0,11,0,11,0,11
+Food Ordering Frontend,com.myapp.ui,MainApp,24,0,0,0,13,0,4,0,4,0
+Food Ordering Frontend,com.myapp.ui.menu,MenuManagementController,704,8,44,0,221,2,80,1,58,1
+Food Ordering Frontend,com.myapp.ui.menu,MenuManagementController.MenuCategory,4,52,0,0,1,15,1,12,1,12
+Food Ordering Frontend,com.myapp.ui.menu,MenuManagementController.new Task() {...},57,0,8,0,10,0,6,0,2,0
+Food Ordering Frontend,com.myapp.ui.menu,MenuManagementController.new Task() {...},61,0,10,0,13,0,7,0,2,0
+Food Ordering Frontend,com.myapp.ui.menu,MenuManagementController.new Task() {...},31,0,4,0,7,0,4,0,2,0
+Food Ordering Frontend,com.myapp.ui.menu,MenuManagementController.new Task() {...},34,0,4,0,7,0,4,0,2,0
+Food Ordering Frontend,com.myapp.ui.menu,MenuManagementController.MenuItem,0,41,0,0,0,12,0,11,0,11
+Food Ordering Frontend,com.myapp.ui.payment,PaymentController.PaymentData,38,0,0,0,11,0,11,0,11,0
+Food Ordering Frontend,com.myapp.ui.payment,PaymentController.OrderSummary,14,55,0,0,4,15,4,9,4,9
+Food Ordering Frontend,com.myapp.ui.payment,PaymentController,870,11,122,0,216,2,125,1,61,1
+Food Ordering Frontend,com.myapp.ui.payment,PaymentController.new ListCell() {...},26,0,4,0,6,0,4,0,2,0
+Food Ordering Frontend,com.myapp.ui.payment,PaymentController.new ListCell() {...},23,0,4,0,6,0,4,0,2,0
+Food Ordering Frontend,com.myapp.ui.payment,PaymentController.PaymentMethod,0,35,0,0,0,8,0,3,0,3
+Food Ordering Frontend,com.myapp.ui.payment,PaymentController.new TableCell() {...},29,0,4,0,6,0,4,0,2,0
+Food Ordering Frontend,com.myapp.ui.payment,PaymentController.new TableCell() {...},29,0,4,0,6,0,4,0,2,0
+Food Ordering Frontend,com.myapp.ui.payment,PaymentController.new TableCell() {...},23,0,4,0,6,0,4,0,2,0
+Food Ordering Frontend,com.myapp.ui.payment,PaymentController.SavedCard,31,0,0,0,9,0,9,0,9,0
+Food Ordering Frontend,com.myapp.ui.payment,PaymentController.WalletInfo,0,24,0,0,0,7,0,5,0,5
+Food Ordering Frontend,com.myapp.ui.payment,PaymentController.OrderItem,43,38,2,2,10,9,11,5,9,5
+Food Ordering Frontend,com.myapp.ui.notification,NotificationController.NotificationFilter,3,42,0,0,1,9,1,3,1,3
+Food Ordering Frontend,com.myapp.ui.notification,NotificationController,863,0,85,0,207,0,92,0,46,0
+Food Ordering Frontend,com.myapp.ui.notification,NotificationController.new Task() {...},12,0,0,0,3,0,2,0,2,0
+Food Ordering Frontend,com.myapp.ui.notification,NotificationController.NotificationPriority,0,42,0,0,0,9,0,3,0,3
+Food Ordering Frontend,com.myapp.ui.notification,NotificationController.NotificationType,0,56,0,0,0,11,0,3,0,3
+Food Ordering Frontend,com.myapp.ui.notification,NotificationController.NotificationSettings,3,70,0,0,1,21,1,14,1,14
+Food Ordering Frontend,com.myapp.ui.notification,NotificationController.NotificationItem,0,43,0,0,0,15,0,8,0,8
+Food Ordering Frontend,com.myapp.ui.auth,LoginController,85,424,17,57,22,117,19,52,5,29
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.new Task() {...},63,16,5,1,12,4,3,2,0,2
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.new Task() {...},89,16,5,1,13,4,3,2,0,2
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.new Task() {...},83,16,5,1,13,4,3,2,0,2
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.new Task() {...},15,28,2,0,4,4,1,2,0,2
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.new Task() {...},2,41,1,1,1,7,1,2,0,2
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.new Task() {...},80,0,10,0,15,0,7,0,2,0
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.new Task() {...},10,22,4,2,1,5,3,2,0,2
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.new Callback() {...},5,6,0,0,1,1,1,1,1,1
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.new TableCell() {...},50,0,8,0,11,0,6,0,2,0
+Food Ordering Frontend,com.myapp.ui.auth,ProfileController,565,181,66,3,144,54,67,10,31,10
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.FavoriteRestaurant,27,19,0,0,7,5,7,5,7,5
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.TransactionItem,0,45,0,0,0,13,0,13,0,13
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController,962,1495,98,51,224,332,108,78,44,62
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.2.new TableCell() {...},133,0,2,0,27,0,6,0,5,0
+Food Ordering Frontend,com.myapp.ui.auth,RegisterController,293,235,40,16,86,53,33,26,13,18
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.new Task() {...},63,16,5,1,12,4,3,2,0,2
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.new Task() {...},2,84,1,1,1,12,1,2,0,2
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.UserSettings,28,45,0,0,7,15,7,8,7,8
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.new Task() {...},54,16,3,1,10,4,2,2,0,2
+Food Ordering Frontend,com.myapp.ui.auth,ProfileController.new Task() {...},51,0,4,0,10,0,4,0,2,0
+Food Ordering Frontend,com.myapp.ui.auth,ProfileController.new Task() {...},10,22,4,2,1,5,3,2,0,2
+Food Ordering Frontend,com.myapp.ui.auth,ProfileController.UserProfile,86,0,0,0,24,0,16,0,16,0
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.OrderHistoryItem,4,41,0,0,1,12,1,12,1,12
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.UserAnalytics,52,0,0,0,15,0,15,0,15,0
+Food Ordering Frontend,com.myapp.ui.auth,LoginController.new Task() {...},0,18,0,0,0,2,0,2,0,2
+Food Ordering Frontend,com.myapp.ui.auth,RegisterController.new Task() {...},33,0,0,0,2,0,2,0,2,0
+Food Ordering Frontend,com.myapp.ui.auth,RegisterController.new Task() {...},10,0,0,0,3,0,2,0,2,0
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.AddressItem,24,19,2,0,5,5,6,5,5,5
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.FavoriteItem,35,19,0,0,7,5,7,5,7,5
+Food Ordering Frontend,com.myapp.ui.auth,UserProfileController.UserProfile,59,0,0,0,17,0,17,0,17,0
+Food Ordering Frontend,com.myapp.ui.restaurant,RestaurantDetailsController.MenuCategory,0,62,0,0,0,20,0,14,0,14
+Food Ordering Frontend,com.myapp.ui.restaurant,RestaurantDetailsController.MenuItem,0,98,0,0,0,30,0,22,0,22
+Food Ordering Frontend,com.myapp.ui.restaurant,RestaurantDetailsController,41,10,4,0,15,4,9,3,7,3
+Food Ordering Frontend,com.myapp.ui.restaurant,RestaurantListController,204,133,12,4,53,42,22,11,14,11
+Food Ordering Frontend,com.myapp.ui.restaurant,RestaurantListController.new Task() {...},36,22,8,2,8,5,5,2,0,2
+Food Ordering Frontend,com.myapp.ui.restaurant,RestaurantListController.Restaurant,0,38,0,0,0,11,0,11,0,11
+Food Ordering Frontend,com.myapp.ui.restaurant,RestaurantDetailsController.CartItem,0,80,1,3,0,27,1,15,0,14
+Food Ordering Frontend,com.myapp.ui.restaurant,RestaurantDetailsController.Restaurant,0,88,0,0,0,27,0,22,0,22
+Food Ordering Frontend,com.myapp.ui.restaurant,RestaurantListController.RestaurantListCell,24,179,7,7,10,33,9,7,2,4
+Food Ordering Frontend,com.myapp.ui.order.internal,TextReceiptExporter,384,0,14,0,56,0,11,0,4,0
+Food Ordering Frontend,com.myapp.ui.admin,AdminDashboardController.OrderData,27,36,0,0,7,13,7,6,7,6
+Food Ordering Frontend,com.myapp.ui.admin,AdminDashboardController.RestaurantData,27,36,0,0,7,13,7,6,7,6
+Food Ordering Frontend,com.myapp.ui.admin,AdminDashboardController.ReportData,33,0,0,0,11,0,7,0,7,0
+Food Ordering Frontend,com.myapp.ui.admin,AdminDashboardController.TransactionData,27,36,0,0,7,13,7,6,7,6
+Food Ordering Frontend,com.myapp.ui.admin,AdminDashboardController,115,1145,18,48,43,196,25,49,11,30
+Food Ordering Frontend,com.myapp.ui.admin,AdminDashboardController.UserData,33,30,0,0,9,11,9,4,9,4

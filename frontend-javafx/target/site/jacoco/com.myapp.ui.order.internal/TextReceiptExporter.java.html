@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TextReceiptExporter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Frontend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.ui.order.internal</a> &gt; <span class="el_source">TextReceiptExporter.java</span></div><h1>TextReceiptExporter.java</h1><pre class="source lang-java linenums">package com.myapp.ui.order.internal;
+
+import com.myapp.ui.order.OrderConfirmationController.OrderInfo;
+import com.myapp.ui.order.OrderConfirmationController.OrderItem;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.NumberFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
+/**
+ * پیاده‌سازی صادرات رسید به صورت فایل متنی
+ * 
+ * این کلاس رسید سفارش را به صورت فایل TXT تولید می‌کند
+ * در فازهای آینده می‌تواند با PDFExporter جایگزین شود
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since فاز 26 - Order Confirmation UI
+ */
+public class TextReceiptExporter implements ReceiptExporter {
+    
+<span class="nc" id="L25">    private final NumberFormat currencyFormat = NumberFormat.getInstance(new Locale(&quot;fa&quot;, &quot;IR&quot;));</span>
+<span class="nc" id="L26">    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(&quot;yyyy/MM/dd HH:mm&quot;);</span>
+    
+<span class="nc" id="L28">    public TextReceiptExporter() {</span>
+<span class="nc" id="L29">        currencyFormat.setGroupingUsed(true);</span>
+<span class="nc" id="L30">    }</span>
+
+    @Override
+    public void export(OrderInfo order, File outputFile) throws IOException {
+<span class="nc" id="L34">        try (FileWriter writer = new FileWriter(outputFile, java.nio.charset.StandardCharsets.UTF_8)) {</span>
+<span class="nc" id="L35">            writer.write(generateReceiptText(order));</span>
+        }
+<span class="nc" id="L37">    }</span>
+    
+    /**
+     * تولید متن رسید سفارش
+     * 
+     * @param order اطلاعات سفارش
+     * @return متن کامل رسید
+     */
+    private String generateReceiptText(OrderInfo order) {
+<span class="nc" id="L46">        StringBuilder receipt = new StringBuilder();</span>
+        
+        // هدر رسید
+<span class="nc" id="L49">        receipt.append(&quot;═══════════════════════════════════════════════════\n&quot;);</span>
+<span class="nc" id="L50">        receipt.append(&quot;                    رسید سفارش                    \n&quot;);</span>
+<span class="nc" id="L51">        receipt.append(&quot;═══════════════════════════════════════════════════\n\n&quot;);</span>
+        
+        // اطلاعات سفارش
+<span class="nc" id="L54">        receipt.append(&quot;شماره سفارش: &quot;).append(order.getOrderId()).append(&quot;\n&quot;);</span>
+<span class="nc" id="L55">        receipt.append(&quot;تاریخ و زمان: &quot;).append(order.getOrderDateTime().format(dateTimeFormatter)).append(&quot;\n&quot;);</span>
+<span class="nc" id="L56">        receipt.append(&quot;زمان تحویل: &quot;).append(order.getEstimatedDelivery().format(dateTimeFormatter)).append(&quot;\n&quot;);</span>
+<span class="nc" id="L57">        receipt.append(&quot;رستوران: &quot;).append(order.getRestaurantName()).append(&quot;\n&quot;);</span>
+<span class="nc" id="L58">        receipt.append(&quot;تلفن رستوران: &quot;).append(order.getRestaurantPhone()).append(&quot;\n\n&quot;);</span>
+        
+        // آدرس تحویل
+<span class="nc" id="L61">        receipt.append(&quot;───────────────────────────────────────────────────\n&quot;);</span>
+<span class="nc" id="L62">        receipt.append(&quot;آدرس تحویل:\n&quot;);</span>
+<span class="nc" id="L63">        receipt.append(order.getDeliveryAddress()).append(&quot;\n&quot;);</span>
+<span class="nc" id="L64">        receipt.append(&quot;تلفن: &quot;).append(order.getCustomerPhone()).append(&quot;\n&quot;);</span>
+<span class="nc bnc" id="L65" title="All 4 branches missed.">        if (order.getOrderNotes() != null &amp;&amp; !order.getOrderNotes().trim().isEmpty()) {</span>
+<span class="nc" id="L66">            receipt.append(&quot;یادداشت: &quot;).append(order.getOrderNotes()).append(&quot;\n&quot;);</span>
+        }
+<span class="nc" id="L68">        receipt.append(&quot;\n&quot;);</span>
+        
+        // آیتم‌های سفارش
+<span class="nc" id="L71">        receipt.append(&quot;───────────────────────────────────────────────────\n&quot;);</span>
+<span class="nc" id="L72">        receipt.append(&quot;آیتم‌های سفارش:\n&quot;);</span>
+<span class="nc" id="L73">        receipt.append(&quot;───────────────────────────────────────────────────\n&quot;);</span>
+        
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        for (OrderItem item : order.getOrderItems()) {</span>
+<span class="nc" id="L76">            receipt.append(String.format(&quot;%-30s × %d\n&quot;, item.getItemName(), item.getQuantity()));</span>
+<span class="nc bnc" id="L77" title="All 4 branches missed.">            if (item.getSpecialInstructions() != null &amp;&amp; !item.getSpecialInstructions().trim().isEmpty()) {</span>
+<span class="nc" id="L78">                receipt.append(String.format(&quot;  نکته: %s\n&quot;, item.getSpecialInstructions()));</span>
+            }
+<span class="nc" id="L80">            receipt.append(String.format(&quot;  قیمت واحد: %s تومان\n&quot;, formatCurrency(item.getUnitPrice())));</span>
+<span class="nc" id="L81">            receipt.append(String.format(&quot;  جمع: %s تومان\n\n&quot;, formatCurrency(item.getTotalPrice())));</span>
+<span class="nc" id="L82">        }</span>
+        
+        // خلاصه مالی
+<span class="nc" id="L85">        receipt.append(&quot;───────────────────────────────────────────────────\n&quot;);</span>
+<span class="nc" id="L86">        receipt.append(&quot;خلاصه مالی:\n&quot;);</span>
+<span class="nc" id="L87">        receipt.append(&quot;───────────────────────────────────────────────────\n&quot;);</span>
+<span class="nc" id="L88">        receipt.append(String.format(&quot;جمع کل:                    %s تومان\n&quot;, formatCurrency(order.getSubtotal())));</span>
+<span class="nc" id="L89">        receipt.append(String.format(&quot;مالیات:                     %s تومان\n&quot;, formatCurrency(order.getTax())));</span>
+        
+<span class="nc bnc" id="L91" title="All 2 branches missed.">        if (order.getDeliveryFee() &gt; 0) {</span>
+<span class="nc" id="L92">            receipt.append(String.format(&quot;هزینه ارسال:                %s تومان\n&quot;, formatCurrency(order.getDeliveryFee())));</span>
+        } else {
+<span class="nc" id="L94">            receipt.append(&quot;هزینه ارسال:                رایگان\n&quot;);</span>
+        }
+        
+<span class="nc bnc" id="L97" title="All 2 branches missed.">        if (order.getDiscount() &gt; 0) {</span>
+<span class="nc" id="L98">            receipt.append(String.format(&quot;تخفیف:                    - %s تومان\n&quot;, formatCurrency(order.getDiscount())));</span>
+        }
+        
+<span class="nc" id="L101">        receipt.append(&quot;───────────────────────────────────────────────────\n&quot;);</span>
+<span class="nc" id="L102">        receipt.append(String.format(&quot;مبلغ نهایی:                 %s تومان\n&quot;, formatCurrency(order.getTotalAmount())));</span>
+<span class="nc" id="L103">        receipt.append(&quot;───────────────────────────────────────────────────\n\n&quot;);</span>
+        
+        // اطلاعات پرداخت
+<span class="nc" id="L106">        receipt.append(&quot;اطلاعات پرداخت:\n&quot;);</span>
+<span class="nc" id="L107">        receipt.append(&quot;روش پرداخت: &quot;).append(order.getPaymentMethod()).append(&quot;\n&quot;);</span>
+<span class="nc" id="L108">        receipt.append(&quot;وضعیت پرداخت: &quot;).append(order.getPaymentStatus()).append(&quot;\n\n&quot;);</span>
+        
+        // فوتر
+<span class="nc" id="L111">        receipt.append(&quot;═══════════════════════════════════════════════════\n&quot;);</span>
+<span class="nc" id="L112">        receipt.append(&quot;              از خرید شما متشکریم!               \n&quot;);</span>
+<span class="nc" id="L113">        receipt.append(&quot;        سیستم سفارش غذای آنلاین               \n&quot;);</span>
+<span class="nc" id="L114">        receipt.append(&quot;═══════════════════════════════════════════════════\n&quot;);</span>
+        
+<span class="nc" id="L116">        return receipt.toString();</span>
+    }
+    
+    /**
+     * فرمت کردن ارز به فارسی
+     * 
+     * @param amount مبلغ
+     * @return مبلغ فرمت شده
+     */
+    private String formatCurrency(double amount) {
+<span class="nc" id="L126">        return currencyFormat.format(amount);</span>
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
