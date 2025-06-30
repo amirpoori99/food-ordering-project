@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.payment</a> &gt; <span class="el_source">PaymentController.java</span></div><h1>PaymentController.java</h1><pre class="source lang-java linenums">package com.myapp.payment;
+
+import com.myapp.common.models.Transaction;
+import com.myapp.common.models.TransactionStatus;
+import com.myapp.common.models.TransactionType;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * کنترلر REST API برای عملیات مالی و پرداخت
+ * 
+ * این کلاس مسئول مدیریت تمام درخواست‌های HTTP مربوط به:
+ * - پردازش پرداخت سفارشات
+ * - پردازش استرداد وجه
+ * - مشاهده تاریخچه تراکنش‌ها
+ * - مدیریت وضعیت تراکنش‌ها
+ * - آمار و گزارش‌گیری مالی
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+public class PaymentController implements HttpHandler {
+    
+    /** سرویس پرداخت برای پردازش منطق کسب‌وکار */
+    private final PaymentService paymentService;
+    
+    /**
+     * سازنده پیش‌فرض - ایجاد instance جدید از PaymentService
+     */
+<span class="nc" id="L39">    public PaymentController() {</span>
+<span class="nc" id="L40">        this.paymentService = new PaymentService();</span>
+<span class="nc" id="L41">    }</span>
+    
+    /**
+     * سازنده برای تزریق وابستگی (Dependency Injection)
+     * برای تست‌ها و configuration سفارشی استفاده می‌شود
+     * 
+     * @param paymentService سرویس پرداخت از بیرون تزریق شده
+     */
+<span class="nc" id="L49">    public PaymentController(PaymentService paymentService) {</span>
+<span class="nc" id="L50">        this.paymentService = paymentService;</span>
+<span class="nc" id="L51">    }</span>
+    
+    /**
+     * متد اصلی پردازش درخواست‌های HTTP
+     * تمام درخواست‌ها را بر اساس method و path مسیریابی می‌کند
+     * 
+     * @param exchange شیء HttpExchange حاوی اطلاعات درخواست و پاسخ
+     * @throws IOException در صورت خطا در پردازش I/O
+     */
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        // دریافت method (GET, POST, PUT) و path درخواست
+<span class="nc" id="L63">        String method = exchange.getRequestMethod();</span>
+<span class="nc" id="L64">        String path = exchange.getRequestURI().getPath();</span>
+        
+        try {
+            // مسیریابی درخواست بر اساس HTTP method
+<span class="nc bnc" id="L68" title="All 4 branches missed.">            switch (method) {</span>
+                case &quot;POST&quot;:
+<span class="nc" id="L70">                    handlePostRequest(exchange, path);</span>
+<span class="nc" id="L71">                    break;</span>
+                case &quot;GET&quot;:
+<span class="nc" id="L73">                    handleGetRequest(exchange, path);</span>
+<span class="nc" id="L74">                    break;</span>
+                case &quot;PUT&quot;:
+<span class="nc" id="L76">                    handlePutRequest(exchange, path);</span>
+<span class="nc" id="L77">                    break;</span>
+                default:
+                    // HTTP method پشتیبانی نشده
+<span class="nc" id="L80">                    sendResponse(exchange, 405, &quot;{\&quot;error\&quot;:\&quot;Method not allowed\&quot;}&quot;);</span>
+                    break;
+            }
+<span class="nc" id="L83">        } catch (Exception e) {</span>
+            // مدیریت خطاهای غیرمنتظره
+<span class="nc" id="L85">            sendResponse(exchange, 500, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L86">        }</span>
+<span class="nc" id="L87">    }</span>
+    
+    // ==================== POST ENDPOINTS ====================
+    
+    /**
+     * پردازش درخواست‌های POST
+     * شامل عملیات ایجاد و پردازش جدید
+     * 
+     * @param exchange شیء HttpExchange
+     * @param path مسیر درخواست
+     * @throws IOException خطا در I/O
+     */
+    private void handlePostRequest(HttpExchange exchange, String path) throws IOException {
+<span class="nc bnc" id="L100" title="All 2 branches missed.">        if (path.equals(&quot;/api/payments/process&quot;)) {</span>
+            // پردازش پرداخت جدید
+<span class="nc" id="L102">            processPayment(exchange);</span>
+<span class="nc bnc" id="L103" title="All 4 branches missed.">        } else if (path.startsWith(&quot;/api/payments/&quot;) &amp;&amp; path.endsWith(&quot;/refund&quot;)) {</span>
+            // پردازش استرداد وجه
+<span class="nc" id="L105">            processRefund(exchange, path);</span>
+        } else {
+            // endpoint یافت نشد
+<span class="nc" id="L108">            sendResponse(exchange, 404, &quot;{\&quot;error\&quot;:\&quot;Endpoint not found\&quot;}&quot;);</span>
+        }
+<span class="nc" id="L110">    }</span>
+    
+    /**
+     * POST /api/payments/process - پردازش پرداخت برای سفارش
+     * 
+     * این endpoint برای پرداخت سفارشات استفاده می‌شود
+     * ورودی: userId, orderId, paymentMethod
+     * خروجی: اطلاعات تراکنش ایجاد شده
+     */
+    private void processPayment(HttpExchange exchange) throws IOException {
+        try {
+            // خواندن body درخواست
+<span class="nc" id="L122">            String requestBody = new String(exchange.getRequestBody().readAllBytes());</span>
+<span class="nc" id="L123">            Map&lt;String, Object&gt; request = parseJsonRequest(requestBody);</span>
+            
+            // استخراج پارامترهای ضروری
+<span class="nc" id="L126">            Long userId = extractLong(request, &quot;userId&quot;);</span>
+<span class="nc" id="L127">            Long orderId = extractLong(request, &quot;orderId&quot;);</span>
+<span class="nc" id="L128">            String paymentMethod = extractString(request, &quot;paymentMethod&quot;);</span>
+            
+            // پردازش پرداخت از طریق service layer
+<span class="nc" id="L131">            Transaction transaction = paymentService.processPayment(userId, orderId, paymentMethod);</span>
+            
+            // سریالایز کردن تراکنش و ارسال پاسخ
+<span class="nc" id="L134">            String response = serializeTransaction(transaction);</span>
+<span class="nc" id="L135">            sendResponse(exchange, 201, response);</span>
+            
+<span class="nc" id="L137">        } catch (IllegalArgumentException e) {</span>
+            // خطای validation ورودی‌ها
+<span class="nc" id="L139">            sendResponse(exchange, 400, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L140">        } catch (Exception e) {</span>
+            // خطای داخلی سرور
+<span class="nc" id="L142">            sendResponse(exchange, 500, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L143">        }</span>
+<span class="nc" id="L144">    }</span>
+    
+    /**
+     * POST /api/payments/{paymentId}/refund - پردازش استرداد وجه
+     * 
+     * این endpoint برای استرداد وجه پرداخت‌های قبلی استفاده می‌شود
+     * ورودی: paymentId در URL و reason در body
+     * خروجی: اطلاعات تراکنش استرداد
+     */
+    private void processRefund(HttpExchange exchange, String path) throws IOException {
+        try {
+            // استخراج paymentId از URL
+<span class="nc" id="L156">            Long paymentId = extractPathParameter(path, &quot;/api/payments/&quot;, &quot;/refund&quot;);</span>
+            
+            // خواندن body درخواست
+<span class="nc" id="L159">            String requestBody = new String(exchange.getRequestBody().readAllBytes());</span>
+<span class="nc" id="L160">            Map&lt;String, Object&gt; request = parseJsonRequest(requestBody);</span>
+            
+            // استخراج دلیل استرداد
+<span class="nc" id="L163">            String reason = extractString(request, &quot;reason&quot;);</span>
+            
+            // پردازش استرداد از طریق service layer
+<span class="nc" id="L166">            Transaction refund = paymentService.processRefund(paymentId, reason);</span>
+            
+            // سریالایز کردن تراکنش استرداد و ارسال پاسخ
+<span class="nc" id="L169">            String response = serializeTransaction(refund);</span>
+<span class="nc" id="L170">            sendResponse(exchange, 201, response);</span>
+            
+<span class="nc" id="L172">        } catch (IllegalArgumentException e) {</span>
+            // خطای validation ورودی‌ها
+<span class="nc" id="L174">            sendResponse(exchange, 400, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L175">        } catch (Exception e) {</span>
+            // خطای داخلی سرور
+<span class="nc" id="L177">            sendResponse(exchange, 500, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L178">        }</span>
+<span class="nc" id="L179">    }</span>
+    
+    // ==================== GET ENDPOINTS ====================
+    
+    /**
+     * پردازش درخواست‌های GET
+     * شامل عملیات مشاهده و جستجو
+     * 
+     * @param exchange شیء HttpExchange
+     * @param path مسیر درخواست
+     * @throws IOException خطا در I/O
+     */
+    private void handleGetRequest(HttpExchange exchange, String path) throws IOException {
+<span class="nc bnc" id="L192" title="All 2 branches missed.">        if (path.startsWith(&quot;/api/payments/transaction/&quot;)) {</span>
+            // دریافت تراکنش بر اساس ID
+<span class="nc" id="L194">            getTransaction(exchange, path);</span>
+<span class="nc bnc" id="L195" title="All 4 branches missed.">        } else if (path.startsWith(&quot;/api/payments/user/&quot;) &amp;&amp; path.endsWith(&quot;/history&quot;)) {</span>
+            // تاریخچه تراکنش‌های کاربر
+<span class="nc" id="L197">            getUserTransactionHistory(exchange, path);</span>
+<span class="nc bnc" id="L198" title="All 4 branches missed.">        } else if (path.startsWith(&quot;/api/payments/user/&quot;) &amp;&amp; path.endsWith(&quot;/wallet-transactions&quot;)) {</span>
+            // تراکنش‌های کیف پول کاربر
+<span class="nc" id="L200">            getUserWalletTransactions(exchange, path);</span>
+<span class="nc bnc" id="L201" title="All 4 branches missed.">        } else if (path.startsWith(&quot;/api/payments/user/&quot;) &amp;&amp; path.endsWith(&quot;/payment-transactions&quot;)) {</span>
+            // تراکنش‌های پرداخت کاربر
+<span class="nc" id="L203">            getUserPaymentTransactions(exchange, path);</span>
+<span class="nc bnc" id="L204" title="All 4 branches missed.">        } else if (path.startsWith(&quot;/api/payments/user/&quot;) &amp;&amp; path.endsWith(&quot;/statistics&quot;)) {</span>
+            // آمار تراکنش‌های کاربر
+<span class="nc" id="L206">            getUserTransactionStatistics(exchange, path);</span>
+<span class="nc bnc" id="L207" title="All 4 branches missed.">        } else if (path.startsWith(&quot;/api/payments/order/&quot;) &amp;&amp; path.endsWith(&quot;/history&quot;)) {</span>
+            // تاریخچه تراکنش‌های سفارش
+<span class="nc" id="L209">            getOrderTransactionHistory(exchange, path);</span>
+<span class="nc bnc" id="L210" title="All 2 branches missed.">        } else if (path.startsWith(&quot;/api/payments/status/&quot;)) {</span>
+            // جستجو بر اساس وضعیت تراکنش
+<span class="nc" id="L212">            getTransactionsByStatus(exchange, path);</span>
+<span class="nc bnc" id="L213" title="All 2 branches missed.">        } else if (path.startsWith(&quot;/api/payments/type/&quot;)) {</span>
+            // جستجو بر اساس نوع تراکنش
+<span class="nc" id="L215">            getTransactionsByType(exchange, path);</span>
+<span class="nc bnc" id="L216" title="All 2 branches missed.">        } else if (path.equals(&quot;/api/payments/date-range&quot;)) {</span>
+            // جستجو بر اساس بازه تاریخ
+<span class="nc" id="L218">            getTransactionsByDateRange(exchange);</span>
+        } else {
+            // endpoint یافت نشد
+<span class="nc" id="L221">            sendResponse(exchange, 404, &quot;{\&quot;error\&quot;:\&quot;Endpoint not found\&quot;}&quot;);</span>
+        }
+<span class="nc" id="L223">    }</span>
+    
+    /**
+     * GET /api/payments/transaction/{transactionId} - دریافت تراکنش بر اساس ID
+     * 
+     * ورودی: transactionId در URL
+     * خروجی: اطلاعات کامل تراکنش
+     */
+    private void getTransaction(HttpExchange exchange, String path) throws IOException {
+        try {
+            // استخراج transactionId از URL
+<span class="nc" id="L234">            Long transactionId = extractPathParameter(path, &quot;/api/payments/transaction/&quot;, &quot;&quot;);</span>
+            
+            // دریافت تراکنش از service layer
+<span class="nc" id="L237">            Transaction transaction = paymentService.getTransaction(transactionId);</span>
+            
+            // سریالایز کردن و ارسال پاسخ
+<span class="nc" id="L240">            String response = serializeTransaction(transaction);</span>
+<span class="nc" id="L241">            sendResponse(exchange, 200, response);</span>
+            
+<span class="nc" id="L243">        } catch (IllegalArgumentException e) {</span>
+            // خطای validation
+<span class="nc" id="L245">            sendResponse(exchange, 400, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L246">        } catch (Exception e) {</span>
+            // تراکنش یافت نشد
+<span class="nc" id="L248">            sendResponse(exchange, 404, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L249">        }</span>
+<span class="nc" id="L250">    }</span>
+    
+    /**
+     * GET /api/payments/user/{userId}/history - دریافت تاریخچه تراکنش‌های کاربر
+     * 
+     * تمام تراکنش‌های یک کاربر را بازمی‌گرداند
+     * شامل پرداخت‌ها، استردادها و تراکنش‌های کیف پول
+     */
+    private void getUserTransactionHistory(HttpExchange exchange, String path) throws IOException {
+        try {
+            // استخراج userId از URL
+<span class="nc" id="L261">            Long userId = extractPathParameter(path, &quot;/api/payments/user/&quot;, &quot;/history&quot;);</span>
+            
+            // دریافت تاریخچه تراکنش‌ها
+<span class="nc" id="L264">            List&lt;Transaction&gt; transactions = paymentService.getUserTransactionHistory(userId);</span>
+            
+            // سریالایز کردن لیست و ارسال پاسخ
+<span class="nc" id="L267">            String response = serializeTransactionList(transactions);</span>
+<span class="nc" id="L268">            sendResponse(exchange, 200, response);</span>
+            
+<span class="nc" id="L270">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L271">            sendResponse(exchange, 400, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L272">        } catch (Exception e) {</span>
+<span class="nc" id="L273">            sendResponse(exchange, 404, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L274">        }</span>
+<span class="nc" id="L275">    }</span>
+    
+    /**
+     * GET /api/payments/user/{userId}/wallet-transactions - دریافت تراکنش‌های کیف پول
+     * 
+     * فقط تراکنش‌های مربوط به کیف پول (شارژ و برداشت) را بازمی‌گرداند
+     */
+    private void getUserWalletTransactions(HttpExchange exchange, String path) throws IOException {
+        try {
+<span class="nc" id="L284">            Long userId = extractPathParameter(path, &quot;/api/payments/user/&quot;, &quot;/wallet-transactions&quot;);</span>
+            
+<span class="nc" id="L286">            List&lt;Transaction&gt; transactions = paymentService.getUserWalletTransactions(userId);</span>
+            
+<span class="nc" id="L288">            String response = serializeTransactionList(transactions);</span>
+<span class="nc" id="L289">            sendResponse(exchange, 200, response);</span>
+            
+<span class="nc" id="L291">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L292">            sendResponse(exchange, 400, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L293">        } catch (Exception e) {</span>
+<span class="nc" id="L294">            sendResponse(exchange, 404, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L295">        }</span>
+<span class="nc" id="L296">    }</span>
+    
+    /**
+     * GET /api/payments/user/{userId}/payment-transactions - دریافت تراکنش‌های پرداخت
+     * 
+     * فقط تراکنش‌های مربوط به پرداخت و استرداد سفارشات را بازمی‌گرداند
+     */
+    private void getUserPaymentTransactions(HttpExchange exchange, String path) throws IOException {
+        try {
+<span class="nc" id="L305">            Long userId = extractPathParameter(path, &quot;/api/payments/user/&quot;, &quot;/payment-transactions&quot;);</span>
+            
+<span class="nc" id="L307">            List&lt;Transaction&gt; transactions = paymentService.getUserPaymentTransactions(userId);</span>
+            
+<span class="nc" id="L309">            String response = serializeTransactionList(transactions);</span>
+<span class="nc" id="L310">            sendResponse(exchange, 200, response);</span>
+            
+<span class="nc" id="L312">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L313">            sendResponse(exchange, 400, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L314">        } catch (Exception e) {</span>
+<span class="nc" id="L315">            sendResponse(exchange, 404, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L316">        }</span>
+<span class="nc" id="L317">    }</span>
+    
+    /**
+     * GET /api/payments/user/{userId}/statistics - دریافت آمار تراکنش‌های کاربر
+     * 
+     * آمار کاملی از فعالیت‌های مالی کاربر شامل:
+     * - تعداد کل تراکنش‌ها
+     * - تراکنش‌های موفق/ناموفق/در انتظار
+     * - مجموع مبلغ خرج شده و استرداد شده
+     * - درصد موفقیت
+     */
+    private void getUserTransactionStatistics(HttpExchange exchange, String path) throws IOException {
+        try {
+<span class="nc" id="L330">            Long userId = extractPathParameter(path, &quot;/api/payments/user/&quot;, &quot;/statistics&quot;);</span>
+            
+<span class="nc" id="L332">            PaymentRepository.TransactionStatistics stats = paymentService.getUserTransactionStatistics(userId);</span>
+            
+<span class="nc" id="L334">            String response = serializeTransactionStatistics(stats);</span>
+<span class="nc" id="L335">            sendResponse(exchange, 200, response);</span>
+            
+<span class="nc" id="L337">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L338">            sendResponse(exchange, 400, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L339">        } catch (Exception e) {</span>
+<span class="nc" id="L340">            sendResponse(exchange, 404, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L341">        }</span>
+<span class="nc" id="L342">    }</span>
+    
+    /**
+     * GET /api/payments/order/{orderId}/history - دریافت تاریخچه تراکنش‌های سفارش
+     * 
+     * تمام تراکنش‌های مربوط به یک سفارش خاص شامل پرداخت و استرداد
+     */
+    private void getOrderTransactionHistory(HttpExchange exchange, String path) throws IOException {
+        try {
+<span class="nc" id="L351">            Long orderId = extractPathParameter(path, &quot;/api/payments/order/&quot;, &quot;/history&quot;);</span>
+            
+<span class="nc" id="L353">            List&lt;Transaction&gt; transactions = paymentService.getOrderTransactionHistory(orderId);</span>
+            
+<span class="nc" id="L355">            String response = serializeTransactionList(transactions);</span>
+<span class="nc" id="L356">            sendResponse(exchange, 200, response);</span>
+            
+<span class="nc" id="L358">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L359">            sendResponse(exchange, 400, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L360">        } catch (Exception e) {</span>
+<span class="nc" id="L361">            sendResponse(exchange, 404, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L362">        }</span>
+<span class="nc" id="L363">    }</span>
+    
+    /**
+     * GET /api/payments/status/{status} - دریافت تراکنش‌ها بر اساس وضعیت
+     * 
+     * فیلتر کردن تراکنش‌ها بر اساس وضعیت: PENDING, COMPLETED, FAILED, CANCELLED
+     */
+    private void getTransactionsByStatus(HttpExchange exchange, String path) throws IOException {
+        try {
+<span class="nc" id="L372">            String statusStr = extractPathParameter(path, &quot;/api/payments/status/&quot;, &quot;&quot;).toString();</span>
+<span class="nc" id="L373">            TransactionStatus status = TransactionStatus.valueOf(statusStr.toUpperCase());</span>
+            
+<span class="nc" id="L375">            List&lt;Transaction&gt; transactions = paymentService.getTransactionsByStatus(status);</span>
+            
+<span class="nc" id="L377">            String response = serializeTransactionList(transactions);</span>
+<span class="nc" id="L378">            sendResponse(exchange, 200, response);</span>
+            
+<span class="nc" id="L380">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L381">            sendResponse(exchange, 400, &quot;{\&quot;error\&quot;:\&quot;Invalid status: &quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L382">        } catch (Exception e) {</span>
+<span class="nc" id="L383">            sendResponse(exchange, 500, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L384">        }</span>
+<span class="nc" id="L385">    }</span>
+    
+    /**
+     * GET /api/payments/type/{type} - دریافت تراکنش‌ها بر اساس نوع
+     * 
+     * فیلتر کردن تراکنش‌ها بر اساس نوع: PAYMENT, REFUND, WALLET_CHARGE, WALLET_WITHDRAWAL
+     */
+    private void getTransactionsByType(HttpExchange exchange, String path) throws IOException {
+        try {
+<span class="nc" id="L394">            String typeStr = extractPathParameter(path, &quot;/api/payments/type/&quot;, &quot;&quot;).toString();</span>
+<span class="nc" id="L395">            TransactionType type = TransactionType.valueOf(typeStr.toUpperCase());</span>
+            
+<span class="nc" id="L397">            List&lt;Transaction&gt; transactions = paymentService.getTransactionsByType(type);</span>
+            
+<span class="nc" id="L399">            String response = serializeTransactionList(transactions);</span>
+<span class="nc" id="L400">            sendResponse(exchange, 200, response);</span>
+            
+<span class="nc" id="L402">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L403">            sendResponse(exchange, 400, &quot;{\&quot;error\&quot;:\&quot;Invalid type: &quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L404">        } catch (Exception e) {</span>
+<span class="nc" id="L405">            sendResponse(exchange, 500, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L406">        }</span>
+<span class="nc" id="L407">    }</span>
+    
+    /**
+     * GET /api/payments/date-range?startDate=...&amp;endDate=... - دریافت تراکنش‌ها در بازه تاریخ
+     * 
+     * جستجوی تراکنش‌ها در یک بازه زمانی مشخص
+     * فرمت تاریخ: ISO 8601 (yyyy-MM-ddTHH:mm:ss)
+     */
+    private void getTransactionsByDateRange(HttpExchange exchange) throws IOException {
+        try {
+            // پارس کردن query parameters
+<span class="nc" id="L418">            String query = exchange.getRequestURI().getQuery();</span>
+<span class="nc" id="L419">            Map&lt;String, String&gt; params = parseQueryParams(query);</span>
+            
+<span class="nc" id="L421">            String startDateStr = params.get(&quot;startDate&quot;);</span>
+<span class="nc" id="L422">            String endDateStr = params.get(&quot;endDate&quot;);</span>
+            
+            // بررسی وجود پارامترهای ضروری
+<span class="nc bnc" id="L425" title="All 4 branches missed.">            if (startDateStr == null || endDateStr == null) {</span>
+<span class="nc" id="L426">                sendResponse(exchange, 400, &quot;{\&quot;error\&quot;:\&quot;Both startDate and endDate parameters are required\&quot;}&quot;);</span>
+<span class="nc" id="L427">                return;</span>
+            }
+            
+            // تبدیل رشته به LocalDateTime
+<span class="nc" id="L431">            LocalDateTime startDate = LocalDateTime.parse(startDateStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);</span>
+<span class="nc" id="L432">            LocalDateTime endDate = LocalDateTime.parse(endDateStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);</span>
+            
+<span class="nc" id="L434">            List&lt;Transaction&gt; transactions = paymentService.getTransactionsByDateRange(startDate, endDate);</span>
+            
+<span class="nc" id="L436">            String response = serializeTransactionList(transactions);</span>
+<span class="nc" id="L437">            sendResponse(exchange, 200, response);</span>
+            
+<span class="nc" id="L439">        } catch (DateTimeParseException e) {</span>
+<span class="nc" id="L440">            sendResponse(exchange, 400, &quot;{\&quot;error\&quot;:\&quot;Invalid date format. Use ISO format: yyyy-MM-ddTHH:mm:ss\&quot;}&quot;);</span>
+<span class="nc" id="L441">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L442">            sendResponse(exchange, 400, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L443">        } catch (Exception e) {</span>
+<span class="nc" id="L444">            sendResponse(exchange, 500, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L445">        }</span>
+<span class="nc" id="L446">    }</span>
+    
+    // ==================== PUT ENDPOINTS ====================
+    
+    /**
+     * پردازش درخواست‌های PUT
+     * شامل عملیات به‌روزرسانی
+     * 
+     * @param exchange شیء HttpExchange
+     * @param path مسیر درخواست
+     * @throws IOException خطا در I/O
+     */
+    private void handlePutRequest(HttpExchange exchange, String path) throws IOException {
+<span class="nc bnc" id="L459" title="All 4 branches missed.">        if (path.startsWith(&quot;/api/payments/&quot;) &amp;&amp; path.endsWith(&quot;/status&quot;)) {</span>
+            // به‌روزرسانی وضعیت تراکنش
+<span class="nc" id="L461">            updateTransactionStatus(exchange, path);</span>
+        } else {
+<span class="nc" id="L463">            sendResponse(exchange, 404, &quot;{\&quot;error\&quot;:\&quot;Endpoint not found\&quot;}&quot;);</span>
+        }
+<span class="nc" id="L465">    }</span>
+    
+    /**
+     * PUT /api/payments/{transactionId}/status - به‌روزرسانی وضعیت تراکنش
+     * 
+     * این endpoint توسط payment gateway ها برای به‌روزرسانی وضعیت تراکنش استفاده می‌شود
+     * مخصوص callback های خارجی و تایید نهایی پرداخت‌ها
+     */
+    private void updateTransactionStatus(HttpExchange exchange, String path) throws IOException {
+        try {
+            // استخراج transactionId از URL
+<span class="nc" id="L476">            Long transactionId = extractPathParameter(path, &quot;/api/payments/&quot;, &quot;/status&quot;);</span>
+            
+            // خواندن body درخواست
+<span class="nc" id="L479">            String requestBody = new String(exchange.getRequestBody().readAllBytes());</span>
+<span class="nc" id="L480">            Map&lt;String, Object&gt; request = parseJsonRequest(requestBody);</span>
+            
+            // استخراج پارامترها
+<span class="nc" id="L483">            String statusStr = extractString(request, &quot;status&quot;);</span>
+<span class="nc" id="L484">            String referenceId = extractOptionalString(request, &quot;referenceId&quot;);</span>
+<span class="nc" id="L485">            String notes = extractOptionalString(request, &quot;notes&quot;);</span>
+            
+<span class="nc" id="L487">            TransactionStatus status = TransactionStatus.valueOf(statusStr.toUpperCase());</span>
+            
+            // به‌روزرسانی وضعیت تراکنش
+<span class="nc" id="L490">            Transaction transaction = paymentService.updateTransactionStatus(transactionId, status, referenceId, notes);</span>
+            
+<span class="nc" id="L492">            String response = serializeTransaction(transaction);</span>
+<span class="nc" id="L493">            sendResponse(exchange, 200, response);</span>
+            
+<span class="nc" id="L495">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L496">            sendResponse(exchange, 400, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L497">        } catch (Exception e) {</span>
+<span class="nc" id="L498">            sendResponse(exchange, 500, &quot;{\&quot;error\&quot;:\&quot;&quot; + e.getMessage() + &quot;\&quot;}&quot;);</span>
+<span class="nc" id="L499">        }</span>
+<span class="nc" id="L500">    }</span>
+    
+    // ==================== UTILITY METHODS ====================
+    
+    /**
+     * ارسال پاسخ HTTP به کلاینت
+     * 
+     * @param exchange شیء HttpExchange
+     * @param statusCode کد وضعیت HTTP
+     * @param response محتوای پاسخ به فرمت JSON
+     * @throws IOException خطا در I/O
+     */
+    private void sendResponse(HttpExchange exchange, int statusCode, String response) throws IOException {
+        // تنظیم header های پاسخ
+<span class="nc" id="L514">        exchange.getResponseHeaders().set(&quot;Content-Type&quot;, &quot;application/json&quot;);</span>
+<span class="nc" id="L515">        exchange.getResponseHeaders().set(&quot;Access-Control-Allow-Origin&quot;, &quot;*&quot;); // CORS support</span>
+        
+        // ارسال header ها و نوشتن محتوای پاسخ
+<span class="nc" id="L518">        exchange.sendResponseHeaders(statusCode, response.length());</span>
+<span class="nc" id="L519">        try (OutputStream os = exchange.getResponseBody()) {</span>
+<span class="nc" id="L520">            os.write(response.getBytes());</span>
+        }
+<span class="nc" id="L522">    }</span>
+    
+    /**
+     * استخراج پارامتر از مسیر URL
+     * 
+     * مثال: از &quot;/api/payments/123/refund&quot; با prefix=&quot;/api/payments/&quot; و suffix=&quot;/refund&quot;
+     * عدد 123 را استخراج می‌کند
+     * 
+     * @param path مسیر کامل
+     * @param prefix پیشوند مسیر
+     * @param suffix پسوند مسیر
+     * @return ID استخراج شده
+     */
+    private Long extractPathParameter(String path, String prefix, String suffix) {
+<span class="nc" id="L536">        String param = path.substring(prefix.length());</span>
+<span class="nc bnc" id="L537" title="All 2 branches missed.">        if (!suffix.isEmpty()) {</span>
+<span class="nc" id="L538">            param = param.substring(0, param.length() - suffix.length());</span>
+        }
+<span class="nc" id="L540">        return Long.parseLong(param);</span>
+    }
+    
+    /**
+     * پارس کردن JSON ساده برای درخواست‌های API
+     * 
+     * توجه: این یک JSON parser ساده است و برای production باید از کتابخانه‌های
+     * حرفه‌ای مثل Jackson یا Gson استفاده کرد
+     * 
+     * @param json رشته JSON ورودی
+     * @return Map حاوی key-value های پارس شده
+     */
+    private Map&lt;String, Object&gt; parseJsonRequest(String json) {
+<span class="nc" id="L553">        Map&lt;String, Object&gt; result = new java.util.HashMap&lt;&gt;();</span>
+        
+        // حذف آکولادهای ابتدا و انتها
+<span class="nc" id="L556">        json = json.trim();</span>
+<span class="nc bnc" id="L557" title="All 4 branches missed.">        if (json.startsWith(&quot;{&quot;) &amp;&amp; json.endsWith(&quot;}&quot;)) {</span>
+<span class="nc" id="L558">            json = json.substring(1, json.length() - 1);</span>
+<span class="nc" id="L559">            String[] pairs = json.split(&quot;,&quot;);</span>
+            
+            // پردازش هر جفت key:value
+<span class="nc bnc" id="L562" title="All 2 branches missed.">            for (String pair : pairs) {</span>
+<span class="nc" id="L563">                String[] keyValue = pair.split(&quot;:&quot;);</span>
+<span class="nc bnc" id="L564" title="All 2 branches missed.">                if (keyValue.length == 2) {</span>
+<span class="nc" id="L565">                    String key = keyValue[0].trim().replaceAll(&quot;\&quot;&quot;, &quot;&quot;);</span>
+<span class="nc" id="L566">                    String value = keyValue[1].trim().replaceAll(&quot;\&quot;&quot;, &quot;&quot;);</span>
+                    
+                    // تلاش برای تبدیل به عدد
+                    try {
+<span class="nc bnc" id="L570" title="All 2 branches missed.">                        if (value.contains(&quot;.&quot;)) {</span>
+<span class="nc" id="L571">                            result.put(key, Double.parseDouble(value));</span>
+                        } else {
+<span class="nc" id="L573">                            result.put(key, Long.parseLong(value));</span>
+                        }
+<span class="nc" id="L575">                    } catch (NumberFormatException e) {</span>
+                        // اگر عدد نبود، به عنوان رشته ذخیره کن
+<span class="nc" id="L577">                        result.put(key, value);</span>
+<span class="nc" id="L578">                    }</span>
+                }
+            }
+        }
+        
+<span class="nc" id="L583">        return result;</span>
+    }
+    
+    /**
+     * پارس کردن query parameters از URL
+     * 
+     * مثال: &quot;startDate=2024-01-01&amp;endDate=2024-12-31&quot;
+     * 
+     * @param query رشته query
+     * @return Map حاوی پارامترها
+     */
+    private Map&lt;String, String&gt; parseQueryParams(String query) {
+<span class="nc" id="L595">        Map&lt;String, String&gt; params = new java.util.HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L596" title="All 2 branches missed.">        if (query != null) {</span>
+<span class="nc" id="L597">            String[] pairs = query.split(&quot;&amp;&quot;);</span>
+<span class="nc bnc" id="L598" title="All 2 branches missed.">            for (String pair : pairs) {</span>
+<span class="nc" id="L599">                String[] keyValue = pair.split(&quot;=&quot;);</span>
+<span class="nc bnc" id="L600" title="All 2 branches missed.">                if (keyValue.length == 2) {</span>
+<span class="nc" id="L601">                    params.put(keyValue[0], keyValue[1]);</span>
+                }
+            }
+        }
+<span class="nc" id="L605">        return params;</span>
+    }
+    
+    /**
+     * استخراج مقدار Long از Map درخواست
+     * 
+     * @param request Map حاوی داده‌های درخواست
+     * @param key کلید مورد نظر
+     * @return مقدار Long
+     * @throws IllegalArgumentException اگر کلید وجود نداشته باشد یا معتبر نباشد
+     */
+    private Long extractLong(Map&lt;String, Object&gt; request, String key) {
+<span class="nc" id="L617">        Object value = request.get(key);</span>
+<span class="nc bnc" id="L618" title="All 2 branches missed.">        if (value instanceof Long) {</span>
+<span class="nc" id="L619">            return (Long) value;</span>
+<span class="nc bnc" id="L620" title="All 2 branches missed.">        } else if (value instanceof Integer) {</span>
+<span class="nc" id="L621">            return ((Integer) value).longValue();</span>
+<span class="nc bnc" id="L622" title="All 2 branches missed.">        } else if (value instanceof String) {</span>
+<span class="nc" id="L623">            return Long.parseLong((String) value);</span>
+        }
+<span class="nc" id="L625">        throw new IllegalArgumentException(&quot;Missing or invalid &quot; + key);</span>
+    }
+    
+    /**
+     * استخراج مقدار String از Map درخواست
+     * 
+     * @param request Map حاوی داده‌های درخواست
+     * @param key کلید مورد نظر
+     * @return مقدار String
+     * @throws IllegalArgumentException اگر کلید وجود نداشته باشد
+     */
+    private String extractString(Map&lt;String, Object&gt; request, String key) {
+<span class="nc" id="L637">        Object value = request.get(key);</span>
+<span class="nc bnc" id="L638" title="All 2 branches missed.">        if (value instanceof String) {</span>
+<span class="nc" id="L639">            return (String) value;</span>
+        }
+<span class="nc" id="L641">        throw new IllegalArgumentException(&quot;Missing or invalid &quot; + key);</span>
+    }
+    
+    /**
+     * استخراج مقدار String اختیاری از Map درخواست
+     * 
+     * @param request Map حاوی داده‌های درخواست
+     * @param key کلید مورد نظر
+     * @return مقدار String یا null
+     */
+    private String extractOptionalString(Map&lt;String, Object&gt; request, String key) {
+<span class="nc" id="L652">        Object value = request.get(key);</span>
+<span class="nc bnc" id="L653" title="All 2 branches missed.">        return value instanceof String ? (String) value : null;</span>
+    }
+    
+    /**
+     * تبدیل شیء Transaction به JSON string
+     * 
+     * @param transaction شیء تراکنش
+     * @return JSON string
+     */
+    private String serializeTransaction(Transaction transaction) {
+<span class="nc" id="L663">        return &quot;{&quot;</span>
+<span class="nc" id="L664">            + &quot;\&quot;id\&quot;:&quot; + transaction.getId() + &quot;,&quot;</span>
+<span class="nc" id="L665">            + &quot;\&quot;userId\&quot;:&quot; + transaction.getUserId() + &quot;,&quot;</span>
+<span class="nc bnc" id="L666" title="All 2 branches missed.">            + &quot;\&quot;orderId\&quot;:&quot; + (transaction.getOrderId() != null ? transaction.getOrderId() : &quot;null&quot;) + &quot;,&quot;</span>
+<span class="nc" id="L667">            + &quot;\&quot;amount\&quot;:&quot; + transaction.getAmount() + &quot;,&quot;</span>
+<span class="nc" id="L668">            + &quot;\&quot;type\&quot;:\&quot;&quot; + transaction.getType() + &quot;\&quot;,&quot;</span>
+<span class="nc" id="L669">            + &quot;\&quot;status\&quot;:\&quot;&quot; + transaction.getStatus() + &quot;\&quot;,&quot;</span>
+<span class="nc bnc" id="L670" title="All 2 branches missed.">            + &quot;\&quot;paymentMethod\&quot;:\&quot;&quot; + (transaction.getPaymentMethod() != null ? transaction.getPaymentMethod() : &quot;&quot;) + &quot;\&quot;,&quot;</span>
+<span class="nc bnc" id="L671" title="All 2 branches missed.">            + &quot;\&quot;referenceId\&quot;:\&quot;&quot; + (transaction.getReferenceId() != null ? transaction.getReferenceId() : &quot;&quot;) + &quot;\&quot;,&quot;</span>
+<span class="nc bnc" id="L672" title="All 2 branches missed.">            + &quot;\&quot;description\&quot;:\&quot;&quot; + (transaction.getDescription() != null ? transaction.getDescription() : &quot;&quot;) + &quot;\&quot;,&quot;</span>
+<span class="nc" id="L673">            + &quot;\&quot;createdAt\&quot;:\&quot;&quot; + transaction.getCreatedAt() + &quot;\&quot;,&quot;</span>
+<span class="nc bnc" id="L674" title="All 2 branches missed.">            + &quot;\&quot;updatedAt\&quot;:\&quot;&quot; + (transaction.getUpdatedAt() != null ? transaction.getUpdatedAt() : &quot;&quot;) + &quot;\&quot;,&quot;</span>
+<span class="nc bnc" id="L675" title="All 2 branches missed.">            + &quot;\&quot;processedAt\&quot;:\&quot;&quot; + (transaction.getProcessedAt() != null ? transaction.getProcessedAt() : &quot;&quot;) + &quot;\&quot;&quot;</span>
+            + &quot;}&quot;;
+    }
+    
+    /**
+     * تبدیل لیست Transaction به JSON array
+     * 
+     * @param transactions لیست تراکنش‌ها
+     * @return JSON array string
+     */
+    private String serializeTransactionList(List&lt;Transaction&gt; transactions) {
+<span class="nc" id="L686">        StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L687">        sb.append(&quot;[&quot;);</span>
+<span class="nc bnc" id="L688" title="All 2 branches missed.">        for (int i = 0; i &lt; transactions.size(); i++) {</span>
+<span class="nc bnc" id="L689" title="All 2 branches missed.">            if (i &gt; 0) sb.append(&quot;,&quot;);</span>
+<span class="nc" id="L690">            sb.append(serializeTransaction(transactions.get(i)));</span>
+        }
+<span class="nc" id="L692">        sb.append(&quot;]&quot;);</span>
+<span class="nc" id="L693">        return sb.toString();</span>
+    }
+    
+    /**
+     * تبدیل آمار تراکنش‌ها به JSON string
+     * 
+     * @param stats شیء آمار تراکنش‌ها
+     * @return JSON string حاوی آمار کامل
+     */
+    private String serializeTransactionStatistics(PaymentRepository.TransactionStatistics stats) {
+<span class="nc" id="L703">        return &quot;{&quot;</span>
+<span class="nc" id="L704">            + &quot;\&quot;totalTransactions\&quot;:&quot; + stats.getTotalTransactions() + &quot;,&quot;</span>
+<span class="nc" id="L705">            + &quot;\&quot;completedTransactions\&quot;:&quot; + stats.getCompletedTransactions() + &quot;,&quot;</span>
+<span class="nc" id="L706">            + &quot;\&quot;pendingTransactions\&quot;:&quot; + stats.getPendingTransactions() + &quot;,&quot;</span>
+<span class="nc" id="L707">            + &quot;\&quot;failedTransactions\&quot;:&quot; + stats.getFailedTransactions() + &quot;,&quot;</span>
+<span class="nc" id="L708">            + &quot;\&quot;totalSpent\&quot;:&quot; + stats.getTotalSpent() + &quot;,&quot;</span>
+<span class="nc" id="L709">            + &quot;\&quot;totalRefunded\&quot;:&quot; + stats.getTotalRefunded() + &quot;,&quot;</span>
+<span class="nc" id="L710">            + &quot;\&quot;netSpent\&quot;:&quot; + stats.getNetSpent() + &quot;,&quot;</span>
+<span class="nc" id="L711">            + &quot;\&quot;successRate\&quot;:&quot; + stats.getSuccessRate()</span>
+            + &quot;}&quot;;
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

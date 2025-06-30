@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>User.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.common.models</a> &gt; <span class="el_source">User.java</span></div><h1>User.java</h1><pre class="source lang-java linenums">package com.myapp.common.models;
+
+import jakarta.persistence.*;
+
+/**
+ * مدل کاربر - نماینده یکی از کاربران سیستم
+ * این کلاس تمام انواع کاربران (خریدار، فروشنده، پیک، مدیر) را پوشش می‌دهد
+ * با استفاده از JPA برای ذخیره‌سازی در دیتابیس تنظیم شده است
+ */
+@Entity                           // نشان‌دهنده entity در JPA
+@Table(name = &quot;users&quot;)           // نام جدول در دیتابیس
+public class User {
+
+    /* ---------- فیلدهای کلاس ---------- */
+    
+    @Id                                                    // کلید اصلی
+    @GeneratedValue(strategy = GenerationType.IDENTITY)   // Auto-increment برای شناسه
+    private Long id;                                       // شناسه یکتای کاربر
+
+    @Column(name = &quot;full_name&quot;, nullable = false)  // نام کامل - اجباری
+    private String fullName;                       // نام و نام خانوادگی کاربر
+
+    @Column(unique = true, nullable = false)       // شماره تلفن - یکتا و اجباری
+    private String phone;                          // شماره تلفن کاربر (برای ورود)
+
+    private String email;                          // آدرس ایمیل (اختیاری)
+
+    @Column(name = &quot;password_hash&quot;, nullable = false)  // رمز عبور hash شده - اجباری
+    private String passwordHash;                       // رمز عبور رمزگذاری شده
+
+    @Enumerated(EnumType.STRING)                   // ذخیره enum به صورت رشته
+    private Role role;                             // نقش کاربر در سیستم
+
+    private String address;                        // آدرس کاربر (اختیاری)
+
+<span class="fc" id="L36">    @Column(name = &quot;is_active&quot;, nullable = false)  // وضعیت فعال بودن حساب</span>
+<span class="fc" id="L37">    private Boolean isActive = true;               // پیش‌فرض: فعال</span>
+
+    /**
+     * enum نقش‌های مختلف کاربران در سیستم
+     * BUYER: خریدار (مشتری)
+     * SELLER: فروشنده (صاحب رستوران)
+     * COURIER: پیک (تحویل‌دهنده)
+     * ADMIN: مدیر سیستم
+     */
+<span class="fc" id="L46">    public enum Role { BUYER, SELLER, COURIER, ADMIN }</span>
+
+    /* ---------- سازنده‌های کلاس ---------- */
+    
+    /**
+     * سازنده اصلی بدون id - برای کد اصلی برنامه
+     * Hibernate خودش id را تولید می‌کند
+     */
+    public User(String fullName,
+                String phone,
+                String email,
+                String passwordHash,
+                Role role,
+<span class="fc" id="L59">                String address) {</span>
+<span class="fc" id="L60">        this.fullName     = fullName;     // تنظیم نام کامل</span>
+<span class="fc" id="L61">        this.phone        = phone;        // تنظیم شماره تلفن</span>
+<span class="fc" id="L62">        this.email        = email;        // تنظیم ایمیل</span>
+<span class="fc" id="L63">        this.passwordHash = passwordHash; // تنظیم رمز عبور hash شده</span>
+<span class="fc" id="L64">        this.role         = role;         // تنظیم نقش کاربر</span>
+<span class="fc" id="L65">        this.address      = address;      // تنظیم آدرس</span>
+<span class="fc" id="L66">        this.isActive     = true;         // کاربران جدید به صورت پیش‌فرض فعال هستند</span>
+<span class="fc" id="L67">    }</span>
+
+    /**
+     * سازنده با Long id - برای تست‌هایی که id را صراحتاً می‌دهند
+     * معمولاً در تست‌های واحد استفاده می‌شود
+     */
+    public User(Long id,
+                String fullName,
+                String phone,
+                String email,
+                String passwordHash,
+                Role role,
+                String address) {
+<span class="fc" id="L80">        this(fullName, phone, email, passwordHash, role, address); // فراخوانی سازنده اصلی</span>
+<span class="fc" id="L81">        this.id = id; // تنظیم دستی شناسه</span>
+<span class="fc" id="L82">    }</span>
+
+    /**
+     * سازنده سازگاری قدیمی (int id) برای حفظ سازگاری با تست‌های قبلی
+     * تبدیل int به Long برای id
+     */
+    public User(int id,
+                String fullName,
+                String phone,
+                String email,
+                String passwordHash,
+                Role role,
+                String address) {
+<span class="fc" id="L95">        this((long) id, fullName, phone, email, passwordHash, role, address); // تبدیل int به Long</span>
+<span class="fc" id="L96">    }</span>
+
+    /**
+     * سازنده پیش‌فرض - برای JPA و فرمورک‌ها
+     * JPA نیاز به سازنده بدون پارامتر دارد
+     */
+<span class="fc" id="L102">    public User() { </span>
+<span class="fc" id="L103">        this.isActive = true; // حتی در سازنده پیش‌فرض، فعال بودن را true قرار می‌دهد</span>
+<span class="fc" id="L104">    }</span>
+
+    /* ---------- Getter و Setter ها ---------- */
+    
+    // دریافت و تنظیم شناسه کاربر
+<span class="fc" id="L109">    public Long getId() { return id; }</span>
+<span class="fc" id="L110">    public void setId(Long id) { this.id = id; }</span>
+
+    // دریافت و تنظیم نام کامل کاربر
+<span class="fc" id="L113">    public String getFullName() { return fullName; }</span>
+<span class="fc" id="L114">    public void setFullName(String fullName) { this.fullName = fullName; }</span>
+
+    // دریافت و تنظیم شماره تلفن کاربر
+<span class="fc" id="L117">    public String getPhone() { return phone; }</span>
+<span class="fc" id="L118">    public void setPhone(String phone) { this.phone = phone; }</span>
+
+    // دریافت و تنظیم ایمیل کاربر
+<span class="fc" id="L121">    public String getEmail() { return email; }</span>
+<span class="fc" id="L122">    public void setEmail(String email) { this.email = email; }</span>
+
+    // دریافت و تنظیم رمز عبور hash شده
+<span class="fc" id="L125">    public String getPasswordHash() { return passwordHash; }</span>
+<span class="fc" id="L126">    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }</span>
+
+    // دریافت و تنظیم نقش کاربر
+<span class="fc" id="L129">    public Role getRole() { return role; }</span>
+<span class="fc" id="L130">    public void setRole(Role role) { this.role = role; }</span>
+
+    // دریافت و تنظیم آدرس کاربر
+<span class="fc" id="L133">    public String getAddress() { return address; }</span>
+<span class="fc" id="L134">    public void setAddress(String address) { this.address = address; }</span>
+    
+    // دریافت و تنظیم وضعیت فعال بودن حساب کاربری
+<span class="fc" id="L137">    public Boolean getIsActive() { return isActive; }</span>
+<span class="fc" id="L138">    public void setIsActive(Boolean isActive) { this.isActive = isActive; }</span>
+    
+    /* ---------- متدهای Factory ---------- */
+    
+    /**
+     * متد Factory برای ثبت نام کاربر - ایجاد کاربر با نقش BUYER
+     * این متد برای ساده‌سازی فرآیند ثبت نام استفاده می‌شود
+     * 
+     * @param fullName نام و نام خانوادگی
+     * @param phone شماره تلفن
+     * @param email آدرس ایمیل
+     * @param passwordHash رمز عبور hash شده
+     * @param address آدرس کاربر
+     * @return شیء User جدید با نقش BUYER
+     */
+    public static User forRegistration(String fullName, String phone, String email, String passwordHash, String address) {
+<span class="fc" id="L154">        return new User(fullName, phone, email, passwordHash, Role.BUYER, address);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

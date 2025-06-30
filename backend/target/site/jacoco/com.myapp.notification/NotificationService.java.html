@@ -1,0 +1,859 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NotificationService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.notification</a> &gt; <span class="el_source">NotificationService.java</span></div><h1>NotificationService.java</h1><pre class="source lang-java linenums">package com.myapp.notification;
+
+import com.myapp.common.models.Notification;
+import com.myapp.common.models.Notification.NotificationType;
+import com.myapp.common.models.Notification.NotificationPriority;
+import com.myapp.common.models.OrderStatus;
+import com.myapp.auth.AuthRepository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * لایه منطق کسب‌وکار سیستم اعلان‌ها (Service Layer Pattern)
+ * 
+ * این کلاس تمام منطق کسب‌وکار مربوط به اعلان‌ها را مدیریت می‌کند:
+ * 
+ * === عملیات پایه اعلان‌ها ===
+ * - ایجاد اعلان‌های ساده و با اولویت
+ * - دریافت اعلان‌ها با انواع فیلتر
+ * - مدیریت وضعیت (خوانده/نخوانده)
+ * - حذف منطقی و بازیابی
+ * 
+ * === Factory Methods اعلان‌های خاص ===
+ * - اعلان ثبت سفارش جدید
+ * - اعلان تغییر وضعیت سفارش
+ * - اعلان اختصاص پیک
+ * - اعلان پردازش پرداخت
+ * - اعلان تایید رستوران
+ * - اعلان نگهداری سیستم
+ * 
+ * === عملیات گروهی ===
+ * - علامت‌گذاری دسته‌ای خوانده شده
+ * - broadcast اعلان‌های عمومی
+ * - تمیزکاری اعلان‌های قدیمی
+ * - حذف گروهی منطقی/فیزیکی
+ * 
+ * === آمار و گزارش ===
+ * - تعداد اعلان‌های خوانده نشده
+ * - آمار بر اساس نوع و اولویت
+ * - گزارش روزانه اعلان‌ها
+ * - آخرین اعلان کاربر
+ * 
+ * === validation و امنیت ===
+ * - اعتبارسنجی شناسه کاربران
+ * - validation محتوای اعلان‌ها
+ * - بررسی پارامترهای ورودی
+ * - کنترل سطح دسترسی
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Business Logic Validation: اعتبارسنجی منطق کسب‌وکار
+ * - Factory Pattern: ایجاد اعلان‌های تخصصی
+ * - Batch Processing: پردازش گروهی برای کارایی
+ * - Error Handling: مدیریت پیشرفته خطاها
+ * - Maintenance Operations: عملیات تعمیر و نگهداری
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+public class NotificationService {
+    /** Repository لایه دسترسی به داده‌های اعلان‌ها */
+    private final NotificationRepository notificationRepository;
+    
+    /** Repository لایه دسترسی به داده‌های احراز هویت */
+    private final AuthRepository authRepository;
+
+    /**
+     * سازنده با dependency injection
+     * 
+     * @param notificationRepository repository اعلان‌ها
+     * @param authRepository repository احراز هویت
+     */
+<span class="fc" id="L74">    public NotificationService(NotificationRepository notificationRepository, AuthRepository authRepository) {</span>
+<span class="fc" id="L75">        this.notificationRepository = notificationRepository;</span>
+<span class="fc" id="L76">        this.authRepository = authRepository;</span>
+<span class="fc" id="L77">    }</span>
+
+    // ==================== BASIC NOTIFICATION OPERATIONS ====================
+    
+    /**
+     * ایجاد اعلان جدید با اولویت معمولی
+     * 
+     * validation کامل ورودی‌ها و ذخیره امن اعلان
+     * 
+     * @param userId شناسه کاربر دریافت‌کننده
+     * @param title عنوان اعلان (حداکثر 100 کاراکتر)
+     * @param message متن پیام (حداکثر 500 کاراکتر)
+     * @param type نوع اعلان
+     * @return اعلان ایجاد شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن ورودی‌ها
+     * @throws RuntimeException در صورت عدم وجود کاربر
+     */
+    public Notification createNotification(Long userId, String title, String message, NotificationType type) {
+<span class="fc" id="L95">        validateUserId(userId);</span>
+<span class="fc" id="L96">        validateNotificationContent(title, message);</span>
+        
+<span class="fc" id="L98">        Notification notification = new Notification(userId, title, message, type);</span>
+<span class="fc" id="L99">        return notificationRepository.save(notification);</span>
+    }
+
+    /**
+     * ایجاد اعلان جدید با اولویت دلخواه
+     * 
+     * @param userId شناسه کاربر دریافت‌کننده
+     * @param title عنوان اعلان
+     * @param message متن پیام
+     * @param type نوع اعلان
+     * @param priority سطح اولویت اعلان
+     * @return اعلان ایجاد شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن ورودی‌ها
+     * @throws RuntimeException در صورت عدم وجود کاربر
+     */
+    public Notification createNotification(Long userId, String title, String message, NotificationType type, NotificationPriority priority) {
+<span class="fc" id="L115">        validateUserId(userId);</span>
+<span class="fc" id="L116">        validateNotificationContent(title, message);</span>
+        
+<span class="fc" id="L118">        Notification notification = new Notification(userId, title, message, type, priority);</span>
+<span class="fc" id="L119">        return notificationRepository.save(notification);</span>
+    }
+
+    /**
+     * دریافت اعلان بر اساس شناسه
+     * 
+     * @param id شناسه اعلان
+     * @return Optional حاوی اعلان یا empty
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه
+     */
+    public Optional&lt;Notification&gt; getNotificationById(Long id) {
+<span class="pc bpc" id="L130" title="2 of 4 branches missed.">        if (id == null || id &lt;= 0) {</span>
+<span class="nc" id="L131">            throw new IllegalArgumentException(&quot;Notification ID cannot be null or negative&quot;);</span>
+        }
+<span class="fc" id="L133">        return notificationRepository.findById(id);</span>
+    }
+
+    /**
+     * دریافت تمام اعلان‌های کاربر
+     * 
+     * @param userId شناسه کاربر
+     * @return لیست اعلان‌های کاربر (مرتب بر اساس تاریخ)
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه کاربر
+     * @throws RuntimeException در صورت عدم وجود کاربر
+     */
+    public List&lt;Notification&gt; getUserNotifications(Long userId) {
+<span class="fc" id="L145">        validateUserId(userId);</span>
+<span class="fc" id="L146">        return notificationRepository.findByUserId(userId);</span>
+    }
+
+    /**
+     * دریافت اعلان‌های کاربر با صفحه‌بندی
+     * 
+     * برای نمایش بهینه در UI و کاهش بار سرور
+     * 
+     * @param userId شناسه کاربر
+     * @param page شماره صفحه (شروع از 0)
+     * @param size تعداد آیتم در هر صفحه
+     * @return لیست اعلان‌های صفحه درخواستی
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     */
+    public List&lt;Notification&gt; getUserNotificationsPaginated(Long userId, int page, int size) {
+<span class="fc" id="L161">        validateUserId(userId);</span>
+<span class="nc" id="L162">        validatePaginationParams(page, size);</span>
+<span class="nc" id="L163">        return notificationRepository.findByUserIdPaginated(userId, page, size);</span>
+    }
+
+    /**
+     * دریافت اعلان‌های خوانده نشده کاربر
+     * 
+     * برای نمایش badge تعداد اعلان‌های جدید
+     * 
+     * @param userId شناسه کاربر
+     * @return لیست اعلان‌های خوانده نشده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه کاربر
+     */
+    public List&lt;Notification&gt; getUnreadNotifications(Long userId) {
+<span class="fc" id="L176">        validateUserId(userId);</span>
+<span class="fc" id="L177">        return notificationRepository.findUnreadByUserId(userId);</span>
+    }
+
+    /**
+     * دریافت اعلان‌های کاربر بر اساس نوع
+     * 
+     * @param userId شناسه کاربر
+     * @param type نوع اعلان (ORDER، PAYMENT، RESTAURANT، ...)
+     * @return لیست اعلان‌های نوع مشخص
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     */
+    public List&lt;Notification&gt; getNotificationsByType(Long userId, NotificationType type) {
+<span class="fc" id="L189">        validateUserId(userId);</span>
+<span class="fc" id="L190">        validateNotificationType(type);</span>
+<span class="fc" id="L191">        return notificationRepository.findByUserIdAndType(userId, type);</span>
+    }
+
+    /**
+     * دریافت اعلان‌های کاربر بر اساس اولویت
+     * 
+     * @param userId شناسه کاربر
+     * @param priority سطح اولویت (LOW، NORMAL، HIGH، URGENT)
+     * @return لیست اعلان‌های با اولویت مشخص
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     */
+    public List&lt;Notification&gt; getNotificationsByPriority(Long userId, NotificationPriority priority) {
+<span class="fc" id="L203">        validateUserId(userId);</span>
+<span class="fc" id="L204">        validateNotificationPriority(priority);</span>
+<span class="fc" id="L205">        return notificationRepository.findByUserIdAndPriority(userId, priority);</span>
+    }
+
+    /**
+     * دریافت اعلان‌های فوری کاربر
+     * 
+     * فقط اعلان‌های با اولویت HIGH برمی‌گرداند
+     * 
+     * @param userId شناسه کاربر
+     * @return لیست اعلان‌های فوری
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه کاربر
+     */
+    public List&lt;Notification&gt; getHighPriorityNotifications(Long userId) {
+<span class="nc" id="L218">        validateUserId(userId);</span>
+<span class="nc" id="L219">        return notificationRepository.findHighPriorityByUserId(userId);</span>
+    }
+
+    /**
+     * دریافت اعلان‌های اخیر کاربر
+     * 
+     * @param userId شناسه کاربر
+     * @param days تعداد روزهای گذشته
+     * @return لیست اعلان‌های اخیر
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     */
+    public List&lt;Notification&gt; getRecentNotifications(Long userId, int days) {
+<span class="fc" id="L231">        validateUserId(userId);</span>
+<span class="fc bfc" id="L232" title="All 2 branches covered.">        if (days &lt;= 0) {</span>
+<span class="fc" id="L233">            throw new IllegalArgumentException(&quot;Days must be positive&quot;);</span>
+        }
+<span class="fc" id="L235">        return notificationRepository.findRecentByUserId(userId, days);</span>
+    }
+
+    // ==================== NOTIFICATION STATE MANAGEMENT ====================
+    
+    /**
+     * علامت‌گذاری اعلان به عنوان خوانده شده
+     * 
+     * @param notificationId شناسه اعلان
+     * @return اعلان به‌روزرسانی شده
+     * @throws RuntimeException در صورت عدم وجود اعلان
+     */
+    public Notification markAsRead(Long notificationId) {
+<span class="fc" id="L248">        Optional&lt;Notification&gt; optNotification = notificationRepository.findById(notificationId);</span>
+<span class="fc bfc" id="L249" title="All 2 branches covered.">        if (optNotification.isEmpty()) {</span>
+<span class="fc" id="L250">            throw new RuntimeException(&quot;Notification not found with id: &quot; + notificationId);</span>
+        }
+        
+<span class="fc" id="L253">        Notification notification = optNotification.get();</span>
+<span class="fc" id="L254">        notification.markAsRead();</span>
+<span class="fc" id="L255">        return notificationRepository.update(notification);</span>
+    }
+
+    /**
+     * علامت‌گذاری اعلان به عنوان خوانده نشده
+     * 
+     * @param notificationId شناسه اعلان
+     * @return اعلان به‌روزرسانی شده
+     * @throws RuntimeException در صورت عدم وجود اعلان
+     */
+    public Notification markAsUnread(Long notificationId) {
+<span class="fc" id="L266">        Optional&lt;Notification&gt; optNotification = notificationRepository.findById(notificationId);</span>
+<span class="fc bfc" id="L267" title="All 2 branches covered.">        if (optNotification.isEmpty()) {</span>
+<span class="fc" id="L268">            throw new RuntimeException(&quot;Notification not found with id: &quot; + notificationId);</span>
+        }
+        
+<span class="fc" id="L271">        Notification notification = optNotification.get();</span>
+<span class="fc" id="L272">        notification.markAsUnread();</span>
+<span class="fc" id="L273">        return notificationRepository.update(notification);</span>
+    }
+
+    /**
+     * حذف منطقی اعلان
+     * 
+     * اعلان را کاملاً حذف نمی‌کند بلکه فقط علامت حذف می‌زند
+     * 
+     * @param notificationId شناسه اعلان
+     * @throws RuntimeException در صورت عدم وجود اعلان
+     */
+    public void deleteNotification(Long notificationId) {
+<span class="fc" id="L285">        Optional&lt;Notification&gt; optNotification = notificationRepository.findById(notificationId);</span>
+<span class="fc bfc" id="L286" title="All 2 branches covered.">        if (optNotification.isEmpty()) {</span>
+<span class="fc" id="L287">            throw new RuntimeException(&quot;Notification not found with id: &quot; + notificationId);</span>
+        }
+        
+<span class="fc" id="L290">        Notification notification = optNotification.get();</span>
+<span class="fc" id="L291">        notification.softDelete();</span>
+<span class="fc" id="L292">        notificationRepository.update(notification);</span>
+<span class="fc" id="L293">    }</span>
+
+    /**
+     * بازیابی اعلان حذف شده
+     * 
+     * علامت حذف را برمی‌دارد و اعلان را فعال می‌کند
+     * 
+     * @param notificationId شناسه اعلان
+     * @throws RuntimeException در صورت عدم وجود اعلان
+     */
+    public void restoreNotification(Long notificationId) {
+<span class="fc" id="L304">        Optional&lt;Notification&gt; optNotification = notificationRepository.findById(notificationId);</span>
+<span class="pc bpc" id="L305" title="1 of 2 branches missed.">        if (optNotification.isEmpty()) {</span>
+<span class="nc" id="L306">            throw new RuntimeException(&quot;Notification not found with id: &quot; + notificationId);</span>
+        }
+        
+<span class="fc" id="L309">        Notification notification = optNotification.get();</span>
+<span class="fc" id="L310">        notification.restore();</span>
+<span class="fc" id="L311">        notificationRepository.update(notification);</span>
+<span class="fc" id="L312">    }</span>
+
+    // ==================== BULK OPERATIONS ====================
+    
+    /**
+     * علامت‌گذاری تمام اعلان‌های کاربر به عنوان خوانده شده
+     * 
+     * عملیات bulk برای بهینه‌سازی performance
+     * 
+     * @param userId شناسه کاربر
+     * @return تعداد اعلان‌های به‌روزرسانی شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه کاربر
+     */
+    public int markAllAsRead(Long userId) {
+<span class="fc" id="L326">        validateUserId(userId);</span>
+<span class="fc" id="L327">        return notificationRepository.markAllAsReadForUser(userId);</span>
+    }
+
+    /**
+     * علامت‌گذاری اعلان‌های نوع خاص به عنوان خوانده شده
+     * 
+     * @param userId شناسه کاربر
+     * @param type نوع اعلان
+     * @return تعداد اعلان‌های به‌روزرسانی شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     */
+    public int markAllAsReadByType(Long userId, NotificationType type) {
+<span class="fc" id="L339">        validateUserId(userId);</span>
+<span class="fc" id="L340">        validateNotificationType(type);</span>
+<span class="fc" id="L341">        return notificationRepository.markAsReadByType(userId, type);</span>
+    }
+
+    /**
+     * تمیزکاری اعلان‌های قدیمی (حذف منطقی)
+     * 
+     * برای نگهداری performance دیتابیس
+     * 
+     * @param daysOld تعداد روزهای قدیمی بودن
+     * @return تعداد اعلان‌های تمیز شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن تعداد روزها
+     */
+    public int cleanupOldNotifications(int daysOld) {
+<span class="pc bpc" id="L354" title="1 of 2 branches missed.">        if (daysOld &lt;= 0) {</span>
+<span class="nc" id="L355">            throw new IllegalArgumentException(&quot;Days must be positive&quot;);</span>
+        }
+<span class="fc" id="L357">        return notificationRepository.softDeleteOldNotifications(daysOld);</span>
+    }
+
+    /**
+     * حذف کامل اعلان‌های منقضی (حذف فیزیکی)
+     * 
+     * برای بهینه‌سازی فضای دیتابیس
+     * 
+     * @param daysOld تعداد روزهای انقضا
+     * @return تعداد اعلان‌های حذف شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن تعداد روزها
+     */
+    public int purgeOldNotifications(int daysOld) {
+<span class="pc bpc" id="L370" title="1 of 2 branches missed.">        if (daysOld &lt;= 0) {</span>
+<span class="nc" id="L371">            throw new IllegalArgumentException(&quot;Days must be positive&quot;);</span>
+        }
+<span class="fc" id="L373">        return notificationRepository.hardDeleteOldNotifications(daysOld);</span>
+    }
+
+    // ==================== FACTORY METHODS FOR SPECIFIC NOTIFICATIONS ====================
+    
+    /**
+     * ایجاد اعلان ثبت سفارش جدید
+     * 
+     * Factory method برای ایجاد آسان اعلان‌های سفارش
+     * 
+     * @param userId شناسه کاربر
+     * @param orderId شناسه سفارش
+     * @param restaurantName نام رستوران
+     * @return اعلان ایجاد شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     */
+    public Notification notifyOrderCreated(Long userId, Long orderId, String restaurantName) {
+<span class="fc" id="L390">        validateUserId(userId);</span>
+<span class="fc bfc" id="L391" title="All 4 branches covered.">        if (orderId == null || orderId &lt;= 0) {</span>
+<span class="fc" id="L392">            throw new IllegalArgumentException(&quot;Order ID cannot be null or negative&quot;);</span>
+        }
+<span class="fc bfc" id="L394" title="All 4 branches covered.">        if (restaurantName == null || restaurantName.trim().isEmpty()) {</span>
+<span class="fc" id="L395">            throw new IllegalArgumentException(&quot;Restaurant name cannot be null or empty&quot;);</span>
+        }
+
+<span class="fc" id="L398">        Notification notification = Notification.orderCreated(userId, orderId, restaurantName);</span>
+<span class="fc" id="L399">        return notificationRepository.save(notification);</span>
+    }
+
+    /**
+     * ایجاد اعلان تغییر وضعیت سفارش
+     * 
+     * @param userId شناسه کاربر
+     * @param orderId شناسه سفارش
+     * @param newStatus وضعیت جدید سفارش
+     * @return اعلان ایجاد شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     */
+    public Notification notifyOrderStatusChanged(Long userId, Long orderId, OrderStatus newStatus) {
+<span class="fc" id="L412">        validateUserId(userId);</span>
+<span class="pc bpc" id="L413" title="1 of 4 branches missed.">        if (orderId == null || orderId &lt;= 0) {</span>
+<span class="fc" id="L414">            throw new IllegalArgumentException(&quot;Order ID cannot be null or negative&quot;);</span>
+        }
+<span class="fc bfc" id="L416" title="All 2 branches covered.">        if (newStatus == null) {</span>
+<span class="fc" id="L417">            throw new IllegalArgumentException(&quot;Order status cannot be null&quot;);</span>
+        }
+
+<span class="fc" id="L420">        Notification notification = Notification.orderStatusChanged(userId, orderId, newStatus);</span>
+<span class="fc" id="L421">        return notificationRepository.save(notification);</span>
+    }
+
+    /**
+     * ایجاد اعلان اختصاص پیک
+     * 
+     * @param userId شناسه کاربر
+     * @param orderId شناسه سفارش
+     * @param deliveryId شناسه تحویل
+     * @param courierName نام پیک
+     * @return اعلان ایجاد شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     */
+    public Notification notifyDeliveryAssigned(Long userId, Long orderId, Long deliveryId, String courierName) {
+<span class="fc" id="L435">        validateUserId(userId);</span>
+<span class="pc bpc" id="L436" title="1 of 4 branches missed.">        if (orderId == null || orderId &lt;= 0) {</span>
+<span class="fc" id="L437">            throw new IllegalArgumentException(&quot;Order ID cannot be null or negative&quot;);</span>
+        }
+<span class="fc bfc" id="L439" title="All 4 branches covered.">        if (deliveryId == null || deliveryId &lt;= 0) {</span>
+<span class="fc" id="L440">            throw new IllegalArgumentException(&quot;Delivery ID cannot be null or negative&quot;);</span>
+        }
+<span class="fc bfc" id="L442" title="All 4 branches covered.">        if (courierName == null || courierName.trim().isEmpty()) {</span>
+<span class="fc" id="L443">            throw new IllegalArgumentException(&quot;Courier name cannot be null or empty&quot;);</span>
+        }
+
+<span class="fc" id="L446">        Notification notification = Notification.deliveryAssigned(userId, orderId, deliveryId, courierName);</span>
+<span class="fc" id="L447">        return notificationRepository.save(notification);</span>
+    }
+
+    /**
+     * ایجاد اعلان پردازش پرداخت
+     * 
+     * @param userId شناسه کاربر
+     * @param orderId شناسه سفارش
+     * @param amount مبلغ پرداخت
+     * @param success وضعیت موفقیت پرداخت
+     * @return اعلان ایجاد شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     */
+    public Notification notifyPaymentProcessed(Long userId, Long orderId, Double amount, boolean success) {
+<span class="fc" id="L461">        validateUserId(userId);</span>
+<span class="pc bpc" id="L462" title="1 of 4 branches missed.">        if (orderId == null || orderId &lt;= 0) {</span>
+<span class="fc" id="L463">            throw new IllegalArgumentException(&quot;Order ID cannot be null or negative&quot;);</span>
+        }
+<span class="fc bfc" id="L465" title="All 4 branches covered.">        if (amount == null || amount &lt;= 0) {</span>
+<span class="fc" id="L466">            throw new IllegalArgumentException(&quot;Amount must be positive&quot;);</span>
+        }
+
+<span class="fc" id="L469">        Notification notification = Notification.paymentProcessed(userId, orderId, amount, success);</span>
+<span class="fc" id="L470">        return notificationRepository.save(notification);</span>
+    }
+
+    /**
+     * ایجاد اعلان تایید رستوران
+     * 
+     * @param userId شناسه کاربر (صاحب رستوران)
+     * @param restaurantId شناسه رستوران
+     * @param restaurantName نام رستوران
+     * @return اعلان ایجاد شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     */
+    public Notification notifyRestaurantApproved(Long userId, Long restaurantId, String restaurantName) {
+<span class="fc" id="L483">        validateUserId(userId);</span>
+<span class="fc bfc" id="L484" title="All 4 branches covered.">        if (restaurantId == null || restaurantId &lt;= 0) {</span>
+<span class="fc" id="L485">            throw new IllegalArgumentException(&quot;Restaurant ID cannot be null or negative&quot;);</span>
+        }
+<span class="fc bfc" id="L487" title="All 4 branches covered.">        if (restaurantName == null || restaurantName.trim().isEmpty()) {</span>
+<span class="fc" id="L488">            throw new IllegalArgumentException(&quot;Restaurant name cannot be null or empty&quot;);</span>
+        }
+
+<span class="fc" id="L491">        Notification notification = Notification.restaurantApproved(userId, restaurantId, restaurantName);</span>
+<span class="fc" id="L492">        return notificationRepository.save(notification);</span>
+    }
+
+    /**
+     * ایجاد اعلان نگهداری سیستم
+     * 
+     * @param userId شناسه کاربر
+     * @param maintenanceTime زمان نگهداری
+     * @return اعلان ایجاد شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     */
+    public Notification notifySystemMaintenance(Long userId, LocalDateTime maintenanceTime) {
+<span class="fc" id="L504">        validateUserId(userId);</span>
+<span class="fc bfc" id="L505" title="All 2 branches covered.">        if (maintenanceTime == null) {</span>
+<span class="fc" id="L506">            throw new IllegalArgumentException(&quot;Maintenance time cannot be null&quot;);</span>
+        }
+
+<span class="fc" id="L509">        Notification notification = Notification.systemMaintenance(userId, maintenanceTime);</span>
+<span class="fc" id="L510">        return notificationRepository.save(notification);</span>
+    }
+
+    // ==================== BROADCAST NOTIFICATIONS ====================
+    
+    /**
+     * پخش اعلان نگهداری سیستم به تمام کاربران فعال
+     * 
+     * از batch processing برای بهینه‌سازی performance استفاده می‌کند
+     * 
+     * @param maintenanceTime زمان نگهداری
+     * @throws IllegalArgumentException در صورت null بودن زمان
+     */
+    public void broadcastSystemMaintenance(LocalDateTime maintenanceTime) {
+<span class="pc bpc" id="L524" title="1 of 2 branches missed.">        if (maintenanceTime == null) {</span>
+<span class="nc" id="L525">            throw new IllegalArgumentException(&quot;Maintenance time cannot be null&quot;);</span>
+        }
+
+        // دریافت تمام کاربران فعال و ایجاد اعلان‌ها به صورت دسته‌ای
+<span class="fc" id="L529">        List&lt;Long&gt; activeUserIds = notificationRepository.getAllActiveUserIds();</span>
+<span class="fc" id="L530">        List&lt;Notification&gt; notifications = new java.util.ArrayList&lt;&gt;();</span>
+        
+<span class="fc bfc" id="L532" title="All 2 branches covered.">        for (Long userId : activeUserIds) {</span>
+            try {
+<span class="fc" id="L534">                Notification notification = Notification.systemMaintenance(userId, maintenanceTime);</span>
+<span class="fc" id="L535">                notifications.add(notification);</span>
+<span class="nc" id="L536">            } catch (Exception e) {</span>
+                // log خطا ولی ادامه کار با سایر کاربران
+<span class="nc" id="L538">                System.err.println(&quot;Failed to create maintenance notification for user &quot; + userId + &quot;: &quot; + e.getMessage());</span>
+<span class="fc" id="L539">            }</span>
+<span class="fc" id="L540">        }</span>
+        
+        // ذخیره تمام اعلان‌ها به صورت دسته‌ای
+<span class="pc bpc" id="L543" title="1 of 2 branches missed.">        if (!notifications.isEmpty()) {</span>
+<span class="fc" id="L544">            notificationRepository.saveBatch(notifications);</span>
+        }
+<span class="fc" id="L546">    }</span>
+
+    /**
+     * پخش پیام تبلیغاتی به تمام کاربران فعال
+     * 
+     * @param title عنوان پیام تبلیغاتی
+     * @param message متن پیام
+     * @param priority سطح اولویت (پیش‌فرض: LOW)
+     * @throws IllegalArgumentException در صورت نامعتبر بودن ورودی‌ها
+     */
+    public void broadcastPromotionalMessage(String title, String message, NotificationPriority priority) {
+<span class="pc bpc" id="L557" title="2 of 4 branches missed.">        if (title == null || title.trim().isEmpty()) {</span>
+<span class="nc" id="L558">            throw new IllegalArgumentException(&quot;Title cannot be null or empty&quot;);</span>
+        }
+<span class="pc bpc" id="L560" title="2 of 4 branches missed.">        if (message == null || message.trim().isEmpty()) {</span>
+<span class="nc" id="L561">            throw new IllegalArgumentException(&quot;Message cannot be null or empty&quot;);</span>
+        }
+<span class="pc bpc" id="L563" title="1 of 2 branches missed.">        if (priority == null) {</span>
+<span class="nc" id="L564">            priority = NotificationPriority.LOW;</span>
+        }
+
+        // دریافت تمام کاربران فعال و ایجاد اعلان‌ها به صورت دسته‌ای
+<span class="fc" id="L568">        List&lt;Long&gt; activeUserIds = notificationRepository.getAllActiveUserIds();</span>
+<span class="fc" id="L569">        List&lt;Notification&gt; notifications = new java.util.ArrayList&lt;&gt;();</span>
+        
+<span class="fc bfc" id="L571" title="All 2 branches covered.">        for (Long userId : activeUserIds) {</span>
+            try {
+<span class="fc" id="L573">                Notification notification = new Notification(userId, title, message, NotificationType.PROMOTIONAL, priority);</span>
+<span class="fc" id="L574">                notifications.add(notification);</span>
+<span class="nc" id="L575">            } catch (Exception e) {</span>
+                // log خطا ولی ادامه کار با سایر کاربران
+<span class="nc" id="L577">                System.err.println(&quot;Failed to create promotional notification for user &quot; + userId + &quot;: &quot; + e.getMessage());</span>
+<span class="fc" id="L578">            }</span>
+<span class="fc" id="L579">        }</span>
+        
+        // ذخیره تمام اعلان‌ها به صورت دسته‌ای
+<span class="pc bpc" id="L582" title="1 of 2 branches missed.">        if (!notifications.isEmpty()) {</span>
+<span class="fc" id="L583">            notificationRepository.saveBatch(notifications);</span>
+        }
+<span class="fc" id="L585">    }</span>
+
+    // ==================== ANALYTICS AND STATISTICS ====================
+    
+    /**
+     * دریافت تعداد اعلان‌های خوانده نشده کاربر
+     * 
+     * @param userId شناسه کاربر
+     * @return تعداد اعلان‌های خوانده نشده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه کاربر
+     */
+    public long getUnreadCount(Long userId) {
+<span class="fc" id="L597">        validateUserId(userId);</span>
+<span class="fc" id="L598">        return notificationRepository.getUnreadCount(userId);</span>
+    }
+
+    /**
+     * دریافت تعداد اعلان‌های کاربر بر اساس نوع
+     * 
+     * @param userId شناسه کاربر
+     * @param type نوع اعلان
+     * @return تعداد اعلان‌های نوع مشخص
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     */
+    public long getNotificationCountByType(Long userId, NotificationType type) {
+<span class="fc" id="L610">        validateUserId(userId);</span>
+<span class="fc" id="L611">        validateNotificationType(type);</span>
+<span class="fc" id="L612">        return notificationRepository.getNotificationCountByType(userId, type);</span>
+    }
+
+    /**
+     * دریافت تعداد اعلان‌های فوری خوانده نشده
+     * 
+     * @param userId شناسه کاربر
+     * @return تعداد اعلان‌های فوری خوانده نشده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه کاربر
+     */
+    public long getHighPriorityUnreadCount(Long userId) {
+<span class="fc" id="L623">        validateUserId(userId);</span>
+<span class="fc" id="L624">        return notificationRepository.getHighPriorityUnreadCount(userId);</span>
+    }
+
+    /**
+     * بررسی وجود اعلان‌های فوری خوانده نشده
+     * 
+     * @param userId شناسه کاربر
+     * @return true اگر اعلان فوری خوانده نشده وجود داشته باشد
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه کاربر
+     */
+    public boolean hasUnreadHighPriorityNotifications(Long userId) {
+<span class="fc" id="L635">        validateUserId(userId);</span>
+<span class="fc bfc" id="L636" title="All 2 branches covered.">        return notificationRepository.getHighPriorityUnreadCount(userId) &gt; 0;</span>
+    }
+
+    /**
+     * دریافت آخرین اعلان کاربر
+     * 
+     * @param userId شناسه کاربر
+     * @return Optional حاوی آخرین اعلان یا empty
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه کاربر
+     */
+    public Optional&lt;Notification&gt; getLatestNotification(Long userId) {
+<span class="fc" id="L647">        validateUserId(userId);</span>
+<span class="fc" id="L648">        return notificationRepository.getLatestNotification(userId);</span>
+    }
+
+    /**
+     * دریافت آمار اعلان‌ها بر اساس نوع
+     * 
+     * نتیجه: [نوع، تعداد کل، تعداد خوانده نشده]
+     * 
+     * @param userId شناسه کاربر
+     * @return لیست آرایه‌های آماری
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه کاربر
+     */
+    public List&lt;Object[]&gt; getNotificationStatsByType(Long userId) {
+<span class="fc" id="L661">        validateUserId(userId);</span>
+<span class="fc" id="L662">        return notificationRepository.getNotificationStatsByType(userId);</span>
+    }
+
+    /**
+     * دریافت آمار روزانه اعلان‌ها
+     * 
+     * نتیجه: [تاریخ، تعداد اعلان‌ها]
+     * 
+     * @param userId شناسه کاربر
+     * @param days تعداد روزهای گذشته
+     * @return لیست آمار روزانه
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     */
+    public List&lt;Object[]&gt; getDailyNotificationCounts(Long userId, int days) {
+<span class="fc" id="L676">        validateUserId(userId);</span>
+<span class="pc bpc" id="L677" title="1 of 2 branches missed.">        if (days &lt;= 0) {</span>
+<span class="nc" id="L678">            throw new IllegalArgumentException(&quot;Days must be positive&quot;);</span>
+        }
+<span class="fc" id="L680">        return notificationRepository.getDailyNotificationCounts(userId, days);</span>
+    }
+
+    // ==================== ENTITY-SPECIFIC QUERIES ====================
+    
+    /**
+     * دریافت تمام اعلان‌های مربوط به سفارش
+     * 
+     * @param orderId شناسه سفارش
+     * @return لیست اعلان‌های سفارش
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه سفارش
+     */
+    public List&lt;Notification&gt; getOrderNotifications(Long orderId) {
+<span class="pc bpc" id="L693" title="2 of 4 branches missed.">        if (orderId == null || orderId &lt;= 0) {</span>
+<span class="nc" id="L694">            throw new IllegalArgumentException(&quot;Order ID cannot be null or negative&quot;);</span>
+        }
+<span class="fc" id="L696">        return notificationRepository.findOrderNotifications(orderId);</span>
+    }
+
+    /**
+     * دریافت اعلان‌های سفارش برای کاربر خاص
+     * 
+     * @param userId شناسه کاربر
+     * @param orderId شناسه سفارش
+     * @return لیست اعلان‌های سفارش کاربر
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     */
+    public List&lt;Notification&gt; getUserOrderNotifications(Long userId, Long orderId) {
+<span class="fc" id="L708">        validateUserId(userId);</span>
+<span class="pc bpc" id="L709" title="2 of 4 branches missed.">        if (orderId == null || orderId &lt;= 0) {</span>
+<span class="nc" id="L710">            throw new IllegalArgumentException(&quot;Order ID cannot be null or negative&quot;);</span>
+        }
+<span class="fc" id="L712">        return notificationRepository.findUserOrderNotifications(userId, orderId);</span>
+    }
+
+    /**
+     * دریافت اعلان‌های مربوط به رستوران
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست اعلان‌های رستوران
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه رستوران
+     */
+    public List&lt;Notification&gt; getRestaurantNotifications(Long restaurantId) {
+<span class="nc bnc" id="L723" title="All 4 branches missed.">        if (restaurantId == null || restaurantId &lt;= 0) {</span>
+<span class="nc" id="L724">            throw new IllegalArgumentException(&quot;Restaurant ID cannot be null or negative&quot;);</span>
+        }
+<span class="nc" id="L726">        return notificationRepository.findRestaurantNotifications(restaurantId);</span>
+    }
+
+    /**
+     * دریافت اعلان‌های مربوط به تحویل
+     * 
+     * @param deliveryId شناسه تحویل
+     * @return لیست اعلان‌های تحویل
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه تحویل
+     */
+    public List&lt;Notification&gt; getDeliveryNotifications(Long deliveryId) {
+<span class="nc bnc" id="L737" title="All 4 branches missed.">        if (deliveryId == null || deliveryId &lt;= 0) {</span>
+<span class="nc" id="L738">            throw new IllegalArgumentException(&quot;Delivery ID cannot be null or negative&quot;);</span>
+        }
+<span class="nc" id="L740">        return notificationRepository.findDeliveryNotifications(deliveryId);</span>
+    }
+
+    // ==================== SCHEDULED MAINTENANCE OPERATIONS ====================
+    
+    /**
+     * عملیات نگهداری روزانه سیستم اعلان‌ها
+     * 
+     * شامل:
+     * - حذف منطقی اعلان‌های بالای 90 روز
+     * - حذف فیزیکی اعلان‌های حذف شده بالای 120 روز
+     * 
+     * @throws RuntimeException در صورت خطا در عملیات نگهداری
+     */
+    public void performDailyMaintenance() {
+        try {
+            // حذف منطقی اعلان‌های قدیمی‌تر از 90 روز
+<span class="fc" id="L757">            int softDeleted = cleanupOldNotifications(90);</span>
+<span class="fc" id="L758">            System.out.println(&quot;Daily maintenance: Soft deleted &quot; + softDeleted + &quot; old notifications&quot;);</span>
+            
+            // حذف فیزیکی اعلان‌های منطقاً حذف شده بیش از 30 روز پیش
+<span class="fc" id="L761">            int hardDeleted = purgeOldNotifications(120);</span>
+<span class="fc" id="L762">            System.out.println(&quot;Daily maintenance: Hard deleted &quot; + hardDeleted + &quot; old notifications&quot;);</span>
+            
+<span class="nc" id="L764">        } catch (Exception e) {</span>
+<span class="nc" id="L765">            System.err.println(&quot;Error during daily maintenance: &quot; + e.getMessage());</span>
+<span class="nc" id="L766">            throw e;</span>
+<span class="fc" id="L767">        }</span>
+<span class="fc" id="L768">    }</span>
+
+    // ==================== VALIDATION METHODS ====================
+    
+    /**
+     * اعتبارسنجی شناسه کاربر
+     * 
+     * بررسی معتبر بودن و وجود کاربر در سیستم
+     * 
+     * @param userId شناسه کاربر
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه
+     * @throws RuntimeException در صورت عدم وجود کاربر
+     */
+    private void validateUserId(Long userId) {
+<span class="fc bfc" id="L782" title="All 4 branches covered.">        if (userId == null || userId &lt;= 0) {</span>
+<span class="fc" id="L783">            throw new IllegalArgumentException(&quot;User ID cannot be null or negative&quot;);</span>
+        }
+        
+        // بررسی وجود کاربر
+<span class="fc bfc" id="L787" title="All 2 branches covered.">        if (authRepository.findById(userId).isEmpty()) {</span>
+<span class="fc" id="L788">            throw new RuntimeException(&quot;User not found with id: &quot; + userId);</span>
+        }
+<span class="fc" id="L790">    }</span>
+
+    /**
+     * اعتبارسنجی محتوای اعلان
+     * 
+     * بررسی طول و محتوای عنوان و پیام
+     * 
+     * @param title عنوان اعلان
+     * @param message متن پیام
+     * @throws IllegalArgumentException در صورت نامعتبر بودن محتوا
+     */
+    private void validateNotificationContent(String title, String message) {
+<span class="fc bfc" id="L802" title="All 4 branches covered.">        if (title == null || title.trim().isEmpty()) {</span>
+<span class="fc" id="L803">            throw new IllegalArgumentException(&quot;Notification title cannot be null or empty&quot;);</span>
+        }
+<span class="fc bfc" id="L805" title="All 2 branches covered.">        if (title.length() &gt; 100) {</span>
+<span class="fc" id="L806">            throw new IllegalArgumentException(&quot;Notification title cannot exceed 100 characters&quot;);</span>
+        }
+<span class="fc bfc" id="L808" title="All 4 branches covered.">        if (message == null || message.trim().isEmpty()) {</span>
+<span class="fc" id="L809">            throw new IllegalArgumentException(&quot;Notification message cannot be null or empty&quot;);</span>
+        }
+<span class="fc bfc" id="L811" title="All 2 branches covered.">        if (message.length() &gt; 500) {</span>
+<span class="fc" id="L812">            throw new IllegalArgumentException(&quot;Notification message cannot exceed 500 characters&quot;);</span>
+        }
+<span class="fc" id="L814">    }</span>
+
+    /**
+     * اعتبارسنجی نوع اعلان
+     * 
+     * @param type نوع اعلان
+     * @throws IllegalArgumentException در صورت null بودن نوع
+     */
+    private void validateNotificationType(NotificationType type) {
+<span class="fc bfc" id="L823" title="All 2 branches covered.">        if (type == null) {</span>
+<span class="fc" id="L824">            throw new IllegalArgumentException(&quot;Notification type cannot be null&quot;);</span>
+        }
+<span class="fc" id="L826">    }</span>
+
+    /**
+     * اعتبارسنجی اولویت اعلان
+     * 
+     * @param priority سطح اولویت
+     * @throws IllegalArgumentException در صورت null بودن اولویت
+     */
+    private void validateNotificationPriority(NotificationPriority priority) {
+<span class="fc bfc" id="L835" title="All 2 branches covered.">        if (priority == null) {</span>
+<span class="fc" id="L836">            throw new IllegalArgumentException(&quot;Notification priority cannot be null&quot;);</span>
+        }
+<span class="fc" id="L838">    }</span>
+
+    /**
+     * اعتبارسنجی پارامترهای صفحه‌بندی
+     * 
+     * @param page شماره صفحه
+     * @param size تعداد آیتم در صفحه
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     */
+    private void validatePaginationParams(int page, int size) {
+<span class="pc bpc" id="L848" title="1 of 2 branches missed.">        if (page &lt; 0) {</span>
+<span class="fc" id="L849">            throw new IllegalArgumentException(&quot;Page number cannot be negative&quot;);</span>
+        }
+<span class="nc bnc" id="L851" title="All 2 branches missed.">        if (size &lt;= 0) {</span>
+<span class="nc" id="L852">            throw new IllegalArgumentException(&quot;Page size must be positive&quot;);</span>
+        }
+<span class="nc bnc" id="L854" title="All 2 branches missed.">        if (size &gt; 100) {</span>
+<span class="nc" id="L855">            throw new IllegalArgumentException(&quot;Page size cannot exceed 100&quot;);</span>
+        }
+<span class="nc" id="L857">    }</span>
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RestaurantService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.restaurant</a> &gt; <span class="el_source">RestaurantService.java</span></div><h1>RestaurantService.java</h1><pre class="source lang-java linenums">package com.myapp.restaurant;
+
+import com.myapp.common.exceptions.NotFoundException;
+import com.myapp.common.models.Restaurant;
+import com.myapp.common.models.RestaurantStatus;
+import com.myapp.common.utils.PerformanceUtil;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.Future;
+import java.util.ArrayList;
+
+/**
+ * سرویس مدیریت رستوران‌ها - لایه منطق کسب‌وکار
+ * این کلاس مسئول پردازش منطق کسب‌وکار مربوط به رستوران‌هاست
+ * شامل ثبت، به‌روزرسانی، مدیریت وضعیت و عملکرد بهینه با caching
+ */
+public class RestaurantService {
+    
+    // repository برای دسترسی به داده‌های رستوران
+    private final RestaurantRepository restaurantRepository;
+    
+    /**
+     * سازنده پیش‌فرض - ایجاد نمونه repository
+     */
+<span class="nc" id="L26">    public RestaurantService() {</span>
+<span class="nc" id="L27">        this.restaurantRepository = new RestaurantRepository();</span>
+<span class="nc" id="L28">    }</span>
+    
+    /**
+     * سازنده برای تزریق وابستگی (استفاده در تست)
+     * 
+     * @param restaurantRepository repository رستوران
+     */
+<span class="fc" id="L35">    public RestaurantService(RestaurantRepository restaurantRepository) {</span>
+<span class="fc" id="L36">        this.restaurantRepository = restaurantRepository;</span>
+<span class="fc" id="L37">    }</span>
+    
+    /**
+     * ثبت رستوران جدید در سیستم
+     * رستوران با وضعیت PENDING ثبت می‌شود و منتظر تأیید مدیر است
+     * 
+     * @param ownerId شناسه مالک رستوران
+     * @param name نام رستوران
+     * @param address آدرس رستوران
+     * @param phone شماره تلفن رستوران
+     * @return رستوران ثبت شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن ورودی‌ها
+     */
+    public Restaurant registerRestaurant(Long ownerId, String name, String address, String phone) {
+        // اعتبارسنجی ورودی‌ها
+<span class="fc" id="L52">        validateRegistrationInput(ownerId, name, address, phone);</span>
+        
+        // ایجاد رستوران جدید با trim کردن رشته‌ها
+<span class="fc" id="L55">        Restaurant restaurant = new Restaurant(ownerId, name.trim(), address.trim(), phone.trim());</span>
+<span class="fc" id="L56">        return restaurantRepository.saveNew(restaurant);</span>
+    }
+    
+    /**
+     * ثبت رستوران با شیء Restaurant
+     * این متد overload شده برای راحتی استفاده است
+     * 
+     * @param restaurant شیء رستوران
+     * @return رستوران ثبت شده
+     * @throws IllegalArgumentException در صورت null بودن رستوران یا نامعتبر بودن اطلاعات
+     */
+    public Restaurant registerRestaurant(Restaurant restaurant) {
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        if (restaurant == null) {</span>
+<span class="fc" id="L69">            throw new IllegalArgumentException(&quot;Restaurant cannot be null&quot;);</span>
+        }
+        
+        // اعتبارسنجی اطلاعات رستوران
+<span class="fc" id="L73">        validateRegistrationInput(restaurant.getOwnerId(), restaurant.getName(), </span>
+<span class="fc" id="L74">                                restaurant.getAddress(), restaurant.getPhone());</span>
+        
+        // تنظیم وضعیت پیش‌فرض برای رستوران‌های جدید
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        if (restaurant.getStatus() == null) {</span>
+<span class="fc" id="L78">            restaurant.setStatus(RestaurantStatus.PENDING);</span>
+        }
+        
+<span class="fc" id="L81">        return restaurantRepository.saveNew(restaurant);</span>
+    }
+    
+    /**
+     * دریافت رستوران با شناسه
+     * 
+     * @param id شناسه رستوران
+     * @return رستوران یافت شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه
+     * @throws NotFoundException در صورت یافت نشدن رستوران
+     */
+    public Restaurant getRestaurantById(Long id) {
+<span class="fc bfc" id="L93" title="All 4 branches covered.">        if (id == null || id &lt;= 0) {</span>
+<span class="fc" id="L94">            throw new IllegalArgumentException(&quot;Restaurant ID must be positive&quot;);</span>
+        }
+        
+<span class="fc" id="L97">        Optional&lt;Restaurant&gt; restaurant = restaurantRepository.findById(id);</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        if (restaurant.isEmpty()) {</span>
+<span class="fc" id="L99">            throw new NotFoundException(&quot;Restaurant&quot;, id);</span>
+        }
+        
+<span class="fc" id="L102">        return restaurant.get();</span>
+    }
+    
+    /**
+     * دریافت همه رستوران‌های متعلق به یک مالک
+     * 
+     * @param ownerId شناسه مالک
+     * @return لیست رستوران‌های مالک
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه مالک
+     */
+    public List&lt;Restaurant&gt; getRestaurantsByOwner(Long ownerId) {
+<span class="pc bpc" id="L113" title="1 of 4 branches missed.">        if (ownerId == null || ownerId &lt;= 0) {</span>
+<span class="fc" id="L114">            throw new IllegalArgumentException(&quot;Owner ID must be positive&quot;);</span>
+        }
+        
+<span class="fc" id="L117">        return restaurantRepository.listByOwner(ownerId);</span>
+    }
+    
+    /**
+     * دریافت همه رستوران‌های تأیید شده (نمایش عمومی) - بهینه‌سازی شده با caching
+     * این متد برای نمایش رستوران‌ها در صفحه اصلی استفاده می‌شود
+     * 
+     * @return لیست رستوران‌های تأیید شده
+     */
+    public List&lt;Restaurant&gt; getApprovedRestaurants() {
+<span class="fc" id="L127">        String cacheKey = PerformanceUtil.createQueryCacheKey(&quot;approved_restaurants&quot;);</span>
+        
+<span class="fc" id="L129">        return PerformanceUtil.executeWithCache(</span>
+            cacheKey,
+            () -&gt; {
+                // اندازه‌گیری عملکرد عملیات دیتابیس
+<span class="fc" id="L133">                PerformanceUtil.PerformanceResult&lt;List&lt;Restaurant&gt;&gt; result = </span>
+<span class="fc" id="L134">                    PerformanceUtil.measurePerformance(&quot;getApprovedRestaurants&quot;, </span>
+<span class="fc" id="L135">                        () -&gt; restaurantRepository.listApproved());</span>
+                
+                // نمایش نتیجه عملکرد با emoji
+<span class="fc" id="L138">                System.out.println(&quot;🏪 &quot; + result.toString());</span>
+<span class="fc" id="L139">                return result.getResult();</span>
+            },
+            List.class,
+            15 // Cache برای 15 دقیقه
+        );
+    }
+    
+    /**
+     * دریافت همه رستوران‌ها (برای مدیران)
+     * 
+     * @return لیست همه رستوران‌ها
+     */
+    public List&lt;Restaurant&gt; getAllRestaurants() {
+<span class="fc" id="L152">        return restaurantRepository.findAll();</span>
+    }
+    
+    /**
+     * دریافت رستوران‌ها بر اساس وضعیت
+     * 
+     * @param status وضعیت مورد نظر (PENDING, APPROVED, REJECTED, SUSPENDED)
+     * @return لیست رستوران‌ها با وضعیت مشخص
+     * @throws IllegalArgumentException در صورت null بودن وضعیت
+     */
+    public List&lt;Restaurant&gt; getRestaurantsByStatus(RestaurantStatus status) {
+<span class="fc bfc" id="L163" title="All 2 branches covered.">        if (status == null) {</span>
+<span class="fc" id="L164">            throw new IllegalArgumentException(&quot;Status cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L167">        return restaurantRepository.findByStatus(status);</span>
+    }
+    
+    /**
+     * به‌روزرسانی وضعیت رستوران (عملکرد مدیریتی)
+     * فقط مدیران اجازه تغییر وضعیت رستوران‌ها را دارند
+     * 
+     * @param id شناسه رستوران
+     * @param status وضعیت جدید
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     * @throws NotFoundException در صورت یافت نشدن رستوران
+     */
+    public void updateRestaurantStatus(Long id, RestaurantStatus status) {
+<span class="pc bpc" id="L180" title="1 of 4 branches missed.">        if (id == null || id &lt;= 0) {</span>
+<span class="fc" id="L181">            throw new IllegalArgumentException(&quot;Restaurant ID must be positive&quot;);</span>
+        }
+<span class="fc bfc" id="L183" title="All 2 branches covered.">        if (status == null) {</span>
+<span class="fc" id="L184">            throw new IllegalArgumentException(&quot;Status cannot be null&quot;);</span>
+        }
+        
+        // بررسی وجود رستوران
+<span class="fc" id="L188">        getRestaurantById(id);</span>
+        
+        // به‌روزرسانی وضعیت در دیتابیس
+<span class="fc" id="L191">        restaurantRepository.updateStatus(id, status);</span>
+<span class="fc" id="L192">    }</span>
+    
+    /**
+     * Update restaurant information
+     */
+    public Restaurant updateRestaurant(Long id, String name, String address, String phone) {
+<span class="pc bpc" id="L198" title="1 of 4 branches missed.">        if (id == null || id &lt;= 0) {</span>
+<span class="fc" id="L199">            throw new IllegalArgumentException(&quot;Restaurant ID must be positive&quot;);</span>
+        }
+        
+<span class="fc" id="L202">        Restaurant existingRestaurant = getRestaurantById(id);</span>
+        
+        // Update fields if provided
+<span class="pc bpc" id="L205" title="1 of 4 branches missed.">        if (name != null &amp;&amp; !name.trim().isEmpty()) {</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">            if (name.trim().length() &gt; 100) {</span>
+<span class="fc" id="L207">                throw new IllegalArgumentException(&quot;Restaurant name cannot exceed 100 characters&quot;);</span>
+            }
+<span class="fc" id="L209">            existingRestaurant.setName(name.trim());</span>
+        }
+        
+<span class="fc bfc" id="L212" title="All 4 branches covered.">        if (address != null &amp;&amp; !address.trim().isEmpty()) {</span>
+<span class="fc bfc" id="L213" title="All 2 branches covered.">            if (address.trim().length() &gt; 200) {</span>
+<span class="fc" id="L214">                throw new IllegalArgumentException(&quot;Restaurant address cannot exceed 200 characters&quot;);</span>
+            }
+<span class="fc" id="L216">            existingRestaurant.setAddress(address.trim());</span>
+        }
+        
+<span class="fc bfc" id="L219" title="All 4 branches covered.">        if (phone != null &amp;&amp; !phone.trim().isEmpty()) {</span>
+<span class="fc bfc" id="L220" title="All 2 branches covered.">            if (phone.trim().length() &gt; 20) {</span>
+<span class="fc" id="L221">                throw new IllegalArgumentException(&quot;Restaurant phone cannot exceed 20 characters&quot;);</span>
+            }
+<span class="fc" id="L223">            existingRestaurant.setPhone(phone.trim());</span>
+        }
+        
+<span class="fc" id="L226">        return restaurantRepository.save(existingRestaurant);</span>
+    }
+    
+    /**
+     * Update restaurant with Restaurant object
+     */
+    public Restaurant updateRestaurant(Restaurant restaurant) {
+<span class="fc bfc" id="L233" title="All 2 branches covered.">        if (restaurant == null) {</span>
+<span class="fc" id="L234">            throw new IllegalArgumentException(&quot;Restaurant cannot be null&quot;);</span>
+        }
+<span class="pc bpc" id="L236" title="1 of 4 branches missed.">        if (restaurant.getId() == null || restaurant.getId() &lt;= 0) {</span>
+<span class="fc" id="L237">            throw new IllegalArgumentException(&quot;Restaurant ID must be positive&quot;);</span>
+        }
+        
+        // Get existing restaurant to preserve all fields
+<span class="fc" id="L241">        Restaurant existingRestaurant = getRestaurantById(restaurant.getId());</span>
+        
+        // Update only the provided fields
+<span class="pc bpc" id="L244" title="2 of 4 branches missed.">        if (restaurant.getName() != null &amp;&amp; !restaurant.getName().trim().isEmpty()) {</span>
+<span class="pc bpc" id="L245" title="1 of 2 branches missed.">            if (restaurant.getName().trim().length() &gt; 100) {</span>
+<span class="nc" id="L246">                throw new IllegalArgumentException(&quot;Restaurant name cannot exceed 100 characters&quot;);</span>
+            }
+<span class="fc" id="L248">            existingRestaurant.setName(restaurant.getName().trim());</span>
+        }
+        
+<span class="pc bpc" id="L251" title="2 of 4 branches missed.">        if (restaurant.getAddress() != null &amp;&amp; !restaurant.getAddress().trim().isEmpty()) {</span>
+<span class="pc bpc" id="L252" title="1 of 2 branches missed.">            if (restaurant.getAddress().trim().length() &gt; 200) {</span>
+<span class="nc" id="L253">                throw new IllegalArgumentException(&quot;Restaurant address cannot exceed 200 characters&quot;);</span>
+            }
+<span class="fc" id="L255">            existingRestaurant.setAddress(restaurant.getAddress().trim());</span>
+        }
+        
+<span class="pc bpc" id="L258" title="2 of 4 branches missed.">        if (restaurant.getPhone() != null &amp;&amp; !restaurant.getPhone().trim().isEmpty()) {</span>
+<span class="pc bpc" id="L259" title="1 of 2 branches missed.">            if (restaurant.getPhone().trim().length() &gt; 20) {</span>
+<span class="nc" id="L260">                throw new IllegalArgumentException(&quot;Restaurant phone cannot exceed 20 characters&quot;);</span>
+            }
+<span class="fc" id="L262">            existingRestaurant.setPhone(restaurant.getPhone().trim());</span>
+        }
+        
+        // Preserve ownerId and status from existing restaurant
+        // (they should not be updated via this method)
+        
+<span class="fc" id="L268">        return restaurantRepository.save(existingRestaurant);</span>
+    }
+    
+    /**
+     * Delete restaurant
+     */
+    public void deleteRestaurant(Long id) {
+<span class="fc bfc" id="L275" title="All 4 branches covered.">        if (id == null || id &lt;= 0) {</span>
+<span class="fc" id="L276">            throw new IllegalArgumentException(&quot;Restaurant ID must be positive&quot;);</span>
+        }
+        
+        // Verify restaurant exists
+<span class="fc" id="L280">        getRestaurantById(id);</span>
+        
+<span class="fc" id="L282">        restaurantRepository.delete(id);</span>
+<span class="fc" id="L283">    }</span>
+    
+    /**
+     * بررسی وجود رستوران با شناسه
+     * 
+     * @param id شناسه رستوران
+     * @return true اگر رستوران وجود داشته باشد
+     */
+    public boolean existsById(Long id) {
+<span class="fc bfc" id="L292" title="All 4 branches covered.">        if (id == null || id &lt;= 0) {</span>
+<span class="fc" id="L293">            return false;</span>
+        }
+        
+<span class="fc" id="L296">        return restaurantRepository.findById(id).isPresent();</span>
+    }
+    
+    /**
+     * دریافت رستوران‌های در انتظار تأیید (برای مدیران)
+     * 
+     * @return لیست رستوران‌های PENDING
+     */
+    public List&lt;Restaurant&gt; getPendingRestaurants() {
+<span class="fc" id="L305">        return restaurantRepository.findByStatus(RestaurantStatus.PENDING);</span>
+    }
+    
+    /**
+     * تأیید رستوران - تغییر وضعیت به APPROVED
+     * 
+     * @param id شناسه رستوران
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه
+     * @throws NotFoundException در صورت یافت نشدن رستوران
+     */
+    public void approveRestaurant(Long id) {
+<span class="fc" id="L316">        updateRestaurantStatus(id, RestaurantStatus.APPROVED);</span>
+<span class="fc" id="L317">    }</span>
+    
+    /**
+     * رد رستوران - تغییر وضعیت به REJECTED
+     * 
+     * @param id شناسه رستوران
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه
+     * @throws NotFoundException در صورت یافت نشدن رستوران
+     */
+    public void rejectRestaurant(Long id) {
+<span class="fc" id="L327">        updateRestaurantStatus(id, RestaurantStatus.REJECTED);</span>
+<span class="fc" id="L328">    }</span>
+    
+    /**
+     * تعلیق رستوران - تغییر وضعیت به SUSPENDED
+     * 
+     * @param id شناسه رستوران
+     * @throws IllegalArgumentException در صورت نامعتبر بودن شناسه
+     * @throws NotFoundException در صورت یافت نشدن رستوران
+     */
+    public void suspendRestaurant(Long id) {
+<span class="fc" id="L338">        updateRestaurantStatus(id, RestaurantStatus.SUSPENDED);</span>
+<span class="fc" id="L339">    }</span>
+    
+    /**
+     * Bulk update restaurant statuses - Optimized with async processing
+     */
+    public Future&lt;Void&gt; bulkUpdateRestaurantStatus(List&lt;Long&gt; restaurantIds, RestaurantStatus status) {
+<span class="nc bnc" id="L345" title="All 4 branches missed.">        if (restaurantIds == null || restaurantIds.isEmpty()) {</span>
+<span class="nc" id="L346">            throw new IllegalArgumentException(&quot;Restaurant IDs cannot be null or empty&quot;);</span>
+        }
+<span class="nc bnc" id="L348" title="All 2 branches missed.">        if (status == null) {</span>
+<span class="nc" id="L349">            throw new IllegalArgumentException(&quot;Status cannot be null&quot;);</span>
+        }
+        
+<span class="nc" id="L352">        return PerformanceUtil.executeAsync(() -&gt; {</span>
+<span class="nc" id="L353">            PerformanceUtil.measurePerformance(&quot;bulkUpdateRestaurantStatus&quot;, () -&gt; {</span>
+                // Process in batches of 50
+<span class="nc" id="L355">                PerformanceUtil.processBatch(restaurantIds, 50, batch -&gt; {</span>
+<span class="nc bnc" id="L356" title="All 2 branches missed.">                    for (Long id : batch) {</span>
+                        try {
+<span class="nc" id="L358">                            updateRestaurantStatus(id, status);</span>
+<span class="nc" id="L359">                        } catch (Exception e) {</span>
+<span class="nc" id="L360">                            System.err.println(&quot;Failed to update restaurant &quot; + id + &quot;: &quot; + e.getMessage());</span>
+<span class="nc" id="L361">                        }</span>
+<span class="nc" id="L362">                    }</span>
+<span class="nc" id="L363">                    return new ArrayList&lt;&gt;(); // Return empty list as required by Function interface</span>
+                });
+                
+                // Clear relevant caches after bulk update
+<span class="nc" id="L367">                clearRestaurantCaches();</span>
+<span class="nc" id="L368">                return null;</span>
+            });
+<span class="nc" id="L370">        });</span>
+    }
+    
+    /**
+     * Bulk approve restaurants - Optimized async operation
+     */
+    public Future&lt;Void&gt; bulkApproveRestaurants(List&lt;Long&gt; restaurantIds) {
+<span class="nc" id="L377">        return bulkUpdateRestaurantStatus(restaurantIds, RestaurantStatus.APPROVED);</span>
+    }
+    
+    /**
+     * Clear restaurant-related caches after data modifications
+     */
+    private void clearRestaurantCaches() {
+        // Clear specific cache keys
+<span class="nc" id="L385">        String approvedKey = PerformanceUtil.createQueryCacheKey(&quot;approved_restaurants&quot;);</span>
+<span class="nc" id="L386">        String statsKey = PerformanceUtil.createQueryCacheKey(&quot;restaurant_statistics&quot;);</span>
+        
+        // Note: PerformanceUtil doesn't have specific key removal, so we'd need to add that
+        // For now, we can force a cache cleanup
+<span class="nc" id="L390">        PerformanceUtil.cleanExpiredEntries();</span>
+<span class="nc" id="L391">    }</span>
+    
+    /**
+     * Get restaurant statistics - Optimized with caching and performance monitoring
+     */
+    public RestaurantStatistics getRestaurantStatistics() {
+<span class="fc" id="L397">        String cacheKey = PerformanceUtil.createQueryCacheKey(&quot;restaurant_statistics&quot;);</span>
+        
+<span class="fc" id="L399">        return PerformanceUtil.executeWithCache(</span>
+            cacheKey,
+            () -&gt; {
+<span class="fc" id="L402">                return PerformanceUtil.measurePerformance(&quot;calculateRestaurantStatistics&quot;, () -&gt; {</span>
+<span class="fc" id="L403">                    return calculateRestaurantStatisticsInternal();</span>
+<span class="fc" id="L404">                }).getResult();</span>
+            },
+            RestaurantStatistics.class,
+            30 // Cache for 30 minutes
+        );
+    }
+    
+    /**
+     * Calculate restaurant statistics without caching - for testing and internal use
+     */
+    private RestaurantStatistics calculateRestaurantStatisticsInternal() {
+<span class="fc" id="L415">        List&lt;Restaurant&gt; allRestaurants = getAllRestaurants();</span>
+        
+        // Check memory usage before processing large dataset
+<span class="pc bpc" id="L418" title="1 of 2 branches missed.">        if (PerformanceUtil.isMemoryUsageCritical()) {</span>
+<span class="nc" id="L419">            PerformanceUtil.forceGarbageCollection();</span>
+        }
+        
+<span class="fc" id="L422">        long totalCount = allRestaurants.size();</span>
+<span class="fc" id="L423">        long approvedCount = allRestaurants.parallelStream()</span>
+<span class="pc bnc" id="L424" title="All 2 branches missed.">                .filter(r -&gt; r.getStatus() == RestaurantStatus.APPROVED)</span>
+<span class="fc" id="L425">                .count();</span>
+<span class="fc" id="L426">        long pendingCount = allRestaurants.parallelStream()</span>
+<span class="pc bnc" id="L427" title="All 2 branches missed.">                .filter(r -&gt; r.getStatus() == RestaurantStatus.PENDING)</span>
+<span class="fc" id="L428">                .count();</span>
+<span class="fc" id="L429">        long rejectedCount = allRestaurants.parallelStream()</span>
+<span class="pc bnc" id="L430" title="All 2 branches missed.">                .filter(r -&gt; r.getStatus() == RestaurantStatus.REJECTED)</span>
+<span class="fc" id="L431">                .count();</span>
+<span class="fc" id="L432">        long suspendedCount = allRestaurants.parallelStream()</span>
+<span class="pc bnc" id="L433" title="All 2 branches missed.">                .filter(r -&gt; r.getStatus() == RestaurantStatus.SUSPENDED)</span>
+<span class="fc" id="L434">                .count();</span>
+        
+<span class="fc" id="L436">        return new RestaurantStatistics(totalCount, approvedCount, pendingCount, </span>
+                                      rejectedCount, suspendedCount);
+    }
+    
+    // متدهای خصوصی برای اعتبارسنجی
+    
+    /**
+     * اعتبارسنجی اطلاعات ورودی برای ثبت رستوران
+     * بررسی تمام محدودیت‌های کسب‌وکار برای اطلاعات رستوران
+     * 
+     * @param ownerId شناسه مالک رستوران
+     * @param name نام رستوران
+     * @param address آدرس رستوران
+     * @param phone شماره تلفن رستوران
+     * @throws IllegalArgumentException در صورت نامعتبر بودن هر کدام از ورودی‌ها
+     */
+    private void validateRegistrationInput(Long ownerId, String name, String address, String phone) {
+        // بررسی شناسه مالک
+<span class="fc bfc" id="L454" title="All 4 branches covered.">        if (ownerId == null || ownerId &lt;= 0) {</span>
+<span class="fc" id="L455">            throw new IllegalArgumentException(&quot;Owner ID must be positive&quot;);</span>
+        }
+        
+        // بررسی نام رستوران
+<span class="fc bfc" id="L459" title="All 4 branches covered.">        if (name == null || name.trim().isEmpty()) {</span>
+<span class="fc" id="L460">            throw new IllegalArgumentException(&quot;Restaurant name cannot be empty&quot;);</span>
+        }
+        
+<span class="fc bfc" id="L463" title="All 2 branches covered.">        if (name.trim().length() &gt; 100) {</span>
+<span class="fc" id="L464">            throw new IllegalArgumentException(&quot;Restaurant name cannot exceed 100 characters&quot;);</span>
+        }
+        
+        // بررسی آدرس رستوران
+<span class="fc bfc" id="L468" title="All 4 branches covered.">        if (address == null || address.trim().isEmpty()) {</span>
+<span class="fc" id="L469">            throw new IllegalArgumentException(&quot;Restaurant address cannot be empty&quot;);</span>
+        }
+        
+<span class="fc bfc" id="L472" title="All 2 branches covered.">        if (address.trim().length() &gt; 200) {</span>
+<span class="fc" id="L473">            throw new IllegalArgumentException(&quot;Restaurant address cannot exceed 200 characters&quot;);</span>
+        }
+        
+        // بررسی شماره تلفن
+<span class="fc bfc" id="L477" title="All 4 branches covered.">        if (phone == null || phone.trim().isEmpty()) {</span>
+<span class="fc" id="L478">            throw new IllegalArgumentException(&quot;Restaurant phone cannot be empty&quot;);</span>
+        }
+        
+<span class="fc bfc" id="L481" title="All 2 branches covered.">        if (phone.trim().length() &gt; 20) {</span>
+<span class="fc" id="L482">            throw new IllegalArgumentException(&quot;Restaurant phone cannot exceed 20 characters&quot;);</span>
+        }
+<span class="fc" id="L484">    }</span>
+    
+    // کلاس داخلی برای آمار رستوران‌ها
+    
+    /**
+     * کلاس آمار رستوران‌ها
+     * حاوی اطلاعات خلاصه از وضعیت رستوران‌ها در سیستم
+     */
+    public static class RestaurantStatistics {
+        private final long totalCount;      // تعداد کل رستوران‌ها
+        private final long approvedCount;   // تعداد رستوران‌های تأیید شده
+        private final long pendingCount;    // تعداد رستوران‌های در انتظار
+        private final long rejectedCount;   // تعداد رستوران‌های رد شده
+        private final long suspendedCount;  // تعداد رستوران‌های تعلیق شده
+        
+        /**
+         * سازنده آمار رستوران‌ها
+         * 
+         * @param totalCount تعداد کل
+         * @param approvedCount تعداد تأیید شده
+         * @param pendingCount تعداد در انتظار
+         * @param rejectedCount تعداد رد شده
+         * @param suspendedCount تعداد تعلیق شده
+         */
+        public RestaurantStatistics(long totalCount, long approvedCount, long pendingCount,
+<span class="fc" id="L509">                                  long rejectedCount, long suspendedCount) {</span>
+<span class="fc" id="L510">            this.totalCount = totalCount;</span>
+<span class="fc" id="L511">            this.approvedCount = approvedCount;</span>
+<span class="fc" id="L512">            this.pendingCount = pendingCount;</span>
+<span class="fc" id="L513">            this.rejectedCount = rejectedCount;</span>
+<span class="fc" id="L514">            this.suspendedCount = suspendedCount;</span>
+<span class="fc" id="L515">        }</span>
+        
+        // Getter methods برای دسترسی به آمار
+<span class="fc" id="L518">        public long getTotalCount() { return totalCount; }</span>
+<span class="fc" id="L519">        public long getApprovedCount() { return approvedCount; }</span>
+<span class="fc" id="L520">        public long getPendingCount() { return pendingCount; }</span>
+<span class="fc" id="L521">        public long getRejectedCount() { return rejectedCount; }</span>
+<span class="fc" id="L522">        public long getSuspendedCount() { return suspendedCount; }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

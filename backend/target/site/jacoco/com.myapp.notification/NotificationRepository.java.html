@@ -1,0 +1,713 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NotificationRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.notification</a> &gt; <span class="el_source">NotificationRepository.java</span></div><h1>NotificationRepository.java</h1><pre class="source lang-java linenums">package com.myapp.notification;
+
+import com.myapp.common.models.Notification;
+import com.myapp.common.models.Notification.NotificationType;
+import com.myapp.common.models.Notification.NotificationPriority;
+import com.myapp.common.utils.DatabaseUtil;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * لایه دسترسی به داده‌های اعلان‌ها (Repository Pattern)
+ * 
+ * این کلاس تمام عملیات دیتابیس مربوط به اعلان‌ها را مدیریت می‌کند:
+ * 
+ * === عملیات CRUD پایه ===
+ * - ایجاد، خواندن، به‌روزرسانی، حذف اعلان‌ها
+ * - مدیریت transaction ها و exception handling
+ * - Retry mechanism برای عملیات ناموفق
+ * 
+ * === جستجوی پیشرفته ===
+ * - جستجو بر اساس کاربر، نوع، اولویت
+ * - فیلتر اعلان‌های خوانده نشده
+ * - جستجوی اعلان‌های اخیر
+ * - Pagination support
+ * 
+ * === عملیات گروهی ===
+ * - علامت‌گذاری دسته‌ای به عنوان خوانده شده
+ * - حذف منطقی اعلان‌های قدیمی
+ * - حذف فیزیکی اعلان‌های منقضی
+ * - ذخیره دسته‌ای اعلان‌ها
+ * 
+ * === آمار و گزارش ===
+ * - تعداد اعلان‌های خوانده نشده
+ * - آمار بر اساس نوع اعلان
+ * - گزارش روزانه اعلان‌ها
+ * - آخرین اعلان کاربر
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Transaction Management: مدیریت امن تراکنش‌ها
+ * - Error Handling: مدیریت پیشرفته خطاها
+ * - Retry Logic: تکرار خودکار عملیات ناموفق
+ * - Soft Delete Support: پشتیبانی از حذف منطقی
+ * - Performance Optimization: بهینه‌سازی query ها
+ * - Batch Operations: عملیات گروهی برای کارایی
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+<span class="fc" id="L55">public class NotificationRepository {</span>
+
+    // ==================== BASIC CRUD OPERATIONS ====================
+    
+    /**
+     * ذخیره اعلان جدید در دیتابیس
+     * 
+     * از transaction management برای تضمین consistency استفاده می‌کند
+     * در صورت خطا، transaction را rollback می‌کند
+     * 
+     * @param notification اعلان برای ذخیره
+     * @return اعلان ذخیره شده با ID
+     * @throws RuntimeException در صورت خطا در ذخیره‌سازی
+     */
+    public Notification save(Notification notification) {
+<span class="fc" id="L70">        Transaction transaction = null;</span>
+<span class="fc" id="L71">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L72">            transaction = session.beginTransaction();</span>
+<span class="fc" id="L73">            session.persist(notification);</span>
+<span class="fc" id="L74">            transaction.commit();</span>
+<span class="fc" id="L75">            return notification;</span>
+<span class="nc" id="L76">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">            if (transaction != null) {</span>
+<span class="nc" id="L78">                transaction.rollback();</span>
+            }
+<span class="nc" id="L80">            throw new RuntimeException(&quot;Error saving notification: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * جستجوی اعلان بر اساس شناسه
+     * 
+     * @param id شناسه اعلان
+     * @return Optional حاوی اعلان یا empty
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public Optional&lt;Notification&gt; findById(Long id) {
+<span class="fc" id="L92">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L93">            Notification notification = session.get(Notification.class, id);</span>
+<span class="fc" id="L94">            return Optional.ofNullable(notification);</span>
+<span class="nc" id="L95">        } catch (Exception e) {</span>
+<span class="nc" id="L96">            throw new RuntimeException(&quot;Error finding notification by id: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * به‌روزرسانی اعلان موجود
+     * 
+     * از retry mechanism برای مقابله با lock exception ها استفاده می‌کند
+     * 
+     * @param notification اعلان برای به‌روزرسانی
+     * @return اعلان به‌روزرسانی شده
+     * @throws RuntimeException در صورت شکست تمام تلاش‌ها
+     */
+    public Notification update(Notification notification) {
+<span class="fc" id="L110">        return updateWithRetry(notification, 3);</span>
+    }
+
+    /**
+     * به‌روزرسانی با قابلیت تکرار خودکار
+     * 
+     * در صورت database lock، عملیات را دوباره تکرار می‌کند
+     * از exponential backoff برای جلوگیری از فشار بیش از حد استفاده می‌کند
+     * 
+     * @param notification اعلان برای به‌روزرسانی
+     * @param maxRetries حداکثر تعداد تلاش
+     * @return اعلان به‌روزرسانی شده
+     */
+    private Notification updateWithRetry(Notification notification, int maxRetries) {
+<span class="fc" id="L124">        Transaction transaction = null;</span>
+<span class="fc" id="L125">        Exception lastException = null;</span>
+        
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">        for (int attempt = 1; attempt &lt;= maxRetries; attempt++) {</span>
+<span class="fc" id="L128">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L129">            transaction = session.beginTransaction();</span>
+<span class="fc" id="L130">            session.merge(notification);</span>
+<span class="fc" id="L131">            transaction.commit();</span>
+<span class="fc" id="L132">            return notification;</span>
+<span class="nc" id="L133">        } catch (Exception e) {</span>
+<span class="nc" id="L134">                lastException = e;</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">            if (transaction != null) {</span>
+<span class="nc" id="L136">                transaction.rollback();</span>
+            }
+                
+                // بررسی امکان تکرار عملیات
+<span class="nc bnc" id="L140" title="All 4 branches missed.">                if (isRetryableException(e) &amp;&amp; attempt &lt; maxRetries) {</span>
+                    try {
+                        // Exponential backoff: 50ms, 100ms, 200ms
+<span class="nc" id="L143">                        Thread.sleep(50 * attempt);</span>
+<span class="nc" id="L144">                    } catch (InterruptedException ie) {</span>
+<span class="nc" id="L145">                        Thread.currentThread().interrupt();</span>
+<span class="nc" id="L146">                        break;</span>
+<span class="nc" id="L147">                    }</span>
+<span class="nc" id="L148">                    continue;</span>
+                }
+<span class="nc" id="L150">                break;</span>
+            }
+        }
+        
+<span class="nc" id="L154">        throw new RuntimeException(&quot;Error updating notification after &quot; + maxRetries + &quot; attempts: &quot; + lastException.getMessage(), lastException);</span>
+        }
+
+    /**
+     * بررسی امکان تکرار عملیات بر اساس نوع خطا
+     * 
+     * @param e exception رخ داده
+     * @return true اگر عملیات قابل تکرار باشد
+     */
+    private boolean isRetryableException(Exception e) {
+<span class="nc" id="L164">        String message = e.getMessage().toLowerCase();</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">        return message.contains(&quot;database is locked&quot;) || </span>
+<span class="nc bnc" id="L166" title="All 2 branches missed.">               message.contains(&quot;sqlite_busy&quot;) ||</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">               message.contains(&quot;lockacquisitionexception&quot;);</span>
+    }
+
+    /**
+     * حذف فیزیکی اعلان از دیتابیس
+     * 
+     * توجه: معمولاً از softDelete استفاده کنید
+     * 
+     * @param notification اعلان برای حذف
+     * @throws RuntimeException در صورت خطا در حذف
+     */
+    public void delete(Notification notification) {
+<span class="fc" id="L179">        Transaction transaction = null;</span>
+<span class="fc" id="L180">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L181">            transaction = session.beginTransaction();</span>
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">            session.remove(session.contains(notification) ? notification : session.merge(notification));</span>
+<span class="fc" id="L183">            transaction.commit();</span>
+<span class="nc" id="L184">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">            if (transaction != null) {</span>
+<span class="nc" id="L186">                transaction.rollback();</span>
+            }
+<span class="nc" id="L188">            throw new RuntimeException(&quot;Error deleting notification: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L189">        }</span>
+<span class="fc" id="L190">    }</span>
+
+    // ==================== FIND OPERATIONS ====================
+    
+    /**
+     * دریافت تمام اعلان‌های یک کاربر
+     * 
+     * فقط اعلان‌های حذف نشده را برمی‌گرداند
+     * نتایج بر اساس تاریخ ایجاد نزولی مرتب شده‌اند
+     * 
+     * @param userId شناسه کاربر
+     * @return لیست اعلان‌های کاربر
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Notification&gt; findByUserId(Long userId) {
+<span class="fc" id="L205">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L206">            String hql = &quot;FROM Notification n WHERE n.userId = :userId AND n.isDeleted = false ORDER BY n.createdAt DESC&quot;;</span>
+<span class="fc" id="L207">            Query&lt;Notification&gt; query = session.createQuery(hql, Notification.class);</span>
+<span class="fc" id="L208">            query.setParameter(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L209">            return query.getResultList();</span>
+<span class="nc" id="L210">        } catch (Exception e) {</span>
+<span class="nc" id="L211">            throw new RuntimeException(&quot;Error finding notifications by user id: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * دریافت اعلان‌های کاربر با صفحه‌بندی
+     * 
+     * برای نمایش اعلان‌ها در قسمت‌های مختلف UI
+     * 
+     * @param userId شناسه کاربر
+     * @param page شماره صفحه (شروع از 0)
+     * @param size تعداد آیتم در هر صفحه
+     * @return لیست اعلان‌های صفحه درخواستی
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Notification&gt; findByUserIdPaginated(Long userId, int page, int size) {
+<span class="fc" id="L227">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L228">            String hql = &quot;FROM Notification n WHERE n.userId = :userId AND n.isDeleted = false ORDER BY n.createdAt DESC&quot;;</span>
+<span class="fc" id="L229">            Query&lt;Notification&gt; query = session.createQuery(hql, Notification.class);</span>
+<span class="fc" id="L230">            query.setParameter(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L231">            query.setFirstResult(page * size);</span>
+<span class="fc" id="L232">            query.setMaxResults(size);</span>
+<span class="fc" id="L233">            return query.getResultList();</span>
+<span class="nc" id="L234">        } catch (Exception e) {</span>
+<span class="nc" id="L235">            throw new RuntimeException(&quot;Error finding paginated notifications: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * دریافت اعلان‌های خوانده نشده کاربر
+     * 
+     * برای نمایش badge تعداد اعلان‌های جدید
+     * 
+     * @param userId شناسه کاربر
+     * @return لیست اعلان‌های خوانده نشده
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Notification&gt; findUnreadByUserId(Long userId) {
+<span class="fc" id="L249">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L250">            String hql = &quot;FROM Notification n WHERE n.userId = :userId AND n.isRead = false AND n.isDeleted = false ORDER BY n.createdAt DESC&quot;;</span>
+<span class="fc" id="L251">            Query&lt;Notification&gt; query = session.createQuery(hql, Notification.class);</span>
+<span class="fc" id="L252">            query.setParameter(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L253">            return query.getResultList();</span>
+<span class="nc" id="L254">        } catch (Exception e) {</span>
+<span class="nc" id="L255">            throw new RuntimeException(&quot;Error finding unread notifications: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * دریافت اعلان‌های کاربر بر اساس نوع
+     * 
+     * @param userId شناسه کاربر
+     * @param type نوع اعلان (ORDER_CREATED، PAYMENT_UPDATE، ...)
+     * @return لیست اعلان‌های از نوع مشخص
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Notification&gt; findByUserIdAndType(Long userId, NotificationType type) {
+<span class="fc" id="L268">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L269">            String hql = &quot;FROM Notification n WHERE n.userId = :userId AND n.type = :type AND n.isDeleted = false ORDER BY n.createdAt DESC&quot;;</span>
+<span class="fc" id="L270">            Query&lt;Notification&gt; query = session.createQuery(hql, Notification.class);</span>
+<span class="fc" id="L271">            query.setParameter(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L272">            query.setParameter(&quot;type&quot;, type);</span>
+<span class="fc" id="L273">            return query.getResultList();</span>
+<span class="nc" id="L274">        } catch (Exception e) {</span>
+<span class="nc" id="L275">            throw new RuntimeException(&quot;Error finding notifications by type: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * دریافت اعلان‌های کاربر بر اساس اولویت
+     * 
+     * @param userId شناسه کاربر
+     * @param priority سطح اولویت (LOW، NORMAL، HIGH، URGENT)
+     * @return لیست اعلان‌های با اولویت مشخص
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Notification&gt; findByUserIdAndPriority(Long userId, NotificationPriority priority) {
+<span class="fc" id="L288">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L289">            String hql = &quot;FROM Notification n WHERE n.userId = :userId AND n.priority = :priority AND n.isDeleted = false ORDER BY n.createdAt DESC&quot;;</span>
+<span class="fc" id="L290">            Query&lt;Notification&gt; query = session.createQuery(hql, Notification.class);</span>
+<span class="fc" id="L291">            query.setParameter(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L292">            query.setParameter(&quot;priority&quot;, priority);</span>
+<span class="fc" id="L293">            return query.getResultList();</span>
+<span class="nc" id="L294">        } catch (Exception e) {</span>
+<span class="nc" id="L295">            throw new RuntimeException(&quot;Error finding notifications by priority: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * دریافت اعلان‌های فوری کاربر
+     * 
+     * فقط اعلان‌های با اولویت HIGH برمی‌گرداند
+     * 
+     * @param userId شناسه کاربر
+     * @return لیست اعلان‌های فوری
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Notification&gt; findHighPriorityByUserId(Long userId) {
+<span class="fc" id="L309">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L310">            String hql = &quot;FROM Notification n WHERE n.userId = :userId AND n.priority = :priority AND n.isDeleted = false ORDER BY n.createdAt DESC&quot;;</span>
+<span class="fc" id="L311">            Query&lt;Notification&gt; query = session.createQuery(hql, Notification.class);</span>
+<span class="fc" id="L312">            query.setParameter(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L313">            query.setParameter(&quot;priority&quot;, NotificationPriority.HIGH);</span>
+<span class="fc" id="L314">            return query.getResultList();</span>
+<span class="nc" id="L315">        } catch (Exception e) {</span>
+<span class="nc" id="L316">            throw new RuntimeException(&quot;Error finding high priority notifications: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * دریافت اعلان‌های اخیر کاربر
+     * 
+     * @param userId شناسه کاربر
+     * @param days تعداد روزهای گذشته
+     * @return لیست اعلان‌های اخیر
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Notification&gt; findRecentByUserId(Long userId, int days) {
+<span class="fc" id="L329">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L330">            LocalDateTime since = LocalDateTime.now().minusDays(days);</span>
+<span class="fc" id="L331">            String hql = &quot;FROM Notification n WHERE n.userId = :userId AND n.createdAt &gt;= :since AND n.isDeleted = false ORDER BY n.createdAt DESC&quot;;</span>
+<span class="fc" id="L332">            Query&lt;Notification&gt; query = session.createQuery(hql, Notification.class);</span>
+<span class="fc" id="L333">            query.setParameter(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L334">            query.setParameter(&quot;since&quot;, since);</span>
+<span class="fc" id="L335">            return query.getResultList();</span>
+<span class="nc" id="L336">        } catch (Exception e) {</span>
+<span class="nc" id="L337">            throw new RuntimeException(&quot;Error finding recent notifications: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    // ==================== ENTITY-SPECIFIC QUERIES ====================
+    
+    /**
+     * دریافت تمام اعلان‌های مربوط به یک سفارش
+     * 
+     * شامل اعلان‌های ثبت، تغییر وضعیت، و اختصاص پیک
+     * 
+     * @param orderId شناسه سفارش
+     * @return لیست اعلان‌های مربوط به سفارش
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Notification&gt; findOrderNotifications(Long orderId) {
+<span class="fc" id="L353">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L354">            String hql = &quot;FROM Notification n WHERE n.relatedEntityId = :orderId AND n.type IN (:orderTypes) AND n.isDeleted = false ORDER BY n.createdAt DESC&quot;;</span>
+<span class="fc" id="L355">            Query&lt;Notification&gt; query = session.createQuery(hql, Notification.class);</span>
+<span class="fc" id="L356">            query.setParameter(&quot;orderId&quot;, orderId);</span>
+<span class="fc" id="L357">            query.setParameter(&quot;orderTypes&quot;, List.of(NotificationType.ORDER_CREATED, NotificationType.ORDER_STATUS_CHANGED, NotificationType.DELIVERY_ASSIGNED));</span>
+<span class="fc" id="L358">            return query.getResultList();</span>
+<span class="nc" id="L359">        } catch (Exception e) {</span>
+<span class="nc" id="L360">            throw new RuntimeException(&quot;Error finding order notifications: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * دریافت اعلان‌های سفارش برای کاربر خاص
+     * 
+     * @param userId شناسه کاربر
+     * @param orderId شناسه سفارش
+     * @return لیست اعلان‌های سفارش کاربر
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Notification&gt; findUserOrderNotifications(Long userId, Long orderId) {
+<span class="fc" id="L373">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L374">            String hql = &quot;FROM Notification n WHERE n.userId = :userId AND n.relatedEntityId = :orderId AND n.type IN (:orderTypes) AND n.isDeleted = false ORDER BY n.createdAt DESC&quot;;</span>
+<span class="fc" id="L375">            Query&lt;Notification&gt; query = session.createQuery(hql, Notification.class);</span>
+<span class="fc" id="L376">            query.setParameter(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L377">            query.setParameter(&quot;orderId&quot;, orderId);</span>
+<span class="fc" id="L378">            query.setParameter(&quot;orderTypes&quot;, List.of(NotificationType.ORDER_CREATED, NotificationType.ORDER_STATUS_CHANGED, NotificationType.DELIVERY_ASSIGNED));</span>
+<span class="fc" id="L379">            return query.getResultList();</span>
+<span class="nc" id="L380">        } catch (Exception e) {</span>
+<span class="nc" id="L381">            throw new RuntimeException(&quot;Error finding user order notifications: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * دریافت اعلان‌های مربوط به رستوران
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست اعلان‌های رستوران
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Notification&gt; findRestaurantNotifications(Long restaurantId) {
+<span class="nc" id="L393">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L394">            String hql = &quot;FROM Notification n WHERE n.relatedEntityId = :restaurantId AND n.type = :type AND n.isDeleted = false ORDER BY n.createdAt DESC&quot;;</span>
+<span class="nc" id="L395">            Query&lt;Notification&gt; query = session.createQuery(hql, Notification.class);</span>
+<span class="nc" id="L396">            query.setParameter(&quot;restaurantId&quot;, restaurantId);</span>
+<span class="nc" id="L397">            query.setParameter(&quot;type&quot;, NotificationType.RESTAURANT_APPROVED);</span>
+<span class="nc" id="L398">            return query.getResultList();</span>
+<span class="nc" id="L399">        } catch (Exception e) {</span>
+<span class="nc" id="L400">            throw new RuntimeException(&quot;Error finding restaurant notifications: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * دریافت اعلان‌های مربوط به تحویل
+     * 
+     * @param deliveryId شناسه تحویل
+     * @return لیست اعلان‌های تحویل
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Notification&gt; findDeliveryNotifications(Long deliveryId) {
+<span class="nc" id="L412">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L413">            String hql = &quot;FROM Notification n WHERE n.relatedEntityId = :deliveryId AND n.type = :type AND n.isDeleted = false ORDER BY n.createdAt DESC&quot;;</span>
+<span class="nc" id="L414">            Query&lt;Notification&gt; query = session.createQuery(hql, Notification.class);</span>
+<span class="nc" id="L415">            query.setParameter(&quot;deliveryId&quot;, deliveryId);</span>
+<span class="nc" id="L416">            query.setParameter(&quot;type&quot;, NotificationType.DELIVERY_ASSIGNED);</span>
+<span class="nc" id="L417">            return query.getResultList();</span>
+<span class="nc" id="L418">        } catch (Exception e) {</span>
+<span class="nc" id="L419">            throw new RuntimeException(&quot;Error finding delivery notifications: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    // ==================== BULK OPERATIONS ====================
+    
+    /**
+     * علامت‌گذاری تمام اعلان‌های کاربر به عنوان خوانده شده
+     * 
+     * عملیات bulk update برای بهینه‌سازی performance
+     * 
+     * @param userId شناسه کاربر
+     * @return تعداد اعلان‌های به‌روزرسانی شده
+     * @throws RuntimeException در صورت خطا در به‌روزرسانی
+     */
+    public int markAllAsReadForUser(Long userId) {
+<span class="fc" id="L435">        Transaction transaction = null;</span>
+<span class="fc" id="L436">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L437">            transaction = session.beginTransaction();</span>
+<span class="fc" id="L438">            String hql = &quot;UPDATE Notification n SET n.isRead = true, n.readAt = :readAt WHERE n.userId = :userId AND n.isRead = false AND n.isDeleted = false&quot;;</span>
+<span class="fc" id="L439">            Query&lt;?&gt; query = session.createQuery(hql);</span>
+<span class="fc" id="L440">            query.setParameter(&quot;readAt&quot;, LocalDateTime.now());</span>
+<span class="fc" id="L441">            query.setParameter(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L442">            int result = query.executeUpdate();</span>
+<span class="fc" id="L443">            transaction.commit();</span>
+<span class="fc" id="L444">            return result;</span>
+<span class="nc" id="L445">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L446" title="All 2 branches missed.">            if (transaction != null) {</span>
+<span class="nc" id="L447">                transaction.rollback();</span>
+            }
+<span class="nc" id="L449">            throw new RuntimeException(&quot;Error marking all notifications as read: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * علامت‌گذاری اعلان‌های نوع خاص به عنوان خوانده شده
+     * 
+     * @param userId شناسه کاربر
+     * @param type نوع اعلان
+     * @return تعداد اعلان‌های به‌روزرسانی شده
+     * @throws RuntimeException در صورت خطا در به‌روزرسانی
+     */
+    public int markAsReadByType(Long userId, NotificationType type) {
+<span class="fc" id="L462">        Transaction transaction = null;</span>
+<span class="fc" id="L463">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L464">            transaction = session.beginTransaction();</span>
+<span class="fc" id="L465">            String hql = &quot;UPDATE Notification n SET n.isRead = true, n.readAt = :readAt WHERE n.userId = :userId AND n.type = :type AND n.isRead = false AND n.isDeleted = false&quot;;</span>
+<span class="fc" id="L466">            Query&lt;?&gt; query = session.createQuery(hql);</span>
+<span class="fc" id="L467">            query.setParameter(&quot;readAt&quot;, LocalDateTime.now());</span>
+<span class="fc" id="L468">            query.setParameter(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L469">            query.setParameter(&quot;type&quot;, type);</span>
+<span class="fc" id="L470">            int result = query.executeUpdate();</span>
+<span class="fc" id="L471">            transaction.commit();</span>
+<span class="fc" id="L472">            return result;</span>
+<span class="nc" id="L473">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L474" title="All 2 branches missed.">            if (transaction != null) {</span>
+<span class="nc" id="L475">                transaction.rollback();</span>
+            }
+<span class="nc" id="L477">            throw new RuntimeException(&quot;Error marking notifications as read by type: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * حذف منطقی اعلان‌های قدیمی
+     * 
+     * اعلان‌ها را حذف نمی‌کند بلکه فقط علامت حذف می‌زند
+     * برای نگهداری تاریخچه و compliance
+     * 
+     * @param daysOld تعداد روزهای قدیمی بودن
+     * @return تعداد اعلان‌های حذف شده
+     * @throws RuntimeException در صورت خطا در حذف
+     */
+    public int softDeleteOldNotifications(int daysOld) {
+<span class="fc" id="L492">        Transaction transaction = null;</span>
+<span class="fc" id="L493">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L494">            transaction = session.beginTransaction();</span>
+<span class="fc" id="L495">            LocalDateTime cutoffDate = LocalDateTime.now().minusDays(daysOld);</span>
+<span class="fc" id="L496">            String hql = &quot;UPDATE Notification n SET n.isDeleted = true, n.deletedAt = :deletedAt WHERE n.createdAt &lt; :cutoffDate AND n.isDeleted = false&quot;;</span>
+<span class="fc" id="L497">            Query&lt;?&gt; query = session.createQuery(hql);</span>
+<span class="fc" id="L498">            query.setParameter(&quot;deletedAt&quot;, LocalDateTime.now());</span>
+<span class="fc" id="L499">            query.setParameter(&quot;cutoffDate&quot;, cutoffDate);</span>
+<span class="fc" id="L500">            int result = query.executeUpdate();</span>
+<span class="fc" id="L501">            transaction.commit();</span>
+<span class="fc" id="L502">            return result;</span>
+<span class="nc" id="L503">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L504" title="All 2 branches missed.">            if (transaction != null) {</span>
+<span class="nc" id="L505">                transaction.rollback();</span>
+            }
+<span class="nc" id="L507">            throw new RuntimeException(&quot;Error soft deleting old notifications: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * حذف فیزیکی اعلان‌های منقضی
+     * 
+     * اعلان‌هایی که قبلاً soft delete شده‌اند را کاملاً حذف می‌کند
+     * برای بهینه‌سازی فضای دیتابیس
+     * 
+     * @param daysOld تعداد روزهای انقضا
+     * @return تعداد اعلان‌های حذف شده
+     * @throws RuntimeException در صورت خطا در حذف
+     */
+    public int hardDeleteOldNotifications(int daysOld) {
+<span class="fc" id="L522">        Transaction transaction = null;</span>
+<span class="fc" id="L523">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L524">            transaction = session.beginTransaction();</span>
+<span class="fc" id="L525">            LocalDateTime cutoffDate = LocalDateTime.now().minusDays(daysOld);</span>
+<span class="fc" id="L526">            String hql = &quot;DELETE FROM Notification n WHERE n.deletedAt &lt; :cutoffDate AND n.isDeleted = true&quot;;</span>
+<span class="fc" id="L527">            Query&lt;?&gt; query = session.createQuery(hql);</span>
+<span class="fc" id="L528">            query.setParameter(&quot;cutoffDate&quot;, cutoffDate);</span>
+<span class="fc" id="L529">            int result = query.executeUpdate();</span>
+<span class="fc" id="L530">            transaction.commit();</span>
+<span class="fc" id="L531">            return result;</span>
+<span class="nc" id="L532">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L533" title="All 2 branches missed.">            if (transaction != null) {</span>
+<span class="nc" id="L534">                transaction.rollback();</span>
+            }
+<span class="nc" id="L536">            throw new RuntimeException(&quot;Error hard deleting old notifications: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    // ==================== STATISTICS AND COUNTS ====================
+    
+    /**
+     * دریافت تعداد اعلان‌های خوانده نشده کاربر
+     * 
+     * @param userId شناسه کاربر
+     * @return تعداد اعلان‌های خوانده نشده
+     * @throws RuntimeException در صورت خطا در شمارش
+     */
+    public long getUnreadCount(Long userId) {
+<span class="fc" id="L550">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L551">            String hql = &quot;SELECT COUNT(n) FROM Notification n WHERE n.userId = :userId AND n.isRead = false AND n.isDeleted = false&quot;;</span>
+<span class="fc" id="L552">            Query&lt;Long&gt; query = session.createQuery(hql, Long.class);</span>
+<span class="fc" id="L553">            query.setParameter(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L554">            return query.getSingleResult();</span>
+<span class="nc" id="L555">        } catch (Exception e) {</span>
+<span class="nc" id="L556">            throw new RuntimeException(&quot;Error getting unread count: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * دریافت تعداد اعلان‌های کاربر بر اساس نوع
+     * 
+     * @param userId شناسه کاربر
+     * @param type نوع اعلان
+     * @return تعداد اعلان‌های نوع مشخص
+     * @throws RuntimeException در صورت خطا در شمارش
+     */
+    public long getNotificationCountByType(Long userId, NotificationType type) {
+<span class="fc" id="L569">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L570">            String hql = &quot;SELECT COUNT(n) FROM Notification n WHERE n.userId = :userId AND n.type = :type AND n.isDeleted = false&quot;;</span>
+<span class="fc" id="L571">            Query&lt;Long&gt; query = session.createQuery(hql, Long.class);</span>
+<span class="fc" id="L572">            query.setParameter(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L573">            query.setParameter(&quot;type&quot;, type);</span>
+<span class="fc" id="L574">            return query.getSingleResult();</span>
+<span class="nc" id="L575">        } catch (Exception e) {</span>
+<span class="nc" id="L576">            throw new RuntimeException(&quot;Error getting notification count by type: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * دریافت تعداد اعلان‌های فوری خوانده نشده
+     * 
+     * @param userId شناسه کاربر
+     * @return تعداد اعلان‌های فوری خوانده نشده
+     * @throws RuntimeException در صورت خطا در شمارش
+     */
+    public long getHighPriorityUnreadCount(Long userId) {
+<span class="fc" id="L588">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L589">            String hql = &quot;SELECT COUNT(n) FROM Notification n WHERE n.userId = :userId AND n.priority = :priority AND n.isRead = false AND n.isDeleted = false&quot;;</span>
+<span class="fc" id="L590">            Query&lt;Long&gt; query = session.createQuery(hql, Long.class);</span>
+<span class="fc" id="L591">            query.setParameter(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L592">            query.setParameter(&quot;priority&quot;, NotificationPriority.HIGH);</span>
+<span class="fc" id="L593">            return query.getSingleResult();</span>
+<span class="nc" id="L594">        } catch (Exception e) {</span>
+<span class="nc" id="L595">            throw new RuntimeException(&quot;Error getting high priority unread count: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * دریافت آخرین اعلان کاربر
+     * 
+     * @param userId شناسه کاربر
+     * @return Optional حاوی آخرین اعلان یا empty
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public Optional&lt;Notification&gt; getLatestNotification(Long userId) {
+<span class="fc" id="L607">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L608">            String hql = &quot;FROM Notification n WHERE n.userId = :userId AND n.isDeleted = false ORDER BY n.createdAt DESC&quot;;</span>
+<span class="fc" id="L609">            Query&lt;Notification&gt; query = session.createQuery(hql, Notification.class);</span>
+<span class="fc" id="L610">            query.setParameter(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L611">            query.setMaxResults(1);</span>
+<span class="fc" id="L612">            List&lt;Notification&gt; results = query.getResultList();</span>
+<span class="pc bpc" id="L613" title="1 of 2 branches missed.">            return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));</span>
+<span class="nc" id="L614">        } catch (Exception e) {</span>
+<span class="nc" id="L615">            throw new RuntimeException(&quot;Error getting latest notification: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * دریافت آمار اعلان‌ها بر اساس نوع
+     * 
+     * نتیجه: [نوع، تعداد کل، تعداد خوانده نشده]
+     * 
+     * @param userId شناسه کاربر
+     * @return لیست آرایه‌های آماری
+     * @throws RuntimeException در صورت خطا در محاسبه آمار
+     */
+    public List&lt;Object[]&gt; getNotificationStatsByType(Long userId) {
+<span class="fc" id="L629">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L630">            String hql = &quot;SELECT n.type, COUNT(n), SUM(CASE WHEN n.isRead = false THEN 1 ELSE 0 END) FROM Notification n WHERE n.userId = :userId AND n.isDeleted = false GROUP BY n.type&quot;;</span>
+<span class="fc" id="L631">            Query&lt;Object[]&gt; query = session.createQuery(hql, Object[].class);</span>
+<span class="fc" id="L632">            query.setParameter(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L633">            return query.getResultList();</span>
+<span class="nc" id="L634">        } catch (Exception e) {</span>
+<span class="nc" id="L635">            throw new RuntimeException(&quot;Error getting notification stats by type: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * دریافت آمار روزانه اعلان‌ها
+     * 
+     * نتیجه: [تاریخ، تعداد اعلان‌ها]
+     * 
+     * @param userId شناسه کاربر
+     * @param days تعداد روزهای گذشته
+     * @return لیست آمار روزانه
+     * @throws RuntimeException در صورت خطا در محاسبه آمار
+     */
+    public List&lt;Object[]&gt; getDailyNotificationCounts(Long userId, int days) {
+<span class="fc" id="L650">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L651">            LocalDateTime since = LocalDateTime.now().minusDays(days);</span>
+<span class="fc" id="L652">            String hql = &quot;SELECT DATE(n.createdAt), COUNT(n) FROM Notification n WHERE n.userId = :userId AND n.createdAt &gt;= :since AND n.isDeleted = false GROUP BY DATE(n.createdAt) ORDER BY DATE(n.createdAt) DESC&quot;;</span>
+<span class="fc" id="L653">            Query&lt;Object[]&gt; query = session.createQuery(hql, Object[].class);</span>
+<span class="fc" id="L654">            query.setParameter(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L655">            query.setParameter(&quot;since&quot;, since);</span>
+<span class="fc" id="L656">            return query.getResultList();</span>
+<span class="nc" id="L657">        } catch (Exception e) {</span>
+<span class="nc" id="L658">            throw new RuntimeException(&quot;Error getting daily notification counts: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    // ==================== BROADCAST OPERATIONS ====================
+    
+    /**
+     * دریافت شناسه تمام کاربران فعال
+     * 
+     * برای ارسال اعلان‌های عمومی (broadcast)
+     * 
+     * @return لیست شناسه کاربران فعال
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Long&gt; getAllActiveUserIds() {
+<span class="fc" id="L673">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L674">            String hql = &quot;SELECT DISTINCT u.id FROM User u WHERE u.isActive = true&quot;;</span>
+<span class="fc" id="L675">            Query&lt;Long&gt; query = session.createQuery(hql, Long.class);</span>
+<span class="fc" id="L676">            return query.getResultList();</span>
+<span class="nc" id="L677">        } catch (Exception e) {</span>
+<span class="nc" id="L678">            throw new RuntimeException(&quot;Error getting all active user ids: &quot; + e.getMessage(), e);</span>
+        }
+    }
+
+    /**
+     * ذخیره دسته‌ای اعلان‌ها
+     * 
+     * برای بهینه‌سازی performance هنگام ارسال اعلان‌های گروهی
+     * از batch processing برای کاهش تعداد round-trip ها استفاده می‌کند
+     * 
+     * @param notifications لیست اعلان‌ها برای ذخیره
+     * @throws RuntimeException در صورت خطا در ذخیره‌سازی
+     */
+    public void saveBatch(List&lt;Notification&gt; notifications) {
+<span class="fc" id="L692">        Transaction transaction = null;</span>
+<span class="fc" id="L693">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L694">            transaction = session.beginTransaction();</span>
+<span class="fc" id="L695">            int batchSize = 50; // بهینه‌سازی برای SQLite</span>
+<span class="fc bfc" id="L696" title="All 2 branches covered.">            for (int i = 0; i &lt; notifications.size(); i++) {</span>
+<span class="fc" id="L697">                session.persist(notifications.get(i));</span>
+<span class="pc bpc" id="L698" title="1 of 4 branches missed.">                if (i % batchSize == 0 &amp;&amp; i &gt; 0) {</span>
+                    // flush و clear برای جلوگیری از OutOfMemory
+<span class="nc" id="L700">                    session.flush();</span>
+<span class="nc" id="L701">                    session.clear();</span>
+                }
+            }
+<span class="fc" id="L704">            transaction.commit();</span>
+<span class="nc" id="L705">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L706" title="All 2 branches missed.">            if (transaction != null) {</span>
+<span class="nc" id="L707">                transaction.rollback();</span>
+            }
+<span class="nc" id="L709">            throw new RuntimeException(&quot;Error saving batch notifications: &quot; + e.getMessage(), e);</span>
+<span class="fc" id="L710">        }</span>
+<span class="fc" id="L711">    }</span>
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

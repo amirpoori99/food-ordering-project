@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DeliveryRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.courier</a> &gt; <span class="el_source">DeliveryRepository.java</span></div><h1>DeliveryRepository.java</h1><pre class="source lang-java linenums">package com.myapp.courier;
+
+import com.myapp.common.models.Delivery;
+import com.myapp.common.models.DeliveryStatus;
+import com.myapp.common.models.Order;
+import com.myapp.common.models.User;
+import com.myapp.common.utils.DatabaseUtil;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Repository برای عملیات Entity تحویل
+ * 
+ * این کلاس مسئول تمام عملیات دیتابیس مربوط به مدیریت تحویل شامل:
+ * - CRUD operations برای Delivery entity
+ * - جستجوی پیشرفته بر اساس معیارهای مختلف
+ * - محاسبه آمار و گزارش‌های پیک‌ها
+ * - Query های بهینه‌سازی شده برای performance
+ * - مدیریت روابط با Order و User entities
+ * 
+ * Pattern های استفاده شده:
+ * - Repository Pattern: انتزاع لایه دسترسی به داده
+ * - Query Optimization: استفاده از HQL برای کارایی بالا
+ * - Aggregate Functions: محاسبه آمار پیچیده
+ * - Session Management: مدیریت صحیح session های Hibernate
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+<span class="nc" id="L35">public class DeliveryRepository {</span>
+
+    /**
+     * ذخیره تحویل جدید در دیتابیس
+     * 
+     * @param delivery تحویل جدید برای ذخیره
+     * @return تحویل ذخیره شده با ID تولید شده
+     */
+    public Delivery save(Delivery delivery) {
+<span class="nc" id="L44">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L45">            session.beginTransaction();</span>
+<span class="nc" id="L46">            session.persist(delivery); // JPA persist برای entity جدید</span>
+<span class="nc" id="L47">            session.getTransaction().commit();</span>
+<span class="nc" id="L48">            return delivery;</span>
+        }
+    }
+
+    /**
+     * به‌روزرسانی تحویل موجود
+     * 
+     * @param delivery تحویل برای به‌روزرسانی
+     * @return تحویل به‌روزرسانی شده
+     */
+    public Delivery update(Delivery delivery) {
+<span class="nc" id="L59">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L60">            session.beginTransaction();</span>
+<span class="nc" id="L61">            Delivery updated = session.merge(delivery); // merge برای به‌روزرسانی</span>
+<span class="nc" id="L62">            session.getTransaction().commit();</span>
+<span class="nc" id="L63">            return updated;</span>
+        }
+    }
+
+    /**
+     * یافتن تحویل بر اساس شناسه
+     * 
+     * @param id شناسه تحویل
+     * @return Optional حاوی تحویل یا خالی
+     */
+    public Optional&lt;Delivery&gt; findById(Long id) {
+<span class="nc" id="L74">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L75">            Delivery delivery = session.get(Delivery.class, id);</span>
+<span class="nc" id="L76">            return Optional.ofNullable(delivery);</span>
+        }
+    }
+
+    /**
+     * یافتن تحویل بر اساس شناسه سفارش
+     * 
+     * هر سفارش فقط یک تحویل دارد (رابطه یک‌به‌یک)
+     * 
+     * @param orderId شناسه سفارش
+     * @return Optional حاوی تحویل یا خالی
+     */
+    public Optional&lt;Delivery&gt; findByOrderId(Long orderId) {
+<span class="nc" id="L89">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L90">            Query&lt;Delivery&gt; query = session.createQuery(</span>
+                &quot;FROM Delivery d WHERE d.order.id = :orderId&quot;, Delivery.class);
+<span class="nc" id="L92">            query.setParameter(&quot;orderId&quot;, orderId);</span>
+<span class="nc" id="L93">            return query.uniqueResultOptional();</span>
+        }
+    }
+
+    /**
+     * یافتن تمام تحویل‌های یک پیک خاص
+     * 
+     * نتایج بر اساس تاریخ اختصاص به صورت نزولی مرتب می‌شوند
+     * 
+     * @param courierId شناسه پیک
+     * @return لیست تحویل‌های پیک
+     */
+    public List&lt;Delivery&gt; findByCourierId(Long courierId) {
+<span class="nc" id="L106">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L107">            Query&lt;Delivery&gt; query = session.createQuery(</span>
+                &quot;FROM Delivery d WHERE d.courier.id = :courierId ORDER BY d.assignedAt DESC&quot;, Delivery.class);
+<span class="nc" id="L109">            query.setParameter(&quot;courierId&quot;, courierId);</span>
+<span class="nc" id="L110">            return query.getResultList();</span>
+        }
+    }
+
+    /**
+     * یافتن تحویل‌ها بر اساس وضعیت
+     * 
+     * @param status وضعیت تحویل (PENDING, ASSIGNED, PICKED_UP, DELIVERED, CANCELLED)
+     * @return لیست تحویل‌های با وضعیت مشخص
+     */
+    public List&lt;Delivery&gt; findByStatus(DeliveryStatus status) {
+<span class="nc" id="L121">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L122">            Query&lt;Delivery&gt; query = session.createQuery(</span>
+                &quot;FROM Delivery d WHERE d.status = :status ORDER BY d.id DESC&quot;, Delivery.class);
+<span class="nc" id="L124">            query.setParameter(&quot;status&quot;, status);</span>
+<span class="nc" id="L125">            return query.getResultList();</span>
+        }
+    }
+
+    /**
+     * یافتن تحویل‌های در انتظار (منتظر اختصاص پیک)
+     * 
+     * @return لیست تحویل‌های PENDING
+     */
+    public List&lt;Delivery&gt; findPendingDeliveries() {
+<span class="nc" id="L135">        return findByStatus(DeliveryStatus.PENDING);</span>
+    }
+
+    /**
+     * یافتن تحویل‌های فعال یک پیک (اختصاص داده شده یا تحویل گرفته شده)
+     * 
+     * برای بررسی در دسترس بودن پیک استفاده می‌شود
+     * 
+     * @param courierId شناسه پیک
+     * @return لیست تحویل‌های فعال پیک
+     */
+    public List&lt;Delivery&gt; findActiveByCourier(Long courierId) {
+<span class="nc" id="L147">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L148">            Query&lt;Delivery&gt; query = session.createQuery(</span>
+                &quot;FROM Delivery d WHERE d.courier.id = :courierId AND d.status IN (:statuses) ORDER BY d.assignedAt&quot;, 
+                Delivery.class);
+<span class="nc" id="L151">            query.setParameter(&quot;courierId&quot;, courierId);</span>
+<span class="nc" id="L152">            query.setParameter(&quot;statuses&quot;, List.of(DeliveryStatus.ASSIGNED, DeliveryStatus.PICKED_UP));</span>
+<span class="nc" id="L153">            return query.getResultList();</span>
+        }
+    }
+
+    /**
+     * یافتن تمام تحویل‌های فعال (هنوز تکمیل یا لغو نشده)
+     * 
+     * برای monitoring و مدیریت کلی سیستم استفاده می‌شود
+     * 
+     * @return لیست تحویل‌های فعال
+     */
+    public List&lt;Delivery&gt; findActiveDeliveries() {
+<span class="nc" id="L165">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L166">            Query&lt;Delivery&gt; query = session.createQuery(</span>
+                &quot;FROM Delivery d WHERE d.status IN (:statuses) ORDER BY d.id DESC&quot;, Delivery.class);
+<span class="nc" id="L168">            query.setParameter(&quot;statuses&quot;, List.of(</span>
+                DeliveryStatus.PENDING, 
+                DeliveryStatus.ASSIGNED, 
+                DeliveryStatus.PICKED_UP
+            ));
+<span class="nc" id="L173">            return query.getResultList();</span>
+        }
+    }
+
+    /**
+     * یافتن تحویل‌ها در بازه زمانی مشخص
+     * 
+     * بر اساس زمان اختصاص پیک فیلتر می‌کند
+     * 
+     * @param startDate تاریخ شروع
+     * @param endDate تاریخ پایان
+     * @return لیست تحویل‌ها در بازه زمانی
+     */
+    public List&lt;Delivery&gt; findByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+<span class="nc" id="L187">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L188">            Query&lt;Delivery&gt; query = session.createQuery(</span>
+                &quot;FROM Delivery d WHERE d.assignedAt BETWEEN :startDate AND :endDate ORDER BY d.assignedAt DESC&quot;, 
+                Delivery.class);
+<span class="nc" id="L191">            query.setParameter(&quot;startDate&quot;, startDate);</span>
+<span class="nc" id="L192">            query.setParameter(&quot;endDate&quot;, endDate);</span>
+<span class="nc" id="L193">            return query.getResultList();</span>
+        }
+    }
+
+    /**
+     * یافتن تحویل‌های پیک در بازه زمانی مشخص
+     * 
+     * @param courierId شناسه پیک
+     * @param startDate تاریخ شروع
+     * @param endDate تاریخ پایان
+     * @return لیست تحویل‌های پیک در بازه زمانی
+     */
+    public List&lt;Delivery&gt; findByCourierAndDateRange(Long courierId, LocalDateTime startDate, LocalDateTime endDate) {
+<span class="nc" id="L206">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L207">            Query&lt;Delivery&gt; query = session.createQuery(</span>
+                &quot;FROM Delivery d WHERE d.courier.id = :courierId AND d.assignedAt BETWEEN :startDate AND :endDate ORDER BY d.assignedAt DESC&quot;, 
+                Delivery.class);
+<span class="nc" id="L210">            query.setParameter(&quot;courierId&quot;, courierId);</span>
+<span class="nc" id="L211">            query.setParameter(&quot;startDate&quot;, startDate);</span>
+<span class="nc" id="L212">            query.setParameter(&quot;endDate&quot;, endDate);</span>
+<span class="nc" id="L213">            return query.getResultList();</span>
+        }
+    }
+
+    /**
+     * یافتن تحویل‌های پیک با وضعیت خاص
+     * 
+     * @param courierId شناسه پیک
+     * @param status وضعیت تحویل
+     * @return لیست تحویل‌های فیلتر شده
+     */
+    public List&lt;Delivery&gt; findByCourierAndStatus(Long courierId, DeliveryStatus status) {
+<span class="nc" id="L225">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L226">            Query&lt;Delivery&gt; query = session.createQuery(</span>
+                &quot;FROM Delivery d WHERE d.courier.id = :courierId AND d.status = :status ORDER BY d.assignedAt DESC&quot;, 
+                Delivery.class);
+<span class="nc" id="L229">            query.setParameter(&quot;courierId&quot;, courierId);</span>
+<span class="nc" id="L230">            query.setParameter(&quot;status&quot;, status);</span>
+<span class="nc" id="L231">            return query.getResultList();</span>
+        }
+    }
+
+    /**
+     * شمارش کل تحویل‌های یک پیک
+     * 
+     * @param courierId شناسه پیک
+     * @return تعداد کل تحویل‌ها
+     */
+    public Long countByCourier(Long courierId) {
+<span class="nc" id="L242">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L243">            Query&lt;Long&gt; query = session.createQuery(</span>
+                &quot;SELECT COUNT(d) FROM Delivery d WHERE d.courier.id = :courierId&quot;, Long.class);
+<span class="nc" id="L245">            query.setParameter(&quot;courierId&quot;, courierId);</span>
+<span class="nc" id="L246">            return query.uniqueResult();</span>
+        }
+    }
+
+    /**
+     * شمارش تحویل‌های پیک با وضعیت خاص
+     * 
+     * @param courierId شناسه پیک
+     * @param status وضعیت تحویل
+     * @return تعداد تحویل‌ها
+     */
+    public Long countByCourierAndStatus(Long courierId, DeliveryStatus status) {
+<span class="nc" id="L258">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L259">            Query&lt;Long&gt; query = session.createQuery(</span>
+                &quot;SELECT COUNT(d) FROM Delivery d WHERE d.courier.id = :courierId AND d.status = :status&quot;, Long.class);
+<span class="nc" id="L261">            query.setParameter(&quot;courierId&quot;, courierId);</span>
+<span class="nc" id="L262">            query.setParameter(&quot;status&quot;, status);</span>
+<span class="nc" id="L263">            return query.uniqueResult();</span>
+        }
+    }
+
+    /**
+     * بررسی وجود تحویل با شناسه مشخص
+     * 
+     * @param id شناسه تحویل
+     * @return true اگر وجود داشته باشد
+     */
+    public boolean existsById(Long id) {
+<span class="nc" id="L274">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L275">            Query&lt;Long&gt; query = session.createQuery(</span>
+                &quot;SELECT COUNT(d) FROM Delivery d WHERE d.id = :id&quot;, Long.class);
+<span class="nc" id="L277">            query.setParameter(&quot;id&quot;, id);</span>
+<span class="nc bnc" id="L278" title="All 2 branches missed.">            return query.uniqueResult() &gt; 0;</span>
+        }
+    }
+
+    /**
+     * بررسی وجود تحویل برای سفارش
+     * 
+     * @param orderId شناسه سفارش
+     * @return true اگر تحویل وجود داشته باشد
+     */
+    public boolean existsByOrderId(Long orderId) {
+<span class="nc" id="L289">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L290">            Query&lt;Long&gt; query = session.createQuery(</span>
+                &quot;SELECT COUNT(d) FROM Delivery d WHERE d.order.id = :orderId&quot;, Long.class);
+<span class="nc" id="L292">            query.setParameter(&quot;orderId&quot;, orderId);</span>
+<span class="nc bnc" id="L293" title="All 2 branches missed.">            return query.uniqueResult() &gt; 0;</span>
+        }
+    }
+
+    /**
+     * حذف تحویل بر اساس شناسه
+     * 
+     * توجه: عملیات حذف به ندرت استفاده می‌شود
+     * 
+     * @param id شناسه تحویل
+     */
+    public void delete(Long id) {
+<span class="nc" id="L305">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L306">            session.beginTransaction();</span>
+<span class="nc" id="L307">            Delivery delivery = session.get(Delivery.class, id);</span>
+<span class="nc bnc" id="L308" title="All 2 branches missed.">            if (delivery != null) {</span>
+<span class="nc" id="L309">                session.remove(delivery);</span>
+            }
+<span class="nc" id="L311">            session.getTransaction().commit();</span>
+        }
+<span class="nc" id="L313">    }</span>
+
+    /**
+     * یافتن تمام تحویل‌ها (برای مدیر سیستم)
+     * 
+     * @return لیست کامل تحویل‌ها
+     */
+    public List&lt;Delivery&gt; findAll() {
+<span class="nc" id="L321">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L322">            Query&lt;Delivery&gt; query = session.createQuery(</span>
+                &quot;FROM Delivery d ORDER BY d.id DESC&quot;, Delivery.class);
+<span class="nc" id="L324">            return query.getResultList();</span>
+        }
+    }
+
+    /**
+     * محاسبه میانگین زمان تحویل برای پیک (بر حسب دقیقه)
+     * 
+     * زمان بین pickup و delivery محاسبه می‌شود
+     * 
+     * @param courierId شناسه پیک
+     * @return میانگین زمان تحویل یا null
+     */
+    public Double getAverageDeliveryTimeMinutes(Long courierId) {
+<span class="nc" id="L337">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+            // محاسبه میانگین زمان بین pickup و delivery به دقیقه
+<span class="nc" id="L339">            Query&lt;Double&gt; query = session.createQuery(</span>
+                &quot;SELECT AVG(EXTRACT(EPOCH FROM (d.deliveredAt - d.pickedUpAt)) / 60) &quot; +
+                &quot;FROM Delivery d WHERE d.courier.id = :courierId AND d.status = :delivered AND d.pickedUpAt IS NOT NULL AND d.deliveredAt IS NOT NULL&quot;, 
+                Double.class);
+<span class="nc" id="L343">            query.setParameter(&quot;courierId&quot;, courierId);</span>
+<span class="nc" id="L344">            query.setParameter(&quot;delivered&quot;, DeliveryStatus.DELIVERED);</span>
+<span class="nc" id="L345">            return query.uniqueResult();</span>
+        }
+    }
+
+    /**
+     * دریافت آمار کامل پیک
+     * 
+     * شامل تعداد تحویل‌ها، درآمد، میانگین زمان و نرخ موفقیت
+     * 
+     * @param courierId شناسه پیک
+     * @return آمار کامل پیک
+     */
+    public CourierStatistics getCourierStatistics(Long courierId) {
+<span class="nc" id="L358">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+            // تعداد کل تحویل‌ها
+<span class="nc" id="L360">            Long totalDeliveries = countByCourier(courierId);</span>
+            
+            // تحویل‌های تکمیل شده
+<span class="nc" id="L363">            Long completedDeliveries = countByCourierAndStatus(courierId, DeliveryStatus.DELIVERED);</span>
+            
+            // تحویل‌های فعال
+<span class="nc" id="L366">            Long activeDeliveries = countByCourierAndStatus(courierId, DeliveryStatus.ASSIGNED) +</span>
+<span class="nc" id="L367">                                   countByCourierAndStatus(courierId, DeliveryStatus.PICKED_UP);</span>
+            
+            // تحویل‌های لغو شده
+<span class="nc" id="L370">            Long cancelledDeliveries = countByCourierAndStatus(courierId, DeliveryStatus.CANCELLED);</span>
+            
+            // میانگین زمان تحویل
+<span class="nc" id="L373">            Double avgDeliveryTime = getAverageDeliveryTimeMinutes(courierId);</span>
+            
+            // کل درآمد (مجموع هزینه‌های تحویل موفق)
+<span class="nc" id="L376">            Query&lt;Double&gt; earningsQuery = session.createQuery(</span>
+                &quot;SELECT COALESCE(SUM(d.deliveryFee), 0.0) FROM Delivery d WHERE d.courier.id = :courierId AND d.status = :delivered&quot;, 
+                Double.class);
+<span class="nc" id="L379">            earningsQuery.setParameter(&quot;courierId&quot;, courierId);</span>
+<span class="nc" id="L380">            earningsQuery.setParameter(&quot;delivered&quot;, DeliveryStatus.DELIVERED);</span>
+<span class="nc" id="L381">            Double totalEarnings = earningsQuery.uniqueResult();</span>
+            
+<span class="nc" id="L383">            return new CourierStatistics(</span>
+                totalDeliveries,
+                completedDeliveries,
+                activeDeliveries,
+                cancelledDeliveries,
+<span class="nc bnc" id="L388" title="All 2 branches missed.">                avgDeliveryTime != null ? avgDeliveryTime : 0.0,</span>
+                totalEarnings
+            );
+        }
+    }
+
+    /**
+     * کلاس داخلی برای آمار پیک
+     * 
+     * حاوی تمام اطلاعات آماری مربوط به عملکرد پیک
+     */
+    public static class CourierStatistics {
+        /** تعداد کل تحویل‌ها */
+        private final Long totalDeliveries;
+        
+        /** تعداد تحویل‌های موفق */
+        private final Long completedDeliveries;
+        
+        /** تعداد تحویل‌های فعال */
+        private final Long activeDeliveries;
+        
+        /** تعداد تحویل‌های لغو شده */
+        private final Long cancelledDeliveries;
+        
+        /** میانگین زمان تحویل (دقیقه) */
+        private final Double averageDeliveryTimeMinutes;
+        
+        /** کل درآمد */
+        private final Double totalEarnings;
+
+        /**
+         * سازنده آمار پیک
+         */
+        public CourierStatistics(Long totalDeliveries, Long completedDeliveries, Long activeDeliveries,
+<span class="fc" id="L422">                               Long cancelledDeliveries, Double averageDeliveryTimeMinutes, Double totalEarnings) {</span>
+<span class="fc" id="L423">            this.totalDeliveries = totalDeliveries;</span>
+<span class="fc" id="L424">            this.completedDeliveries = completedDeliveries;</span>
+<span class="fc" id="L425">            this.activeDeliveries = activeDeliveries;</span>
+<span class="fc" id="L426">            this.cancelledDeliveries = cancelledDeliveries;</span>
+<span class="fc" id="L427">            this.averageDeliveryTimeMinutes = averageDeliveryTimeMinutes;</span>
+<span class="fc" id="L428">            this.totalEarnings = totalEarnings;</span>
+<span class="fc" id="L429">        }</span>
+
+        // ==================== GETTERS ====================
+        
+        /** @return تعداد کل تحویل‌ها */
+<span class="fc" id="L434">        public Long getTotalDeliveries() { return totalDeliveries; }</span>
+        
+        /** @return تعداد تحویل‌های موفق */
+<span class="fc" id="L437">        public Long getCompletedDeliveries() { return completedDeliveries; }</span>
+        
+        /** @return تعداد تحویل‌های فعال */
+<span class="nc" id="L440">        public Long getActiveDeliveries() { return activeDeliveries; }</span>
+        
+        /** @return تعداد تحویل‌های لغو شده */
+<span class="nc" id="L443">        public Long getCancelledDeliveries() { return cancelledDeliveries; }</span>
+        
+        /** @return میانگین زمان تحویل */
+<span class="nc" id="L446">        public Double getAverageDeliveryTimeMinutes() { return averageDeliveryTimeMinutes; }</span>
+        
+        /** @return کل درآمد */
+<span class="nc" id="L449">        public Double getTotalEarnings() { return totalEarnings; }</span>
+        
+        /**
+         * محاسبه نرخ موفقیت پیک
+         * 
+         * @return درصد موفقیت (0-100)
+         */
+        public Double getSuccessRate() {
+<span class="nc bnc" id="L457" title="All 2 branches missed.">            if (totalDeliveries == 0) return 0.0;</span>
+<span class="nc" id="L458">            return (completedDeliveries.doubleValue() / totalDeliveries.doubleValue()) * 100.0;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

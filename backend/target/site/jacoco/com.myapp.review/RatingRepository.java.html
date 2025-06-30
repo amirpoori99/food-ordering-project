@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RatingRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.review</a> &gt; <span class="el_source">RatingRepository.java</span></div><h1>RatingRepository.java</h1><pre class="source lang-java linenums">package com.myapp.review;
+
+import com.myapp.common.models.Rating;
+import com.myapp.common.models.Restaurant;
+import com.myapp.common.models.User;
+import com.myapp.common.utils.DatabaseUtil;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+/**
+ * Repository لایه دسترسی داده برای entity های Rating (نظرات و امتیازات)
+ * 
+ * این کلاس تمام عملیات پایگاه داده مربوط به مدیریت نظرات و امتیازدهی را ارائه می‌دهد:
+ * 
+ * === عملیات CRUD پایه ===
+ * - save(): ذخیره/به‌روزرسانی نظر و امتیاز
+ * - findById(): جستجو بر اساس شناسه
+ * - delete(): حذف نظر
+ * - findAll(): دریافت تمام نظرات
+ * 
+ * === جستجوهای تخصصی ===
+ * - findByUserAndRestaurant(): نظر کاربر برای رستوران خاص (unique constraint)
+ * - findByRestaurant(): تمام نظرات رستوران
+ * - findByUser(): تمام نظرات کاربر
+ * - findByScoreRange(): نظرات در بازه امتیاز مشخص
+ * - findVerifiedRatings(): نظرات تایید شده
+ * - findRatingsWithReviews(): نظراتی که متن نظر دارند
+ * - findRecentRatings(): نظرات اخیر (در چند روز گذشته)
+ * 
+ * === عملیات آماری ===
+ * - getAverageRating(): میانگین امتیاز رستوران
+ * - getRatingCount(): تعداد نظرات رستوران
+ * - getRatingDistribution(): توزیع امتیازات (تعداد هر امتیاز 1-5)
+ * - getTopRatedRestaurants(): رستوران‌های برتر بر اساس امتیاز
+ * 
+ * === صفحه‌بندی و شمارش ===
+ * - findWithPagination(): دریافت با صفحه‌بندی
+ * - countAll(): تعداد کل نظرات
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Unique Constraint: هر کاربر فقط یک نظر برای هر رستوران
+ * - Statistical Queries: queries پیچیده برای آمارگیری
+ * - Rating Distribution: تحلیل توزیع امتیازات
+ * - Verification Support: پشتیبانی از نظرات تایید شده
+ * - Temporal Filtering: فیلتر بر اساس زمان
+ * - Aggregation Functions: استفاده از توابع آماری SQL
+ * - Error Handling: مدیریت خطاها با try-catch
+ * - Logging: ثبت تمام عملیات
+ * - HQL Queries: استفاده از Hibernate Query Language
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+<span class="fc" id="L63">public class RatingRepository {</span>
+    
+    /** Logger برای ثبت عملیات و خطاها */
+<span class="fc" id="L66">    private static final Logger logger = LoggerFactory.getLogger(RatingRepository.class);</span>
+    
+    /**
+     * ذخیره نظر جدید یا به‌روزرسانی نظر موجود
+     * 
+     * این متد بر اساس وجود ID تشخیص می‌دهد که آیا باید نظر جدید ایجاد کند یا موجودی را به‌روزرسانی کند
+     * 
+     * @param rating شیء نظر برای ذخیره
+     * @return نظر ذخیره شده یا به‌روزرسانی شده
+     * @throws RuntimeException در صورت خطا در ذخیره‌سازی
+     */
+    public Rating save(Rating rating) {
+<span class="fc" id="L78">        Transaction transaction = null;</span>
+<span class="fc" id="L79">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L80">            transaction = session.beginTransaction();</span>
+            
+<span class="fc bfc" id="L82" title="All 2 branches covered.">            if (rating.getId() == null) {</span>
+                // ایجاد نظر جدید
+<span class="fc" id="L84">                session.persist(rating);</span>
+<span class="fc" id="L85">                logger.info(&quot;Created new rating: {}&quot;, rating);</span>
+            } else {
+                // به‌روزرسانی نظر موجود
+<span class="fc" id="L88">                rating = session.merge(rating);</span>
+<span class="fc" id="L89">                logger.info(&quot;Updated rating: {}&quot;, rating);</span>
+            }
+            
+<span class="fc" id="L92">            transaction.commit();</span>
+<span class="fc" id="L93">            return rating;</span>
+            
+<span class="fc" id="L95">        } catch (Exception e) {</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">            if (transaction != null) {</span>
+<span class="nc" id="L97">                transaction.rollback();</span>
+            }
+<span class="nc" id="L99">            logger.error(&quot;Error saving rating: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L100">            throw new RuntimeException(&quot;Failed to save rating&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * جستجوی نظر بر اساس شناسه
+     * 
+     * @param id شناسه نظر
+     * @return Optional حاوی نظر یا empty در صورت عدم وجود
+     */
+    public Optional&lt;Rating&gt; findById(Long id) {
+<span class="fc" id="L111">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L112">            Rating rating = session.get(Rating.class, id);</span>
+<span class="fc" id="L113">            return Optional.ofNullable(rating);</span>
+<span class="fc" id="L114">        } catch (Exception e) {</span>
+<span class="fc" id="L115">            logger.error(&quot;Error finding rating by ID {}: {}&quot;, id, e.getMessage(), e);</span>
+<span class="fc" id="L116">            return Optional.empty();</span>
+        }
+    }
+    
+    /**
+     * جستجوی نظر بر اساس کاربر و رستوران (محدودیت یکتایی)
+     * 
+     * هر کاربر فقط می‌تواند یک نظر برای هر رستوران داشته باشد
+     * 
+     * @param user کاربر نظردهنده
+     * @param restaurant رستوران مورد نظر
+     * @return Optional حاوی نظر یا empty در صورت عدم وجود
+     */
+    public Optional&lt;Rating&gt; findByUserAndRestaurant(User user, Restaurant restaurant) {
+<span class="fc bfc" id="L130" title="All 4 branches covered.">        if (user == null || restaurant == null) {</span>
+<span class="fc" id="L131">            logger.warn(&quot;Cannot find rating with null user or restaurant&quot;);</span>
+<span class="fc" id="L132">            return Optional.empty();</span>
+        }
+        
+<span class="fc" id="L135">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L136">            String hql = &quot;FROM Rating r WHERE r.user.id = :userId AND r.restaurant.id = :restaurantId&quot;;</span>
+<span class="fc" id="L137">            Query&lt;Rating&gt; query = session.createQuery(hql, Rating.class);</span>
+<span class="fc" id="L138">            query.setParameter(&quot;userId&quot;, user.getId());</span>
+<span class="fc" id="L139">            query.setParameter(&quot;restaurantId&quot;, restaurant.getId());</span>
+            
+<span class="fc" id="L141">            List&lt;Rating&gt; results = query.getResultList();</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">            return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));</span>
+            
+<span class="nc" id="L144">        } catch (Exception e) {</span>
+<span class="nc" id="L145">            logger.error(&quot;Error finding rating by user {} and restaurant {}: {}&quot;, </span>
+<span class="nc" id="L146">                        user.getId(), restaurant.getId(), e.getMessage(), e);</span>
+<span class="nc" id="L147">            return Optional.empty();</span>
+        }
+    }
+    
+    /**
+     * دریافت تمام نظرات مربوط به رستوران خاص
+     * 
+     * نظرات بر اساس تاریخ ایجاد (جدیدترین ابتدا) مرتب می‌شوند
+     * 
+     * @param restaurant رستوران مورد نظر
+     * @return لیست نظرات رستوران
+     */
+    public List&lt;Rating&gt; findByRestaurant(Restaurant restaurant) {
+<span class="fc bfc" id="L160" title="All 2 branches covered.">        if (restaurant == null) {</span>
+<span class="fc" id="L161">            logger.warn(&quot;Cannot find ratings for null restaurant&quot;);</span>
+<span class="fc" id="L162">            return List.of();</span>
+        }
+        
+<span class="fc" id="L165">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L166">            String hql = &quot;FROM Rating r WHERE r.restaurant.id = :restaurantId ORDER BY r.createdAt DESC&quot;;</span>
+<span class="fc" id="L167">            Query&lt;Rating&gt; query = session.createQuery(hql, Rating.class);</span>
+<span class="fc" id="L168">            query.setParameter(&quot;restaurantId&quot;, restaurant.getId());</span>
+            
+<span class="fc" id="L170">            return query.getResultList();</span>
+            
+<span class="nc" id="L172">        } catch (Exception e) {</span>
+<span class="nc" id="L173">            logger.error(&quot;Error finding ratings for restaurant {}: {}&quot;, </span>
+<span class="nc" id="L174">                        restaurant.getId(), e.getMessage(), e);</span>
+<span class="nc" id="L175">            return List.of();</span>
+        }
+    }
+    
+    /**
+     * دریافت تمام نظرات ثبت شده توسط کاربر خاص
+     * 
+     * @param user کاربر مورد نظر
+     * @return لیست نظرات کاربر (مرتب شده بر اساس تاریخ)
+     */
+    public List&lt;Rating&gt; findByUser(User user) {
+<span class="fc bfc" id="L186" title="All 2 branches covered.">        if (user == null) {</span>
+<span class="fc" id="L187">            logger.warn(&quot;Cannot find ratings for null user&quot;);</span>
+<span class="fc" id="L188">            return List.of();</span>
+        }
+        
+<span class="fc" id="L191">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L192">            String hql = &quot;FROM Rating r WHERE r.user.id = :userId ORDER BY r.createdAt DESC&quot;;</span>
+<span class="fc" id="L193">            Query&lt;Rating&gt; query = session.createQuery(hql, Rating.class);</span>
+<span class="fc" id="L194">            query.setParameter(&quot;userId&quot;, user.getId());</span>
+            
+<span class="fc" id="L196">            return query.getResultList();</span>
+            
+<span class="nc" id="L198">        } catch (Exception e) {</span>
+<span class="nc" id="L199">            logger.error(&quot;Error finding ratings by user {}: {}&quot;, user.getId(), e.getMessage(), e);</span>
+<span class="nc" id="L200">            return List.of();</span>
+        }
+    }
+    
+    /**
+     * جستجوی نظرات در بازه امتیاز مشخص
+     * 
+     * @param minScore حداقل امتیاز (شامل)
+     * @param maxScore حداکثر امتیاز (شامل)
+     * @return لیست نظرات در بازه امتیاز
+     */
+    public List&lt;Rating&gt; findByScoreRange(int minScore, int maxScore) {
+<span class="fc" id="L212">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L213">            String hql = &quot;FROM Rating r WHERE r.ratingScore BETWEEN :minScore AND :maxScore ORDER BY r.createdAt DESC&quot;;</span>
+<span class="fc" id="L214">            Query&lt;Rating&gt; query = session.createQuery(hql, Rating.class);</span>
+<span class="fc" id="L215">            query.setParameter(&quot;minScore&quot;, minScore);</span>
+<span class="fc" id="L216">            query.setParameter(&quot;maxScore&quot;, maxScore);</span>
+            
+<span class="fc" id="L218">            return query.getResultList();</span>
+            
+<span class="nc" id="L220">        } catch (Exception e) {</span>
+<span class="nc" id="L221">            logger.error(&quot;Error finding ratings by score range {}-{}: {}&quot;, </span>
+<span class="nc" id="L222">                        minScore, maxScore, e.getMessage(), e);</span>
+<span class="nc" id="L223">            return List.of();</span>
+        }
+    }
+    
+    /**
+     * دریافت نظرات تایید شده
+     * 
+     * نظراتی که توسط مدیریت سیستم تایید شده‌اند
+     * 
+     * @return لیست نظرات تایید شده
+     */
+    public List&lt;Rating&gt; findVerifiedRatings() {
+<span class="fc" id="L235">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L236">            String hql = &quot;FROM Rating r WHERE r.isVerified = true ORDER BY r.createdAt DESC&quot;;</span>
+<span class="fc" id="L237">            Query&lt;Rating&gt; query = session.createQuery(hql, Rating.class);</span>
+            
+<span class="fc" id="L239">            return query.getResultList();</span>
+            
+<span class="nc" id="L241">        } catch (Exception e) {</span>
+<span class="nc" id="L242">            logger.error(&quot;Error finding verified ratings: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L243">            return List.of();</span>
+        }
+    }
+    
+    /**
+     * دریافت نظراتی که متن نظر دارند
+     * 
+     * نظراتی که علاوه بر امتیاز، متن توضیحی نیز ارائه کرده‌اند
+     * 
+     * @return لیست نظرات دارای متن
+     */
+    public List&lt;Rating&gt; findRatingsWithReviews() {
+<span class="fc" id="L255">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L256">            String hql = &quot;FROM Rating r WHERE r.reviewText IS NOT NULL AND r.reviewText != '' ORDER BY r.createdAt DESC&quot;;</span>
+<span class="fc" id="L257">            Query&lt;Rating&gt; query = session.createQuery(hql, Rating.class);</span>
+            
+<span class="fc" id="L259">            return query.getResultList();</span>
+            
+<span class="nc" id="L261">        } catch (Exception e) {</span>
+<span class="nc" id="L262">            logger.error(&quot;Error finding ratings with reviews: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L263">            return List.of();</span>
+        }
+    }
+    
+    /**
+     * دریافت نظرات اخیر (در چند روز گذشته)
+     * 
+     * @param days تعداد روزهای گذشته
+     * @return لیست نظرات اخیر
+     */
+    public List&lt;Rating&gt; findRecentRatings(int days) {
+<span class="fc" id="L274">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L275">            LocalDateTime cutoffDate = LocalDateTime.now().minusDays(days);</span>
+<span class="fc" id="L276">            String hql = &quot;FROM Rating r WHERE r.createdAt &gt;= :cutoffDate ORDER BY r.createdAt DESC&quot;;</span>
+<span class="fc" id="L277">            Query&lt;Rating&gt; query = session.createQuery(hql, Rating.class);</span>
+<span class="fc" id="L278">            query.setParameter(&quot;cutoffDate&quot;, cutoffDate);</span>
+            
+<span class="fc" id="L280">            return query.getResultList();</span>
+            
+<span class="nc" id="L282">        } catch (Exception e) {</span>
+<span class="nc" id="L283">            logger.error(&quot;Error finding recent ratings for {} days: {}&quot;, days, e.getMessage(), e);</span>
+<span class="nc" id="L284">            return List.of();</span>
+        }
+    }
+    
+    /**
+     * محاسبه میانگین امتیاز رستوران
+     * 
+     * @param restaurant رستوران مورد نظر
+     * @return میانگین امتیاز (0.0 در صورت عدم وجود نظر)
+     */
+    public Double getAverageRating(Restaurant restaurant) {
+<span class="fc bfc" id="L295" title="All 2 branches covered.">        if (restaurant == null) {</span>
+<span class="fc" id="L296">            logger.warn(&quot;Cannot get average rating for null restaurant&quot;);</span>
+<span class="fc" id="L297">            return 0.0;</span>
+        }
+        
+<span class="fc" id="L300">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L301">            String hql = &quot;SELECT AVG(r.ratingScore) FROM Rating r WHERE r.restaurant.id = :restaurantId&quot;;</span>
+<span class="fc" id="L302">            Query&lt;Double&gt; query = session.createQuery(hql, Double.class);</span>
+<span class="fc" id="L303">            query.setParameter(&quot;restaurantId&quot;, restaurant.getId());</span>
+            
+<span class="fc" id="L305">            Double result = query.uniqueResult();</span>
+<span class="fc bfc" id="L306" title="All 2 branches covered.">            return result != null ? result : 0.0;</span>
+            
+<span class="nc" id="L308">        } catch (Exception e) {</span>
+<span class="nc" id="L309">            logger.error(&quot;Error getting average rating for restaurant {}: {}&quot;, </span>
+<span class="nc" id="L310">                        restaurant.getId(), e.getMessage(), e);</span>
+<span class="nc" id="L311">            return 0.0;</span>
+        }
+    }
+    
+    /**
+     * شمارش تعداد نظرات رستوران
+     * 
+     * @param restaurant رستوران مورد نظر
+     * @return تعداد نظرات (0 در صورت عدم وجود)
+     */
+    public Long getRatingCount(Restaurant restaurant) {
+<span class="fc bfc" id="L322" title="All 2 branches covered.">        if (restaurant == null) {</span>
+<span class="fc" id="L323">            logger.warn(&quot;Cannot get rating count for null restaurant&quot;);</span>
+<span class="fc" id="L324">            return 0L;</span>
+        }
+        
+<span class="fc" id="L327">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L328">            String hql = &quot;SELECT COUNT(r) FROM Rating r WHERE r.restaurant.id = :restaurantId&quot;;</span>
+<span class="fc" id="L329">            Query&lt;Long&gt; query = session.createQuery(hql, Long.class);</span>
+<span class="fc" id="L330">            query.setParameter(&quot;restaurantId&quot;, restaurant.getId());</span>
+            
+<span class="fc" id="L332">            Long result = query.uniqueResult();</span>
+<span class="pc bpc" id="L333" title="1 of 2 branches missed.">            return result != null ? result : 0L;</span>
+            
+<span class="nc" id="L335">        } catch (Exception e) {</span>
+<span class="nc" id="L336">            logger.error(&quot;Error getting rating count for restaurant {}: {}&quot;, </span>
+<span class="nc" id="L337">                        restaurant.getId(), e.getMessage(), e);</span>
+<span class="nc" id="L338">            return 0L;</span>
+        }
+    }
+    
+    /**
+     * دریافت توزیع امتیازات رستوران (تعداد هر امتیاز از 1 تا 5)
+     * 
+     * این متد برای نمایش نمودار توزیع امتیازات استفاده می‌شود
+     * 
+     * @param restaurant رستوران مورد نظر
+     * @return Map حاوی تعداد هر امتیاز (1-5)
+     */
+    public Map&lt;Integer, Long&gt; getRatingDistribution(Restaurant restaurant) {
+<span class="fc bfc" id="L351" title="All 2 branches covered.">        if (restaurant == null) {</span>
+<span class="fc" id="L352">            logger.warn(&quot;Cannot get rating distribution for null restaurant&quot;);</span>
+<span class="fc" id="L353">            return Map.of(1, 0L, 2, 0L, 3, 0L, 4, 0L, 5, 0L);</span>
+        }
+        
+<span class="fc" id="L356">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L357">            String hql = &quot;SELECT r.ratingScore, COUNT(r) FROM Rating r WHERE r.restaurant.id = :restaurantId GROUP BY r.ratingScore&quot;;</span>
+<span class="fc" id="L358">            Query&lt;Object[]&gt; query = session.createQuery(hql, Object[].class);</span>
+<span class="fc" id="L359">            query.setParameter(&quot;restaurantId&quot;, restaurant.getId());</span>
+            
+<span class="fc" id="L361">            List&lt;Object[]&gt; results = query.getResultList();</span>
+<span class="fc" id="L362">            Map&lt;Integer, Long&gt; distribution = new java.util.HashMap&lt;&gt;();</span>
+            
+            // مقداردهی اولیه تمام امتیازها به 0
+<span class="fc bfc" id="L365" title="All 2 branches covered.">            for (int i = 1; i &lt;= 5; i++) {</span>
+<span class="fc" id="L366">                distribution.put(i, 0L);</span>
+            }
+            
+            // پر کردن تعداد واقعی
+<span class="fc bfc" id="L370" title="All 2 branches covered.">            for (Object[] result : results) {</span>
+<span class="fc" id="L371">                Integer score = (Integer) result[0];</span>
+<span class="fc" id="L372">                Long count = (Long) result[1];</span>
+<span class="fc" id="L373">                distribution.put(score, count);</span>
+<span class="fc" id="L374">            }</span>
+            
+<span class="fc" id="L376">            return distribution;</span>
+            
+<span class="nc" id="L378">        } catch (Exception e) {</span>
+<span class="nc" id="L379">            logger.error(&quot;Error getting rating distribution for restaurant {}: {}&quot;, </span>
+<span class="nc" id="L380">                        restaurant.getId(), e.getMessage(), e);</span>
+<span class="nc" id="L381">            return Map.of(1, 0L, 2, 0L, 3, 0L, 4, 0L, 5, 0L);</span>
+        }
+    }
+    
+    /**
+     * دریافت رستوران‌های برتر بر اساس امتیاز
+     * 
+     * فقط رستوران‌هایی که حداقل 5 نظر دارند در نظر گرفته می‌شوند
+     * ابتدا بر اساس میانگین امتیاز و سپس تعداد نظرات مرتب می‌شوند
+     * 
+     * @param limit تعداد رستوران‌های برتر
+     * @return لیست Object[] حاوی [restaurantId, restaurantName, averageRating, ratingCount]
+     */
+    public List&lt;Object[]&gt; getTopRatedRestaurants(int limit) {
+<span class="fc" id="L395">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L396">            String hql = &quot;&quot;&quot;</span>
+                SELECT r.restaurant.id, r.restaurant.name, AVG(r.ratingScore), COUNT(r)
+                FROM Rating r 
+                GROUP BY r.restaurant.id, r.restaurant.name 
+                HAVING COUNT(r) &gt;= 5 
+                ORDER BY AVG(r.ratingScore) DESC, COUNT(r) DESC
+                &quot;&quot;&quot;;
+<span class="fc" id="L403">            Query&lt;Object[]&gt; query = session.createQuery(hql, Object[].class);</span>
+<span class="fc" id="L404">            query.setMaxResults(limit);</span>
+            
+<span class="fc" id="L406">            return query.getResultList();</span>
+            
+<span class="nc" id="L408">        } catch (Exception e) {</span>
+<span class="nc" id="L409">            logger.error(&quot;Error getting top rated restaurants: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L410">            return List.of();</span>
+        }
+    }
+    
+    /**
+     * حذف نظر بر اساس شناسه
+     * 
+     * @param id شناسه نظر
+     * @return true در صورت حذف موفق، false در غیر این صورت
+     */
+    public boolean delete(Long id) {
+<span class="fc bfc" id="L421" title="All 2 branches covered.">        if (id == null) {</span>
+<span class="fc" id="L422">            logger.warn(&quot;Cannot delete rating with null ID&quot;);</span>
+<span class="fc" id="L423">            return false;</span>
+        }
+        
+<span class="fc" id="L426">        Transaction transaction = null;</span>
+<span class="fc" id="L427">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L428">            transaction = session.beginTransaction();</span>
+            
+<span class="fc" id="L430">            Rating rating = session.get(Rating.class, id);</span>
+<span class="fc bfc" id="L431" title="All 2 branches covered.">            if (rating != null) {</span>
+<span class="fc" id="L432">                session.remove(rating);</span>
+<span class="fc" id="L433">                transaction.commit();</span>
+<span class="fc" id="L434">                logger.info(&quot;Deleted rating with ID: {}&quot;, id);</span>
+<span class="fc" id="L435">                return true;</span>
+            } else {
+<span class="fc" id="L437">                transaction.rollback();</span>
+<span class="fc" id="L438">                logger.warn(&quot;Rating with ID {} not found for deletion&quot;, id);</span>
+<span class="fc" id="L439">                return false;</span>
+            }
+            
+<span class="pc bpc" id="L442" title="1 of 2 branches missed.">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L443" title="All 2 branches missed.">            if (transaction != null) {</span>
+                try {
+<span class="nc" id="L445">                    transaction.rollback();</span>
+<span class="nc" id="L446">                } catch (Exception rollbackEx) {</span>
+<span class="nc" id="L447">                    logger.error(&quot;Error during rollback: {}&quot;, rollbackEx.getMessage(), rollbackEx);</span>
+<span class="nc" id="L448">                }</span>
+            }
+<span class="nc" id="L450">            logger.error(&quot;Error deleting rating {}: {}&quot;, id, e.getMessage(), e);</span>
+<span class="nc" id="L451">            return false;</span>
+        }
+    }
+    
+    /**
+     * دریافت تمام نظرات (برای مقاصد مدیریتی)
+     * 
+     * @return لیست تمام نظرات (مرتب شده بر اساس تاریخ ایجاد)
+     */
+    public List&lt;Rating&gt; findAll() {
+<span class="fc" id="L461">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L462">            String hql = &quot;FROM Rating r ORDER BY r.createdAt DESC&quot;;</span>
+<span class="fc" id="L463">            Query&lt;Rating&gt; query = session.createQuery(hql, Rating.class);</span>
+            
+<span class="fc" id="L465">            return query.getResultList();</span>
+            
+<span class="nc" id="L467">        } catch (Exception e) {</span>
+<span class="nc" id="L468">            logger.error(&quot;Error finding all ratings: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L469">            return List.of();</span>
+        }
+    }
+    
+    /**
+     * دریافت نظرات با صفحه‌بندی
+     * 
+     * برای بهبود عملکرد در صفحات مدیریت با تعداد زیاد نظرات
+     * 
+     * @param offset شروع از رکورد (شروع از 0)
+     * @param limit تعداد رکوردها در هر صفحه
+     * @return لیست نظرات با صفحه‌بندی
+     */
+    public List&lt;Rating&gt; findWithPagination(int offset, int limit) {
+<span class="fc" id="L483">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L484">            String hql = &quot;FROM Rating r ORDER BY r.createdAt DESC&quot;;</span>
+<span class="fc" id="L485">            Query&lt;Rating&gt; query = session.createQuery(hql, Rating.class);</span>
+<span class="fc" id="L486">            query.setFirstResult(offset);</span>
+<span class="fc" id="L487">            query.setMaxResults(limit);</span>
+            
+<span class="fc" id="L489">            return query.getResultList();</span>
+            
+<span class="nc" id="L491">        } catch (Exception e) {</span>
+<span class="nc" id="L492">            logger.error(&quot;Error finding ratings with pagination: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L493">            return List.of();</span>
+        }
+    }
+    
+    /**
+     * شمارش کل تعداد نظرات
+     * 
+     * برای آمارهای کلی و محاسبه pagination
+     * 
+     * @return تعداد کل نظرات
+     */
+    public Long countAll() {
+<span class="fc" id="L505">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L506">            String hql = &quot;SELECT COUNT(r) FROM Rating r&quot;;</span>
+<span class="fc" id="L507">            Query&lt;Long&gt; query = session.createQuery(hql, Long.class);</span>
+            
+<span class="fc" id="L509">            Long result = query.uniqueResult();</span>
+<span class="pc bpc" id="L510" title="1 of 2 branches missed.">            return result != null ? result : 0L;</span>
+            
+<span class="nc" id="L512">        } catch (Exception e) {</span>
+<span class="nc" id="L513">            logger.error(&quot;Error counting all ratings: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L514">            return 0L;</span>
+        }
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

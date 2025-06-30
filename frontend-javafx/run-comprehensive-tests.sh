@@ -1,14 +1,23 @@
 #!/bin/bash
 
+# ================================================================
+# اسکریپت اجرای جامع تست‌های سیستم سفارش غذا (Frontend)
+# این اسکریپت تمام تست‌های واحد، یکپارچگی، عملکرد و امنیت را اجرا می‌کند
+# و گزارش کامل تولید می‌نماید.
+# نویسنده: تیم توسعه
+# تاریخ آخرین ویرایش: تیر ۱۴۰۴
+# نسخه: ۲.۰ - سیستم تست جامع پیشرفته
+# ================================================================
+
 echo "================================================================================"
 echo "🎯 FOOD ORDERING SYSTEM - COMPREHENSIVE TEST EXECUTION"
 echo "📅 Date: $(date)"
 echo "================================================================================"
 
 echo ""
-echo "🔍 Checking Prerequisites..."
+echo "🔍 Checking Prerequisites..."  # بررسی پیش‌نیازها و ابزارهای مورد نیاز
 
-# Check if Maven is installed
+# بررسی نصب بودن Maven - ابزار اصلی ساخت پروژه
 if ! command -v mvn &> /dev/null; then
     echo "❌ Maven not found! Please install Maven first."
     echo "💡 Install with: sudo apt-get install maven (Ubuntu/Debian)"
@@ -17,7 +26,7 @@ if ! command -v mvn &> /dev/null; then
 fi
 echo "✅ Maven found"
 
-# Check if Java is installed
+# بررسی نصب بودن Java - محیط اجرایی مورد نیاز
 if ! command -v java &> /dev/null; then
     echo "❌ Java not found! Please install Java 11+ first."
     echo "💡 Install with: sudo apt-get install openjdk-17-jdk"
@@ -25,7 +34,7 @@ if ! command -v java &> /dev/null; then
 fi
 echo "✅ Java found"
 
-# Check if backend project exists
+# بررسی وجود پروژه backend - برای تست‌های یکپارچگی
 if [ ! -f "../backend/pom.xml" ]; then
     echo "❌ Backend project not found!"
     echo "💡 Make sure backend folder exists in parent directory"
@@ -34,16 +43,16 @@ fi
 echo "✅ Backend project found"
 
 echo ""
-echo "🚀 Starting Backend Server..."
+echo "🚀 Starting Backend Server..."  # راه‌اندازی سرور بک‌اند برای تست‌های یکپارچگی
 cd ../backend
-mvn spring-boot:run &
-BACKEND_PID=$!
+mvn spring-boot:run &   # اجرای سرور بک‌اند در پس‌زمینه
+BACKEND_PID=$!          # ذخیره شناسه فرآیند سرور
 cd ../frontend-javafx
 
-echo "⏳ Waiting for backend to start (30 seconds)..."
+echo "⏳ Waiting for backend to start (30 seconds)..."  # صبر برای راه‌اندازی کامل سرور
 sleep 30
 
-# Check if backend is actually running
+# بررسی اجرای صحیح سرور بک‌اند
 if kill -0 $BACKEND_PID 2>/dev/null; then
     echo "✅ Backend server started successfully"
 else
@@ -51,16 +60,18 @@ else
 fi
 
 echo ""
-echo "🧪 Running Comprehensive Test Suite..."
+echo "🧪 Running Comprehensive Test Suite..."  # اجرای تست‌های جامع
 echo ""
 
-# Function to run tests with error handling
+# تابع اجرای هر دسته تست با مدیریت خطا
+# این تابع هر دسته تست را اجرا کرده و نتیجه را گزارش می‌دهد
 run_test_category() {
-    local test_pattern=$1
-    local category_name=$2
+    local test_pattern=$1      # الگوی نام فایل‌های تست
+    local category_name=$2     # نام دسته تست برای نمایش
     
     echo "📊 Executing: $category_name"
     
+    # اجرای تست‌ها با Maven و مدیریت خطاها
     if mvn test -Dtest="$test_pattern" -Dmaven.test.failure.ignore=true; then
         echo "✅ $category_name completed"
     else
@@ -69,20 +80,20 @@ run_test_category() {
     echo ""
 }
 
-# Run all test categories
-run_test_category "**/*SimpleTest" "Unit Tests"
-run_test_category "**/*IntegrationTest" "Integration Tests"
-run_test_category "**/*PerformanceTest" "Performance Tests"
-run_test_category "**/*SecurityTest" "Security Tests"
-run_test_category "**/*EdgeCaseTest" "Edge Case Tests"
-run_test_category "ComprehensiveTestSuite" "Comprehensive Test Suite"
+# اجرای تمام دسته‌های تست به ترتیب اولویت
+run_test_category "**/*SimpleTest" "Unit Tests"           # تست‌های واحد - بررسی عملکرد جداگانه کلاس‌ها
+run_test_category "**/*IntegrationTest" "Integration Tests" # تست‌های یکپارچگی - بررسی تعامل بین بخش‌ها
+run_test_category "**/*PerformanceTest" "Performance Tests" # تست‌های عملکرد - بررسی سرعت و کارایی
+run_test_category "**/*SecurityTest" "Security Tests"       # تست‌های امنیتی - بررسی آسیب‌پذیری‌ها
+run_test_category "**/*EdgeCaseTest" "Edge Case Tests"      # تست‌های شرایط خاص - بررسی حالت‌های غیرعادی
+run_test_category "ComprehensiveTestSuite" "Comprehensive Test Suite" # تست جامع - اجرای تمام تست‌ها
 
-echo "📈 Generating Test Reports..."
-mvn surefire-report:report-only
-mvn surefire-report:failsafe-report-only
+echo "📈 Generating Test Reports..."  # تولید گزارش تست‌ها
+mvn surefire-report:report-only       # تولید گزارش Surefire
+mvn surefire-report:failsafe-report-only  # تولید گزارش Failsafe
 
 echo ""
-echo "📋 Test Results Location:"
+echo "📋 Test Results Location:"  # نمایش مسیر گزارش‌ها
 if [ -f "target/surefire-reports/index.html" ]; then
     echo "✅ HTML Report: $(pwd)/target/surefire-reports/index.html"
     echo "💡 Open in browser: file://$(pwd)/target/surefire-reports/index.html"
@@ -90,6 +101,7 @@ else
     echo "⚠️ Test report not found at expected location"
 fi
 
+# بررسی وجود گزارش پوشش تست
 if [ -f "target/site/jacoco/index.html" ]; then
     echo "✅ Coverage Report: $(pwd)/target/site/jacoco/index.html"
     echo "💡 Open in browser: file://$(pwd)/target/site/jacoco/index.html"
@@ -104,7 +116,7 @@ echo "📊 Coverage reports location: target/site/jacoco/"
 echo "================================================================================"
 
 echo ""
-echo "🛑 Stopping Backend Server..."
+echo "🛑 Stopping Backend Server..."  # توقف سرور بک‌اند
 if kill -0 $BACKEND_PID 2>/dev/null; then
     kill $BACKEND_PID
     echo "✅ Backend server stopped"
@@ -113,5 +125,5 @@ else
 fi
 
 echo ""
-echo "🎉 All done! Press Enter to exit..."
+echo "🎉 All done! Press Enter to exit..."  # انتظار برای خروج کاربر
 read -r 

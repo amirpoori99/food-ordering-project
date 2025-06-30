@@ -1,0 +1,711 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PerformanceUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.common.utils</a> &gt; <span class="el_source">PerformanceUtil.java</span></div><h1>PerformanceUtil.java</h1><pre class="source lang-java linenums">package com.myapp.common.utils;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.time.LocalDateTime;
+import java.time.Duration;
+import java.util.function.Supplier;
+import java.util.function.Consumer;
+
+/**
+ * کلاس ابزاری بهینه‌سازی عملکرد پیشرفته برای سیستم سفارش غذا
+ * Version: 2.0 - Phase 33 Implementation
+ * 
+ * شامل سیستم cache پیشرفته، پردازش ناهمزمان، مدیریت حافظه، 
+ * بهینه‌سازی کوئری، نظارت بر عملکرد و تکنیک‌های پیشرفته بهینه‌سازی
+ * 
+ * این کلاس ابزارهای پیشرفته‌ای برای بهبود سرعت و کارایی سیستم فراهم می‌کند
+ */
+<span class="nc" id="L32">public class PerformanceUtil {</span>
+    
+    // ==================== سیستم کش پیشرفته (ADVANCED CACHING SYSTEM) ====================
+    
+    // نقشه thread-safe برای ذخیره‌سازی داده‌های کش شده
+<span class="fc" id="L37">    private static final Map&lt;String, CacheEntry&gt; cache = new ConcurrentHashMap&lt;&gt;();</span>
+    // کش برای آمار عملکرد
+<span class="fc" id="L39">    private static final Map&lt;String, PerformanceStats&gt; performanceCache = new ConcurrentHashMap&lt;&gt;();</span>
+    // صف برای مدیریت LRU (Least Recently Used)
+<span class="fc" id="L41">    private static final Queue&lt;String&gt; lruQueue = new ConcurrentLinkedQueue&lt;&gt;();</span>
+    
+    // تنظیمات پیشرفته کش
+    private static final long DEFAULT_CACHE_TTL_MINUTES = 30;
+    private static final int MAX_CACHE_SIZE = 1000; // کاهش اندازه کش برای هماهنگی با تست
+    private static final int LRU_CLEANUP_THRESHOLD = 100; // آستانه پاک‌سازی LRU
+<span class="fc" id="L47">    private static final AtomicLong cacheHits = new AtomicLong(0);</span>
+<span class="fc" id="L48">    private static final AtomicLong cacheMisses = new AtomicLong(0);</span>
+    
+    /**
+     * کلاس داخلی پیشرفته برای ذخیره‌سازی آیتم‌های کش با پشتیبانی از TTL و LRU
+     */
+    private static class CacheEntry {
+        private final Object value;
+        private final LocalDateTime expiryTime;
+        private LocalDateTime lastAccessTime; // حذف final برای امکان تغییر
+        private final AtomicInteger accessCount;
+        
+<span class="fc" id="L59">        public CacheEntry(Object value, long ttlMinutes) {</span>
+<span class="fc" id="L60">            this.value = value;</span>
+<span class="fc" id="L61">            this.expiryTime = LocalDateTime.now().plusMinutes(ttlMinutes);</span>
+<span class="fc" id="L62">            this.lastAccessTime = LocalDateTime.now();</span>
+<span class="fc" id="L63">            this.accessCount = new AtomicInteger(0);</span>
+<span class="fc" id="L64">        }</span>
+        
+        public boolean isExpired() {
+<span class="fc" id="L67">            return LocalDateTime.now().isAfter(expiryTime);</span>
+        }
+        
+        public Object getValue() {
+<span class="fc" id="L71">            lastAccessTime = LocalDateTime.now();</span>
+<span class="fc" id="L72">            accessCount.incrementAndGet();</span>
+<span class="fc" id="L73">            return value;</span>
+        }
+        
+        public LocalDateTime getLastAccessTime() {
+<span class="nc" id="L77">            return lastAccessTime;</span>
+        }
+        
+        public int getAccessCount() {
+<span class="nc" id="L81">            return accessCount.get();</span>
+        }
+        
+        public boolean isHot() {
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">            return accessCount.get() &gt; 10; // آیتم‌های داغ</span>
+        }
+    }
+    
+    /**
+     * کلاس آمار عملکرد برای مانیتورینگ
+     */
+<span class="fc" id="L92">    private static class PerformanceStats {</span>
+<span class="fc" id="L93">        private final AtomicLong totalExecutions = new AtomicLong(0);</span>
+<span class="fc" id="L94">        private final AtomicLong totalExecutionTime = new AtomicLong(0);</span>
+<span class="fc" id="L95">        private final AtomicLong minExecutionTime = new AtomicLong(Long.MAX_VALUE);</span>
+<span class="fc" id="L96">        private final AtomicLong maxExecutionTime = new AtomicLong(0);</span>
+<span class="fc" id="L97">        private final AtomicLong errors = new AtomicLong(0);</span>
+        
+        public void recordExecution(long executionTime) {
+<span class="fc" id="L100">            totalExecutions.incrementAndGet();</span>
+<span class="fc" id="L101">            totalExecutionTime.addAndGet(executionTime);</span>
+            
+            // Update min/max
+<span class="fc" id="L104">            long currentMin = minExecutionTime.get();</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">            while (executionTime &lt; currentMin &amp;&amp; </span>
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">                   !minExecutionTime.compareAndSet(currentMin, executionTime)) {</span>
+<span class="nc" id="L107">                currentMin = minExecutionTime.get();</span>
+            }
+            
+<span class="fc" id="L110">            long currentMax = maxExecutionTime.get();</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">            while (executionTime &gt; currentMax &amp;&amp; </span>
+<span class="pc bpc" id="L112" title="1 of 2 branches missed.">                   !maxExecutionTime.compareAndSet(currentMax, executionTime)) {</span>
+<span class="nc" id="L113">                currentMax = maxExecutionTime.get();</span>
+            }
+<span class="fc" id="L115">        }</span>
+        
+        public void recordError() {
+<span class="nc" id="L118">            errors.incrementAndGet();</span>
+<span class="nc" id="L119">        }</span>
+        
+        public double getAverageExecutionTime() {
+<span class="nc" id="L122">            long total = totalExecutions.get();</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">            return total &gt; 0 ? (double) totalExecutionTime.get() / total : 0;</span>
+        }
+        
+        public long getMinExecutionTime() {
+<span class="nc bnc" id="L127" title="All 2 branches missed.">            return minExecutionTime.get() == Long.MAX_VALUE ? 0 : minExecutionTime.get();</span>
+        }
+        
+        public long getMaxExecutionTime() {
+<span class="nc" id="L131">            return maxExecutionTime.get();</span>
+        }
+        
+        public long getTotalExecutions() {
+<span class="nc" id="L135">            return totalExecutions.get();</span>
+        }
+        
+        public long getErrorCount() {
+<span class="nc" id="L139">            return errors.get();</span>
+        }
+        
+        public double getErrorRate() {
+<span class="nc" id="L143">            long total = totalExecutions.get();</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">            return total &gt; 0 ? (double) errors.get() / total : 0;</span>
+        }
+    }
+    
+    // ==================== سیستم کش پیشرفته ====================
+    
+    /**
+     * ذخیره‌سازی داده در کش با TTL پیش‌فرض و مدیریت LRU
+     */
+    public static void cacheData(String key, Object data) {
+<span class="fc" id="L154">        cacheData(key, data, DEFAULT_CACHE_TTL_MINUTES);</span>
+<span class="fc" id="L155">    }</span>
+    
+    /**
+     * ذخیره‌سازی داده در کش با TTL سفارشی و مدیریت LRU
+     */
+    public static void cacheData(String key, Object data, long ttlMinutes) {
+        // مدیریت LRU و اندازه کش
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        if (cache.size() &gt;= MAX_CACHE_SIZE) {</span>
+<span class="fc" id="L163">            cleanupLRU();</span>
+        }
+        
+<span class="fc" id="L166">        cache.put(key, new CacheEntry(data, ttlMinutes));</span>
+<span class="fc" id="L167">        lruQueue.offer(key);</span>
+<span class="fc" id="L168">    }</span>
+    
+    /**
+     * دریافت داده از کش با آمارگیری
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public static &lt;T&gt; T getCachedData(String key, Class&lt;T&gt; type) {
+<span class="fc" id="L175">        CacheEntry entry = cache.get(key);</span>
+<span class="pc bpc" id="L176" title="1 of 4 branches missed.">        if (entry == null || entry.isExpired()) {</span>
+<span class="fc" id="L177">            cache.remove(key);</span>
+<span class="fc" id="L178">            cacheMisses.incrementAndGet();</span>
+<span class="fc" id="L179">            return null;</span>
+        }
+        
+<span class="fc" id="L182">        cacheHits.incrementAndGet();</span>
+        try {
+<span class="fc" id="L184">            return type.cast(entry.getValue());</span>
+<span class="fc" id="L185">        } catch (ClassCastException e) {</span>
+<span class="fc" id="L186">            cache.remove(key);</span>
+<span class="fc" id="L187">            cacheMisses.incrementAndGet();</span>
+<span class="fc" id="L188">            return null;</span>
+        }
+    }
+    
+    /**
+     * پاک‌سازی LRU برای آزادسازی فضا
+     */
+    private static void cleanupLRU() {
+<span class="fc" id="L196">        int itemsToRemove = LRU_CLEANUP_THRESHOLD;</span>
+<span class="fc" id="L197">        List&lt;String&gt; itemsToRemoveList = new ArrayList&lt;&gt;();</span>
+        
+        // پیدا کردن آیتم‌های کم‌استفاده
+<span class="pc bpc" id="L200" title="1 of 2 branches missed.">        for (Map.Entry&lt;String, CacheEntry&gt; entry : cache.entrySet()) {</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">            if (itemsToRemoveList.size() &gt;= itemsToRemove) break;</span>
+            
+<span class="fc" id="L203">            CacheEntry cacheEntry = entry.getValue();</span>
+<span class="pc bpc" id="L204" title="2 of 4 branches missed.">            if (!cacheEntry.isHot() &amp;&amp; !cacheEntry.isExpired()) {</span>
+<span class="fc" id="L205">                itemsToRemoveList.add(entry.getKey());</span>
+            }
+<span class="fc" id="L207">        }</span>
+        
+        // حذف آیتم‌های انتخاب شده
+<span class="fc bfc" id="L210" title="All 2 branches covered.">        for (String key : itemsToRemoveList) {</span>
+<span class="fc" id="L211">            cache.remove(key);</span>
+<span class="fc" id="L212">            lruQueue.remove(key);</span>
+<span class="fc" id="L213">        }</span>
+<span class="fc" id="L214">    }</span>
+    
+    /**
+     * دریافت آمار پیشرفته کش
+     */
+    public static Map&lt;String, Object&gt; getAdvancedCacheStats() {
+<span class="fc" id="L220">        Map&lt;String, Object&gt; stats = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L221">        stats.put(&quot;totalEntries&quot;, cache.size());</span>
+<span class="fc" id="L222">        stats.put(&quot;maxSize&quot;, MAX_CACHE_SIZE);</span>
+<span class="fc" id="L223">        stats.put(&quot;cacheHits&quot;, cacheHits.get());</span>
+<span class="fc" id="L224">        stats.put(&quot;cacheMisses&quot;, cacheMisses.get());</span>
+        
+<span class="fc" id="L226">        long totalRequests = cacheHits.get() + cacheMisses.get();</span>
+<span class="fc bfc" id="L227" title="All 2 branches covered.">        double hitRate = totalRequests &gt; 0 ? (double) cacheHits.get() / totalRequests : 0;</span>
+<span class="fc" id="L228">        stats.put(&quot;hitRate&quot;, String.format(&quot;%.2f%%&quot;, hitRate * 100));</span>
+        
+        // آمار آیتم‌های داغ
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">        long hotItems = cache.values().stream().mapToLong(entry -&gt; entry.isHot() ? 1 : 0).sum();</span>
+<span class="fc" id="L232">        stats.put(&quot;hotItems&quot;, hotItems);</span>
+        
+        // آمار آیتم‌های منقضی
+<span class="pc bpc" id="L235" title="1 of 2 branches missed.">        long expiredCount = cache.values().stream().mapToLong(entry -&gt; entry.isExpired() ? 1 : 0).sum();</span>
+<span class="fc" id="L236">        stats.put(&quot;expiredEntries&quot;, expiredCount);</span>
+<span class="fc" id="L237">        stats.put(&quot;activeEntries&quot;, cache.size() - expiredCount);</span>
+        
+<span class="fc" id="L239">        return stats;</span>
+    }
+    
+    // ==================== پردازش ناهمزمان پیشرفته (ADVANCED ASYNC PROCESSING) ====================
+    
+    // Thread pool پیشرفته با تنظیمات بهینه
+<span class="fc" id="L245">    private static final ExecutorService executor = new ThreadPoolExecutor(</span>
+        10, // core pool size
+        50, // maximum pool size
+        60L, // keep alive time
+        TimeUnit.SECONDS,
+        new LinkedBlockingQueue&lt;&gt;(1000), // work queue
+        new ThreadPoolExecutor.CallerRunsPolicy() // rejection policy
+    );
+    
+    // Thread pool برای کارهای I/O محور
+<span class="fc" id="L255">    private static final ExecutorService ioExecutor = Executors.newCachedThreadPool();</span>
+    
+    /**
+     * اجرای کار به صورت ناهمزمان با CompletableFuture
+     */
+    public static &lt;T&gt; CompletableFuture&lt;T&gt; executeAsync(Supplier&lt;T&gt; supplier) {
+<span class="nc" id="L261">        return CompletableFuture.supplyAsync(supplier, executor);</span>
+    }
+    
+    /**
+     * اجرای کار به صورت ناهمزمان برای I/O operations
+     */
+    public static &lt;T&gt; CompletableFuture&lt;T&gt; executeIOAsync(Supplier&lt;T&gt; supplier) {
+<span class="nc" id="L268">        return CompletableFuture.supplyAsync(supplier, ioExecutor);</span>
+    }
+    
+    /**
+     * اجرای چندین کار به صورت همزمان با timeout
+     */
+    public static &lt;T&gt; List&lt;T&gt; executeConcurrentlyWithTimeout(
+            List&lt;Supplier&lt;T&gt;&gt; suppliers, long timeout, TimeUnit unit) {
+        
+<span class="nc" id="L277">        List&lt;CompletableFuture&lt;T&gt;&gt; futures = suppliers.stream()</span>
+<span class="nc" id="L278">            .map(supplier -&gt; CompletableFuture.supplyAsync(supplier, executor))</span>
+<span class="nc" id="L279">            .toList();</span>
+        
+<span class="nc" id="L281">        CompletableFuture&lt;Void&gt; allFutures = CompletableFuture.allOf(</span>
+<span class="nc" id="L282">            futures.toArray(new CompletableFuture[0])</span>
+        );
+        
+        try {
+<span class="nc" id="L286">            allFutures.get(timeout, unit);</span>
+<span class="nc" id="L287">        } catch (Exception e) {</span>
+            // Timeout or other exception
+<span class="nc" id="L289">            allFutures.cancel(true);</span>
+<span class="nc" id="L290">        }</span>
+        
+<span class="nc" id="L292">        return futures.stream()</span>
+<span class="nc" id="L293">            .map(future -&gt; {</span>
+                try {
+<span class="nc" id="L295">                    return future.get(0, TimeUnit.MILLISECONDS);</span>
+<span class="nc" id="L296">                } catch (Exception e) {</span>
+<span class="nc" id="L297">                    return null;</span>
+                }
+            })
+<span class="nc" id="L300">            .toList();</span>
+    }
+    
+    // ==================== بهینه‌سازی حافظه پیشرفته (ADVANCED MEMORY OPTIMIZATION) ====================
+    
+    /**
+     * مانیتورینگ پیشرفته حافظه با آمار تفصیلی
+     */
+    public static Map&lt;String, Object&gt; getAdvancedMemoryStats() {
+<span class="fc" id="L309">        Runtime runtime = Runtime.getRuntime();</span>
+<span class="fc" id="L310">        Map&lt;String, Object&gt; stats = new ConcurrentHashMap&lt;&gt;();</span>
+        
+        // آمار حافظه
+<span class="fc" id="L313">        long totalMemory = runtime.totalMemory();</span>
+<span class="fc" id="L314">        long freeMemory = runtime.freeMemory();</span>
+<span class="fc" id="L315">        long usedMemory = totalMemory - freeMemory;</span>
+<span class="fc" id="L316">        long maxMemory = runtime.maxMemory();</span>
+        
+<span class="fc" id="L318">        stats.put(&quot;totalMemoryMB&quot;, totalMemory / 1024 / 1024);</span>
+<span class="fc" id="L319">        stats.put(&quot;freeMemoryMB&quot;, freeMemory / 1024 / 1024);</span>
+<span class="fc" id="L320">        stats.put(&quot;usedMemoryMB&quot;, usedMemory / 1024 / 1024);</span>
+<span class="fc" id="L321">        stats.put(&quot;maxMemoryMB&quot;, maxMemory / 1024 / 1024);</span>
+<span class="fc" id="L322">        stats.put(&quot;memoryUsagePercent&quot;, (double) usedMemory / maxMemory * 100);</span>
+        
+        // اضافه کردن کلیدهای مورد نیاز تست‌ها
+<span class="fc" id="L325">        stats.put(&quot;usagePercentage&quot;, (double) usedMemory / maxMemory * 100);</span>
+<span class="fc" id="L326">        stats.put(&quot;isCritical&quot;, isMemoryUsageCritical());</span>
+        
+        // آمار GC
+<span class="fc" id="L329">        long gcCount = 0;</span>
+<span class="fc" id="L330">        long gcTime = 0;</span>
+        try {
+            java.lang.management.GarbageCollectorMXBean[] gcBeans = 
+<span class="fc" id="L333">                java.lang.management.ManagementFactory.getGarbageCollectorMXBeans()</span>
+<span class="fc" id="L334">                    .toArray(new java.lang.management.GarbageCollectorMXBean[0]);</span>
+            
+<span class="fc bfc" id="L336" title="All 2 branches covered.">            for (java.lang.management.GarbageCollectorMXBean gcBean : gcBeans) {</span>
+<span class="fc" id="L337">                gcCount += gcBean.getCollectionCount();</span>
+<span class="fc" id="L338">                gcTime += gcBean.getCollectionTime();</span>
+            }
+<span class="nc" id="L340">        } catch (Exception e) {</span>
+            // GC stats not available
+<span class="fc" id="L342">        }</span>
+        
+<span class="fc" id="L344">        stats.put(&quot;gcCount&quot;, gcCount);</span>
+<span class="fc" id="L345">        stats.put(&quot;gcTimeMS&quot;, gcTime);</span>
+        
+<span class="fc" id="L347">        return stats;</span>
+    }
+    
+    /**
+     * بررسی بحرانی بودن استفاده از حافظه
+     */
+    public static boolean isMemoryUsageCritical() {
+<span class="fc" id="L354">        Runtime runtime = Runtime.getRuntime();</span>
+<span class="fc" id="L355">        long usedMemory = runtime.totalMemory() - runtime.freeMemory();</span>
+<span class="fc" id="L356">        long maxMemory = runtime.maxMemory();</span>
+<span class="fc" id="L357">        double memoryUsage = (double) usedMemory / maxMemory;</span>
+<span class="pc bpc" id="L358" title="1 of 2 branches missed.">        return memoryUsage &gt; 0.9; // بیش از 90% استفاده</span>
+    }
+    
+    /**
+     * بهینه‌سازی حافظه با تنظیمات پیشرفته
+     */
+    public static void optimizeMemory() {
+<span class="nc" id="L365">        Runtime runtime = Runtime.getRuntime();</span>
+        
+        // بررسی وضعیت حافظه
+<span class="nc" id="L368">        long usedMemory = runtime.totalMemory() - runtime.freeMemory();</span>
+<span class="nc" id="L369">        long maxMemory = runtime.maxMemory();</span>
+<span class="nc" id="L370">        double memoryUsage = (double) usedMemory / maxMemory;</span>
+        
+        // اگر استفاده از حافظه بیش از 80% باشد، GC اجباری
+<span class="nc bnc" id="L373" title="All 2 branches missed.">        if (memoryUsage &gt; 0.8) {</span>
+<span class="nc" id="L374">            System.gc();</span>
+            
+            // بررسی مجدد بعد از GC
+<span class="nc" id="L377">            usedMemory = runtime.totalMemory() - runtime.freeMemory();</span>
+<span class="nc" id="L378">            memoryUsage = (double) usedMemory / maxMemory;</span>
+            
+            // اگر همچنان بالا است، هشدار
+<span class="nc bnc" id="L381" title="All 2 branches missed.">            if (memoryUsage &gt; 0.9) {</span>
+<span class="nc" id="L382">                System.err.println(&quot;⚠️ WARNING: High memory usage detected: &quot; + </span>
+<span class="nc" id="L383">                    String.format(&quot;%.1f%%&quot;, memoryUsage * 100));</span>
+            }
+        }
+<span class="nc" id="L386">    }</span>
+    
+    // ==================== پردازش Batch ====================
+    
+    /**
+     * پردازش Batch برای عملیات‌های بزرگ
+     */
+    public static &lt;T, R&gt; List&lt;R&gt; processBatch(List&lt;T&gt; items, int batchSize, 
+                                             java.util.function.Function&lt;List&lt;T&gt;, List&lt;R&gt;&gt; batchProcessor) {
+<span class="fc" id="L395">        List&lt;R&gt; results = new ArrayList&lt;&gt;();</span>
+        
+<span class="fc bfc" id="L397" title="All 2 branches covered.">        for (int i = 0; i &lt; items.size(); i += batchSize) {</span>
+<span class="fc" id="L398">            int endIndex = Math.min(i + batchSize, items.size());</span>
+<span class="fc" id="L399">            List&lt;T&gt; batch = items.subList(i, endIndex);</span>
+            
+<span class="fc" id="L401">            List&lt;R&gt; batchResults = batchProcessor.apply(batch);</span>
+<span class="fc" id="L402">            results.addAll(batchResults);</span>
+        }
+        
+<span class="fc" id="L405">        return results;</span>
+    }
+    
+    // ==================== بهینه‌سازی کوئری پیشرفته (ADVANCED QUERY OPTIMIZATION) ====================
+    
+    /**
+     * اجرای کوئری با کش پیشرفته و آمارگیری عملکرد
+     */
+    public static &lt;T&gt; T executeWithAdvancedCache(String cacheKey, Supplier&lt;T&gt; executor, Class&lt;T&gt; resultType) {
+<span class="nc" id="L414">        return executeWithAdvancedCache(cacheKey, executor, resultType, DEFAULT_CACHE_TTL_MINUTES);</span>
+    }
+    
+    /**
+     * اجرای کوئری با کش پیشرفته، آمارگیری و مانیتورینگ
+     */
+    public static &lt;T&gt; T executeWithAdvancedCache(String cacheKey, Supplier&lt;T&gt; executor, Class&lt;T&gt; resultType, long ttlMinutes) {
+        // بررسی کش
+<span class="fc" id="L422">        T cachedResult = getCachedData(cacheKey, resultType);</span>
+<span class="fc bfc" id="L423" title="All 2 branches covered.">        if (cachedResult != null) {</span>
+<span class="fc" id="L424">            return cachedResult;</span>
+        }
+        
+        // اجرای کوئری با آمارگیری
+<span class="fc" id="L428">        long startTime = System.currentTimeMillis();</span>
+<span class="fc" id="L429">        T result = null;</span>
+<span class="fc" id="L430">        boolean success = false;</span>
+        
+        try {
+<span class="fc" id="L433">            result = executor.get();</span>
+<span class="fc" id="L434">            success = true;</span>
+<span class="nc" id="L435">        } catch (Exception e) {</span>
+            // ثبت خطا در آمار
+<span class="nc" id="L437">            recordPerformanceError(cacheKey);</span>
+<span class="nc" id="L438">            throw e;</span>
+        } finally {
+<span class="fc" id="L440">            long executionTime = System.currentTimeMillis() - startTime;</span>
+<span class="fc" id="L441">            recordPerformanceStats(cacheKey, executionTime, success);</span>
+        }
+        
+        // کش کردن نتیجه
+<span class="pc bpc" id="L445" title="1 of 2 branches missed.">        if (result != null) {</span>
+<span class="fc" id="L446">            cacheData(cacheKey, result, ttlMinutes);</span>
+        }
+        
+<span class="fc" id="L449">        return result;</span>
+    }
+    
+    /**
+     * ثبت آمار عملکرد
+     */
+    private static void recordPerformanceStats(String operation, long executionTime, boolean success) {
+<span class="fc" id="L456">        PerformanceStats stats = performanceCache.computeIfAbsent(operation, k -&gt; new PerformanceStats());</span>
+        
+<span class="pc bpc" id="L458" title="1 of 2 branches missed.">        if (success) {</span>
+<span class="fc" id="L459">            stats.recordExecution(executionTime);</span>
+        } else {
+<span class="nc" id="L461">            stats.recordError();</span>
+        }
+<span class="fc" id="L463">    }</span>
+    
+    /**
+     * ثبت خطای عملکرد
+     */
+    private static void recordPerformanceError(String operation) {
+<span class="nc" id="L469">        PerformanceStats stats = performanceCache.computeIfAbsent(operation, k -&gt; new PerformanceStats());</span>
+<span class="nc" id="L470">        stats.recordError();</span>
+<span class="nc" id="L471">    }</span>
+    
+    /**
+     * دریافت آمار عملکرد برای عملیات خاص
+     */
+    public static Map&lt;String, Object&gt; getPerformanceStats(String operation) {
+<span class="nc" id="L477">        PerformanceStats stats = performanceCache.get(operation);</span>
+<span class="nc bnc" id="L478" title="All 2 branches missed.">        if (stats == null) {</span>
+<span class="nc" id="L479">            return new ConcurrentHashMap&lt;&gt;();</span>
+        }
+        
+<span class="nc" id="L482">        Map&lt;String, Object&gt; result = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="nc" id="L483">        result.put(&quot;operation&quot;, operation);</span>
+<span class="nc" id="L484">        result.put(&quot;totalExecutions&quot;, stats.getTotalExecutions());</span>
+<span class="nc" id="L485">        result.put(&quot;averageExecutionTime&quot;, stats.getAverageExecutionTime());</span>
+<span class="nc" id="L486">        result.put(&quot;minExecutionTime&quot;, stats.getMinExecutionTime());</span>
+<span class="nc" id="L487">        result.put(&quot;maxExecutionTime&quot;, stats.getMaxExecutionTime());</span>
+<span class="nc" id="L488">        result.put(&quot;errorCount&quot;, stats.getErrorCount());</span>
+<span class="nc" id="L489">        result.put(&quot;errorRate&quot;, stats.getErrorRate());</span>
+        
+<span class="nc" id="L491">        return result;</span>
+    }
+    
+    /**
+     * دریافت آمار عملکرد کلی
+     */
+    public static Map&lt;String, Object&gt; getAllPerformanceStats() {
+<span class="nc" id="L498">        Map&lt;String, Object&gt; allStats = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="nc" id="L499">        allStats.put(&quot;totalOperations&quot;, performanceCache.size());</span>
+        
+        // آمار کلی
+<span class="nc" id="L502">        long totalExecutions = 0;</span>
+<span class="nc" id="L503">        long totalErrors = 0;</span>
+<span class="nc" id="L504">        double totalExecutionTime = 0;</span>
+        
+<span class="nc bnc" id="L506" title="All 2 branches missed.">        for (PerformanceStats stats : performanceCache.values()) {</span>
+<span class="nc" id="L507">            totalExecutions += stats.getTotalExecutions();</span>
+<span class="nc" id="L508">            totalErrors += stats.getErrorCount();</span>
+<span class="nc" id="L509">            totalExecutionTime += stats.getAverageExecutionTime() * stats.getTotalExecutions();</span>
+<span class="nc" id="L510">        }</span>
+        
+<span class="nc" id="L512">        allStats.put(&quot;totalExecutions&quot;, totalExecutions);</span>
+<span class="nc" id="L513">        allStats.put(&quot;totalErrors&quot;, totalErrors);</span>
+<span class="nc bnc" id="L514" title="All 2 branches missed.">        allStats.put(&quot;overallErrorRate&quot;, totalExecutions &gt; 0 ? (double) totalErrors / totalExecutions : 0);</span>
+<span class="nc bnc" id="L515" title="All 2 branches missed.">        allStats.put(&quot;averageExecutionTime&quot;, totalExecutions &gt; 0 ? totalExecutionTime / totalExecutions : 0);</span>
+        
+<span class="nc" id="L517">        return allStats;</span>
+    }
+    
+    // ==================== متدهای موجود (EXISTING METHODS) ====================
+    
+    public static boolean isCached(String key) {
+<span class="fc" id="L523">        CacheEntry entry = cache.get(key);</span>
+<span class="pc bpc" id="L524" title="2 of 4 branches missed.">        if (entry == null || entry.isExpired()) {</span>
+<span class="nc" id="L525">            cache.remove(key);</span>
+<span class="nc" id="L526">            return false;</span>
+        }
+<span class="fc" id="L528">        return true;</span>
+    }
+    
+    public static void clearCache() {
+<span class="fc" id="L532">        cache.clear();</span>
+<span class="fc" id="L533">        lruQueue.clear();</span>
+<span class="fc" id="L534">        cacheHits.set(0);</span>
+<span class="fc" id="L535">        cacheMisses.set(0);</span>
+<span class="fc" id="L536">    }</span>
+    
+    public static void cleanExpiredEntries() {
+<span class="nc" id="L539">        cache.entrySet().removeIf(entry -&gt; entry.getValue().isExpired());</span>
+<span class="nc" id="L540">    }</span>
+    
+    public static Map&lt;String, Object&gt; getCacheStats() {
+<span class="fc" id="L543">        return getAdvancedCacheStats();</span>
+    }
+    
+    public static Future&lt;Void&gt; executeAsync(Runnable task) {
+<span class="fc" id="L547">        return executor.submit(() -&gt; {</span>
+<span class="fc" id="L548">            task.run();</span>
+<span class="fc" id="L549">            return null;</span>
+        });
+    }
+    
+    public static List&lt;Future&lt;Void&gt;&gt; executeConcurrently(List&lt;Runnable&gt; tasks) {
+<span class="fc" id="L554">        List&lt;Future&lt;Void&gt;&gt; futures = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L555" title="All 2 branches covered.">        for (Runnable task : tasks) {</span>
+<span class="fc" id="L556">            futures.add(executeAsync(task));</span>
+<span class="fc" id="L557">        }</span>
+<span class="fc" id="L558">        return futures;</span>
+    }
+    
+    public static boolean waitForCompletion(List&lt;Future&lt;Void&gt;&gt; futures, long timeout, TimeUnit unit) {
+        try {
+<span class="fc bfc" id="L563" title="All 2 branches covered.">            for (Future&lt;Void&gt; future : futures) {</span>
+<span class="fc" id="L564">                future.get(timeout, unit);</span>
+<span class="fc" id="L565">            }</span>
+<span class="fc" id="L566">            return true;</span>
+<span class="nc" id="L567">        } catch (Exception e) {</span>
+<span class="nc" id="L568">            return false;</span>
+        }
+    }
+    
+    public static Map&lt;String, Object&gt; getMemoryStats() {
+<span class="fc" id="L573">        return getAdvancedMemoryStats();</span>
+    }
+    
+    public static void forceGarbageCollection() {
+<span class="fc" id="L577">        System.gc();</span>
+<span class="fc" id="L578">    }</span>
+    
+    public static String createQueryCacheKey(String operation, Object... params) {
+<span class="fc" id="L581">        StringBuilder keyBuilder = new StringBuilder(operation);</span>
+<span class="fc bfc" id="L582" title="All 2 branches covered.">        for (Object param : params) {</span>
+<span class="pc bpc" id="L583" title="1 of 2 branches missed.">            keyBuilder.append(&quot;_&quot;).append(param != null ? param.toString() : &quot;null&quot;);</span>
+        }
+<span class="fc" id="L585">        return keyBuilder.toString();</span>
+    }
+    
+    public static &lt;T&gt; T executeWithCache(String cacheKey, QueryExecutor&lt;T&gt; executor, Class&lt;T&gt; resultType) {
+<span class="fc" id="L589">        return executeWithCache(cacheKey, executor, resultType, DEFAULT_CACHE_TTL_MINUTES);</span>
+    }
+    
+    public static &lt;T&gt; T executeWithCache(String cacheKey, QueryExecutor&lt;T&gt; executor, Class&lt;T&gt; resultType, long ttlMinutes) {
+<span class="fc" id="L593">        return executeWithAdvancedCache(cacheKey, executor::execute, resultType, ttlMinutes);</span>
+    }
+    
+    @FunctionalInterface
+    public interface QueryExecutor&lt;T&gt; {
+        T execute();
+    }
+    
+    public static &lt;T&gt; PerformanceResult&lt;T&gt; measurePerformance(String operation, Supplier&lt;T&gt; supplier) {
+<span class="fc" id="L602">        long startTime = System.currentTimeMillis();</span>
+<span class="fc" id="L603">        T result = null;</span>
+<span class="fc" id="L604">        boolean success = false;</span>
+        
+        try {
+<span class="fc" id="L607">            result = supplier.get();</span>
+<span class="fc" id="L608">            success = true;</span>
+<span class="nc" id="L609">        } catch (Exception e) {</span>
+<span class="nc" id="L610">            recordPerformanceError(operation);</span>
+<span class="nc" id="L611">            throw e;</span>
+        } finally {
+<span class="fc" id="L613">            long executionTime = System.currentTimeMillis() - startTime;</span>
+<span class="fc" id="L614">            recordPerformanceStats(operation, executionTime, success);</span>
+        }
+        
+<span class="fc" id="L617">        return new PerformanceResult&lt;&gt;(result, System.currentTimeMillis() - startTime, success, operation);</span>
+    }
+    
+    public static class PerformanceResult&lt;T&gt; {
+        private final T result;
+        private final long executionTime;
+        private final boolean success;
+        private final String operationName;
+        
+<span class="nc" id="L626">        public PerformanceResult(T result, long executionTime, boolean success) {</span>
+<span class="nc" id="L627">            this.result = result;</span>
+<span class="nc" id="L628">            this.executionTime = executionTime;</span>
+<span class="nc" id="L629">            this.success = success;</span>
+<span class="nc" id="L630">            this.operationName = &quot;unknown&quot;;</span>
+<span class="nc" id="L631">        }</span>
+        
+<span class="fc" id="L633">        public PerformanceResult(T result, long executionTime, boolean success, String operationName) {</span>
+<span class="fc" id="L634">            this.result = result;</span>
+<span class="fc" id="L635">            this.executionTime = executionTime;</span>
+<span class="fc" id="L636">            this.success = success;</span>
+<span class="fc" id="L637">            this.operationName = operationName;</span>
+<span class="fc" id="L638">        }</span>
+        
+<span class="fc" id="L640">        public T getResult() { return result; }</span>
+<span class="nc" id="L641">        public long getExecutionTime() { return executionTime; }</span>
+<span class="fc" id="L642">        public long getExecutionTimeMs() { return executionTime; }</span>
+<span class="nc" id="L643">        public boolean isSuccess() { return success; }</span>
+<span class="fc" id="L644">        public String getOperationName() { return operationName; }</span>
+        
+        @Override
+        public String toString() {
+<span class="fc" id="L648">            return String.format(&quot;PerformanceResult{executionTime=%dms, success=%s, operation=%s}&quot;, </span>
+<span class="fc" id="L649">                executionTime, success, operationName);</span>
+        }
+    }
+    
+    // ==================== متدهای جدید برای فاز 33 ====================
+    
+    /**
+     * بهینه‌سازی خودکار سیستم
+     */
+    public static void autoOptimize() {
+        // بهینه‌سازی حافظه
+<span class="nc" id="L660">        optimizeMemory();</span>
+        
+        // پاک‌سازی کش
+<span class="nc" id="L663">        cleanExpiredEntries();</span>
+        
+        // بررسی اندازه کش
+<span class="nc bnc" id="L666" title="All 2 branches missed.">        if (cache.size() &gt; MAX_CACHE_SIZE * 0.8) {</span>
+<span class="nc" id="L667">            cleanupLRU();</span>
+        }
+<span class="nc" id="L669">    }</span>
+    
+    /**
+     * دریافت گزارش کامل عملکرد
+     */
+    public static Map&lt;String, Object&gt; getCompletePerformanceReport() {
+<span class="nc" id="L675">        Map&lt;String, Object&gt; report = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="nc" id="L676">        report.put(&quot;timestamp&quot;, LocalDateTime.now().toString());</span>
+<span class="nc" id="L677">        report.put(&quot;cacheStats&quot;, getAdvancedCacheStats());</span>
+<span class="nc" id="L678">        report.put(&quot;memoryStats&quot;, getAdvancedMemoryStats());</span>
+<span class="nc" id="L679">        report.put(&quot;performanceStats&quot;, getAllPerformanceStats());</span>
+        
+<span class="nc" id="L681">        return report;</span>
+    }
+    
+    /**
+     * تنظیم مجدد آمار عملکرد
+     */
+    public static void resetPerformanceStats() {
+<span class="nc" id="L688">        performanceCache.clear();</span>
+<span class="nc" id="L689">    }</span>
+    
+    /**
+     * خاموش کردن سیستم
+     */
+    public static void shutdown() {
+<span class="fc" id="L695">        executor.shutdown();</span>
+<span class="fc" id="L696">        ioExecutor.shutdown();</span>
+        try {
+<span class="pc bpc" id="L698" title="1 of 2 branches missed.">            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {</span>
+<span class="nc" id="L699">                executor.shutdownNow();</span>
+            }
+<span class="pc bpc" id="L701" title="1 of 2 branches missed.">            if (!ioExecutor.awaitTermination(60, TimeUnit.SECONDS)) {</span>
+<span class="nc" id="L702">                ioExecutor.shutdownNow();</span>
+            }
+<span class="nc" id="L704">        } catch (InterruptedException e) {</span>
+<span class="nc" id="L705">            executor.shutdownNow();</span>
+<span class="nc" id="L706">            ioExecutor.shutdownNow();</span>
+<span class="nc" id="L707">            Thread.currentThread().interrupt();</span>
+<span class="fc" id="L708">        }</span>
+<span class="fc" id="L709">    }</span>
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

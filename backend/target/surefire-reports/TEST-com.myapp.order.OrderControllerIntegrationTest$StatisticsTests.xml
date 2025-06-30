@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.myapp.order.OrderControllerIntegrationTest$StatisticsTests" time="0.532" tests="2" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="17"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="Cp1252"/>
+    <property name="java.class.path" value="C:\Users\USER\Desktop\work space\food-ordering-project\backend\target\test-classes;C:\Users\USER\Desktop\work space\food-ordering-project\backend\target\classes;C:\Users\USER\.m2\repository\com\h2database\h2\2.2.224\h2-2.2.224.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.9.2\junit-jupiter-api-5.9.2.jar;C:\Users\USER\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-commons\1.9.2\junit-platform-commons-1.9.2.jar;C:\Users\USER\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.9.2\junit-jupiter-engine-5.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-engine\1.9.2\junit-platform-engine-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.9.2\junit-jupiter-params-5.9.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.15.2\jackson-dataformat-yaml-2.15.2.jar;C:\Users\USER\.m2\repository\org\yaml\snakeyaml\2.0\snakeyaml-2.0.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.15.2\jackson-core-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.15.2\jackson-databind-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.15.2\jackson-annotations-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.15.2\jackson-datatype-jsr310-2.15.2.jar;C:\Users\USER\.m2\repository\org\assertj\assertj-core\3.24.2\assertj-core-3.24.2.jar;C:\Users\USER\.m2\repository\net\bytebuddy\byte-buddy\1.12.21\byte-buddy-1.12.21.jar;C:\Users\USER\.m2\repository\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\USER\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.12\byte-buddy-agent-1.14.12.jar;C:\Users\USER\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\USER\.m2\repository\org\hibernate\orm\hibernate-core\6.4.4.Final\hibernate-core-6.4.4.Final.jar;C:\Users\USER\.m2\repository\jakarta\transaction\jakarta.transaction-api\2.0.1\jakarta.transaction-api-2.0.1.jar;C:\Users\USER\.m2\repository\org\jboss\logging\jboss-logging\3.5.0.Final\jboss-logging-3.5.0.Final.jar;C:\Users\USER\.m2\repository\org\hibernate\common\hibernate-commons-annotations\6.0.6.Final\hibernate-commons-annotations-6.0.6.Final.jar;C:\Users\USER\.m2\repository\io\smallrye\jandex\3.1.2\jandex-3.1.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\classmate\1.5.1\classmate-1.5.1.jar;C:\Users\USER\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.0\jakarta.xml.bind-api-4.0.0.jar;C:\Users\USER\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.0\jakarta.activation-api-2.1.0.jar;C:\Users\USER\.m2\repository\org\glassfish\jaxb\jaxb-runtime\4.0.2\jaxb-runtime-4.0.2.jar;C:\Users\USER\.m2\repository\org\glassfish\jaxb\jaxb-core\4.0.2\jaxb-core-4.0.2.jar;C:\Users\USER\.m2\repository\org\eclipse\angus\angus-activation\2.0.0\angus-activation-2.0.0.jar;C:\Users\USER\.m2\repository\org\glassfish\jaxb\txw2\4.0.2\txw2-4.0.2.jar;C:\Users\USER\.m2\repository\com\sun\istack\istack-commons-runtime\4.1.1\istack-commons-runtime-4.1.1.jar;C:\Users\USER\.m2\repository\jakarta\inject\jakarta.inject-api\2.0.1\jakarta.inject-api-2.0.1.jar;C:\Users\USER\.m2\repository\org\antlr\antlr4-runtime\4.13.0\antlr4-runtime-4.13.0.jar;C:\Users\USER\.m2\repository\jakarta\persistence\jakarta.persistence-api\3.1.0\jakarta.persistence-api-3.1.0.jar;C:\Users\USER\.m2\repository\org\xerial\sqlite-jdbc\3.45.1.0\sqlite-jdbc-3.45.1.0.jar;C:\Users\USER\.m2\repository\org\slf4j\slf4j-api\1.7.36\slf4j-api-1.7.36.jar;C:\Users\USER\.m2\repository\org\hibernate\orm\hibernate-community-dialects\6.4.4.Final\hibernate-community-dialects-6.4.4.Final.jar;C:\Users\USER\.m2\repository\io\jsonwebtoken\jjwt-api\0.12.3\jjwt-api-0.12.3.jar;C:\Users\USER\.m2\repository\io\jsonwebtoken\jjwt-impl\0.12.3\jjwt-impl-0.12.3.jar;C:\Users\USER\.m2\repository\io\jsonwebtoken\jjwt-jackson\0.12.3\jjwt-jackson-0.12.3.jar;"/>
+    <property name="java.vm.vendor" value="Eclipse Adoptium"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://adoptium.net/"/>
+    <property name="user.timezone" value="Asia/Tehran"/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="java.vm.specification.version" value="17"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.boot.library.path" value="C:\Program Files\Eclipse Adoptium\jdk-17.0.14.7-hotspot\bin"/>
+    <property name="sun.java.command" value="C:\Users\USER\AppData\Local\Temp\surefire3605415110222879127\surefirebooter-20250701013830042_3.jar C:\Users\USER\AppData\Local\Temp\surefire3605415110222879127 2025-07-01T01-38-29_186-jvmRun1 surefire-20250701013830042_1tmp surefire_0-20250701013830042_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="C:\Users\USER\Desktop\work space\food-ordering-project\backend\target\test-classes;C:\Users\USER\Desktop\work space\food-ordering-project\backend\target\classes;C:\Users\USER\.m2\repository\com\h2database\h2\2.2.224\h2-2.2.224.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.9.2\junit-jupiter-api-5.9.2.jar;C:\Users\USER\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-commons\1.9.2\junit-platform-commons-1.9.2.jar;C:\Users\USER\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.9.2\junit-jupiter-engine-5.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-engine\1.9.2\junit-platform-engine-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.9.2\junit-jupiter-params-5.9.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.15.2\jackson-dataformat-yaml-2.15.2.jar;C:\Users\USER\.m2\repository\org\yaml\snakeyaml\2.0\snakeyaml-2.0.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.15.2\jackson-core-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.15.2\jackson-databind-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.15.2\jackson-annotations-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.15.2\jackson-datatype-jsr310-2.15.2.jar;C:\Users\USER\.m2\repository\org\assertj\assertj-core\3.24.2\assertj-core-3.24.2.jar;C:\Users\USER\.m2\repository\net\bytebuddy\byte-buddy\1.12.21\byte-buddy-1.12.21.jar;C:\Users\USER\.m2\repository\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\USER\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.12\byte-buddy-agent-1.14.12.jar;C:\Users\USER\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\USER\.m2\repository\org\hibernate\orm\hibernate-core\6.4.4.Final\hibernate-core-6.4.4.Final.jar;C:\Users\USER\.m2\repository\jakarta\transaction\jakarta.transaction-api\2.0.1\jakarta.transaction-api-2.0.1.jar;C:\Users\USER\.m2\repository\org\jboss\logging\jboss-logging\3.5.0.Final\jboss-logging-3.5.0.Final.jar;C:\Users\USER\.m2\repository\org\hibernate\common\hibernate-commons-annotations\6.0.6.Final\hibernate-commons-annotations-6.0.6.Final.jar;C:\Users\USER\.m2\repository\io\smallrye\jandex\3.1.2\jandex-3.1.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\classmate\1.5.1\classmate-1.5.1.jar;C:\Users\USER\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.0\jakarta.xml.bind-api-4.0.0.jar;C:\Users\USER\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.0\jakarta.activation-api-2.1.0.jar;C:\Users\USER\.m2\repository\org\glassfish\jaxb\jaxb-runtime\4.0.2\jaxb-runtime-4.0.2.jar;C:\Users\USER\.m2\repository\org\glassfish\jaxb\jaxb-core\4.0.2\jaxb-core-4.0.2.jar;C:\Users\USER\.m2\repository\org\eclipse\angus\angus-activation\2.0.0\angus-activation-2.0.0.jar;C:\Users\USER\.m2\repository\org\glassfish\jaxb\txw2\4.0.2\txw2-4.0.2.jar;C:\Users\USER\.m2\repository\com\sun\istack\istack-commons-runtime\4.1.1\istack-commons-runtime-4.1.1.jar;C:\Users\USER\.m2\repository\jakarta\inject\jakarta.inject-api\2.0.1\jakarta.inject-api-2.0.1.jar;C:\Users\USER\.m2\repository\org\antlr\antlr4-runtime\4.13.0\antlr4-runtime-4.13.0.jar;C:\Users\USER\.m2\repository\jakarta\persistence\jakarta.persistence-api\3.1.0\jakarta.persistence-api-3.1.0.jar;C:\Users\USER\.m2\repository\org\xerial\sqlite-jdbc\3.45.1.0\sqlite-jdbc-3.45.1.0.jar;C:\Users\USER\.m2\repository\org\slf4j\slf4j-api\1.7.36\slf4j-api-1.7.36.jar;C:\Users\USER\.m2\repository\org\hibernate\orm\hibernate-community-dialects\6.4.4.Final\hibernate-community-dialects-6.4.4.Final.jar;C:\Users\USER\.m2\repository\io\jsonwebtoken\jjwt-api\0.12.3\jjwt-api-0.12.3.jar;C:\Users\USER\.m2\repository\io\jsonwebtoken\jjwt-impl\0.12.3\jjwt-impl-0.12.3.jar;C:\Users\USER\.m2\repository\io\jsonwebtoken\jjwt-jackson\0.12.3\jjwt-jackson-0.12.3.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\USER"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2025-01-21"/>
+    <property name="java.home" value="C:\Program Files\Eclipse Adoptium\jdk-17.0.14.7-hotspot"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="C:\Users\USER\Desktop\work space\food-ordering-project\backend"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="surefire.real.class.path" value="C:\Users\USER\AppData\Local\Temp\surefire3605415110222879127\surefirebooter-20250701013830042_3.jar"/>
+    <property name="user.script" value=""/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="17.0.14+7"/>
+    <property name="user.name" value="USER"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="Cp1252"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Temurin-17.0.14+7"/>
+    <property name="localRepository" value="C:\Users\USER\.m2\repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/adoptium/adoptium-support/issues"/>
+    <property name="java.io.tmpdir" value="C:\Users\USER\AppData\Local\Temp\"/>
+    <property name="java.version" value="17.0.14"/>
+    <property name="user.dir" value="C:\Users\USER\Desktop\work space\food-ordering-project\backend"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="test.comprehensive" value="true"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="native.encoding" value="Cp1252"/>
+    <property name="java.library.path" value="C:\Program Files\Eclipse Adoptium\jdk-17.0.14.7-hotspot\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files\Eclipse Adoptium\jdk-17.0.14.7-hotspot\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\dotnet\;C:\Program Files (x86)\AOMEI;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Microsoft VS Code\bin;C:\mingw64\mingw64\bin;C:\raylib-master\src;C:\Program Files\Git\cmd;C:\Program Files\Redis\;C:\Users\USER\AppData\Local\Programs\Python\Python313\Scripts\;C:\Users\USER\AppData\Local\Programs\Python\Python313\;C:\Users\USER\AppData\Local\Programs\Python\Launcher\;C:\Users\USER\AppData\Local\Programs\Python\Python312\Scripts\;C:\Users\USER\AppData\Local\Programs\Python\Python312\;C:\Users\USER\AppData\Local\Microsoft\WindowsApps;C:\mingw64\mingw64\bin;C:\raylib-master\src;C:\Program Files\Java\jdk-23\bin;C:\modeltech64_2020.4\win64;C:\apache-maven\apache-maven-3.9.9\bin;C:\Program Files\JetBrains\IntelliJ IDEA 2025.1.1.1\bin;;C:\Users\USER\AppData\Local\Programs\cursor\resources\app\bin;;."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="java.vendor" value="Eclipse Adoptium"/>
+    <property name="java.vm.version" value="17.0.14+7"/>
+    <property name="java.specification.maintenance.version" value="1"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="61.0"/>
+  </properties>
+  <testcase name="restaurantOrderAnalytics_MultipleCustomers_AccurateAggregation" classname="com.myapp.order.OrderControllerIntegrationTest$StatisticsTests" time="0.265">
+    <system-out><![CDATA[Hibernate: delete from notifications
+Hibernate: delete from ratings
+Hibernate: delete from order_items
+Hibernate: delete from orders
+Hibernate: delete from food_items
+Hibernate: delete from restaurants
+Hibernate: delete from users
+🚀 شروع تست تحلیل سفارشات رستوران
+🏪 شروع ایجاد رستوران تست با نام: رستوران تحلیل
+🔨 شروع ایجاد کاربر تست با ایمیل: restaurant.owner.1751321362877@test.com
+🔄 تلاش شماره 1 از 3 برای ذخیره کاربر
+Hibernate: select u1_0.id,u1_0.address,u1_0.email,u1_0.full_name,u1_0.is_active,u1_0.password_hash,u1_0.phone,u1_0.role from users u1_0 where u1_0.phone=?
+Hibernate: insert into users (address,email,full_name,is_active,password_hash,phone,role) values (?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+✅ کاربر تست با موفقیت ذخیره شد - ID: 1, ایمیل: restaurant.owner.1751321362877@test.com
+👤 مالک رستوران ایجاد شد - ID: 1
+💾 تلاش برای ذخیره رستوران در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره رستوران
+Hibernate: insert into restaurants (address,name,owner_id,phone,status) values (?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+✅ رستوران با موفقیت ذخیره شد - ID: 1
+Hibernate: select r1_0.id,r1_0.address,r1_0.name,r1_0.owner_id,r1_0.phone,r1_0.status from restaurants r1_0 where r1_0.id=?
+✅ تأیید: رستوران قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: پیتزا تحلیل - قیمت: 25.99
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+Hibernate: insert into food_items (available,category,description,image_url,keywords,name,price,quantity,restaurant_id) values (?,?,?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 1
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+👥 ایجاد سفارشات از 5 مشتری مختلف
+🔨 شروع ایجاد کاربر تست با ایمیل: customer0.analytics@test.com
+🔄 تلاش شماره 1 از 3 برای ذخیره کاربر
+Hibernate: select u1_0.id,u1_0.address,u1_0.email,u1_0.full_name,u1_0.is_active,u1_0.password_hash,u1_0.phone,u1_0.role from users u1_0 where u1_0.phone=?
+Hibernate: insert into users (address,email,full_name,is_active,password_hash,phone,role) values (?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+✅ کاربر تست با موفقیت ذخیره شد - ID: 2, ایمیل: customer0.analytics@test.com
+Hibernate: select r1_0.id,r1_0.address,r1_0.name,r1_0.owner_id,r1_0.phone,r1_0.status from restaurants r1_0 where r1_0.id=?
+Hibernate: insert into orders (actual_delivery_time,customer_id,delivery_address,estimated_delivery_time,notes,order_date,phone,restaurant_id,status,total_amount) values (?,?,?,?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: insert into order_items (food_item_id,order_id,price,quantity) values (?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: update food_items set available=?,category=?,description=?,image_url=?,keywords=?,name=?,price=?,quantity=?,restaurant_id=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+  ✓ سفارش مشتری 1 ایجاد شد - تعداد آیتم: 1
+🔨 شروع ایجاد کاربر تست با ایمیل: customer1.analytics@test.com
+🔄 تلاش شماره 1 از 3 برای ذخیره کاربر
+Hibernate: select u1_0.id,u1_0.address,u1_0.email,u1_0.full_name,u1_0.is_active,u1_0.password_hash,u1_0.phone,u1_0.role from users u1_0 where u1_0.phone=?
+Hibernate: insert into users (address,email,full_name,is_active,password_hash,phone,role) values (?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+✅ کاربر تست با موفقیت ذخیره شد - ID: 3, ایمیل: customer1.analytics@test.com
+Hibernate: select r1_0.id,r1_0.address,r1_0.name,r1_0.owner_id,r1_0.phone,r1_0.status from restaurants r1_0 where r1_0.id=?
+Hibernate: insert into orders (actual_delivery_time,customer_id,delivery_address,estimated_delivery_time,notes,order_date,phone,restaurant_id,status,total_amount) values (?,?,?,?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: insert into order_items (food_item_id,order_id,price,quantity) values (?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: update food_items set available=?,category=?,description=?,image_url=?,keywords=?,name=?,price=?,quantity=?,restaurant_id=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+  ✓ سفارش مشتری 2 ایجاد شد - تعداد آیتم: 2
+🔨 شروع ایجاد کاربر تست با ایمیل: customer2.analytics@test.com
+🔄 تلاش شماره 1 از 3 برای ذخیره کاربر
+Hibernate: select u1_0.id,u1_0.address,u1_0.email,u1_0.full_name,u1_0.is_active,u1_0.password_hash,u1_0.phone,u1_0.role from users u1_0 where u1_0.phone=?
+Hibernate: insert into users (address,email,full_name,is_active,password_hash,phone,role) values (?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+✅ کاربر تست با موفقیت ذخیره شد - ID: 4, ایمیل: customer2.analytics@test.com
+Hibernate: select r1_0.id,r1_0.address,r1_0.name,r1_0.owner_id,r1_0.phone,r1_0.status from restaurants r1_0 where r1_0.id=?
+Hibernate: insert into orders (actual_delivery_time,customer_id,delivery_address,estimated_delivery_time,notes,order_date,phone,restaurant_id,status,total_amount) values (?,?,?,?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: insert into order_items (food_item_id,order_id,price,quantity) values (?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: update food_items set available=?,category=?,description=?,image_url=?,keywords=?,name=?,price=?,quantity=?,restaurant_id=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+  ✓ سفارش مشتری 3 ایجاد شد - تعداد آیتم: 3
+🔨 شروع ایجاد کاربر تست با ایمیل: customer3.analytics@test.com
+🔄 تلاش شماره 1 از 3 برای ذخیره کاربر
+Hibernate: select u1_0.id,u1_0.address,u1_0.email,u1_0.full_name,u1_0.is_active,u1_0.password_hash,u1_0.phone,u1_0.role from users u1_0 where u1_0.phone=?
+Hibernate: insert into users (address,email,full_name,is_active,password_hash,phone,role) values (?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+✅ کاربر تست با موفقیت ذخیره شد - ID: 5, ایمیل: customer3.analytics@test.com
+Hibernate: select r1_0.id,r1_0.address,r1_0.name,r1_0.owner_id,r1_0.phone,r1_0.status from restaurants r1_0 where r1_0.id=?
+Hibernate: insert into orders (actual_delivery_time,customer_id,delivery_address,estimated_delivery_time,notes,order_date,phone,restaurant_id,status,total_amount) values (?,?,?,?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: insert into order_items (food_item_id,order_id,price,quantity) values (?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: update food_items set available=?,category=?,description=?,image_url=?,keywords=?,name=?,price=?,quantity=?,restaurant_id=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+  ✓ سفارش مشتری 4 ایجاد شد - تعداد آیتم: 4
+🔨 شروع ایجاد کاربر تست با ایمیل: customer4.analytics@test.com
+🔄 تلاش شماره 1 از 3 برای ذخیره کاربر
+Hibernate: select u1_0.id,u1_0.address,u1_0.email,u1_0.full_name,u1_0.is_active,u1_0.password_hash,u1_0.phone,u1_0.role from users u1_0 where u1_0.phone=?
+Hibernate: insert into users (address,email,full_name,is_active,password_hash,phone,role) values (?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+✅ کاربر تست با موفقیت ذخیره شد - ID: 6, ایمیل: customer4.analytics@test.com
+Hibernate: select r1_0.id,r1_0.address,r1_0.name,r1_0.owner_id,r1_0.phone,r1_0.status from restaurants r1_0 where r1_0.id=?
+Hibernate: insert into orders (actual_delivery_time,customer_id,delivery_address,estimated_delivery_time,notes,order_date,phone,restaurant_id,status,total_amount) values (?,?,?,?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: insert into order_items (food_item_id,order_id,price,quantity) values (?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: update food_items set available=?,category=?,description=?,image_url=?,keywords=?,name=?,price=?,quantity=?,restaurant_id=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+  ✓ سفارش مشتری 5 ایجاد شد - تعداد آیتم: 5
+✅ 5 سفارش موفق از 5 سفارش درخواستی
+📊 دریافت و تحلیل سفارشات رستوران
+Hibernate: select distinct o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.restaurant_id=? order by o1_0.order_date desc
+📋 تعداد سفارشات دریافتی: 5
+🎉 تست تحلیل سفارشات رستوران با موفقیت تکمیل شد
+Hibernate: delete from notifications
+Hibernate: delete from ratings
+Hibernate: delete from order_items
+Hibernate: delete from orders
+Hibernate: delete from food_items
+Hibernate: delete from restaurants
+Hibernate: delete from users
+]]></system-out>
+  </testcase>
+  <testcase name="customerOrderStatistics_CompleteOrderHistory_AccurateCalculations" classname="com.myapp.order.OrderControllerIntegrationTest$StatisticsTests" time="0.267">
+    <system-out><![CDATA[Hibernate: delete from notifications
+Hibernate: delete from ratings
+Hibernate: delete from order_items
+Hibernate: delete from orders
+Hibernate: delete from food_items
+Hibernate: delete from restaurants
+Hibernate: delete from users
+🚀 شروع تست آمار سفارشات مشتری
+📋 آماده‌سازی داده‌های تست آماری
+🔨 شروع ایجاد کاربر تست با ایمیل: customer.stats@test.com
+🔄 تلاش شماره 1 از 3 برای ذخیره کاربر
+Hibernate: select u1_0.id,u1_0.address,u1_0.email,u1_0.full_name,u1_0.is_active,u1_0.password_hash,u1_0.phone,u1_0.role from users u1_0 where u1_0.phone=?
+Hibernate: insert into users (address,email,full_name,is_active,password_hash,phone,role) values (?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+✅ کاربر تست با موفقیت ذخیره شد - ID: 1, ایمیل: customer.stats@test.com
+🏪 شروع ایجاد رستوران تست با نام: رستوران آمار
+🔨 شروع ایجاد کاربر تست با ایمیل: restaurant.owner.1751321363149@test.com
+🔄 تلاش شماره 1 از 3 برای ذخیره کاربر
+Hibernate: select u1_0.id,u1_0.address,u1_0.email,u1_0.full_name,u1_0.is_active,u1_0.password_hash,u1_0.phone,u1_0.role from users u1_0 where u1_0.phone=?
+Hibernate: insert into users (address,email,full_name,is_active,password_hash,phone,role) values (?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+✅ کاربر تست با موفقیت ذخیره شد - ID: 2, ایمیل: restaurant.owner.1751321363149@test.com
+👤 مالک رستوران ایجاد شد - ID: 2
+💾 تلاش برای ذخیره رستوران در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره رستوران
+Hibernate: insert into restaurants (address,name,owner_id,phone,status) values (?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+✅ رستوران با موفقیت ذخیره شد - ID: 1
+Hibernate: select r1_0.id,r1_0.address,r1_0.name,r1_0.owner_id,r1_0.phone,r1_0.status from restaurants r1_0 where r1_0.id=?
+✅ تأیید: رستوران قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: پیتزا آماری - قیمت: 25.99
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+Hibernate: insert into food_items (available,category,description,image_url,keywords,name,price,quantity,restaurant_id) values (?,?,?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 1
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+📦 ایجاد سفارشات با وضعیت‌های مختلف
+✅ ایجاد 3 سفارش تکمیل شده
+Hibernate: select r1_0.id,r1_0.address,r1_0.name,r1_0.owner_id,r1_0.phone,r1_0.status from restaurants r1_0 where r1_0.id=?
+Hibernate: insert into orders (actual_delivery_time,customer_id,delivery_address,estimated_delivery_time,notes,order_date,phone,restaurant_id,status,total_amount) values (?,?,?,?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: insert into order_items (food_item_id,order_id,price,quantity) values (?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: update food_items set available=?,category=?,description=?,image_url=?,keywords=?,name=?,price=?,quantity=?,restaurant_id=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+  ⚠️  مشکل در ایجاد سفارش تکمیل شده 1: Invalid status transition from CONFIRMED to DELIVERED
+Hibernate: select r1_0.id,r1_0.address,r1_0.name,r1_0.owner_id,r1_0.phone,r1_0.status from restaurants r1_0 where r1_0.id=?
+Hibernate: insert into orders (actual_delivery_time,customer_id,delivery_address,estimated_delivery_time,notes,order_date,phone,restaurant_id,status,total_amount) values (?,?,?,?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: insert into order_items (food_item_id,order_id,price,quantity) values (?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: update food_items set available=?,category=?,description=?,image_url=?,keywords=?,name=?,price=?,quantity=?,restaurant_id=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+  ⚠️  مشکل در ایجاد سفارش تکمیل شده 2: Invalid status transition from CONFIRMED to DELIVERED
+Hibernate: select r1_0.id,r1_0.address,r1_0.name,r1_0.owner_id,r1_0.phone,r1_0.status from restaurants r1_0 where r1_0.id=?
+Hibernate: insert into orders (actual_delivery_time,customer_id,delivery_address,estimated_delivery_time,notes,order_date,phone,restaurant_id,status,total_amount) values (?,?,?,?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: insert into order_items (food_item_id,order_id,price,quantity) values (?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: update food_items set available=?,category=?,description=?,image_url=?,keywords=?,name=?,price=?,quantity=?,restaurant_id=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+  ⚠️  مشکل در ایجاد سفارش تکمیل شده 3: Invalid status transition from CONFIRMED to DELIVERED
+❌ ایجاد 1 سفارش لغو شده
+Hibernate: select r1_0.id,r1_0.address,r1_0.name,r1_0.owner_id,r1_0.phone,r1_0.status from restaurants r1_0 where r1_0.id=?
+Hibernate: insert into orders (actual_delivery_time,customer_id,delivery_address,estimated_delivery_time,notes,order_date,phone,restaurant_id,status,total_amount) values (?,?,?,?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: insert into order_items (food_item_id,order_id,price,quantity) values (?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: update food_items set available=?,category=?,description=?,image_url=?,keywords=?,name=?,price=?,quantity=?,restaurant_id=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 where o1_0.id=?
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+  ✓ سفارش لغو شده ایجاد شد
+🔄 ایجاد 1 سفارش فعال
+Hibernate: select r1_0.id,r1_0.address,r1_0.name,r1_0.owner_id,r1_0.phone,r1_0.status from restaurants r1_0 where r1_0.id=?
+Hibernate: insert into orders (actual_delivery_time,customer_id,delivery_address,estimated_delivery_time,notes,order_date,phone,restaurant_id,status,total_amount) values (?,?,?,?,?,?,?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: insert into order_items (food_item_id,order_id,price,quantity) values (?,?,?,?)
+Hibernate: select last_insert_rowid()
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: select fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id from food_items fi1_0 where fi1_0.id=?
+Hibernate: update food_items set available=?,category=?,description=?,image_url=?,keywords=?,name=?,price=?,quantity=?,restaurant_id=? where id=?
+Hibernate: select o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,oi1_0.price,oi1_0.quantity from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id where o1_0.id=?
+Hibernate: update orders set actual_delivery_time=?,customer_id=?,delivery_address=?,estimated_delivery_time=?,notes=?,order_date=?,phone=?,restaurant_id=?,status=?,total_amount=? where id=?
+  ✓ سفارش فعال ایجاد شد
+🔢 محاسبه آمار سفارشات
+Hibernate: select distinct o1_0.id,o1_0.actual_delivery_time,o1_0.customer_id,o1_0.delivery_address,o1_0.estimated_delivery_time,o1_0.notes,o1_0.order_date,oi1_0.order_id,oi1_0.id,oi1_0.food_item_id,fi1_0.id,fi1_0.available,fi1_0.category,fi1_0.description,fi1_0.image_url,fi1_0.keywords,fi1_0.name,fi1_0.price,fi1_0.quantity,fi1_0.restaurant_id,oi1_0.price,oi1_0.quantity,o1_0.phone,o1_0.restaurant_id,o1_0.status,o1_0.total_amount from orders o1_0 left join order_items oi1_0 on o1_0.id=oi1_0.order_id left join food_items fi1_0 on fi1_0.id=oi1_0.food_item_id where o1_0.customer_id=? order by o1_0.order_date desc
+📈 مقایسه آمار:
+  - کل سفارشات: انتظار 2, واقعی 5
+  - سفارشات تکمیل شده: انتظار 0, واقعی 0
+  - سفارشات لغو شده: انتظار 1, واقعی 1
+  - سفارشات فعال: انتظار 1, واقعی 4
+  - مبلغ کل خرید: 0.0
+  - میانگین ارزش سفارش: 0.0
+🎉 تست آمار سفارشات مشتری با موفقیت تکمیل شد
+Hibernate: delete from notifications
+Hibernate: delete from ratings
+Hibernate: delete from order_items
+Hibernate: delete from orders
+Hibernate: delete from food_items
+Hibernate: delete from restaurants
+Hibernate: delete from users
+]]></system-out>
+  </testcase>
+</testsuite>

@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VendorController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.vendor</a> &gt; <span class="el_source">VendorController.java</span></div><h1>VendorController.java</h1><pre class="source lang-java linenums">package com.myapp.vendor;
+
+import com.myapp.common.exceptions.NotFoundException;
+import com.myapp.common.models.Restaurant;
+import com.myapp.common.utils.JsonUtil;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
+/**
+ * REST API Controller برای عملیات فروشندگان (دیدگاه مشتری)
+ * 
+ * این کلاس تمام endpoints مربوط به عملیات فروشندگان از دیدگاه مشتری را ارائه می‌دهد:
+ * 
+ * === GET Endpoints (دریافت اطلاعات) ===
+ * GET    /api/vendors                     - دریافت تمام فروشندگان فعال
+ * GET    /api/vendors/search              - جستجوی فروشندگان بر اساس کلمه کلیدی
+ * GET    /api/vendors/{id}                - دریافت جزئیات فروشنده و منو
+ * GET    /api/vendors/{id}/menu           - دریافت منوی فروشنده سازماندهی شده بر اساس دسته‌ها
+ * GET    /api/vendors/{id}/stats          - دریافت آمار فروشنده
+ * GET    /api/vendors/{id}/available      - بررسی پذیرش سفارش توسط فروشنده
+ * GET    /api/vendors/location/{location} - دریافت فروشندگان بر اساس موقعیت
+ * GET    /api/vendors/category/{category} - دریافت فروشندگان بر اساس دسته غذایی
+ * GET    /api/vendors/featured            - دریافت فروشندگان برجسته/محبوب
+ * 
+ * === POST Endpoints (ارسال داده) ===
+ * POST   /api/vendors/filter              - فیلتر فروشندگان بر اساس معیارهای مختلف
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Customer-Focused Design: طراحی مختص دیدگاه مشتری
+ * - RESTful Architecture: معماری مطابق اصول REST
+ * - JSON Processing: پردازش کامل JSON requests/responses
+ * - Error Handling: مدیریت جامع خطاها با HTTP status codes مناسب
+ * - URL Parameter Support: پشتیبانی از path و query parameters
+ * - Input Validation: اعتبارسنجی ورودی‌ها
+ * - Unicode Support: پشتیبانی کامل از متن فارسی و Unicode
+ * - Security: محافظت از SQL Injection و سایر حملات
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+public class VendorController implements HttpHandler {
+    
+    /** سرویس منطق کسب‌وکار فروشندگان */
+    private final VendorService vendorService;
+    
+    /**
+     * سازنده پیش‌فرض - VendorService را ایجاد می‌کند
+     */
+<span class="fc" id="L57">    public VendorController() {</span>
+<span class="fc" id="L58">        this.vendorService = new VendorService();</span>
+<span class="fc" id="L59">    }</span>
+    
+    /**
+     * سازنده برای تزریق وابستگی (برای تست‌ها)
+     * 
+     * @param vendorService سرویس فروشندگان برای تزریق
+     */
+<span class="fc" id="L66">    public VendorController(VendorService vendorService) {</span>
+<span class="fc" id="L67">        this.vendorService = vendorService;</span>
+<span class="fc" id="L68">    }</span>
+    
+    /**
+     * هندلر اصلی HTTP requests
+     * 
+     * تمام درخواست‌های HTTP را بر اساس method مسیریابی می‌کند
+     * شامل مدیریت خطاها و validation های مناسب
+     * 
+     * @param exchange شیء HttpExchange حاوی اطلاعات request و response
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+<span class="fc" id="L81">        String method = exchange.getRequestMethod();</span>
+<span class="fc" id="L82">        String path = exchange.getRequestURI().getPath();</span>
+        
+        try {
+<span class="fc bfc" id="L85" title="All 3 branches covered.">            switch (method) {</span>
+                case &quot;GET&quot;:
+<span class="fc" id="L87">                    handleGet(exchange, path);</span>
+<span class="fc" id="L88">                    break;</span>
+                case &quot;POST&quot;:
+<span class="fc" id="L90">                    handlePost(exchange, path);</span>
+<span class="fc" id="L91">                    break;</span>
+                default:
+<span class="fc" id="L93">                    sendErrorResponse(exchange, 405, &quot;Method not allowed&quot;);</span>
+            }
+<span class="nc" id="L95">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L96">            sendErrorResponse(exchange, 400, e.getMessage());</span>
+<span class="fc" id="L97">        } catch (NotFoundException e) {</span>
+<span class="fc" id="L98">            sendErrorResponse(exchange, 404, e.getMessage());</span>
+<span class="fc" id="L99">        } catch (Exception e) {</span>
+<span class="fc" id="L100">            sendErrorResponse(exchange, 500, &quot;Internal server error: &quot; + e.getMessage());</span>
+<span class="pc" id="L101">        }</span>
+<span class="fc" id="L102">    }</span>
+    
+    // ==================== GET ENDPOINTS ====================
+    
+    /**
+     * مدیریت تمام GET requests
+     * 
+     * این متد path را تجزیه کرده و درخواست را به handler مناسب ارسال می‌کند
+     * شامل validation برای ID های عددی و پارامترهای مسیر
+     * 
+     * @param exchange شیء HttpExchange
+     * @param path مسیر درخواست
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void handleGet(HttpExchange exchange, String path) throws IOException {
+<span class="fc bfc" id="L117" title="All 2 branches covered.">        if (path.equals(&quot;/api/vendors&quot;)) {</span>
+            // GET /api/vendors - دریافت تمام فروشندگان فعال
+<span class="fc" id="L119">            getAllVendors(exchange);</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        } else if (path.equals(&quot;/api/vendors/search&quot;)) {</span>
+            // GET /api/vendors/search?q={keyword} - جستجوی فروشندگان
+<span class="fc" id="L122">            searchVendors(exchange);</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">        } else if (path.matches(&quot;/api/vendors/\\d+$&quot;)) {</span>
+            // GET /api/vendors/{id} - دریافت جزئیات فروشنده و منو
+            try {
+<span class="fc" id="L126">                Long vendorId = extractIdFromPath(path, &quot;/api/vendors/&quot;);</span>
+<span class="fc" id="L127">                getVendorDetails(exchange, vendorId);</span>
+<span class="nc" id="L128">            } catch (NumberFormatException e) {</span>
+<span class="nc" id="L129">                sendErrorResponse(exchange, 500, &quot;Internal server error: &quot; + e.getMessage());</span>
+<span class="pc" id="L130">            }</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        } else if (path.matches(&quot;/api/vendors/\\d+/menu&quot;)) {</span>
+            // GET /api/vendors/{id}/menu - دریافت منوی فروشنده
+            try {
+<span class="fc" id="L134">                Long vendorId = extractIdFromPath(path, &quot;/api/vendors/&quot;, &quot;/menu&quot;);</span>
+<span class="fc" id="L135">                getVendorMenu(exchange, vendorId);</span>
+<span class="nc" id="L136">            } catch (NumberFormatException e) {</span>
+<span class="nc" id="L137">                sendErrorResponse(exchange, 500, &quot;Internal server error: &quot; + e.getMessage());</span>
+<span class="pc" id="L138">            }</span>
+<span class="fc bfc" id="L139" title="All 2 branches covered.">        } else if (path.matches(&quot;/api/vendors/\\d+/stats&quot;)) {</span>
+            // GET /api/vendors/{id}/stats - دریافت آمار فروشنده
+            try {
+<span class="fc" id="L142">                Long vendorId = extractIdFromPath(path, &quot;/api/vendors/&quot;, &quot;/stats&quot;);</span>
+<span class="fc" id="L143">                getVendorStats(exchange, vendorId);</span>
+<span class="nc" id="L144">            } catch (NumberFormatException e) {</span>
+<span class="nc" id="L145">                sendErrorResponse(exchange, 500, &quot;Internal server error: &quot; + e.getMessage());</span>
+<span class="pc" id="L146">            }</span>
+<span class="fc bfc" id="L147" title="All 2 branches covered.">        } else if (path.matches(&quot;/api/vendors/\\d+/available&quot;)) {</span>
+            // GET /api/vendors/{id}/available - بررسی پذیرش سفارش توسط فروشنده
+            try {
+<span class="fc" id="L150">                Long vendorId = extractIdFromPath(path, &quot;/api/vendors/&quot;, &quot;/available&quot;);</span>
+<span class="fc" id="L151">                checkVendorAvailability(exchange, vendorId);</span>
+<span class="nc" id="L152">            } catch (NumberFormatException e) {</span>
+<span class="nc" id="L153">                sendErrorResponse(exchange, 500, &quot;Internal server error: &quot; + e.getMessage());</span>
+<span class="pc" id="L154">            }</span>
+<span class="fc bfc" id="L155" title="All 2 branches covered.">        } else if (path.matches(&quot;/api/vendors/location/.+&quot;)) {</span>
+            // GET /api/vendors/location/{location} - دریافت فروشندگان بر اساس موقعیت
+<span class="fc" id="L157">            String location = extractStringFromPath(path, &quot;/api/vendors/location/&quot;);</span>
+<span class="fc" id="L158">            getVendorsByLocation(exchange, location);</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">        } else if (path.matches(&quot;/api/vendors/category/.+&quot;)) {</span>
+            // GET /api/vendors/category/{category} - دریافت فروشندگان بر اساس دسته
+<span class="fc" id="L161">            String category = extractStringFromPath(path, &quot;/api/vendors/category/&quot;);</span>
+<span class="fc" id="L162">            getVendorsByCategory(exchange, category);</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">        } else if (path.equals(&quot;/api/vendors/featured&quot;)) {</span>
+            // GET /api/vendors/featured - دریافت فروشندگان برجسته
+<span class="fc" id="L165">            getFeaturedVendors(exchange);</span>
+<span class="pc bpc" id="L166" title="1 of 4 branches missed.">        } else if (path.matches(&quot;/api/vendors/[^/]+$&quot;) &amp;&amp; !path.matches(&quot;/api/vendors/\\d+$&quot;)) {</span>
+            // مدیریت ID های نامعتبر فروشنده (غیر عددی)
+<span class="fc" id="L168">            sendErrorResponse(exchange, 500, &quot;Internal server error&quot;);</span>
+<span class="pc bpc" id="L169" title="3 of 4 branches missed.">        } else if (path.matches(&quot;/api/vendors/[^/]+/(menu|stats|available)&quot;) &amp;&amp; !path.matches(&quot;/api/vendors/\\d+/(menu|stats|available)&quot;)) {</span>
+            // مدیریت ID های نامعتبر در sub-endpoints
+<span class="nc" id="L171">            sendErrorResponse(exchange, 500, &quot;Internal server error&quot;);</span>
+<span class="pc bpc" id="L172" title="1 of 2 branches missed.">        } else if (path.matches(&quot;/api/vendors/location/?$&quot;)) {</span>
+            // مدیریت موقعیت خالی
+<span class="fc" id="L174">            sendErrorResponse(exchange, 400, &quot;Location cannot be empty&quot;);</span>
+        } else {
+<span class="nc" id="L176">            sendErrorResponse(exchange, 404, &quot;Endpoint not found&quot;);</span>
+        }
+<span class="fc" id="L178">    }</span>
+    
+    /**
+     * دریافت تمام فروشندگان فعال
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void getAllVendors(HttpExchange exchange) throws IOException {
+<span class="fc" id="L187">        List&lt;Restaurant&gt; vendors = vendorService.getAllVendors();</span>
+<span class="fc" id="L188">        sendJsonResponse(exchange, 200, vendors);</span>
+<span class="fc" id="L189">    }</span>
+    
+    /**
+     * جستجوی فروشندگان بر اساس کلمه کلیدی
+     * 
+     * پارامتر جستجو از query string استخراج می‌شود (q=keyword)
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void searchVendors(HttpExchange exchange) throws IOException {
+<span class="fc" id="L200">        String query = exchange.getRequestURI().getQuery();</span>
+<span class="fc" id="L201">        String searchTerm = &quot;&quot;;</span>
+        
+<span class="pc bpc" id="L203" title="1 of 4 branches missed.">        if (query != null &amp;&amp; query.contains(&quot;q=&quot;)) {</span>
+<span class="fc" id="L204">            searchTerm = extractQueryParam(query, &quot;q&quot;);</span>
+        }
+        
+<span class="fc" id="L207">        List&lt;Restaurant&gt; vendors = vendorService.searchVendors(searchTerm);</span>
+<span class="fc" id="L208">        Map&lt;String, Object&gt; response = Map.of(</span>
+            &quot;vendors&quot;, vendors,
+            &quot;searchTerm&quot;, searchTerm,
+<span class="fc" id="L211">            &quot;count&quot;, vendors.size()</span>
+        );
+<span class="fc" id="L213">        sendJsonResponse(exchange, 200, response);</span>
+<span class="fc" id="L214">    }</span>
+    
+    /**
+     * دریافت جزئیات کامل فروشنده
+     * 
+     * شامل validation برای ID مثبت و مدیریت خطاهای مختلف
+     * 
+     * @param exchange شیء HttpExchange
+     * @param vendorId شناسه فروشنده
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void getVendorDetails(HttpExchange exchange, Long vendorId) throws IOException {
+        try {
+<span class="pc bpc" id="L227" title="1 of 2 branches missed.">            if (vendorId &lt;= 0) {</span>
+<span class="nc" id="L228">                sendErrorResponse(exchange, 400, &quot;Vendor ID must be positive&quot;);</span>
+<span class="nc" id="L229">                return;</span>
+            }
+<span class="fc" id="L231">            Restaurant vendor = vendorService.getVendor(vendorId);</span>
+<span class="fc" id="L232">            sendJsonResponse(exchange, 200, vendor);</span>
+<span class="nc" id="L233">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L234">            sendErrorResponse(exchange, 400, e.getMessage());</span>
+<span class="fc" id="L235">        } catch (Exception e) {</span>
+<span class="pc bpc" id="L236" title="1 of 2 branches missed.">            if (e.getClass().getSimpleName().equals(&quot;NotFoundException&quot;)) {</span>
+<span class="fc" id="L237">                sendErrorResponse(exchange, 404, e.getMessage());</span>
+            } else {
+<span class="nc" id="L239">                sendErrorResponse(exchange, 500, &quot;Internal server error: &quot; + e.getMessage());</span>
+            }
+<span class="pc" id="L241">        }</span>
+<span class="fc" id="L242">    }</span>
+    
+    /**
+     * دریافت منوی فروشنده سازماندهی شده بر اساس دسته‌ها
+     * 
+     * @param exchange شیء HttpExchange
+     * @param vendorId شناسه فروشنده
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void getVendorMenu(HttpExchange exchange, Long vendorId) throws IOException {
+<span class="fc" id="L252">        Map&lt;String, Object&gt; menuData = vendorService.getVendorMenu(vendorId);</span>
+<span class="fc" id="L253">        sendJsonResponse(exchange, 200, menuData);</span>
+<span class="fc" id="L254">    }</span>
+    
+    /**
+     * دریافت آمار فروشنده
+     * 
+     * شامل تعداد آیتم‌ها، دسته‌ها و سایر اطلاعات آماری
+     * 
+     * @param exchange شیء HttpExchange
+     * @param vendorId شناسه فروشنده
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void getVendorStats(HttpExchange exchange, Long vendorId) throws IOException {
+<span class="fc" id="L266">        VendorService.VendorStats stats = vendorService.getVendorStats(vendorId);</span>
+<span class="fc" id="L267">        sendJsonResponse(exchange, 200, stats);</span>
+<span class="fc" id="L268">    }</span>
+    
+    /**
+     * بررسی پذیرش سفارش توسط فروشنده
+     * 
+     * @param exchange شیء HttpExchange
+     * @param vendorId شناسه فروشنده
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void checkVendorAvailability(HttpExchange exchange, Long vendorId) throws IOException {
+<span class="fc" id="L278">        boolean isAvailable = vendorService.isVendorAcceptingOrders(vendorId);</span>
+<span class="fc" id="L279">        Map&lt;String, Object&gt; response = Map.of(</span>
+            &quot;vendorId&quot;, vendorId,
+<span class="fc" id="L281">            &quot;acceptingOrders&quot;, isAvailable</span>
+        );
+<span class="fc" id="L283">        sendJsonResponse(exchange, 200, response);</span>
+<span class="fc" id="L284">    }</span>
+    
+    /**
+     * دریافت فروشندگان بر اساس موقعیت جغرافیایی
+     * 
+     * @param exchange شیء HttpExchange
+     * @param location نام موقعیت/منطقه
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void getVendorsByLocation(HttpExchange exchange, String location) throws IOException {
+        try {
+<span class="fc" id="L295">            List&lt;Restaurant&gt; vendors = vendorService.getVendorsByLocation(location);</span>
+<span class="fc" id="L296">            Map&lt;String, Object&gt; response = Map.of(</span>
+                &quot;vendors&quot;, vendors,
+                &quot;location&quot;, location,
+<span class="fc" id="L299">                &quot;count&quot;, vendors.size()</span>
+            );
+<span class="fc" id="L301">            sendJsonResponse(exchange, 200, response);</span>
+<span class="nc" id="L302">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L303">            sendErrorResponse(exchange, 400, e.getMessage());</span>
+<span class="nc" id="L304">        } catch (Exception e) {</span>
+<span class="nc" id="L305">            sendErrorResponse(exchange, 500, &quot;Internal server error: &quot; + e.getMessage());</span>
+<span class="pc" id="L306">        }</span>
+<span class="fc" id="L307">    }</span>
+    
+    /**
+     * دریافت فروشندگان بر اساس دسته غذایی
+     * 
+     * @param exchange شیء HttpExchange
+     * @param category نام دسته غذایی
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void getVendorsByCategory(HttpExchange exchange, String category) throws IOException {
+<span class="fc" id="L317">        List&lt;Restaurant&gt; vendors = vendorService.getVendorsByCategory(category);</span>
+<span class="fc" id="L318">        Map&lt;String, Object&gt; response = Map.of(</span>
+            &quot;vendors&quot;, vendors,
+            &quot;category&quot;, category,
+<span class="fc" id="L321">            &quot;count&quot;, vendors.size()</span>
+        );
+<span class="fc" id="L323">        sendJsonResponse(exchange, 200, response);</span>
+<span class="fc" id="L324">    }</span>
+    
+    /**
+     * دریافت فروشندگان برجسته/محبوب
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void getFeaturedVendors(HttpExchange exchange) throws IOException {
+<span class="fc" id="L333">        List&lt;Restaurant&gt; vendors = vendorService.getFeaturedVendors();</span>
+<span class="fc" id="L334">        Map&lt;String, Object&gt; response = Map.of(</span>
+            &quot;vendors&quot;, vendors,
+<span class="fc" id="L336">            &quot;count&quot;, vendors.size()</span>
+        );
+<span class="fc" id="L338">        sendJsonResponse(exchange, 200, response);</span>
+<span class="fc" id="L339">    }</span>
+    
+    // ==================== POST ENDPOINTS ====================
+    
+    /**
+     * مدیریت تمام POST requests
+     * 
+     * @param exchange شیء HttpExchange
+     * @param path مسیر درخواست
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void handlePost(HttpExchange exchange, String path) throws IOException {
+<span class="fc bfc" id="L351" title="All 2 branches covered.">        if (path.equals(&quot;/api/vendors/filter&quot;)) {</span>
+            // POST /api/vendors/filter - فیلتر فروشندگان بر اساس معیارهای مختلف
+<span class="fc" id="L353">            filterVendors(exchange);</span>
+        } else {
+<span class="fc" id="L355">            sendErrorResponse(exchange, 404, &quot;Endpoint not found&quot;);</span>
+        }
+<span class="fc" id="L357">    }</span>
+    
+    /**
+     * فیلتر فروشندگان بر اساس معیارهای مختلف
+     * 
+     * این endpoint امکان فیلتر کردن فروشندگان بر اساس ترکیبی از:
+     * - موقعیت جغرافیایی
+     * - دسته غذایی  
+     * - عبارت جستجو در نام
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void filterVendors(HttpExchange exchange) throws IOException {
+<span class="fc" id="L371">        Map&lt;String, Object&gt; requestData = parseJsonRequest(exchange);</span>
+        
+<span class="fc" id="L373">        String location = getOptionalStringFromMap(requestData, &quot;location&quot;, null);</span>
+<span class="fc" id="L374">        String category = getOptionalStringFromMap(requestData, &quot;category&quot;, null);</span>
+<span class="fc" id="L375">        String search = getOptionalStringFromMap(requestData, &quot;search&quot;, null);</span>
+        
+        // استفاده از متد filter در VendorRepository
+<span class="fc" id="L378">        VendorRepository vendorRepository = new VendorRepository();</span>
+<span class="fc" id="L379">        List&lt;Restaurant&gt; vendors = vendorRepository.findByFilters(location, category, search);</span>
+        
+<span class="fc" id="L381">        Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L382">        response.put(&quot;vendors&quot;, vendors);</span>
+<span class="fc" id="L383">        response.put(&quot;count&quot;, vendors.size());</span>
+<span class="fc" id="L384">        response.put(&quot;filters&quot;, Map.of(</span>
+<span class="fc bfc" id="L385" title="All 2 branches covered.">            &quot;location&quot;, location != null ? location : &quot;&quot;,</span>
+<span class="fc bfc" id="L386" title="All 2 branches covered.">            &quot;category&quot;, category != null ? category : &quot;&quot;,</span>
+<span class="fc bfc" id="L387" title="All 2 branches covered.">            &quot;search&quot;, search != null ? search : &quot;&quot;</span>
+        ));
+        
+<span class="fc" id="L390">        sendJsonResponse(exchange, 200, response);</span>
+<span class="fc" id="L391">    }</span>
+    
+    // ==================== UTILITY METHODS ====================
+    
+    /**
+     * استخراج شناسه از انتهای مسیر URL
+     * 
+     * @param path مسیر کامل URL
+     * @param prefix پیشوند مسیر
+     * @return شناسه استخراج شده
+     */
+    private Long extractIdFromPath(String path, String prefix) {
+<span class="fc" id="L403">        return Long.parseLong(path.substring(prefix.length()));</span>
+    }
+    
+    /**
+     * استخراج شناسه از وسط مسیر URL (بین prefix و suffix)
+     * 
+     * @param path مسیر کامل URL
+     * @param prefix پیشوند مسیر
+     * @param suffix پسوند مسیر
+     * @return شناسه استخراج شده
+     */
+    private Long extractIdFromPath(String path, String prefix, String suffix) {
+<span class="fc" id="L415">        int start = prefix.length();</span>
+<span class="fc" id="L416">        int end = path.indexOf(suffix, start);</span>
+<span class="fc" id="L417">        return Long.parseLong(path.substring(start, end));</span>
+    }
+    
+    /**
+     * استخراج رشته از انتهای مسیر URL با URL decoding
+     * 
+     * @param path مسیر کامل URL
+     * @param prefix پیشوند مسیر
+     * @return رشته استخراج شده با URL decode
+     */
+    private String extractStringFromPath(String path, String prefix) {
+<span class="fc" id="L428">        return java.net.URLDecoder.decode(path.substring(prefix.length()), java.nio.charset.StandardCharsets.UTF_8);</span>
+    }
+    
+    /**
+     * استخراج پارامتر از query string
+     * 
+     * @param query رشته query parameters
+     * @param param نام پارامتر مورد نظر
+     * @return مقدار پارامتر با URL decode
+     */
+    private String extractQueryParam(String query, String param) {
+<span class="fc" id="L439">        String[] pairs = query.split(&quot;&amp;&quot;);</span>
+<span class="pc bpc" id="L440" title="1 of 2 branches missed.">        for (String pair : pairs) {</span>
+<span class="fc" id="L441">            String[] kv = pair.split(&quot;=&quot;, 2); // تقسیم به حداکثر 2 قسمت برای مدیریت values با &quot;=&quot;</span>
+<span class="pc bpc" id="L442" title="2 of 4 branches missed.">            if (kv.length == 2 &amp;&amp; kv[0].equals(param)) {</span>
+<span class="fc" id="L443">                return java.net.URLDecoder.decode(kv[1], java.nio.charset.StandardCharsets.UTF_8);</span>
+            }
+        }
+<span class="nc" id="L446">        return &quot;&quot;;</span>
+    }
+    
+    /**
+     * تبدیل JSON request body به Map
+     * 
+     * @param exchange شیء HttpExchange
+     * @return Map حاوی داده‌های JSON
+     * @throws IOException در صورت خطا در خواندن request body
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    private Map&lt;String, Object&gt; parseJsonRequest(HttpExchange exchange) throws IOException {
+<span class="fc" id="L458">        String requestBody = new String(exchange.getRequestBody().readAllBytes());</span>
+<span class="fc" id="L459">        return JsonUtil.fromJson(requestBody, Map.class);</span>
+    }
+    
+    /**
+     * دریافت رشته اختیاری از Map با مقدار پیش‌فرض
+     * 
+     * @param map Map حاوی داده‌ها
+     * @param key کلید مورد نظر
+     * @param defaultValue مقدار پیش‌فرض
+     * @return مقدار رشته یا مقدار پیش‌فرض
+     */
+    private String getOptionalStringFromMap(Map&lt;String, Object&gt; map, String key, String defaultValue) {
+<span class="fc" id="L471">        Object value = map.get(key);</span>
+<span class="pc bpc" id="L472" title="1 of 4 branches missed.">        if (value == null || value.toString().trim().isEmpty()) {</span>
+<span class="fc" id="L473">            return defaultValue;</span>
+        }
+<span class="fc" id="L475">        return value.toString().trim();</span>
+    }
+    
+    /**
+     * ارسال پاسخ JSON با status code مشخص
+     * 
+     * @param exchange شیء HttpExchange
+     * @param statusCode کد وضعیت HTTP
+     * @param data داده برای serialize کردن به JSON
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void sendJsonResponse(HttpExchange exchange, int statusCode, Object data) throws IOException {
+<span class="fc" id="L487">        String jsonResponse = JsonUtil.toJson(data);</span>
+<span class="fc" id="L488">        exchange.getResponseHeaders().set(&quot;Content-Type&quot;, &quot;application/json&quot;);</span>
+<span class="fc" id="L489">        exchange.sendResponseHeaders(statusCode, jsonResponse.getBytes().length);</span>
+<span class="fc" id="L490">        try (OutputStream os = exchange.getResponseBody()) {</span>
+<span class="fc" id="L491">            os.write(jsonResponse.getBytes());</span>
+        }
+<span class="fc" id="L493">    }</span>
+    
+    /**
+     * ارسال پاسخ خطا با JSON format
+     * 
+     * @param exchange شیء HttpExchange
+     * @param statusCode کد وضعیت HTTP
+     * @param message پیام خطا
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void sendErrorResponse(HttpExchange exchange, int statusCode, String message) throws IOException {
+<span class="fc" id="L504">        Map&lt;String, Object&gt; errorResponse = Map.of(</span>
+            &quot;error&quot;, message,
+<span class="fc" id="L506">            &quot;status&quot;, statusCode,</span>
+<span class="fc" id="L507">            &quot;timestamp&quot;, java.time.Instant.now().toString()</span>
+        );
+<span class="fc" id="L509">        sendJsonResponse(exchange, statusCode, errorResponse);</span>
+<span class="fc" id="L510">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

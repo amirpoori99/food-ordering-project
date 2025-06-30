@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FavoritesController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.favorites</a> &gt; <span class="el_source">FavoritesController.java</span></div><h1>FavoritesController.java</h1><pre class="source lang-java linenums">package com.myapp.favorites;
+
+import com.myapp.common.exceptions.NotFoundException;
+import com.myapp.common.models.Favorite;
+import com.myapp.common.utils.JsonUtil;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * کنترلر REST API برای مدیریت علاقه‌مندی‌ها
+ * 
+ * این کلاس تمام endpoint های HTTP مربوط به مدیریت علاقه‌مندی‌های کاربران را ارائه می‌دهد:
+ * 
+ * === GET Endpoints ===
+ * GET    /api/favorites?userId={id}                    - علاقه‌مندی‌های کاربر
+ * GET    /api/favorites/check?userId={u}&amp;restaurantId={r} - بررسی وجود علاقه‌مندی
+ * GET    /api/favorites/recent?days={d}                - علاقه‌مندی‌های اخیر
+ * GET    /api/favorites/with-notes                     - دارای یادداشت
+ * GET    /api/favorites/stats?userId={id}              - آمارهای کاربر
+ * GET    /api/favorites/restaurant/{id}                - علاقه‌مندان رستوران
+ * GET    /api/favorites/restaurant/{id}?count=true     - تعداد علاقه‌مندان
+ * GET    /api/favorites/user/{id}                      - علاقه‌مندی‌های کاربر
+ * GET    /api/favorites/user/{id}?count=true           - تعداد علاقه‌مندی‌ها
+ * GET    /api/favorites/{id}                           - علاقه‌مندی خاص
+ * 
+ * === POST Endpoints ===
+ * POST   /api/favorites/add                            - اضافه کردن علاقه‌مندی
+ * 
+ * === PUT Endpoints ===
+ * PUT    /api/favorites/{id}/notes                     - به‌روزرسانی یادداشت
+ * 
+ * === DELETE Endpoints ===
+ * DELETE /api/favorites/remove?userId={u}&amp;restaurantId={r} - حذف علاقه‌مندی
+ * DELETE /api/favorites/{id}                           - حذف بر اساس ID
+ * 
+ * === JSON Request/Response Format ===
+ * Add Favorite Request:
+ * {
+ *   &quot;userId&quot;: number,
+ *   &quot;restaurantId&quot;: number,
+ *   &quot;notes&quot;: string (optional)
+ * }
+ * 
+ * Update Notes Request:
+ * {
+ *   &quot;notes&quot;: string
+ * }
+ * 
+ * Standard Response:
+ * {
+ *   &quot;success&quot;: boolean,
+ *   &quot;message&quot;: string (optional),
+ *   &quot;data&quot;: object (optional),
+ *   &quot;error&quot;: string (on error)
+ * }
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - RESTful Design: طراحی مطابق استانداردهای REST
+ * - Flexible Endpoints: endpoint های متنوع برای نیازهای مختلف
+ * - Query Parameter Support: پشتیبانی کامل از پارامترهای URL
+ * - Path Parameter Support: پشتیبانی از path variables
+ * - JSON Processing: پردازش کامل JSON requests/responses
+ * - Error Handling: مدیریت جامع خطاها
+ * - Validation: اعتبارسنجی ورودی‌ها
+ * - Logging: ثبت تمام عملیات
+ * - CORS Support: پشتیبانی از cross-origin requests
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+public class FavoritesController implements HttpHandler {
+    
+    /** Logger برای ثبت عملیات و خطاها */
+<span class="fc" id="L85">    private static final Logger logger = LoggerFactory.getLogger(FavoritesController.class);</span>
+    
+    /** سرویس منطق کسب‌وکار علاقه‌مندی‌ها */
+    private final FavoritesService favoritesService;
+    
+    /**
+     * سازنده پیش‌فرض - Dependency Injection خودکار
+     */
+<span class="fc" id="L93">    public FavoritesController() {</span>
+<span class="fc" id="L94">        this.favoritesService = new FavoritesService();</span>
+<span class="fc" id="L95">    }</span>
+    
+    /**
+     * سازنده برای تست - Manual Dependency Injection
+     * 
+     * @param favoritesService سرویس علاقه‌مندی‌ها برای تست
+     */
+<span class="fc" id="L102">    public FavoritesController(FavoritesService favoritesService) {</span>
+<span class="fc" id="L103">        this.favoritesService = favoritesService;</span>
+<span class="fc" id="L104">    }</span>
+
+    /**
+     * هندلر اصلی HTTP requests
+     * 
+     * تمام درخواست‌های HTTP را بر اساس method و path مسیریابی می‌کند
+     * شامل error handling جامع و logging مناسب
+     * 
+     * @param exchange شیء HTTP request/response
+     * @throws IOException در صورت خطا در پردازش HTTP
+     */
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+<span class="fc" id="L117">        String method = exchange.getRequestMethod();</span>
+<span class="fc" id="L118">        String path = exchange.getRequestURI().getPath();</span>
+        
+        try {
+            // حذف prefix پایه &quot;/api/favorites&quot;
+<span class="fc" id="L122">            String endpoint = path.replace(&quot;/api/favorites&quot;, &quot;&quot;);</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">            if (endpoint.startsWith(&quot;/&quot;)) {</span>
+<span class="fc" id="L124">                endpoint = endpoint.substring(1);</span>
+            }
+            
+<span class="fc" id="L127">            logger.info(&quot;🔗 Favorites API: {} {}&quot;, method, endpoint);</span>
+            
+            // مسیریابی بر اساس HTTP method
+<span class="fc bfc" id="L130" title="All 5 branches covered.">            switch (method) {</span>
+                case &quot;GET&quot;:
+<span class="fc" id="L132">                    handleGet(exchange, endpoint);</span>
+<span class="fc" id="L133">                    break;</span>
+                case &quot;POST&quot;:
+<span class="fc" id="L135">                    handlePost(exchange, endpoint);</span>
+<span class="fc" id="L136">                    break;</span>
+                case &quot;PUT&quot;:
+<span class="fc" id="L138">                    handlePut(exchange, endpoint);</span>
+<span class="fc" id="L139">                    break;</span>
+                case &quot;DELETE&quot;:
+<span class="fc" id="L141">                    handleDelete(exchange, endpoint);</span>
+<span class="fc" id="L142">                    break;</span>
+                default:
+<span class="fc" id="L144">                    sendErrorResponse(exchange, 405, &quot;Method not allowed: &quot; + method);</span>
+            }
+            
+<span class="fc" id="L147">        } catch (NotFoundException e) {</span>
+<span class="fc" id="L148">            logger.warn(&quot;Resource not found: {}&quot;, e.getMessage());</span>
+<span class="fc" id="L149">            sendErrorResponse(exchange, 404, e.getMessage());</span>
+<span class="fc" id="L150">        } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L151">            logger.warn(&quot;Invalid request: {}&quot;, e.getMessage());</span>
+<span class="fc" id="L152">            sendErrorResponse(exchange, 400, e.getMessage());</span>
+<span class="fc" id="L153">        } catch (Exception e) {</span>
+<span class="fc" id="L154">            logger.error(&quot;Favorites Controller Error: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L155">            sendErrorResponse(exchange, 500, &quot;Internal server error: &quot; + e.getMessage());</span>
+<span class="fc" id="L156">        }</span>
+<span class="fc" id="L157">    }</span>
+    
+    /**
+     * مدیریت تمام GET requests
+     * 
+     * این متد پیچیده‌ترین بخش کنترلر است و انواع مختلف GET endpoints را پشتیبانی می‌کند
+     * 
+     * @param exchange HTTP exchange object
+     * @param endpoint endpoint path بعد از حذف prefix
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGet(HttpExchange exchange, String endpoint) throws IOException {
+<span class="fc" id="L169">        String query = exchange.getRequestURI().getQuery();</span>
+        
+<span class="fc bfc" id="L171" title="All 2 branches covered.">        if (endpoint.isEmpty()) {</span>
+            // GET /api/favorites?userId=123
+<span class="pc bpc" id="L173" title="1 of 4 branches missed.">            if (query != null &amp;&amp; query.contains(&quot;userId=&quot;)) {</span>
+<span class="fc" id="L174">                String userIdStr = extractQueryParam(query, &quot;userId&quot;);</span>
+<span class="fc" id="L175">                Long userId = parseId(userIdStr, &quot;userId&quot;);</span>
+<span class="fc" id="L176">                List&lt;Favorite&gt; favorites = favoritesService.getUserFavorites(userId);</span>
+                
+<span class="fc" id="L178">                Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L179">                response.put(&quot;success&quot;, true);</span>
+<span class="fc" id="L180">                response.put(&quot;favorites&quot;, favorites);</span>
+<span class="fc" id="L181">                response.put(&quot;count&quot;, favorites.size());</span>
+                
+<span class="fc" id="L183">                sendSuccessResponse(exchange, response);</span>
+<span class="fc" id="L184">            } else {</span>
+<span class="fc" id="L185">                sendErrorResponse(exchange, 400, &quot;Missing required parameter: userId&quot;);</span>
+            }
+            
+<span class="fc bfc" id="L188" title="All 2 branches covered.">        } else if (endpoint.equals(&quot;check&quot;)) {</span>
+            // GET /api/favorites/check?userId=123&amp;restaurantId=456
+            // بررسی اینکه آیا کاربر خاص، رستوران خاص را علاقه‌مندی کرده است
+<span class="pc bpc" id="L191" title="2 of 6 branches missed.">            if (query != null &amp;&amp; query.contains(&quot;userId=&quot;) &amp;&amp; query.contains(&quot;restaurantId=&quot;)) {</span>
+<span class="fc" id="L192">                String userIdStr = extractQueryParam(query, &quot;userId&quot;);</span>
+<span class="fc" id="L193">                String restaurantIdStr = extractQueryParam(query, &quot;restaurantId&quot;);</span>
+                
+<span class="fc" id="L195">                Long userId = parseId(userIdStr, &quot;userId&quot;);</span>
+<span class="fc" id="L196">                Long restaurantId = parseId(restaurantIdStr, &quot;restaurantId&quot;);</span>
+<span class="fc" id="L197">                boolean isFavorite = favoritesService.isFavorite(userId, restaurantId);</span>
+                
+<span class="fc" id="L199">                Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L200">                response.put(&quot;success&quot;, true);</span>
+<span class="fc" id="L201">                response.put(&quot;isFavorite&quot;, isFavorite);</span>
+                
+<span class="fc" id="L203">                sendSuccessResponse(exchange, response);</span>
+<span class="fc" id="L204">            } else {</span>
+<span class="fc" id="L205">                sendErrorResponse(exchange, 400, &quot;Missing required parameters: userId, restaurantId&quot;);</span>
+            }
+            
+<span class="fc bfc" id="L208" title="All 2 branches covered.">        } else if (endpoint.equals(&quot;recent&quot;)) {</span>
+            // GET /api/favorites/recent?days=30
+            // دریافت علاقه‌مندی‌های اخیر
+<span class="fc" id="L211">            int days = 30; // مقدار پیش‌فرض</span>
+<span class="pc bpc" id="L212" title="1 of 4 branches missed.">            if (query != null &amp;&amp; query.contains(&quot;days=&quot;)) {</span>
+<span class="fc" id="L213">                String daysStr = extractQueryParam(query, &quot;days&quot;);</span>
+                try {
+<span class="fc" id="L215">                    days = Integer.parseInt(daysStr);</span>
+<span class="pc bpc" id="L216" title="1 of 2 branches missed.">                    if (days &lt; 1) days = 30; // validation</span>
+<span class="fc" id="L217">                } catch (NumberFormatException e) {</span>
+<span class="fc" id="L218">                    days = 30; // fallback</span>
+<span class="fc" id="L219">                }</span>
+            }
+            
+<span class="fc" id="L222">            List&lt;Favorite&gt; recentFavorites = favoritesService.getRecentFavorites(days);</span>
+            
+<span class="fc" id="L224">            Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L225">            response.put(&quot;success&quot;, true);</span>
+<span class="fc" id="L226">            response.put(&quot;favorites&quot;, recentFavorites);</span>
+<span class="fc" id="L227">            response.put(&quot;count&quot;, recentFavorites.size());</span>
+<span class="fc" id="L228">            response.put(&quot;days&quot;, days);</span>
+            
+<span class="fc" id="L230">            sendSuccessResponse(exchange, response);</span>
+            
+<span class="fc bfc" id="L232" title="All 2 branches covered.">        } else if (endpoint.equals(&quot;with-notes&quot;)) {</span>
+            // GET /api/favorites/with-notes
+            // دریافت علاقه‌مندی‌های دارای یادداشت
+<span class="fc" id="L235">            List&lt;Favorite&gt; favoritesWithNotes = favoritesService.getFavoritesWithNotes();</span>
+            
+<span class="fc" id="L237">            Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L238">            response.put(&quot;success&quot;, true);</span>
+<span class="fc" id="L239">            response.put(&quot;favorites&quot;, favoritesWithNotes);</span>
+<span class="fc" id="L240">            response.put(&quot;count&quot;, favoritesWithNotes.size());</span>
+            
+<span class="fc" id="L242">            sendSuccessResponse(exchange, response);</span>
+            
+<span class="fc bfc" id="L244" title="All 2 branches covered.">        } else if (endpoint.equals(&quot;stats&quot;)) {</span>
+            // GET /api/favorites/stats?userId=123
+            // دریافت آمارهای کامل علاقه‌مندی‌های کاربر
+<span class="pc bpc" id="L247" title="1 of 4 branches missed.">            if (query != null &amp;&amp; query.contains(&quot;userId=&quot;)) {</span>
+<span class="fc" id="L248">                String userIdStr = extractQueryParam(query, &quot;userId&quot;);</span>
+<span class="fc" id="L249">                Long userId = parseId(userIdStr, &quot;userId&quot;);</span>
+<span class="fc" id="L250">                FavoritesService.FavoriteStats stats = favoritesService.getUserFavoriteStats(userId);</span>
+                
+<span class="fc" id="L252">                Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L253">                response.put(&quot;success&quot;, true);</span>
+<span class="fc" id="L254">                response.put(&quot;stats&quot;, stats);</span>
+                
+<span class="fc" id="L256">                sendSuccessResponse(exchange, response);</span>
+<span class="fc" id="L257">            } else {</span>
+<span class="fc" id="L258">                sendErrorResponse(exchange, 400, &quot;Missing required parameter: userId&quot;);</span>
+            }
+            
+<span class="fc bfc" id="L261" title="All 2 branches covered.">        } else if (endpoint.startsWith(&quot;restaurant/&quot;)) {</span>
+            // GET /api/favorites/restaurant/123
+            // دریافت اطلاعات علاقه‌مندی برای رستوران خاص
+<span class="fc" id="L264">            String restaurantIdStr = endpoint.substring(&quot;restaurant/&quot;.length());</span>
+<span class="fc" id="L265">            Long restaurantId = parseId(restaurantIdStr, &quot;restaurantId&quot;);</span>
+            
+<span class="pc bpc" id="L267" title="1 of 4 branches missed.">            if (query != null &amp;&amp; query.contains(&quot;count=true&quot;)) {</span>
+                // GET /api/favorites/restaurant/123?count=true
+                // تنها تعداد علاقه‌مندان را برگردان
+<span class="fc" id="L270">                Long count = favoritesService.getRestaurantFavoriteCount(restaurantId);</span>
+                
+<span class="fc" id="L272">                Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L273">                response.put(&quot;success&quot;, true);</span>
+<span class="fc" id="L274">                response.put(&quot;count&quot;, count);</span>
+                
+<span class="fc" id="L276">                sendSuccessResponse(exchange, response);</span>
+<span class="fc" id="L277">            } else {</span>
+                // GET /api/favorites/restaurant/123
+                // تمام علاقه‌مندی‌های رستوران را برگردان
+<span class="fc" id="L280">                List&lt;Favorite&gt; favorites = favoritesService.getRestaurantFavorites(restaurantId);</span>
+                
+<span class="fc" id="L282">                Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L283">                response.put(&quot;success&quot;, true);</span>
+<span class="fc" id="L284">                response.put(&quot;favorites&quot;, favorites);</span>
+<span class="fc" id="L285">                response.put(&quot;count&quot;, favorites.size());</span>
+                
+<span class="fc" id="L287">                sendSuccessResponse(exchange, response);</span>
+            }
+            
+<span class="pc bpc" id="L290" title="1 of 2 branches missed.">        } else if (endpoint.startsWith(&quot;user/&quot;)) {</span>
+            // GET /api/favorites/user/123
+            // دریافت اطلاعات علاقه‌مندی برای کاربر خاص
+<span class="nc" id="L293">            String userIdStr = endpoint.substring(&quot;user/&quot;.length());</span>
+<span class="nc" id="L294">            Long userId = parseId(userIdStr, &quot;userId&quot;);</span>
+            
+<span class="nc bnc" id="L296" title="All 4 branches missed.">            if (query != null &amp;&amp; query.contains(&quot;count=true&quot;)) {</span>
+                // GET /api/favorites/user/123?count=true
+                // تنها تعداد علاقه‌مندی‌ها را برگردان
+<span class="nc" id="L299">                Long count = favoritesService.getUserFavoriteCount(userId);</span>
+                
+<span class="nc" id="L301">                Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L302">                response.put(&quot;success&quot;, true);</span>
+<span class="nc" id="L303">                response.put(&quot;count&quot;, count);</span>
+                
+<span class="nc" id="L305">                sendSuccessResponse(exchange, response);</span>
+<span class="nc" id="L306">            } else {</span>
+                // GET /api/favorites/user/123
+                // تمام علاقه‌مندی‌های کاربر را برگردان
+<span class="nc" id="L309">                List&lt;Favorite&gt; favorites = favoritesService.getUserFavorites(userId);</span>
+                
+<span class="nc" id="L311">                Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L312">                response.put(&quot;success&quot;, true);</span>
+<span class="nc" id="L313">                response.put(&quot;favorites&quot;, favorites);</span>
+<span class="nc" id="L314">                response.put(&quot;count&quot;, favorites.size());</span>
+                
+<span class="nc" id="L316">                sendSuccessResponse(exchange, response);</span>
+            }
+            
+<span class="pc bfc" id="L319" title="All 2 branches covered.">        } else if (endpoint.matches(&quot;\\d+&quot;)) {</span>
+            // GET /api/favorites/123
+            // دریافت علاقه‌مندی خاص بر اساس ID
+<span class="fc" id="L322">            Long favoriteId = parseId(endpoint, &quot;favoriteId&quot;);</span>
+<span class="fc" id="L323">            Favorite favorite = favoritesService.getFavorite(favoriteId);</span>
+            
+<span class="fc" id="L325">            Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L326">            response.put(&quot;success&quot;, true);</span>
+<span class="fc" id="L327">            response.put(&quot;favorite&quot;, favorite);</span>
+            
+<span class="fc" id="L329">            sendSuccessResponse(exchange, response);</span>
+            
+<span class="fc" id="L331">        } else {</span>
+<span class="fc" id="L332">            sendErrorResponse(exchange, 404, &quot;Endpoint not found: &quot; + endpoint);</span>
+        }
+<span class="fc" id="L334">    }</span>
+    
+    /**
+     * مدیریت تمام POST requests
+     * 
+     * شامل ایجاد علاقه‌مندی جدید
+     * 
+     * @param exchange HTTP exchange object
+     * @param endpoint endpoint path
+     * @throws IOException در صورت خطا در پردازش
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    private void handlePost(HttpExchange exchange, String endpoint) throws IOException {
+<span class="fc" id="L347">        String requestBody = new String(exchange.getRequestBody().readAllBytes());</span>
+        
+<span class="pc bpc" id="L349" title="2 of 4 branches missed.">        if (endpoint.isEmpty() || endpoint.equals(&quot;add&quot;)) {</span>
+            // POST /api/favorites/add
+            // اضافه کردن رستوران به علاقه‌مندی‌های کاربر
+<span class="fc" id="L352">            Map&lt;String, Object&gt; data = JsonUtil.fromJson(requestBody, Map.class);</span>
+            
+<span class="pc bpc" id="L354" title="1 of 4 branches missed.">            if (!data.containsKey(&quot;userId&quot;) || !data.containsKey(&quot;restaurantId&quot;)) {</span>
+<span class="fc" id="L355">                sendErrorResponse(exchange, 400, &quot;Missing required fields: userId, restaurantId&quot;);</span>
+<span class="fc" id="L356">                return;</span>
+            }
+            
+<span class="fc" id="L359">            Long userId = Long.valueOf(data.get(&quot;userId&quot;).toString());</span>
+<span class="fc" id="L360">            Long restaurantId = Long.valueOf(data.get(&quot;restaurantId&quot;).toString());</span>
+<span class="fc bfc" id="L361" title="All 2 branches covered.">            String notes = data.containsKey(&quot;notes&quot;) ? data.get(&quot;notes&quot;).toString() : null;</span>
+            
+<span class="fc" id="L363">            Favorite favorite = favoritesService.addFavorite(userId, restaurantId, notes);</span>
+            
+<span class="fc" id="L365">            Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L366">            response.put(&quot;success&quot;, true);</span>
+<span class="fc" id="L367">            response.put(&quot;message&quot;, &quot;Added to favorites successfully&quot;);</span>
+<span class="fc" id="L368">            response.put(&quot;favorite&quot;, favorite);</span>
+            
+<span class="fc" id="L370">            sendSuccessResponse(exchange, response);</span>
+            
+<span class="fc" id="L372">        } else {</span>
+<span class="nc" id="L373">            sendErrorResponse(exchange, 404, &quot;Endpoint not found: &quot; + endpoint);</span>
+        }
+<span class="fc" id="L375">    }</span>
+    
+    /**
+     * مدیریت تمام PUT requests
+     * 
+     * شامل به‌روزرسانی یادداشت‌های علاقه‌مندی
+     * 
+     * @param exchange HTTP exchange object
+     * @param endpoint endpoint path
+     * @throws IOException در صورت خطا در پردازش
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    private void handlePut(HttpExchange exchange, String endpoint) throws IOException {
+<span class="fc" id="L388">        String requestBody = new String(exchange.getRequestBody().readAllBytes());</span>
+        
+<span class="fc bfc" id="L390" title="All 2 branches covered.">        if (endpoint.matches(&quot;\\d+/notes&quot;)) {</span>
+            // PUT /api/favorites/123/notes
+            // به‌روزرسانی یادداشت علاقه‌مندی
+<span class="fc" id="L393">            String favoriteIdStr = endpoint.substring(0, endpoint.indexOf(&quot;/notes&quot;));</span>
+<span class="fc" id="L394">            Long favoriteId = parseId(favoriteIdStr, &quot;favoriteId&quot;);</span>
+            
+<span class="fc" id="L396">            Map&lt;String, Object&gt; data = JsonUtil.fromJson(requestBody, Map.class);</span>
+<span class="pc bpc" id="L397" title="1 of 2 branches missed.">            String notes = data.containsKey(&quot;notes&quot;) ? data.get(&quot;notes&quot;).toString() : null;</span>
+            
+<span class="fc" id="L399">            Favorite favorite = favoritesService.updateFavoriteNotes(favoriteId, notes);</span>
+            
+<span class="fc" id="L401">            Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L402">            response.put(&quot;success&quot;, true);</span>
+<span class="fc" id="L403">            response.put(&quot;message&quot;, &quot;Favorite notes updated successfully&quot;);</span>
+<span class="fc" id="L404">            response.put(&quot;favorite&quot;, favorite);</span>
+            
+<span class="fc" id="L406">            sendSuccessResponse(exchange, response);</span>
+            
+<span class="fc" id="L408">        } else {</span>
+<span class="fc" id="L409">            sendErrorResponse(exchange, 404, &quot;Endpoint not found: &quot; + endpoint);</span>
+        }
+<span class="fc" id="L411">    }</span>
+    
+    /**
+     * مدیریت تمام DELETE requests
+     * 
+     * شامل حذف علاقه‌مندی به دو روش مختلف
+     * 
+     * @param exchange HTTP exchange object
+     * @param endpoint endpoint path
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleDelete(HttpExchange exchange, String endpoint) throws IOException {
+<span class="fc" id="L423">        String query = exchange.getRequestURI().getQuery();</span>
+        
+<span class="pc bpc" id="L425" title="1 of 4 branches missed.">        if (endpoint.isEmpty() || endpoint.equals(&quot;remove&quot;)) {</span>
+            // DELETE /api/favorites/remove?userId=123&amp;restaurantId=456
+            // حذف علاقه‌مندی بر اساس userId و restaurantId
+<span class="pc bpc" id="L428" title="2 of 6 branches missed.">            if (query != null &amp;&amp; query.contains(&quot;userId=&quot;) &amp;&amp; query.contains(&quot;restaurantId=&quot;)) {</span>
+<span class="fc" id="L429">                String userIdStr = extractQueryParam(query, &quot;userId&quot;);</span>
+<span class="fc" id="L430">                String restaurantIdStr = extractQueryParam(query, &quot;restaurantId&quot;);</span>
+                
+<span class="fc" id="L432">                Long userId = parseId(userIdStr, &quot;userId&quot;);</span>
+<span class="fc" id="L433">                Long restaurantId = parseId(restaurantIdStr, &quot;restaurantId&quot;);</span>
+                
+<span class="fc" id="L435">                boolean removed = favoritesService.removeFavorite(userId, restaurantId);</span>
+                
+<span class="fc" id="L437">                Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L438">                response.put(&quot;success&quot;, true);</span>
+<span class="fc" id="L439">                response.put(&quot;message&quot;, &quot;Removed from favorites successfully&quot;);</span>
+<span class="fc" id="L440">                response.put(&quot;removed&quot;, removed);</span>
+                
+<span class="fc" id="L442">                sendSuccessResponse(exchange, response);</span>
+<span class="fc" id="L443">            } else {</span>
+<span class="fc" id="L444">                sendErrorResponse(exchange, 400, &quot;Missing required parameters: userId, restaurantId&quot;);</span>
+            }
+            
+<span class="pc bpc" id="L447" title="1 of 2 branches missed.">        } else if (endpoint.matches(&quot;\\d+&quot;)) {</span>
+            // DELETE /api/favorites/123
+            // حذف علاقه‌مندی بر اساس ID (معمولاً توسط ادمین)
+<span class="fc" id="L450">            Long favoriteId = parseId(endpoint, &quot;favoriteId&quot;);</span>
+<span class="fc" id="L451">            boolean deleted = favoritesService.deleteFavorite(favoriteId);</span>
+            
+<span class="fc" id="L453">            Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L454">            response.put(&quot;success&quot;, true);</span>
+<span class="fc" id="L455">            response.put(&quot;message&quot;, &quot;Favorite deleted successfully&quot;);</span>
+<span class="fc" id="L456">            response.put(&quot;deleted&quot;, deleted);</span>
+            
+<span class="fc" id="L458">            sendSuccessResponse(exchange, response);</span>
+            
+<span class="fc" id="L460">        } else {</span>
+<span class="nc" id="L461">            sendErrorResponse(exchange, 404, &quot;Endpoint not found: &quot; + endpoint);</span>
+        }
+<span class="fc" id="L463">    }</span>
+    
+    // ==================== UTILITY METHODS ====================
+    
+    /**
+     * تبدیل رشته ID به Long با validation
+     * 
+     * @param idStr رشته حاوی ID
+     * @param fieldName نام فیلد برای نمایش در خطا
+     * @return ID تبدیل شده
+     * @throws IllegalArgumentException اگر ID نامعتبر باشد
+     */
+    private Long parseId(String idStr, String fieldName) {
+<span class="pc bpc" id="L476" title="2 of 4 branches missed.">        if (idStr == null || idStr.trim().isEmpty()) {</span>
+<span class="nc" id="L477">            throw new IllegalArgumentException(fieldName + &quot; cannot be null or empty&quot;);</span>
+        }
+        
+        try {
+<span class="fc" id="L481">            return Long.parseLong(idStr.trim());</span>
+<span class="fc" id="L482">        } catch (NumberFormatException e) {</span>
+<span class="fc" id="L483">            throw new IllegalArgumentException(&quot;Invalid &quot; + fieldName + &quot; format: &quot; + idStr);</span>
+        }
+    }
+    
+    /**
+     * استخراج مقدار پارامتر از query string
+     * 
+     * شامل URL decoding برای پشتیبانی از کاراکترهای خاص
+     * 
+     * @param query query string کامل
+     * @param param نام پارامتر مورد نظر
+     * @return مقدار پارامتر یا null در صورت عدم وجود
+     */
+    private String extractQueryParam(String query, String param) {
+<span class="pc bpc" id="L497" title="2 of 4 branches missed.">        if (query == null || param == null) {</span>
+<span class="nc" id="L498">            return null;</span>
+        }
+        
+<span class="fc" id="L501">        String[] pairs = query.split(&quot;&amp;&quot;);</span>
+<span class="pc bpc" id="L502" title="1 of 2 branches missed.">        for (String pair : pairs) {</span>
+<span class="fc" id="L503">            String[] keyValue = pair.split(&quot;=&quot;, 2);</span>
+<span class="pc bpc" id="L504" title="1 of 4 branches missed.">            if (keyValue.length == 2 &amp;&amp; keyValue[0].equals(param)) {</span>
+                try {
+                    // URL decoding برای پشتیبانی از کاراکترهای خاص
+<span class="fc" id="L507">                    return URLDecoder.decode(keyValue[1], StandardCharsets.UTF_8);</span>
+<span class="nc" id="L508">                } catch (Exception e) {</span>
+<span class="nc" id="L509">                    logger.warn(&quot;Failed to decode query parameter {}: {}&quot;, param, keyValue[1]);</span>
+<span class="nc" id="L510">                    return keyValue[1]; // fallback به raw value</span>
+                }
+            }
+        }
+<span class="nc" id="L514">        return null;</span>
+    }
+    
+    /**
+     * ارسال پاسخ موفق JSON
+     * 
+     * @param exchange HTTP exchange
+     * @param data داده برای تبدیل به JSON
+     * @throws IOException در صورت خطا در ارسال
+     */
+    private void sendSuccessResponse(HttpExchange exchange, Object data) throws IOException {
+<span class="fc" id="L525">        String jsonResponse = JsonUtil.toJson(data);</span>
+<span class="fc" id="L526">        sendResponse(exchange, 200, jsonResponse);</span>
+<span class="fc" id="L527">    }</span>
+    
+    /**
+     * ارسال پاسخ خطا JSON
+     * 
+     * @param exchange HTTP exchange
+     * @param statusCode HTTP status code
+     * @param message پیام خطا
+     * @throws IOException در صورت خطا در ارسال
+     */
+    private void sendErrorResponse(HttpExchange exchange, int statusCode, String message) throws IOException {
+<span class="fc" id="L538">        Map&lt;String, Object&gt; errorResponse = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L539">        errorResponse.put(&quot;success&quot;, false);</span>
+<span class="fc" id="L540">        errorResponse.put(&quot;error&quot;, message);</span>
+        
+<span class="fc" id="L542">        String jsonResponse = JsonUtil.toJson(errorResponse);</span>
+<span class="fc" id="L543">        sendResponse(exchange, statusCode, jsonResponse);</span>
+<span class="fc" id="L544">    }</span>
+    
+    /**
+     * ارسال پاسخ HTTP با تنظیمات کامل
+     * 
+     * شامل Content-Type، CORS headers و response body
+     * 
+     * @param exchange HTTP exchange
+     * @param statusCode HTTP status code
+     * @param response محتوای پاسخ
+     * @throws IOException در صورت خطا در ارسال
+     */
+    private void sendResponse(HttpExchange exchange, int statusCode, String response) throws IOException {
+        // تنظیم headers
+<span class="fc" id="L558">        exchange.getResponseHeaders().set(&quot;Content-Type&quot;, &quot;application/json&quot;);</span>
+<span class="fc" id="L559">        exchange.getResponseHeaders().set(&quot;Access-Control-Allow-Origin&quot;, &quot;*&quot;); // CORS support</span>
+<span class="fc" id="L560">        exchange.sendResponseHeaders(statusCode, response.getBytes().length);</span>
+        
+        // ارسال response body
+<span class="fc" id="L563">        try (OutputStream os = exchange.getResponseBody()) {</span>
+<span class="fc" id="L564">            os.write(response.getBytes());</span>
+        }
+<span class="fc" id="L566">    }</span>
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

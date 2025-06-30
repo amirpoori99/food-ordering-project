@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FavoritesRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.favorites</a> &gt; <span class="el_source">FavoritesRepository.java</span></div><h1>FavoritesRepository.java</h1><pre class="source lang-java linenums">package com.myapp.favorites;
+
+import com.myapp.common.models.Favorite;
+import com.myapp.common.models.Restaurant;
+import com.myapp.common.models.User;
+import com.myapp.common.utils.DatabaseUtil;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Repository لایه دسترسی داده برای entity های Favorite
+ * 
+ * این کلاس تمام عملیات پایگاه داده مربوط به مدیریت علاقه‌مندی‌های کاربران را ارائه می‌دهد:
+ * 
+ * === عملیات CRUD پایه ===
+ * - save(): ذخیره یا به‌روزرسانی علاقه‌مندی
+ * - findById(): جستجو بر اساس شناسه
+ * - delete(): حذف علاقه‌مندی
+ * 
+ * === جستجوهای تخصصی ===
+ * - findByUser(): علاقه‌مندی‌های کاربر خاص
+ * - findByRestaurant(): علاقه‌مندی‌های رستوران خاص
+ * - findByUserAndRestaurant(): جستجوی ترکیبی
+ * - findRecentFavorites(): علاقه‌مندی‌های اخیر
+ * - findFavoritesWithNotes(): علاقه‌مندی‌های دارای یادداشت
+ * 
+ * === عملیات آماری ===
+ * - countByUser(): تعداد علاقه‌مندی‌های کاربر
+ * - countByRestaurant(): تعداد علاقه‌مندی‌های رستوران
+ * - countAll(): کل تعداد علاقه‌مندی‌ها
+ * 
+ * === صفحه‌بندی ===
+ * - findWithPagination(): دریافت با صفحه‌بندی
+ * - findAll(): تمام علاقه‌مندی‌ها (برای ادمین)
+ * 
+ * === متدهای Legacy ===
+ * - save(userId, restaurantId): روش قدیمی ذخیره
+ * - find(userId, restaurantId): روش قدیمی جستجو
+ * - listByUser(): نام قدیمی findByUser
+ * - clear(): پاکسازی کامل (تست)
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Transaction Management: مدیریت تراکنش‌ها
+ * - Error Handling: مدیریت خطاها با try-catch
+ * - Logging: ثبت تمام عملیات و خطاها
+ * - HQL Queries: استفاده از Hibernate Query Language
+ * - Null Safety: بررسی null برای ورودی‌ها
+ * - Performance: Sort و Order بهینه
+ * - Backward Compatibility: حفظ سازگاری با نسخه قبل
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+<span class="fc" id="L63">public class FavoritesRepository {</span>
+
+    /** Logger برای ثبت عملیات و خطاها */
+<span class="fc" id="L66">    private static final Logger logger = LoggerFactory.getLogger(FavoritesRepository.class);</span>
+
+    /**
+     * ذخیره علاقه‌مندی جدید یا به‌روزرسانی موجود
+     * 
+     * این متد از JPA merge و persist استفاده می‌کند تا بر اساس وجود ID
+     * تصمیم بگیرد که آیا باید رکورد جدید ایجاد کند یا موجود را به‌روزرسانی کند
+     * 
+     * @param favorite شیء علاقه‌مندی برای ذخیره
+     * @return علاقه‌مندی ذخیره شده با ID تخصیص داده شده
+     * @throws RuntimeException در صورت خطا در ذخیره‌سازی
+     */
+    public Favorite save(Favorite favorite) {
+<span class="fc" id="L79">        Transaction transaction = null;</span>
+<span class="fc" id="L80">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L81">            transaction = session.beginTransaction();</span>
+            
+<span class="fc bfc" id="L83" title="All 2 branches covered.">            if (favorite.getId() == null) {</span>
+                // رکورد جدید - از persist استفاده می‌کنیم
+<span class="fc" id="L85">                session.persist(favorite);</span>
+<span class="fc" id="L86">                logger.info(&quot;Created new favorite: {}&quot;, favorite);</span>
+            } else {
+                // به‌روزرسانی رکورد موجود - از merge استفاده می‌کنیم
+<span class="fc" id="L89">                favorite = session.merge(favorite);</span>
+<span class="fc" id="L90">                logger.info(&quot;Updated favorite: {}&quot;, favorite);</span>
+            }
+            
+<span class="fc" id="L93">            transaction.commit();</span>
+<span class="fc" id="L94">            return favorite;</span>
+            
+<span class="fc" id="L96">        } catch (Exception e) {</span>
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">            if (transaction != null) {</span>
+<span class="nc" id="L98">                transaction.rollback();</span>
+            }
+<span class="nc" id="L100">            logger.error(&quot;Error saving favorite: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L101">            throw new RuntimeException(&quot;Failed to save favorite&quot;, e);</span>
+        }
+    }
+
+    /**
+     * متد Legacy برای سازگاری با نسخه قبل
+     * 
+     * این متد شیوه قدیمی ذخیره علاقه‌مندی با userId و restaurantId است
+     * ابتدا User و Restaurant را از دیتابیس load می‌کند سپس Favorite ایجاد می‌کند
+     * 
+     * @param userId شناسه کاربر
+     * @param restaurantId شناسه رستوران
+     * @return علاقه‌مندی ایجاد شده
+     * @throws IllegalArgumentException اگر کاربر یا رستوران یافت نشود
+     * @throws RuntimeException در صورت خطا در ذخیره‌سازی
+     */
+    public Favorite save(long userId, long restaurantId) {
+<span class="fc" id="L118">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L119">            User user = session.get(User.class, userId);</span>
+<span class="fc" id="L120">            Restaurant restaurant = session.get(Restaurant.class, restaurantId);</span>
+            
+<span class="pc bpc" id="L122" title="1 of 4 branches missed.">            if (user == null || restaurant == null) {</span>
+<span class="fc" id="L123">                throw new IllegalArgumentException(&quot;User or Restaurant not found&quot;);</span>
+            }
+            
+<span class="nc" id="L126">            Favorite favorite = new Favorite(user, restaurant);</span>
+<span class="nc" id="L127">            return save(favorite);</span>
+            
+<span class="fc" id="L129">        } catch (Exception e) {</span>
+<span class="fc" id="L130">            logger.error(&quot;Error saving favorite with userId {} and restaurantId {}: {}&quot;, </span>
+<span class="fc" id="L131">                        userId, restaurantId, e.getMessage(), e);</span>
+<span class="fc" id="L132">            throw new RuntimeException(&quot;Failed to save favorite&quot;, e);</span>
+        }
+    }
+
+    /**
+     * جستجوی علاقه‌مندی بر اساس شناسه
+     * 
+     * @param id شناسه علاقه‌مندی
+     * @return Optional حاوی علاقه‌مندی یا empty در صورت عدم وجود
+     */
+    public Optional&lt;Favorite&gt; findById(Long id) {
+<span class="fc" id="L143">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L144">            Favorite favorite = session.get(Favorite.class, id);</span>
+<span class="fc" id="L145">            return Optional.ofNullable(favorite);</span>
+<span class="nc" id="L146">        } catch (Exception e) {</span>
+<span class="nc" id="L147">            logger.error(&quot;Error finding favorite by ID {}: {}&quot;, id, e.getMessage(), e);</span>
+<span class="nc" id="L148">            return Optional.empty();</span>
+        }
+    }
+
+    /**
+     * جستجوی علاقه‌مندی بر اساس کاربر و رستوران
+     * 
+     * این متد برای بررسی اینکه آیا کاربر خاص، رستوران خاص را به علاقه‌مندی‌هایش
+     * اضافه کرده است یا خیر استفاده می‌شود
+     * 
+     * @param user شیء کاربر
+     * @param restaurant شیء رستوران
+     * @return Optional حاوی علاقه‌مندی یا empty در صورت عدم وجود
+     */
+    public Optional&lt;Favorite&gt; findByUserAndRestaurant(User user, Restaurant restaurant) {
+<span class="fc bfc" id="L163" title="All 4 branches covered.">        if (user == null || restaurant == null) {</span>
+<span class="fc" id="L164">            logger.warn(&quot;Cannot find favorite with null user or restaurant&quot;);</span>
+<span class="fc" id="L165">            return Optional.empty();</span>
+        }
+        
+<span class="fc" id="L168">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L169">            String hql = &quot;FROM Favorite f WHERE f.user.id = :userId AND f.restaurant.id = :restaurantId&quot;;</span>
+<span class="fc" id="L170">            Query&lt;Favorite&gt; query = session.createQuery(hql, Favorite.class);</span>
+<span class="fc" id="L171">            query.setParameter(&quot;userId&quot;, user.getId());</span>
+<span class="fc" id="L172">            query.setParameter(&quot;restaurantId&quot;, restaurant.getId());</span>
+            
+<span class="fc" id="L174">            List&lt;Favorite&gt; results = query.getResultList();</span>
+<span class="pc bpc" id="L175" title="1 of 2 branches missed.">            return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));</span>
+            
+<span class="nc" id="L177">        } catch (Exception e) {</span>
+<span class="nc" id="L178">            logger.error(&quot;Error finding favorite by user {} and restaurant {}: {}&quot;, </span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">                        user != null ? user.getId() : &quot;null&quot;, </span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">                        restaurant != null ? restaurant.getId() : &quot;null&quot;, </span>
+<span class="nc" id="L181">                        e.getMessage(), e);</span>
+<span class="nc" id="L182">            return Optional.empty();</span>
+        }
+    }
+
+    /**
+     * متد Legacy برای سازگاری با نسخه قبل
+     * 
+     * همان کار findByUserAndRestaurant را انجام می‌دهد اما با ID به جای شیء
+     * 
+     * @param userId شناسه کاربر
+     * @param restaurantId شناسه رستوران
+     * @return Optional حاوی علاقه‌مندی یا empty در صورت عدم وجود
+     */
+    public Optional&lt;Favorite&gt; find(long userId, long restaurantId) {
+<span class="fc" id="L196">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L197">            String hql = &quot;FROM Favorite f WHERE f.user.id = :userId AND f.restaurant.id = :restaurantId&quot;;</span>
+<span class="fc" id="L198">            Query&lt;Favorite&gt; query = session.createQuery(hql, Favorite.class);</span>
+<span class="fc" id="L199">            query.setParameter(&quot;userId&quot;, userId);</span>
+<span class="fc" id="L200">            query.setParameter(&quot;restaurantId&quot;, restaurantId);</span>
+            
+<span class="fc" id="L202">            List&lt;Favorite&gt; results = query.getResultList();</span>
+<span class="pc bpc" id="L203" title="1 of 2 branches missed.">            return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));</span>
+            
+<span class="nc" id="L205">        } catch (Exception e) {</span>
+<span class="nc" id="L206">            logger.error(&quot;Error finding favorite by userId {} and restaurantId {}: {}&quot;, </span>
+<span class="nc" id="L207">                        userId, restaurantId, e.getMessage(), e);</span>
+<span class="nc" id="L208">            return Optional.empty();</span>
+        }
+    }
+
+    /**
+     * دریافت تمام علاقه‌مندی‌های یک کاربر
+     * 
+     * نتایج بر اساس تاریخ ایجاد به صورت نزولی مرتب می‌شوند
+     * (جدیدترین‌ها اول)
+     * 
+     * @param user شیء کاربر
+     * @return لیست علاقه‌مندی‌های کاربر
+     */
+    public List&lt;Favorite&gt; findByUser(User user) {
+<span class="fc" id="L222">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L223">            String hql = &quot;FROM Favorite f WHERE f.user.id = :userId ORDER BY f.createdAt DESC&quot;;</span>
+<span class="fc" id="L224">            Query&lt;Favorite&gt; query = session.createQuery(hql, Favorite.class);</span>
+<span class="fc" id="L225">            query.setParameter(&quot;userId&quot;, user.getId());</span>
+            
+<span class="fc" id="L227">            return query.getResultList();</span>
+            
+<span class="fc" id="L229">        } catch (Exception e) {</span>
+<span class="nc" id="L230">            logger.error(&quot;Error finding favorites for user {}: {}&quot;, user.getId(), e.getMessage(), e);</span>
+<span class="nc" id="L231">            return List.of();</span>
+        }
+    }
+
+    /**
+     * متد Legacy برای سازگاری با نسخه قبل
+     * 
+     * همان کار findByUser را انجام می‌دهد اما با userId به جای شیء User
+     * 
+     * @param userId شناسه کاربر
+     * @return لیست علاقه‌مندی‌های کاربر
+     */
+    public List&lt;Favorite&gt; listByUser(long userId) {
+<span class="fc" id="L244">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L245">            String hql = &quot;FROM Favorite f WHERE f.user.id = :userId ORDER BY f.createdAt DESC&quot;;</span>
+<span class="fc" id="L246">            Query&lt;Favorite&gt; query = session.createQuery(hql, Favorite.class);</span>
+<span class="fc" id="L247">            query.setParameter(&quot;userId&quot;, userId);</span>
+            
+<span class="fc" id="L249">            return query.getResultList();</span>
+            
+<span class="nc" id="L251">        } catch (Exception e) {</span>
+<span class="nc" id="L252">            logger.error(&quot;Error listing favorites for user {}: {}&quot;, userId, e.getMessage(), e);</span>
+<span class="nc" id="L253">            return List.of();</span>
+        }
+    }
+
+    /**
+     * دریافت تمام علاقه‌مندی‌های یک رستوران
+     * 
+     * برای بررسی محبوبیت رستوران و آمارگیری استفاده می‌شود
+     * نتایج بر اساس تاریخ ایجاد مرتب می‌شوند
+     * 
+     * @param restaurant شیء رستوران
+     * @return لیست علاقه‌مندی‌های رستوران
+     */
+    public List&lt;Favorite&gt; findByRestaurant(Restaurant restaurant) {
+<span class="fc" id="L267">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L268">            String hql = &quot;FROM Favorite f WHERE f.restaurant.id = :restaurantId ORDER BY f.createdAt DESC&quot;;</span>
+<span class="fc" id="L269">            Query&lt;Favorite&gt; query = session.createQuery(hql, Favorite.class);</span>
+<span class="fc" id="L270">            query.setParameter(&quot;restaurantId&quot;, restaurant.getId());</span>
+            
+<span class="fc" id="L272">            return query.getResultList();</span>
+            
+<span class="fc" id="L274">        } catch (Exception e) {</span>
+<span class="pc" id="L275">            logger.error(&quot;Error finding favorites for restaurant {}: {}&quot;, </span>
+<span class="nc" id="L276">                        restaurant.getId(), e.getMessage(), e);</span>
+<span class="nc" id="L277">            return List.of();</span>
+        }
+    }
+
+    /**
+     * دریافت علاقه‌مندی‌های اخیر (در چند روز گذشته)
+     * 
+     * برای تحلیل trend ها و الگوهای رفتاری کاربران مفید است
+     * 
+     * @param days تعداد روزهای گذشته
+     * @return لیست علاقه‌مندی‌های اخیر
+     */
+    public List&lt;Favorite&gt; findRecentFavorites(int days) {
+<span class="fc" id="L290">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L291">            String hql = &quot;FROM Favorite f WHERE f.createdAt &gt;= :cutoffDate ORDER BY f.createdAt DESC&quot;;</span>
+<span class="fc" id="L292">            Query&lt;Favorite&gt; query = session.createQuery(hql, Favorite.class);</span>
+<span class="fc" id="L293">            query.setParameter(&quot;cutoffDate&quot;, LocalDateTime.now().minusDays(days));</span>
+            
+<span class="fc" id="L295">            return query.getResultList();</span>
+            
+<span class="nc" id="L297">        } catch (Exception e) {</span>
+<span class="nc" id="L298">            logger.error(&quot;Error finding recent favorites for {} days: {}&quot;, days, e.getMessage(), e);</span>
+<span class="nc" id="L299">            return List.of();</span>
+        }
+    }
+
+    /**
+     * دریافت علاقه‌مندی‌های دارای یادداشت
+     * 
+     * برخی کاربران یادداشت‌هایی برای علاقه‌مندی‌هایشان می‌نویسند
+     * این متد تنها علاقه‌مندی‌های دارای یادداشت را برمی‌گرداند
+     * 
+     * @return لیست علاقه‌مندی‌های دارای یادداشت
+     */
+    public List&lt;Favorite&gt; findFavoritesWithNotes() {
+<span class="fc" id="L312">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L313">            String hql = &quot;FROM Favorite f WHERE f.notes IS NOT NULL AND f.notes != '' ORDER BY f.createdAt DESC&quot;;</span>
+<span class="fc" id="L314">            Query&lt;Favorite&gt; query = session.createQuery(hql, Favorite.class);</span>
+            
+<span class="fc" id="L316">            return query.getResultList();</span>
+            
+<span class="nc" id="L318">        } catch (Exception e) {</span>
+<span class="nc" id="L319">            logger.error(&quot;Error finding favorites with notes: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L320">            return List.of();</span>
+        }
+    }
+
+    /**
+     * شمارش تعداد علاقه‌مندی‌های یک رستوران
+     * 
+     * برای محاسبه امتیاز محبوبیت رستوران استفاده می‌شود
+     * 
+     * @param restaurant شیء رستوران
+     * @return تعداد علاقه‌مندی‌ها
+     */
+    public Long countByRestaurant(Restaurant restaurant) {
+<span class="fc" id="L333">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L334">            String hql = &quot;SELECT COUNT(f) FROM Favorite f WHERE f.restaurant.id = :restaurantId&quot;;</span>
+<span class="fc" id="L335">            Query&lt;Long&gt; query = session.createQuery(hql, Long.class);</span>
+<span class="fc" id="L336">            query.setParameter(&quot;restaurantId&quot;, restaurant.getId());</span>
+            
+<span class="fc" id="L338">            Long result = query.uniqueResult();</span>
+<span class="pc bpc" id="L339" title="1 of 2 branches missed.">            return result != null ? result : 0L;</span>
+            
+<span class="fc" id="L341">        } catch (Exception e) {</span>
+<span class="pc" id="L342">            logger.error(&quot;Error counting favorites for restaurant {}: {}&quot;, </span>
+<span class="nc" id="L343">                        restaurant.getId(), e.getMessage(), e);</span>
+<span class="nc" id="L344">            return 0L;</span>
+        }
+    }
+
+    /**
+     * شمارش تعداد علاقه‌مندی‌های یک کاربر
+     * 
+     * برای پروفایل کاربر و آمارهای شخصی استفاده می‌شود
+     * 
+     * @param user شیء کاربر
+     * @return تعداد علاقه‌مندی‌ها
+     */
+    public Long countByUser(User user) {
+<span class="fc" id="L357">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L358">            String hql = &quot;SELECT COUNT(f) FROM Favorite f WHERE f.user.id = :userId&quot;;</span>
+<span class="fc" id="L359">            Query&lt;Long&gt; query = session.createQuery(hql, Long.class);</span>
+<span class="fc" id="L360">            query.setParameter(&quot;userId&quot;, user.getId());</span>
+            
+<span class="fc" id="L362">            Long result = query.uniqueResult();</span>
+<span class="pc bpc" id="L363" title="1 of 2 branches missed.">            return result != null ? result : 0L;</span>
+            
+<span class="fc" id="L365">        } catch (Exception e) {</span>
+<span class="nc" id="L366">            logger.error(&quot;Error counting favorites for user {}: {}&quot;, user.getId(), e.getMessage(), e);</span>
+<span class="nc" id="L367">            return 0L;</span>
+        }
+    }
+
+    /**
+     * حذف علاقه‌مندی بر اساس شناسه
+     * 
+     * @param id شناسه علاقه‌مندی
+     * @return true در صورت حذف موفق، false در غیر این صورت
+     */
+    public boolean delete(Long id) {
+<span class="fc" id="L378">        Transaction transaction = null;</span>
+<span class="fc" id="L379">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L380">            transaction = session.beginTransaction();</span>
+            
+<span class="fc" id="L382">            Favorite favorite = session.get(Favorite.class, id);</span>
+<span class="pc bpc" id="L383" title="1 of 2 branches missed.">            if (favorite != null) {</span>
+<span class="nc" id="L384">                session.remove(favorite);</span>
+<span class="nc" id="L385">                logger.info(&quot;Deleted favorite with ID: {}&quot;, id);</span>
+<span class="nc" id="L386">                transaction.commit();</span>
+<span class="nc" id="L387">                return true;</span>
+            } else {
+<span class="fc" id="L389">                logger.warn(&quot;Favorite with ID {} not found for deletion&quot;, id);</span>
+<span class="fc" id="L390">                transaction.rollback();</span>
+<span class="fc" id="L391">                return false;</span>
+            }
+            
+<span class="pc bnc" id="L394" title="All 2 branches missed.">        } catch (Exception e) {</span>
+<span class="pc bpc" id="L395" title="1 of 2 branches missed.">            if (transaction != null) {</span>
+<span class="nc" id="L396">                transaction.rollback();</span>
+            }
+<span class="nc" id="L398">            logger.error(&quot;Error deleting favorite {}: {}&quot;, id, e.getMessage(), e);</span>
+<span class="nc" id="L399">            return false;</span>
+        }
+    }
+
+    /**
+     * متد Legacy برای حذف علاقه‌مندی
+     * 
+     * ابتدا علاقه‌مندی را پیدا می‌کند سپس آن را حذف می‌کند
+     * 
+     * @param userId شناسه کاربر
+     * @param restaurantId شناسه رستوران
+     */
+    public void delete(long userId, long restaurantId) {
+<span class="fc" id="L412">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L413">            Optional&lt;Favorite&gt; favorite = find(userId, restaurantId);</span>
+<span class="pc bpc" id="L414" title="1 of 2 branches missed.">            if (favorite.isPresent()) {</span>
+<span class="nc" id="L415">                delete(favorite.get().getId());</span>
+            }
+<span class="nc" id="L417">        } catch (Exception e) {</span>
+<span class="nc" id="L418">            logger.error(&quot;Error deleting favorite for user {} and restaurant {}: {}&quot;, </span>
+<span class="nc" id="L419">                        userId, restaurantId, e.getMessage(), e);</span>
+<span class="fc" id="L420">        }</span>
+<span class="fc" id="L421">    }</span>
+
+    /**
+     * دریافت تمام علاقه‌مندی‌ها (برای اهداف مدیریتی)
+     * 
+     * این متد معمولاً توسط ادمین‌ها برای بررسی کل سیستم استفاده می‌شود
+     * 
+     * @return لیست تمام علاقه‌مندی‌ها
+     */
+    public List&lt;Favorite&gt; findAll() {
+<span class="fc" id="L431">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L432">            String hql = &quot;FROM Favorite f ORDER BY f.createdAt DESC&quot;;</span>
+<span class="fc" id="L433">            Query&lt;Favorite&gt; query = session.createQuery(hql, Favorite.class);</span>
+            
+<span class="fc" id="L435">            return query.getResultList();</span>
+            
+<span class="nc" id="L437">        } catch (Exception e) {</span>
+<span class="nc" id="L438">            logger.error(&quot;Error finding all favorites: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L439">            return List.of();</span>
+        }
+    }
+
+    /**
+     * دریافت علاقه‌مندی‌ها با صفحه‌بندی
+     * 
+     * برای بهبود عملکرد در صفحات با تعداد زیاد علاقه‌مندی
+     * 
+     * @param offset نقطه شروع (تعداد رکوردهای skip شده)
+     * @param limit حداکثر تعداد رکوردهای برگشتی
+     * @return لیست علاقه‌مندی‌ها با صفحه‌بندی
+     */
+    public List&lt;Favorite&gt; findWithPagination(int offset, int limit) {
+<span class="fc" id="L453">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L454">            String hql = &quot;FROM Favorite f ORDER BY f.createdAt DESC&quot;;</span>
+<span class="fc" id="L455">            Query&lt;Favorite&gt; query = session.createQuery(hql, Favorite.class);</span>
+<span class="fc" id="L456">            query.setFirstResult(offset);</span>
+<span class="fc" id="L457">            query.setMaxResults(limit);</span>
+            
+<span class="fc" id="L459">            return query.getResultList();</span>
+            
+<span class="fc" id="L461">        } catch (Exception e) {</span>
+<span class="fc" id="L462">            logger.error(&quot;Error finding favorites with pagination: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L463">            return List.of();</span>
+        }
+    }
+
+    /**
+     * شمارش کل علاقه‌مندی‌ها
+     * 
+     * برای آمارهای کلی سیستم و محاسبه pagination
+     * 
+     * @return تعداد کل علاقه‌مندی‌ها
+     */
+    public Long countAll() {
+<span class="fc" id="L475">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L476">            String hql = &quot;SELECT COUNT(f) FROM Favorite f&quot;;</span>
+<span class="fc" id="L477">            Query&lt;Long&gt; query = session.createQuery(hql, Long.class);</span>
+            
+<span class="fc" id="L479">            Long result = query.uniqueResult();</span>
+<span class="pc bpc" id="L480" title="1 of 2 branches missed.">            return result != null ? result : 0L;</span>
+            
+<span class="nc" id="L482">        } catch (Exception e) {</span>
+<span class="nc" id="L483">            logger.error(&quot;Error counting all favorites: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L484">            return 0L;</span>
+        }
+    }
+
+    /**
+     * متد Legacy برای پاکسازی کامل علاقه‌مندی‌ها
+     * 
+     * ⚠️ خطرناک: تمام علاقه‌مندی‌ها را حذف می‌کند
+     * معمولاً فقط در تست‌ها استفاده می‌شود
+     */
+    public void clear() {
+<span class="fc" id="L495">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="fc" id="L496">            Transaction transaction = session.beginTransaction();</span>
+<span class="fc" id="L497">            session.createQuery(&quot;DELETE FROM Favorite&quot;).executeUpdate();</span>
+<span class="fc" id="L498">            transaction.commit();</span>
+<span class="fc" id="L499">            logger.info(&quot;Cleared all favorites&quot;);</span>
+<span class="nc" id="L500">        } catch (Exception e) {</span>
+<span class="nc" id="L501">            logger.error(&quot;Error clearing favorites: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L502">        }</span>
+<span class="fc" id="L503">    }</span>
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

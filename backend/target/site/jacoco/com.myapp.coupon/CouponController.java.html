@@ -1,0 +1,806 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CouponController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.coupon</a> &gt; <span class="el_source">CouponController.java</span></div><h1>CouponController.java</h1><pre class="source lang-java linenums">package com.myapp.coupon;
+
+import com.myapp.common.exceptions.NotFoundException;
+import com.myapp.common.models.Coupon;
+import com.myapp.common.utils.JsonUtil;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Controller REST API برای مدیریت کوپن‌های تخفیف
+ * 
+ * این کلاس تمام endpoints مربوط به عملیات کوپن‌ها را ارائه می‌دهد:
+ * 
+ * === GET Endpoints (دریافت اطلاعات) ===
+ * GET    /api/coupons/{id}                 - دریافت کوپن بر اساس شناسه
+ * GET    /api/coupons/code/{code}          - دریافت کوپن بر اساس کد
+ * GET    /api/coupons/valid                - دریافت تمام کوپن‌های معتبر
+ * GET    /api/coupons/restaurant/{id}      - دریافت کوپن‌های رستوران خاص
+ * GET    /api/coupons/global               - دریافت کوپن‌های سراسری
+ * GET    /api/coupons/applicable           - دریافت کوپن‌های قابل اعمال (با query params)
+ * GET    /api/coupons/statistics           - دریافت آمار کوپن‌ها
+ * GET    /api/coupons/expiring             - دریافت کوپن‌های نزدیک به انقضا
+ * 
+ * === POST Endpoints (ایجاد و عملیات) ===
+ * POST   /api/coupons                      - ایجاد کوپن جدید
+ * POST   /api/coupons/{id}/activate        - فعال‌سازی کوپن
+ * POST   /api/coupons/{id}/deactivate      - غیرفعال‌سازی کوپن
+ * POST   /api/coupons/apply                - اعمال کوپن به سفارش
+ * 
+ * === PUT Endpoints (به‌روزرسانی) ===
+ * PUT    /api/coupons/{id}                 - به‌روزرسانی اطلاعات کوپن
+ * 
+ * === DELETE Endpoints (حذف) ===
+ * DELETE /api/coupons/{id}                 - حذف کوپن
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Request/Response JSON Processing: پردازش JSON برای همه endpoints
+ * - Parameter Validation: اعتبارسنجی کامل پارامترها
+ * - Error Handling: مدیریت خطاها با HTTP status codes مناسب
+ * - Type Conversion: تبدیل انواع داده‌ها (String، Long، Double، Integer)
+ * - DateTime Parsing: پارس کردن تاریخ و زمان با ISO format
+ * - Query Parameter Support: پشتیبانی از query parameters
+ * - Path Parameter Extraction: استخراج پارامترها از URL path
+ * - Permission-based Operations: عملیات مبتنی بر مجوزهای کاربر
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+public class CouponController implements HttpHandler {
+    
+    /** سرویس منطق کسب‌وکار کوپن‌ها */
+    private final CouponService couponService;
+    
+    /**
+     * سازنده پیش‌فرض - CouponService را ایجاد می‌کند
+     */
+<span class="nc" id="L66">    public CouponController() {</span>
+<span class="nc" id="L67">        this.couponService = new CouponService();</span>
+<span class="nc" id="L68">    }</span>
+    
+    /**
+     * سازنده برای تزریق وابستگی (برای تست‌ها)
+     * 
+     * @param couponService سرویس کوپن‌ها
+     */
+<span class="fc" id="L75">    public CouponController(CouponService couponService) {</span>
+<span class="fc" id="L76">        this.couponService = couponService;</span>
+<span class="fc" id="L77">    }</span>
+    
+    /**
+     * متد اصلی پردازش HTTP requests
+     * 
+     * این متد requests را بر اساس HTTP method به متدهای مناسب هدایت می‌کند
+     * 
+     * @param exchange شیء HttpExchange حاوی اطلاعات request و response
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+<span class="fc" id="L89">        String method = exchange.getRequestMethod();</span>
+<span class="fc" id="L90">        String path = exchange.getRequestURI().getPath();</span>
+        
+        try {
+<span class="fc bfc" id="L93" title="All 5 branches covered.">            switch (method) {</span>
+                case &quot;GET&quot;:
+<span class="fc" id="L95">                    handleGet(exchange, path);</span>
+<span class="fc" id="L96">                    break;</span>
+                case &quot;POST&quot;:
+<span class="fc" id="L98">                    handlePost(exchange, path);</span>
+<span class="fc" id="L99">                    break;</span>
+                case &quot;PUT&quot;:
+<span class="fc" id="L101">                    handlePut(exchange, path);</span>
+<span class="fc" id="L102">                    break;</span>
+                case &quot;DELETE&quot;:
+<span class="fc" id="L104">                    handleDelete(exchange, path);</span>
+<span class="fc" id="L105">                    break;</span>
+                default:
+<span class="fc" id="L107">                    sendErrorResponse(exchange, 405, &quot;Method not allowed&quot;);</span>
+            }
+<span class="nc" id="L109">        } catch (IllegalArgumentException e) {</span>
+            // خطاهای validation (400 Bad Request)
+<span class="nc" id="L111">            sendErrorResponse(exchange, 400, e.getMessage());</span>
+<span class="nc" id="L112">        } catch (NotFoundException e) {</span>
+            // خطاهای عدم وجود resource (404 Not Found)
+<span class="nc" id="L114">            sendErrorResponse(exchange, 404, e.getMessage());</span>
+<span class="fc" id="L115">        } catch (Exception e) {</span>
+            // خطاهای داخلی سرور (500 Internal Server Error)
+<span class="fc" id="L117">            sendErrorResponse(exchange, 500, &quot;Internal server error: &quot; + e.getMessage());</span>
+<span class="pc" id="L118">        }</span>
+<span class="fc" id="L119">    }</span>
+    
+    // ==================== GET ENDPOINTS ====================
+    
+    /**
+     * پردازش تمام GET requests
+     * 
+     * این متد path را بررسی کرده و درخواست را به handler مناسب ارسال می‌کند
+     * 
+     * @param exchange شیء HttpExchange
+     * @param path مسیر درخواست
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void handleGet(HttpExchange exchange, String path) throws IOException {
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        if (path.matches(&quot;/api/coupons/\\d+&quot;)) {</span>
+            // GET /api/coupons/{id} - دریافت کوپن بر اساس شناسه
+<span class="fc" id="L135">            Long id = extractIdFromPath(path);</span>
+<span class="fc" id="L136">            getCouponById(exchange, id);</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">        } else if (path.matches(&quot;/api/coupons/code/.+&quot;)) {</span>
+            // GET /api/coupons/code/{code} - دریافت کوپن بر اساس کد
+<span class="fc" id="L139">            String code = extractCodeFromPath(path);</span>
+<span class="fc" id="L140">            getCouponByCode(exchange, code);</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">        } else if (path.equals(&quot;/api/coupons/valid&quot;)) {</span>
+            // GET /api/coupons/valid - دریافت تمام کوپن‌های معتبر
+<span class="fc" id="L143">            getValidCoupons(exchange);</span>
+<span class="fc bfc" id="L144" title="All 2 branches covered.">        } else if (path.matches(&quot;/api/coupons/restaurant/\\d+&quot;)) {</span>
+            // GET /api/coupons/restaurant/{id} - دریافت کوپن‌های رستوران
+<span class="fc" id="L146">            Long restaurantId = extractIdFromPath(path, &quot;/api/coupons/restaurant/&quot;);</span>
+<span class="fc" id="L147">            getRestaurantCoupons(exchange, restaurantId);</span>
+<span class="pc bpc" id="L148" title="1 of 2 branches missed.">        } else if (path.equals(&quot;/api/coupons/global&quot;)) {</span>
+            // GET /api/coupons/global - دریافت کوپن‌های سراسری
+<span class="nc" id="L150">            getGlobalCoupons(exchange);</span>
+<span class="fc bfc" id="L151" title="All 2 branches covered.">        } else if (path.equals(&quot;/api/coupons/applicable&quot;)) {</span>
+            // GET /api/coupons/applicable - دریافت کوپن‌های قابل اعمال
+<span class="fc" id="L153">            getApplicableCoupons(exchange);</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">        } else if (path.equals(&quot;/api/coupons/statistics&quot;)) {</span>
+            // GET /api/coupons/statistics - دریافت آمار کوپن‌ها
+<span class="fc" id="L156">            getCouponStatistics(exchange);</span>
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">        } else if (path.equals(&quot;/api/coupons/expiring&quot;)) {</span>
+            // GET /api/coupons/expiring - دریافت کوپن‌های نزدیک به انقضا
+<span class="nc" id="L159">            getCouponsExpiringSoon(exchange);</span>
+        } else {
+<span class="fc" id="L161">            sendErrorResponse(exchange, 404, &quot;Endpoint not found&quot;);</span>
+        }
+<span class="fc" id="L163">    }</span>
+    
+    /**
+     * دریافت کوپن بر اساس شناسه
+     * 
+     * @param exchange شیء HttpExchange
+     * @param id شناسه کوپن
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void getCouponById(HttpExchange exchange, Long id) throws IOException {
+<span class="fc" id="L173">        Coupon coupon = couponService.getCoupon(id);</span>
+<span class="fc" id="L174">        sendJsonResponse(exchange, 200, coupon);</span>
+<span class="fc" id="L175">    }</span>
+    
+    /**
+     * دریافت کوپن بر اساس کد
+     * 
+     * @param exchange شیء HttpExchange
+     * @param code کد کوپن
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void getCouponByCode(HttpExchange exchange, String code) throws IOException {
+<span class="fc" id="L185">        Coupon coupon = couponService.getCouponByCode(code);</span>
+<span class="fc" id="L186">        sendJsonResponse(exchange, 200, coupon);</span>
+<span class="fc" id="L187">    }</span>
+    
+    /**
+     * دریافت تمام کوپن‌های معتبر
+     * 
+     * کوپن‌هایی که فعال و در بازه زمانی معتبر هستند
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void getValidCoupons(HttpExchange exchange) throws IOException {
+<span class="fc" id="L198">        List&lt;Coupon&gt; coupons = couponService.getValidCoupons();</span>
+<span class="fc" id="L199">        sendJsonResponse(exchange, 200, coupons);</span>
+<span class="fc" id="L200">    }</span>
+    
+    /**
+     * دریافت کوپن‌های رستوران خاص
+     * 
+     * @param exchange شیء HttpExchange
+     * @param restaurantId شناسه رستوران
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void getRestaurantCoupons(HttpExchange exchange, Long restaurantId) throws IOException {
+<span class="fc" id="L210">        List&lt;Coupon&gt; coupons = couponService.getRestaurantCoupons(restaurantId);</span>
+<span class="fc" id="L211">        sendJsonResponse(exchange, 200, coupons);</span>
+<span class="fc" id="L212">    }</span>
+    
+    /**
+     * دریافت کوپن‌های سراسری
+     * 
+     * کوپن‌هایی که برای تمام رستوران‌ها قابل استفاده هستند
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void getGlobalCoupons(HttpExchange exchange) throws IOException {
+<span class="nc" id="L223">        List&lt;Coupon&gt; coupons = couponService.getGlobalCoupons();</span>
+<span class="nc" id="L224">        sendJsonResponse(exchange, 200, coupons);</span>
+<span class="nc" id="L225">    }</span>
+    
+    /**
+     * دریافت کوپن‌های قابل اعمال برای سفارش
+     * 
+     * Query Parameters:
+     * - orderAmount (required): مبلغ سفارش
+     * - restaurantId (optional): شناسه رستوران
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void getApplicableCoupons(HttpExchange exchange) throws IOException {
+<span class="fc" id="L238">        Map&lt;String, String&gt; queryParams = parseQueryParams(exchange.getRequestURI().getQuery());</span>
+        
+<span class="fc" id="L240">        String orderAmountStr = queryParams.get(&quot;orderAmount&quot;);</span>
+<span class="fc" id="L241">        String restaurantIdStr = queryParams.get(&quot;restaurantId&quot;);</span>
+        
+<span class="fc bfc" id="L243" title="All 2 branches covered.">        if (orderAmountStr == null) {</span>
+<span class="fc" id="L244">            sendErrorResponse(exchange, 400, &quot;orderAmount parameter is required&quot;);</span>
+<span class="fc" id="L245">            return;</span>
+        }
+        
+        try {
+<span class="fc" id="L249">            Double orderAmount = Double.parseDouble(orderAmountStr);</span>
+<span class="pc bpc" id="L250" title="1 of 2 branches missed.">            Long restaurantId = restaurantIdStr != null ? Long.parseLong(restaurantIdStr) : null;</span>
+            
+<span class="fc" id="L252">            List&lt;Coupon&gt; coupons = couponService.getApplicableCoupons(orderAmount, restaurantId);</span>
+<span class="fc" id="L253">            sendJsonResponse(exchange, 200, coupons);</span>
+<span class="nc" id="L254">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L255">            sendErrorResponse(exchange, 400, &quot;Invalid number format in parameters&quot;);</span>
+<span class="fc" id="L256">        }</span>
+<span class="fc" id="L257">    }</span>
+    
+    /**
+     * دریافت آمار کوپن‌ها
+     * 
+     * شامل تعداد کل، فعال، نزدیک به انقضا و منقضی
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void getCouponStatistics(HttpExchange exchange) throws IOException {
+<span class="fc" id="L268">        CouponService.CouponStatistics stats = couponService.getCouponStatistics();</span>
+<span class="fc" id="L269">        sendJsonResponse(exchange, 200, stats);</span>
+<span class="fc" id="L270">    }</span>
+    
+    /**
+     * دریافت کوپن‌های نزدیک به انقضا
+     * 
+     * Query Parameters:
+     * - days (optional): تعداد روزهای آینده (پیش‌فرض: 7 روز)
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void getCouponsExpiringSoon(HttpExchange exchange) throws IOException {
+<span class="nc" id="L282">        Map&lt;String, String&gt; queryParams = parseQueryParams(exchange.getRequestURI().getQuery());</span>
+<span class="nc" id="L283">        String daysStr = queryParams.get(&quot;days&quot;);</span>
+        
+<span class="nc" id="L285">        int days = 7; // پیش‌فرض 7 روز</span>
+<span class="nc bnc" id="L286" title="All 2 branches missed.">        if (daysStr != null) {</span>
+            try {
+<span class="nc" id="L288">                days = Integer.parseInt(daysStr);</span>
+<span class="nc" id="L289">            } catch (NumberFormatException e) {</span>
+<span class="nc" id="L290">                sendErrorResponse(exchange, 400, &quot;Invalid days parameter&quot;);</span>
+<span class="nc" id="L291">                return;</span>
+<span class="nc" id="L292">            }</span>
+        }
+        
+<span class="nc" id="L295">        List&lt;Coupon&gt; coupons = couponService.getCouponsExpiringSoon(days);</span>
+<span class="nc" id="L296">        sendJsonResponse(exchange, 200, coupons);</span>
+<span class="nc" id="L297">    }</span>
+    
+    // ==================== POST ENDPOINTS ====================
+    
+    /**
+     * پردازش تمام POST requests
+     * 
+     * @param exchange شیء HttpExchange
+     * @param path مسیر درخواست
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void handlePost(HttpExchange exchange, String path) throws IOException {
+<span class="fc bfc" id="L309" title="All 2 branches covered.">        if (path.equals(&quot;/api/coupons&quot;)) {</span>
+            // POST /api/coupons - ایجاد کوپن جدید
+<span class="fc" id="L311">            createCoupon(exchange);</span>
+<span class="fc bfc" id="L312" title="All 2 branches covered.">        } else if (path.matches(&quot;/api/coupons/\\d+/activate&quot;)) {</span>
+            // POST /api/coupons/{id}/activate - فعال‌سازی کوپن
+<span class="fc" id="L314">            Long id = extractIdFromPath(path, &quot;/api/coupons/&quot;, &quot;/activate&quot;);</span>
+<span class="fc" id="L315">            activateCoupon(exchange, id);</span>
+<span class="fc bfc" id="L316" title="All 2 branches covered.">        } else if (path.matches(&quot;/api/coupons/\\d+/deactivate&quot;)) {</span>
+            // POST /api/coupons/{id}/deactivate - غیرفعال‌سازی کوپن
+<span class="fc" id="L318">            Long id = extractIdFromPath(path, &quot;/api/coupons/&quot;, &quot;/deactivate&quot;);</span>
+<span class="fc" id="L319">            deactivateCoupon(exchange, id);</span>
+<span class="pc bpc" id="L320" title="1 of 2 branches missed.">        } else if (path.equals(&quot;/api/coupons/apply&quot;)) {</span>
+            // POST /api/coupons/apply - اعمال کوپن به سفارش
+<span class="fc" id="L322">            applyCoupon(exchange);</span>
+        } else {
+<span class="nc" id="L324">            sendErrorResponse(exchange, 404, &quot;Endpoint not found&quot;);</span>
+        }
+<span class="fc" id="L326">    }</span>
+    
+    /**
+     * ایجاد کوپن جدید
+     * 
+     * Request Body JSON Fields:
+     * - code (required): کد کوپن
+     * - description (required): توضیحات
+     * - type (required): نوع کوپن (PERCENTAGE | FIXED_AMOUNT)
+     * - value (required): مقدار تخفیف
+     * - validFrom (required): تاریخ شروع اعتبار
+     * - validUntil (required): تاریخ پایان اعتبار
+     * - createdBy (required): شناسه ایجادکننده
+     * - restaurantId (optional): شناسه رستوران
+     * - minOrderAmount (optional): حداقل مبلغ سفارش
+     * - maxDiscountAmount (optional): حداکثر مبلغ تخفیف
+     * - usageLimit (optional): محدودیت کل استفاده
+     * - perUserLimit (optional): محدودیت هر کاربر
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void createCoupon(HttpExchange exchange) throws IOException {
+<span class="fc" id="L349">        String requestBody = new String(exchange.getRequestBody().readAllBytes());</span>
+<span class="fc" id="L350">        Map&lt;String, Object&gt; requestData = parseJsonRequest(requestBody);</span>
+        
+        // پارامترهای اجباری
+<span class="fc" id="L353">        String code = getStringFromMap(requestData, &quot;code&quot;);</span>
+<span class="fc" id="L354">        String description = getStringFromMap(requestData, &quot;description&quot;);</span>
+<span class="fc" id="L355">        String typeStr = getStringFromMap(requestData, &quot;type&quot;);</span>
+<span class="fc" id="L356">        Double value = getDoubleFromMap(requestData, &quot;value&quot;);</span>
+<span class="fc" id="L357">        String validFromStr = getStringFromMap(requestData, &quot;validFrom&quot;);</span>
+<span class="fc" id="L358">        String validUntilStr = getStringFromMap(requestData, &quot;validUntil&quot;);</span>
+<span class="fc" id="L359">        Long createdBy = getLongFromMap(requestData, &quot;createdBy&quot;);</span>
+<span class="fc" id="L360">        Long restaurantId = getLongFromMap(requestData, &quot;restaurantId&quot;); // اختیاری</span>
+        
+        // پارامترهای اختیاری
+<span class="fc" id="L363">        Double minOrderAmount = getDoubleFromMap(requestData, &quot;minOrderAmount&quot;);</span>
+<span class="fc" id="L364">        Double maxDiscountAmount = getDoubleFromMap(requestData, &quot;maxDiscountAmount&quot;);</span>
+<span class="fc" id="L365">        Integer usageLimit = getIntegerFromMap(requestData, &quot;usageLimit&quot;);</span>
+<span class="fc" id="L366">        Integer perUserLimit = getIntegerFromMap(requestData, &quot;perUserLimit&quot;);</span>
+        
+        // پارس کردن تاریخ‌ها
+<span class="fc" id="L369">        LocalDateTime validFrom = parseDateTime(validFromStr);</span>
+<span class="fc" id="L370">        LocalDateTime validUntil = parseDateTime(validUntilStr);</span>
+        
+        // پارس کردن نوع کوپن
+        Coupon.CouponType type;
+        try {
+<span class="fc" id="L375">            type = Coupon.CouponType.valueOf(typeStr.toUpperCase());</span>
+<span class="nc" id="L376">        } catch (IllegalArgumentException | NullPointerException e) {</span>
+<span class="nc" id="L377">            sendErrorResponse(exchange, 400, &quot;Invalid coupon type. Must be PERCENTAGE or FIXED_AMOUNT&quot;);</span>
+<span class="nc" id="L378">            return;</span>
+<span class="fc" id="L379">        }</span>
+        
+        // ایجاد کوپن
+        Coupon coupon;
+<span class="pc bpc" id="L383" title="4 of 8 branches missed.">        if (minOrderAmount != null || maxDiscountAmount != null || usageLimit != null || perUserLimit != null) {</span>
+            // ایجاد کوپن با تنظیمات پیشرفته
+<span class="nc" id="L385">            coupon = couponService.createCouponWithSettings(</span>
+                code, description, type, value, validFrom, validUntil,
+                minOrderAmount, maxDiscountAmount, usageLimit, perUserLimit,
+                createdBy, restaurantId);
+        } else {
+            // ایجاد کوپن ساده
+<span class="pc bpc" id="L391" title="1 of 2 branches missed.">            if (type == Coupon.CouponType.PERCENTAGE) {</span>
+<span class="fc" id="L392">                coupon = couponService.createPercentageCoupon(code, description, value, validFrom, validUntil, createdBy, restaurantId);</span>
+            } else {
+<span class="nc" id="L394">                coupon = couponService.createFixedAmountCoupon(code, description, value, validFrom, validUntil, createdBy, restaurantId);</span>
+            }
+        }
+        
+<span class="fc" id="L398">        sendJsonResponse(exchange, 201, coupon);</span>
+<span class="fc" id="L399">    }</span>
+    
+    /**
+     * فعال‌سازی کوپن
+     * 
+     * Request Body JSON Fields:
+     * - activatedBy (required): شناسه فعال‌کننده
+     * 
+     * @param exchange شیء HttpExchange
+     * @param id شناسه کوپن
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void activateCoupon(HttpExchange exchange, Long id) throws IOException {
+<span class="fc" id="L412">        String requestBody = new String(exchange.getRequestBody().readAllBytes());</span>
+<span class="fc" id="L413">        Map&lt;String, Object&gt; requestData = parseJsonRequest(requestBody);</span>
+<span class="fc" id="L414">        Long activatedBy = getLongFromMap(requestData, &quot;activatedBy&quot;);</span>
+        
+<span class="fc" id="L416">        couponService.activateCoupon(id, activatedBy);</span>
+<span class="fc" id="L417">        sendJsonResponse(exchange, 200, Map.of(&quot;message&quot;, &quot;Coupon activated successfully&quot;));</span>
+<span class="fc" id="L418">    }</span>
+    
+    /**
+     * غیرفعال‌سازی کوپن
+     * 
+     * Request Body JSON Fields:
+     * - deactivatedBy (required): شناسه غیرفعال‌کننده
+     * 
+     * @param exchange شیء HttpExchange
+     * @param id شناسه کوپن
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void deactivateCoupon(HttpExchange exchange, Long id) throws IOException {
+<span class="fc" id="L431">        String requestBody = new String(exchange.getRequestBody().readAllBytes());</span>
+<span class="fc" id="L432">        Map&lt;String, Object&gt; requestData = parseJsonRequest(requestBody);</span>
+<span class="fc" id="L433">        Long deactivatedBy = getLongFromMap(requestData, &quot;deactivatedBy&quot;);</span>
+        
+<span class="fc" id="L435">        couponService.deactivateCoupon(id, deactivatedBy);</span>
+<span class="fc" id="L436">        sendJsonResponse(exchange, 200, Map.of(&quot;message&quot;, &quot;Coupon deactivated successfully&quot;));</span>
+<span class="fc" id="L437">    }</span>
+    
+    /**
+     * اعمال کوپن به سفارش
+     * 
+     * Request Body JSON Fields:
+     * - couponCode (required): کد کوپن
+     * - orderAmount (required): مبلغ سفارش
+     * - restaurantId (required): شناسه رستوران
+     * - userId (required): شناسه کاربر
+     * 
+     * Response:
+     * - success: true/false
+     * - coupon: شیء کوپن (در صورت موفقیت)
+     * - discountAmount: مبلغ تخفیف (در صورت موفقیت)
+     * - errorMessage: پیام خطا (در صورت ناموفقی بودن)
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void applyCoupon(HttpExchange exchange) throws IOException {
+<span class="fc" id="L458">        String requestBody = new String(exchange.getRequestBody().readAllBytes());</span>
+<span class="fc" id="L459">        Map&lt;String, Object&gt; requestData = parseJsonRequest(requestBody);</span>
+        
+<span class="fc" id="L461">        String couponCode = getStringFromMap(requestData, &quot;couponCode&quot;);</span>
+<span class="fc" id="L462">        Double orderAmount = getDoubleFromMap(requestData, &quot;orderAmount&quot;);</span>
+<span class="fc" id="L463">        Long restaurantId = getLongFromMap(requestData, &quot;restaurantId&quot;);</span>
+<span class="fc" id="L464">        Long userId = getLongFromMap(requestData, &quot;userId&quot;);</span>
+        
+<span class="fc" id="L466">        CouponService.CouponApplicationResult result = couponService.applyCoupon(couponCode, orderAmount, restaurantId, userId);</span>
+        
+<span class="pc bpc" id="L468" title="1 of 2 branches missed.">        if (result.isSuccess()) {</span>
+<span class="fc" id="L469">            Map&lt;String, Object&gt; response = Map.of(</span>
+<span class="fc" id="L470">                &quot;success&quot;, true,</span>
+<span class="fc" id="L471">                &quot;coupon&quot;, result.getCoupon(),</span>
+<span class="fc" id="L472">                &quot;discountAmount&quot;, result.getDiscountAmount()</span>
+            );
+<span class="fc" id="L474">            sendJsonResponse(exchange, 200, response);</span>
+<span class="fc" id="L475">        } else {</span>
+<span class="nc" id="L476">            Map&lt;String, Object&gt; response = Map.of(</span>
+<span class="nc" id="L477">                &quot;success&quot;, false,</span>
+<span class="nc" id="L478">                &quot;errorMessage&quot;, result.getErrorMessage()</span>
+            );
+<span class="nc" id="L480">            sendJsonResponse(exchange, 400, response);</span>
+        }
+<span class="fc" id="L482">    }</span>
+    
+    // ==================== PUT ENDPOINTS ====================
+    
+    /**
+     * پردازش تمام PUT requests
+     * 
+     * @param exchange شیء HttpExchange
+     * @param path مسیر درخواست
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void handlePut(HttpExchange exchange, String path) throws IOException {
+<span class="pc bpc" id="L494" title="1 of 2 branches missed.">        if (path.matches(&quot;/api/coupons/\\d+&quot;)) {</span>
+            // PUT /api/coupons/{id} - به‌روزرسانی کوپن
+<span class="fc" id="L496">            Long id = extractIdFromPath(path);</span>
+<span class="fc" id="L497">            updateCoupon(exchange, id);</span>
+<span class="fc" id="L498">        } else {</span>
+<span class="nc" id="L499">            sendErrorResponse(exchange, 404, &quot;Endpoint not found&quot;);</span>
+        }
+<span class="fc" id="L501">    }</span>
+    
+    /**
+     * به‌روزرسانی اطلاعات کوپن
+     * 
+     * Request Body JSON Fields (همه اختیاری):
+     * - description: توضیحات جدید
+     * - minOrderAmount: حداقل مبلغ سفارش
+     * - maxDiscountAmount: حداکثر مبلغ تخفیف
+     * - usageLimit: محدودیت کل استفاده
+     * - perUserLimit: محدودیت هر کاربر
+     * - validUntil: تاریخ انقضا
+     * - updatedBy (required): شناسه به‌روزرسانی کننده
+     * 
+     * @param exchange شیء HttpExchange
+     * @param id شناسه کوپن
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void updateCoupon(HttpExchange exchange, Long id) throws IOException {
+<span class="fc" id="L520">        String requestBody = new String(exchange.getRequestBody().readAllBytes());</span>
+<span class="fc" id="L521">        Map&lt;String, Object&gt; requestData = parseJsonRequest(requestBody);</span>
+        
+<span class="fc" id="L523">        String description = getStringFromMap(requestData, &quot;description&quot;);</span>
+<span class="fc" id="L524">        Double minOrderAmount = getDoubleFromMap(requestData, &quot;minOrderAmount&quot;);</span>
+<span class="fc" id="L525">        Double maxDiscountAmount = getDoubleFromMap(requestData, &quot;maxDiscountAmount&quot;);</span>
+<span class="fc" id="L526">        Integer usageLimit = getIntegerFromMap(requestData, &quot;usageLimit&quot;);</span>
+<span class="fc" id="L527">        Integer perUserLimit = getIntegerFromMap(requestData, &quot;perUserLimit&quot;);</span>
+<span class="fc" id="L528">        String validUntilStr = getStringFromMap(requestData, &quot;validUntil&quot;);</span>
+<span class="fc" id="L529">        Long updatedBy = getLongFromMap(requestData, &quot;updatedBy&quot;);</span>
+        
+<span class="fc" id="L531">        LocalDateTime validUntil = null;</span>
+<span class="pc bpc" id="L532" title="1 of 2 branches missed.">        if (validUntilStr != null) {</span>
+<span class="nc" id="L533">            validUntil = parseDateTime(validUntilStr);</span>
+        }
+        
+<span class="fc" id="L536">        Coupon updatedCoupon = couponService.updateCoupon(id, description, minOrderAmount, </span>
+                                                         maxDiscountAmount, usageLimit, perUserLimit, 
+                                                         validUntil, updatedBy);
+        
+<span class="fc" id="L540">        sendJsonResponse(exchange, 200, updatedCoupon);</span>
+<span class="fc" id="L541">    }</span>
+    
+    // ==================== DELETE ENDPOINTS ====================
+    
+    /**
+     * پردازش تمام DELETE requests
+     * 
+     * @param exchange شیء HttpExchange
+     * @param path مسیر درخواست
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void handleDelete(HttpExchange exchange, String path) throws IOException {
+<span class="pc bpc" id="L553" title="1 of 2 branches missed.">        if (path.matches(&quot;/api/coupons/\\d+&quot;)) {</span>
+            // DELETE /api/coupons/{id} - حذف کوپن
+<span class="fc" id="L555">            Long id = extractIdFromPath(path);</span>
+<span class="fc" id="L556">            deleteCoupon(exchange, id);</span>
+<span class="fc" id="L557">        } else {</span>
+<span class="nc" id="L558">            sendErrorResponse(exchange, 404, &quot;Endpoint not found&quot;);</span>
+        }
+<span class="fc" id="L560">    }</span>
+    
+    /**
+     * حذف کوپن
+     * 
+     * Request Body JSON Fields:
+     * - deletedBy (required): شناسه حذف‌کننده
+     * 
+     * @param exchange شیء HttpExchange
+     * @param id شناسه کوپن
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void deleteCoupon(HttpExchange exchange, Long id) throws IOException {
+<span class="fc" id="L573">        String requestBody = new String(exchange.getRequestBody().readAllBytes());</span>
+<span class="fc" id="L574">        Map&lt;String, Object&gt; requestData = parseJsonRequest(requestBody);</span>
+<span class="fc" id="L575">        Long deletedBy = getLongFromMap(requestData, &quot;deletedBy&quot;);</span>
+        
+<span class="fc" id="L577">        couponService.deleteCoupon(id, deletedBy);</span>
+<span class="fc" id="L578">        sendJsonResponse(exchange, 200, Map.of(&quot;message&quot;, &quot;Coupon deleted successfully&quot;));</span>
+<span class="fc" id="L579">    }</span>
+    
+    // ==================== HELPER METHODS ====================
+    
+    /**
+     * پارس کردن JSON request body
+     * 
+     * @param requestBody محتوای JSON request
+     * @return Map حاوی داده‌های پارس شده
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    private Map&lt;String, Object&gt; parseJsonRequest(String requestBody) {
+<span class="fc" id="L591">        return JsonUtil.fromJson(requestBody, Map.class);</span>
+    }
+    
+    /**
+     * استخراج شناسه از انتهای path
+     * 
+     * مثال: &quot;/api/coupons/123&quot; -&gt; 123
+     * 
+     * @param path مسیر URL
+     * @return شناسه استخراج شده
+     */
+    private Long extractIdFromPath(String path) {
+<span class="fc" id="L603">        String[] parts = path.split(&quot;/&quot;);</span>
+<span class="fc" id="L604">        return Long.parseLong(parts[parts.length - 1]);</span>
+    }
+    
+    /**
+     * استخراج شناسه از path با prefix مشخص
+     * 
+     * @param path مسیر URL
+     * @param prefix پیشوند مسیر
+     * @return شناسه استخراج شده
+     */
+    private Long extractIdFromPath(String path, String prefix) {
+<span class="fc" id="L615">        String idStr = path.substring(prefix.length());</span>
+<span class="fc" id="L616">        return Long.parseLong(idStr);</span>
+    }
+    
+    /**
+     * استخراج شناسه از path با prefix و suffix
+     * 
+     * @param path مسیر URL
+     * @param prefix پیشوند مسیر
+     * @param suffix پسوند مسیر
+     * @return شناسه استخراج شده
+     */
+    private Long extractIdFromPath(String path, String prefix, String suffix) {
+<span class="fc" id="L628">        String idStr = path.substring(prefix.length(), path.length() - suffix.length());</span>
+<span class="fc" id="L629">        return Long.parseLong(idStr);</span>
+    }
+    
+    /**
+     * استخراج کد کوپن از path
+     * 
+     * @param path مسیر URL
+     * @return کد کوپن استخراج شده
+     */
+    private String extractCodeFromPath(String path) {
+<span class="fc" id="L639">        return path.substring(&quot;/api/coupons/code/&quot;.length());</span>
+    }
+    
+    /**
+     * پارس کردن رشته تاریخ و زمان به LocalDateTime
+     * 
+     * فرمت مورد انتظار: ISO Local DateTime (yyyy-MM-ddTHH:mm:ss)
+     * 
+     * @param dateTimeStr رشته تاریخ و زمان
+     * @return شیء LocalDateTime
+     * @throws IllegalArgumentException در صورت فرمت نامعتبر
+     */
+    private LocalDateTime parseDateTime(String dateTimeStr) {
+<span class="pc bpc" id="L652" title="2 of 4 branches missed.">        if (dateTimeStr == null || dateTimeStr.trim().isEmpty()) {</span>
+<span class="nc" id="L653">            throw new IllegalArgumentException(&quot;DateTime string cannot be null or empty&quot;);</span>
+        }
+        
+        try {
+<span class="fc" id="L657">            return LocalDateTime.parse(dateTimeStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);</span>
+<span class="nc" id="L658">        } catch (DateTimeParseException e) {</span>
+<span class="nc" id="L659">            throw new IllegalArgumentException(&quot;Invalid datetime format. Use ISO format: yyyy-MM-ddTHH:mm:ss&quot;);</span>
+        }
+    }
+    
+    /**
+     * پارس کردن query parameters از URL
+     * 
+     * @param query رشته query parameters
+     * @return Map حاوی پارامترها
+     */
+    private Map&lt;String, String&gt; parseQueryParams(String query) {
+<span class="fc" id="L670">        Map&lt;String, String&gt; params = new java.util.HashMap&lt;&gt;();</span>
+<span class="pc bpc" id="L671" title="1 of 4 branches missed.">        if (query != null &amp;&amp; !query.isEmpty()) {</span>
+<span class="fc" id="L672">            String[] pairs = query.split(&quot;&amp;&quot;);</span>
+<span class="fc bfc" id="L673" title="All 2 branches covered.">            for (String pair : pairs) {</span>
+<span class="fc" id="L674">                String[] keyValue = pair.split(&quot;=&quot;, 2);</span>
+<span class="pc bpc" id="L675" title="1 of 2 branches missed.">                if (keyValue.length == 2) {</span>
+<span class="fc" id="L676">                    params.put(keyValue[0], keyValue[1]);</span>
+                }
+            }
+        }
+<span class="fc" id="L680">        return params;</span>
+    }
+    
+    /**
+     * دریافت مقدار String از Map
+     * 
+     * @param map Map حاوی داده‌ها
+     * @param key کلید مورد نظر
+     * @return مقدار String یا null
+     */
+    private String getStringFromMap(Map&lt;String, Object&gt; map, String key) {
+<span class="fc" id="L691">        Object value = map.get(key);</span>
+<span class="fc bfc" id="L692" title="All 2 branches covered.">        return value != null ? value.toString() : null;</span>
+    }
+    
+    /**
+     * دریافت مقدار Long از Map با تبدیل انواع مختلف
+     * 
+     * @param map Map حاوی داده‌ها
+     * @param key کلید مورد نظر
+     * @return مقدار Long یا null
+     * @throws IllegalArgumentException در صورت نوع نامعتبر
+     */
+    private Long getLongFromMap(Map&lt;String, Object&gt; map, String key) {
+<span class="fc" id="L704">        Object value = map.get(key);</span>
+<span class="fc bfc" id="L705" title="All 2 branches covered.">        if (value == null) return null;</span>
+<span class="pc bpc" id="L706" title="1 of 2 branches missed.">        if (value instanceof Long) return (Long) value;</span>
+<span class="pc bpc" id="L707" title="1 of 2 branches missed.">        if (value instanceof Integer) return ((Integer) value).longValue();</span>
+<span class="nc bnc" id="L708" title="All 2 branches missed.">        if (value instanceof String) {</span>
+            try {
+<span class="nc" id="L710">                return Long.parseLong((String) value);</span>
+<span class="nc" id="L711">            } catch (NumberFormatException e) {</span>
+<span class="nc" id="L712">                throw new IllegalArgumentException(&quot;Invalid number format for &quot; + key + &quot;: &quot; + value);</span>
+            }
+        }
+<span class="nc" id="L715">        throw new IllegalArgumentException(&quot;Invalid type for &quot; + key + &quot;: &quot; + value.getClass().getSimpleName());</span>
+    }
+    
+    /**
+     * دریافت مقدار Double از Map با تبدیل انواع مختلف
+     * 
+     * @param map Map حاوی داده‌ها
+     * @param key کلید مورد نظر
+     * @return مقدار Double یا null
+     * @throws IllegalArgumentException در صورت نوع نامعتبر
+     */
+    private Double getDoubleFromMap(Map&lt;String, Object&gt; map, String key) {
+<span class="fc" id="L727">        Object value = map.get(key);</span>
+<span class="fc bfc" id="L728" title="All 2 branches covered.">        if (value == null) return null;</span>
+<span class="pc bpc" id="L729" title="1 of 2 branches missed.">        if (value instanceof Double) return (Double) value;</span>
+<span class="nc bnc" id="L730" title="All 2 branches missed.">        if (value instanceof Float) return ((Float) value).doubleValue();</span>
+<span class="nc bnc" id="L731" title="All 2 branches missed.">        if (value instanceof Integer) return ((Integer) value).doubleValue();</span>
+<span class="nc bnc" id="L732" title="All 2 branches missed.">        if (value instanceof Long) return ((Long) value).doubleValue();</span>
+<span class="nc bnc" id="L733" title="All 2 branches missed.">        if (value instanceof String) {</span>
+            try {
+<span class="nc" id="L735">                return Double.parseDouble((String) value);</span>
+<span class="nc" id="L736">            } catch (NumberFormatException e) {</span>
+<span class="nc" id="L737">                throw new IllegalArgumentException(&quot;Invalid number format for &quot; + key + &quot;: &quot; + value);</span>
+            }
+        }
+<span class="nc" id="L740">        throw new IllegalArgumentException(&quot;Invalid type for &quot; + key + &quot;: &quot; + value.getClass().getSimpleName());</span>
+    }
+    
+    /**
+     * دریافت مقدار Integer از Map با تبدیل انواع مختلف
+     * 
+     * @param map Map حاوی داده‌ها
+     * @param key کلید مورد نظر
+     * @return مقدار Integer یا null
+     * @throws IllegalArgumentException در صورت نوع نامعتبر
+     */
+    private Integer getIntegerFromMap(Map&lt;String, Object&gt; map, String key) {
+<span class="fc" id="L752">        Object value = map.get(key);</span>
+<span class="pc bpc" id="L753" title="1 of 2 branches missed.">        if (value == null) return null;</span>
+<span class="nc bnc" id="L754" title="All 2 branches missed.">        if (value instanceof Integer) return (Integer) value;</span>
+<span class="nc bnc" id="L755" title="All 2 branches missed.">        if (value instanceof Long) {</span>
+<span class="nc" id="L756">            Long longValue = (Long) value;</span>
+<span class="nc bnc" id="L757" title="All 4 branches missed.">            if (longValue &gt; Integer.MAX_VALUE || longValue &lt; Integer.MIN_VALUE) {</span>
+<span class="nc" id="L758">                throw new IllegalArgumentException(&quot;Value too large for integer: &quot; + value);</span>
+            }
+<span class="nc" id="L760">            return longValue.intValue();</span>
+        }
+<span class="nc bnc" id="L762" title="All 2 branches missed.">        if (value instanceof String) {</span>
+            try {
+<span class="nc" id="L764">                return Integer.parseInt((String) value);</span>
+<span class="nc" id="L765">            } catch (NumberFormatException e) {</span>
+<span class="nc" id="L766">                throw new IllegalArgumentException(&quot;Invalid number format for &quot; + key + &quot;: &quot; + value);</span>
+            }
+        }
+<span class="nc" id="L769">        throw new IllegalArgumentException(&quot;Invalid type for &quot; + key + &quot;: &quot; + value.getClass().getSimpleName());</span>
+    }
+    
+    /**
+     * ارسال پاسخ JSON با status code مشخص
+     * 
+     * @param exchange شیء HttpExchange
+     * @param statusCode کد وضعیت HTTP
+     * @param data داده برای serialize کردن به JSON
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void sendJsonResponse(HttpExchange exchange, int statusCode, Object data) throws IOException {
+<span class="fc" id="L781">        String jsonResponse = JsonUtil.toJson(data);</span>
+<span class="fc" id="L782">        exchange.getResponseHeaders().set(&quot;Content-Type&quot;, &quot;application/json&quot;);</span>
+<span class="fc" id="L783">        exchange.sendResponseHeaders(statusCode, jsonResponse.getBytes().length);</span>
+<span class="fc" id="L784">        try (OutputStream os = exchange.getResponseBody()) {</span>
+<span class="fc" id="L785">            os.write(jsonResponse.getBytes());</span>
+        }
+<span class="fc" id="L787">    }</span>
+    
+    /**
+     * ارسال پاسخ خطا با پیام مشخص
+     * 
+     * @param exchange شیء HttpExchange
+     * @param statusCode کد وضعیت HTTP خطا
+     * @param message پیام خطا
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void sendErrorResponse(HttpExchange exchange, int statusCode, String message) throws IOException {
+<span class="fc" id="L798">        String jsonResponse = &quot;{\&quot;error\&quot;:\&quot;&quot; + message.replace(&quot;\&quot;&quot;, &quot;\\\&quot;&quot;) + &quot;\&quot;}&quot;;</span>
+<span class="fc" id="L799">        exchange.getResponseHeaders().set(&quot;Content-Type&quot;, &quot;application/json&quot;);</span>
+<span class="fc" id="L800">        exchange.sendResponseHeaders(statusCode, jsonResponse.getBytes().length);</span>
+<span class="fc" id="L801">        try (OutputStream os = exchange.getResponseBody()) {</span>
+<span class="fc" id="L802">            os.write(jsonResponse.getBytes());</span>
+        }
+<span class="fc" id="L804">    }</span>
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

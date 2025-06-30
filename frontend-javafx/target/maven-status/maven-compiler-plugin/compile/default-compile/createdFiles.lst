@@ -1,7 +1,6 @@
 com\myapp\ui\menu\MenuManagementController.class
 com\myapp\ui\notification\NotificationController$NotificationFilter.class
 com\myapp\ui\order\CartController$CartSummary.class
-AdminOrderController.class
 com\myapp\ui\auth\UserProfileController$UserSettings.class
 com\myapp\ui\menu\MenuManagementController$1.class
 com\myapp\ui\auth\RegisterController$2.class
@@ -37,10 +36,8 @@ com\myapp\ui\notification\NotificationController$NotificationSettings.class
 com\myapp\ui\restaurant\RestaurantDetailsController$MenuItem.class
 com\myapp\ui\payment\PaymentController$4.class
 com\myapp\ui\payment\PaymentController$1.class
-AdminTransactionController.class
 com\myapp\ui\order\OrderConfirmationController$TrackingStatus.class
 com\myapp\ui\common\NotificationService.class
-EditRestaurantController.class
 com\myapp\ui\order\internal\ReceiptExporter.class
 com\myapp\ui\common\NavigationController.class
 com\myapp\ui\common\SessionManager.class
@@ -57,10 +54,8 @@ com\myapp\ui\auth\ProfileController$2.class
 com\myapp\ui\restaurant\RestaurantDetailsController.class
 com\myapp\ui\common\FrontendConstants$API.class
 com\myapp\ui\common\SessionManager$User.class
-WalletController.class
 com\myapp\ui\order\OrderConfirmationController$TrackingStep.class
 com\myapp\ui\payment\PaymentController$3.class
-CourierAvailableController.class
 com\myapp\ui\payment\PaymentController$WalletInfo.class
 com\myapp\ui\auth\UserProfileController$AddressItem.class
 com\myapp\ui\admin\AdminDashboardController$RestaurantData.class
@@ -70,16 +65,12 @@ com\myapp\ui\auth\UserProfileController$5.class
 com\myapp\ui\restaurant\RestaurantDetailsController$Restaurant.class
 com\myapp\ui\auth\UserProfileController$UserProfile.class
 com\myapp\ui\restaurant\RestaurantDetailsController$MenuCategory.class
-CouponManagementController.class
-CourierHistoryController.class
 com\myapp\ui\admin\AdminDashboardController$UserData.class
 com\myapp\ui\common\UIPolishController.class
 com\myapp\ui\common\FrontendConstants$FORMAT.class
-ItemManagementController.class
 com\myapp\ui\common\FrontendConstants$TEST.class
 com\myapp\ui\order\OrderHistoryController$OrderHistory.class
 com\myapp\ui\auth\ProfileController$1.class
-CreateRestaurantController.class
 com\myapp\ui\payment\PaymentController$OrderItem.class
 com\myapp\ui\payment\PaymentController$5.class
 com\myapp\ui\order\OrderHistoryController$OrderItem.class
@@ -87,7 +78,6 @@ com\myapp\ui\order\OrderConfirmationController$8.class
 com\myapp\ui\order\OrderConfirmationController.class
 com\myapp\ui\auth\UserProfileController$3.class
 com\myapp\ui\restaurant\RestaurantListController$1.class
-CouponController.class
 com\myapp\ui\auth\LoginController$1.class
 com\myapp\ui\MainApp.class
 com\myapp\ui\menu\MenuManagementController$MenuItem.class
@@ -101,7 +91,6 @@ com\myapp\ui\order\OrderHistoryController$1.class
 com\myapp\ui\restaurant\RestaurantDetailsController$CartItem.class
 com\myapp\ui\order\OrderConfirmationController$9.class
 com\myapp\ui\auth\UserProfileController$2.class
-AdminUserController.class
 com\myapp\ui\auth\UserProfileController$9.class
 com\myapp\ui\payment\PaymentController$6.class
 com\myapp\ui\common\FrontendConstants$MESSAGES.class
@@ -113,11 +102,9 @@ com\myapp\ui\auth\RegisterController.class
 com\myapp\ui\auth\UserProfileController$10.class
 com\myapp\ui\auth\UserProfileController$2$1.class
 com\myapp\ui\notification\NotificationController$NotificationPriority.class
-VendorSearchController.class
 com\myapp\ui\common\HttpClientUtil.class
 com\myapp\ui\payment\PaymentController$PaymentData.class
 com\myapp\ui\notification\NotificationController$2.class
-OrderDetailController.class
 com\myapp\ui\order\CartController$1.class
 com\myapp\ui\auth\RegisterController$1.class
 com\myapp\ui\auth\UserProfileController$OrderHistoryItem.class
@@ -132,6 +119,5 @@ com\myapp\ui\order\OrderConfirmationController$3.class
 com\myapp\ui\auth\UserProfileController$11.class
 com\myapp\ui\admin\AdminDashboardController$TransactionData.class
 com\myapp\ui\order\OrderConfirmationController$OrderItem.class
-ReviewController.class
 com\myapp\ui\notification\NotificationController$1.class
 com\myapp\ui\auth\UserProfileController$UserAnalytics.class

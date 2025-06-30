@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ValidationUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.common.utils</a> &gt; <span class="el_source">ValidationUtil.java</span></div><h1>ValidationUtil.java</h1><pre class="source lang-java linenums">package com.myapp.common.utils;
+
+import com.myapp.common.constants.ApplicationConstants;
+
+import java.util.regex.Pattern;
+
+/**
+ * کلاس ابزاری اعتبارسنجی متمرکز - ولیدیشن یکپارچه در کل برنامه
+ * این کلاس مجموعه کاملی از متدهای اعتبارسنجی برای انواع داده‌ها فراهم می‌کند
+ * شامل ولیدیشن ایمیل، تلفن، رمز عبور، نام، شماره، قیمت و logic تجاری
+ */
+public class ValidationUtil {
+    
+    // الگوهای regex پیش‌کامپایل شده برای بهبود عملکرد
+<span class="fc" id="L15">    private static final Pattern EMAIL_PATTERN = Pattern.compile(</span>
+        &quot;^[A-Za-z0-9+_.-]+@([A-Za-z0-9.-]+\\.[A-Za-z]{2,})$&quot;  // فرمت استاندارد ایمیل
+    );
+    
+<span class="fc" id="L19">    private static final Pattern PHONE_PATTERN = Pattern.compile(</span>
+        &quot;^09\\d{9}$&quot;  // فرمت شماره موبایل ایرانی (09xxxxxxxxx)
+    );
+    
+<span class="fc" id="L23">    private static final Pattern PASSWORD_PATTERN = Pattern.compile(</span>
+        &quot;^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&amp;+=])(?=\\S+$).{8,}$&quot;  // رمز عبور قوی
+    );
+    
+<span class="fc" id="L27">    private static final Pattern NAME_PATTERN = Pattern.compile(</span>
+        &quot;^[\\u0600-\\u06FF\\u0750-\\u077F\\u08A0-\\u08FF\\uFB50-\\uFDFF\\uFE70-\\uFEFF\\s\\w.-]+$&quot;  // کاراکترهای فارسی + انگلیسی
+    );
+    
+    // سازنده خصوصی برای جلوگیری از ایجاد نمونه از کلاس utility
+<span class="nc" id="L32">    private ValidationUtil() {</span>
+<span class="nc" id="L33">        throw new UnsupportedOperationException(&quot;این کلاس utility است و نمی‌توان از آن نمونه ایجاد کرد&quot;);</span>
+    }
+    
+    // ==================== اعتبارسنجی رشته متن ====================
+    
+    /**
+     * بررسی اینکه رشته null یا خالی نباشد
+     * 
+     * @param value رشته برای بررسی
+     * @return true اگر رشته معتبر باشد (نه null و نه خالی)
+     */
+    public static boolean isNotEmpty(String value) {
+<span class="fc bfc" id="L45" title="All 4 branches covered.">        return value != null &amp;&amp; !value.trim().isEmpty();</span>
+    }
+    
+    /**
+     * بررسی طول رشته در محدوده مشخص
+     * 
+     * @param value رشته برای بررسی
+     * @param minLength حداقل طول مجاز
+     * @param maxLength حداکثر طول مجاز
+     * @return true اگر طول رشته در محدوده باشد
+     */
+    public static boolean isValidLength(String value, int minLength, int maxLength) {
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        if (value == null) return false;</span>
+<span class="fc" id="L58">        int length = value.trim().length();</span>
+<span class="fc bfc" id="L59" title="All 4 branches covered.">        return length &gt;= minLength &amp;&amp; length &lt;= maxLength;</span>
+    }
+    
+    /**
+     * اعتبارسنجی فیلد اجباری رشته‌ای
+     * 
+     * @param value مقدار برای بررسی
+     * @param fieldName نام فیلد برای پیام خطا
+     * @throws IllegalArgumentException اگر فیلد null یا خالی باشد
+     */
+    public static void validateRequiredString(String value, String fieldName) {
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        if (!isNotEmpty(value)) {</span>
+<span class="fc" id="L71">            throw new IllegalArgumentException(fieldName + &quot; نمی‌تواند null یا خالی باشد&quot;);</span>
+        }
+<span class="fc" id="L73">    }</span>
+    
+    /**
+     * اعتبارسنجی طول رشته با پیام خطای سفارشی
+     * 
+     * @param value رشته برای بررسی
+     * @param fieldName نام فیلد برای پیام خطا
+     * @param minLength حداقل طول مجاز
+     * @param maxLength حداکثر طول مجاز
+     * @throws IllegalArgumentException اگر طول نامعتبر باشد
+     */
+    public static void validateStringLength(String value, String fieldName, int minLength, int maxLength) {
+<span class="fc bfc" id="L85" title="All 4 branches covered.">        if (value != null &amp;&amp; !isValidLength(value, minLength, maxLength)) {</span>
+<span class="fc" id="L86">            throw new IllegalArgumentException(String.format(</span>
+<span class="fc" id="L87">                &quot;%s باید بین %d تا %d کاراکتر باشد&quot;, fieldName, minLength, maxLength</span>
+            ));
+        }
+<span class="fc" id="L90">    }</span>
+    
+    // ==================== اعتبارسنجی ایمیل ====================
+    
+    /**
+     * بررسی صحت فرمت ایمیل
+     * 
+     * @param email آدرس ایمیل برای بررسی
+     * @return true اگر فرمت ایمیل معتبر باشد
+     */
+    public static boolean isValidEmail(String email) {
+<span class="fc bfc" id="L101" title="All 4 branches covered.">        if (email == null || email.trim().isEmpty()) {</span>
+<span class="fc" id="L102">            return false;</span>
+        }
+<span class="fc" id="L104">        return EMAIL_PATTERN.matcher(email.trim()).matches();</span>
+    }
+    
+    /**
+     * اعتبارسنجی ایمیل با پرتاب استثنا در صورت نامعتبر بودن
+     * 
+     * @param email آدرس ایمیل برای بررسی
+     * @throws IllegalArgumentException اگر فرمت ایمیل نامعتبر باشد
+     */
+    public static void validateEmail(String email) {
+<span class="fc bfc" id="L114" title="All 2 branches covered.">        if (!isValidEmail(email)) {</span>
+<span class="fc" id="L115">            throw new IllegalArgumentException(ApplicationConstants.ERROR_MESSAGES.INVALID_EMAIL_FORMAT);</span>
+        }
+<span class="fc" id="L117">    }</span>
+    
+    // ==================== اعتبارسنجی شماره تلفن ====================
+    
+    /**
+     * بررسی صحت فرمت شماره موبایل ایرانی
+     * فرمت قابل قبول: 09xxxxxxxxx (11 رقم شروع با 09)
+     * 
+     * @param phone شماره تلفن برای بررسی
+     * @return true اگر فرمت شماره تلفن معتبر باشد
+     */
+    public static boolean isValidPhone(String phone) {
+<span class="fc bfc" id="L129" title="All 4 branches covered.">        if (phone == null || phone.trim().isEmpty()) {</span>
+<span class="fc" id="L130">            return false;</span>
+        }
+<span class="fc" id="L132">        return PHONE_PATTERN.matcher(phone.trim()).matches();</span>
+    }
+    
+    /**
+     * اعتبارسنجی شماره تلفن با پرتاب استثنا در صورت نامعتبر بودن
+     * 
+     * @param phone شماره تلفن برای بررسی
+     * @throws IllegalArgumentException اگر فرمت شماره تلفن نامعتبر باشد
+     */
+    public static void validatePhone(String phone) {
+<span class="fc bfc" id="L142" title="All 2 branches covered.">        if (!isValidPhone(phone)) {</span>
+<span class="fc" id="L143">            throw new IllegalArgumentException(ApplicationConstants.ERROR_MESSAGES.INVALID_PHONE_FORMAT);</span>
+        }
+<span class="fc" id="L145">    }</span>
+    
+    // ==================== اعتبارسنجی رمز عبور ====================
+    
+    /**
+     * بررسی قدرت رمز عبور
+     * رمز عبور باید حداقل 8 کاراکتر، شامل حروف بزرگ، کوچک، عدد و کاراکتر خاص باشد
+     * 
+     * @param password رمز عبور برای بررسی
+     * @return true اگر رمز عبور قوی باشد
+     */
+    public static boolean isValidPassword(String password) {
+<span class="fc bfc" id="L157" title="All 4 branches covered.">        if (password == null || password.trim().isEmpty()) {</span>
+<span class="fc" id="L158">            return false;</span>
+        }
+<span class="fc" id="L160">        return PASSWORD_PATTERN.matcher(password).matches();</span>
+    }
+    
+    /**
+     * اعتبارسنجی رمز عبور با پرتاب استثنا در صورت ضعیف بودن
+     * 
+     * @param password رمز عبور برای بررسی
+     * @throws IllegalArgumentException اگر رمز عبور ضعیف باشد
+     */
+    public static void validatePassword(String password) {
+<span class="fc bfc" id="L170" title="All 2 branches covered.">        if (!isValidPassword(password)) {</span>
+<span class="fc" id="L171">            throw new IllegalArgumentException(ApplicationConstants.ERROR_MESSAGES.WEAK_PASSWORD);</span>
+        }
+<span class="fc" id="L173">    }</span>
+    
+    /**
+     * دریافت شرایط رمز عبور معتبر
+     * 
+     * @return توضیح کامل شرایط رمز عبور قوی
+     */
+    public static String getPasswordRequirements() {
+<span class="fc" id="L181">        return &quot;رمز عبور باید شامل موارد زیر باشد:\n&quot; +</span>
+               &quot;- حداقل 8 کاراکتر\n&quot; +
+               &quot;- حداقل یک حرف بزرگ انگلیسی (A-Z)\n&quot; +
+               &quot;- حداقل یک حرف کوچک انگلیسی (a-z)\n&quot; +
+               &quot;- حداقل یک عدد (0-9)\n&quot; +
+               &quot;- حداقل یک کاراکتر خاص (@#$%^&amp;+=)\n&quot; +
+               &quot;- بدون فاصله یا space&quot;;
+    }
+    
+    // ==================== اعتبارسنجی نام ====================
+    
+    /**
+     * بررسی اعتبار نام (پشتیبانی از کاراکترهای فارسی و انگلیسی)
+     * 
+     * @param name نام برای بررسی
+     * @return true اگر نام معتبر باشد
+     */
+    public static boolean isValidName(String name) {
+<span class="fc bfc" id="L199" title="All 4 branches covered.">        if (name == null || name.trim().isEmpty()) {</span>
+<span class="fc" id="L200">            return false;</span>
+        }
+<span class="pc bpc" id="L202" title="1 of 2 branches missed.">        return NAME_PATTERN.matcher(name.trim()).matches() &amp;&amp; </span>
+<span class="fc bfc" id="L203" title="All 2 branches covered.">               isValidLength(name, 2, ApplicationConstants.VALIDATION.MAX_NAME_LENGTH);</span>
+    }
+    
+    /**
+     * اعتبارسنجی نام با پرتاب استثنا
+     * 
+     * @param name نام برای بررسی
+     * @param fieldName نام فیلد برای پیام خطا
+     * @throws IllegalArgumentException اگر نام نامعتبر باشد
+     */
+    public static void validateName(String name, String fieldName) {
+<span class="fc" id="L214">        validateRequiredString(name, fieldName);</span>
+<span class="pc bpc" id="L215" title="1 of 2 branches missed.">        if (!isValidName(name)) {</span>
+<span class="nc" id="L216">            throw new IllegalArgumentException(fieldName + &quot; حاوی کاراکترهای نامعتبر یا طول نامناسب است&quot;);</span>
+        }
+<span class="fc" id="L218">    }</span>
+    
+    // ==================== اعتبارسنجی عددی ====================
+    
+    /**
+     * بررسی مثبت بودن عدد
+     * 
+     * @param number عدد برای بررسی
+     * @return true اگر عدد مثبت باشد
+     */
+    public static boolean isPositive(Number number) {
+<span class="fc bfc" id="L229" title="All 4 branches covered.">        return number != null &amp;&amp; number.doubleValue() &gt; 0;</span>
+    }
+    
+    /**
+     * بررسی غیرمنفی بودن عدد
+     * 
+     * @param number عدد برای بررسی
+     * @return true اگر عدد غیرمنفی باشد
+     */
+    public static boolean isNonNegative(Number number) {
+<span class="fc bfc" id="L239" title="All 4 branches covered.">        return number != null &amp;&amp; number.doubleValue() &gt;= 0;</span>
+    }
+    
+    /**
+     * بررسی قرار گیری عدد در محدوده مشخص
+     * 
+     * @param number عدد برای بررسی
+     * @param min حداقل مقدار
+     * @param max حداکثر مقدار
+     * @return true اگر عدد در محدوده باشد
+     */
+    public static boolean isInRange(Number number, double min, double max) {
+<span class="fc bfc" id="L251" title="All 2 branches covered.">        if (number == null) return false;</span>
+<span class="fc" id="L252">        double value = number.doubleValue();</span>
+<span class="fc bfc" id="L253" title="All 4 branches covered.">        return value &gt;= min &amp;&amp; value &lt;= max;</span>
+    }
+    
+    /**
+     * اعتبارسنجی عدد مثبت با پرتاب استثنا
+     * 
+     * @param number عدد برای بررسی
+     * @param fieldName نام فیلد برای پیام خطا
+     * @throws IllegalArgumentException اگر عدد مثبت نباشد
+     */
+    public static void validatePositiveNumber(Number number, String fieldName) {
+<span class="nc bnc" id="L264" title="All 2 branches missed.">        if (!isPositive(number)) {</span>
+<span class="nc" id="L265">            throw new IllegalArgumentException(fieldName + &quot; باید مثبت باشد&quot;);</span>
+        }
+<span class="nc" id="L267">    }</span>
+    
+    /**
+     * اعتبارسنجی قیمت
+     * 
+     * @param price قیمت برای بررسی
+     * @throws IllegalArgumentException اگر قیمت نامعتبر باشد
+     */
+    public static void validatePrice(Double price) {
+<span class="fc bfc" id="L276" title="All 2 branches covered.">        if (price == null) {</span>
+<span class="fc" id="L277">            throw new IllegalArgumentException(&quot;قیمت نمی‌تواند null باشد&quot;);</span>
+        }
+<span class="fc bfc" id="L279" title="All 2 branches covered.">        if (!isInRange(price, ApplicationConstants.VALIDATION.MIN_PRICE, ApplicationConstants.VALIDATION.MAX_PRICE)) {</span>
+<span class="fc" id="L280">            throw new IllegalArgumentException(String.format(</span>
+                &quot;قیمت باید بین %.2f و %.2f باشد&quot;, 
+<span class="fc" id="L282">                ApplicationConstants.VALIDATION.MIN_PRICE, </span>
+<span class="fc" id="L283">                ApplicationConstants.VALIDATION.MAX_PRICE</span>
+            ));
+        }
+<span class="fc" id="L286">    }</span>
+    
+    /**
+     * اعتبارسنجی تعداد
+     * 
+     * @param quantity تعداد برای بررسی
+     * @throws IllegalArgumentException اگر تعداد نامعتبر باشد
+     */
+    public static void validateQuantity(Integer quantity) {
+<span class="fc bfc" id="L295" title="All 2 branches covered.">        if (quantity == null) {</span>
+<span class="fc" id="L296">            throw new IllegalArgumentException(&quot;تعداد نمی‌تواند null باشد&quot;);</span>
+        }
+<span class="fc bfc" id="L298" title="All 2 branches covered.">        if (!isInRange(quantity, ApplicationConstants.VALIDATION.MIN_QUANTITY, ApplicationConstants.VALIDATION.MAX_QUANTITY)) {</span>
+<span class="fc" id="L299">            throw new IllegalArgumentException(String.format(</span>
+                &quot;تعداد باید بین %d و %d باشد&quot;, 
+<span class="fc" id="L301">                ApplicationConstants.VALIDATION.MIN_QUANTITY, </span>
+<span class="fc" id="L302">                ApplicationConstants.VALIDATION.MAX_QUANTITY</span>
+            ));
+        }
+<span class="fc" id="L305">    }</span>
+    
+    /**
+     * اعتبارسنجی امتیاز
+     * 
+     * @param rating امتیاز برای بررسی
+     * @throws IllegalArgumentException اگر امتیاز نامعتبر باشد
+     */
+    public static void validateRating(Integer rating) {
+<span class="fc bfc" id="L314" title="All 2 branches covered.">        if (rating == null) {</span>
+<span class="fc" id="L315">            throw new IllegalArgumentException(&quot;امتیاز نمی‌تواند null باشد&quot;);</span>
+        }
+<span class="fc bfc" id="L317" title="All 2 branches covered.">        if (!isInRange(rating, ApplicationConstants.VALIDATION.MIN_RATING, ApplicationConstants.VALIDATION.MAX_RATING)) {</span>
+<span class="fc" id="L318">            throw new IllegalArgumentException(String.format(</span>
+                &quot;امتیاز باید بین %d و %d باشد&quot;, 
+<span class="fc" id="L320">                ApplicationConstants.VALIDATION.MIN_RATING, </span>
+<span class="fc" id="L321">                ApplicationConstants.VALIDATION.MAX_RATING</span>
+            ));
+        }
+<span class="fc" id="L324">    }</span>
+    
+    // ==================== اعتبارسنجی شناسه ====================
+    
+    /**
+     * بررسی اعتبار شناسه entity
+     * 
+     * @param id شناسه برای بررسی
+     * @return true اگر شناسه معتبر باشد
+     */
+    public static boolean isValidId(Long id) {
+<span class="fc bfc" id="L335" title="All 4 branches covered.">        return id != null &amp;&amp; id &gt; 0;</span>
+    }
+    
+    /**
+     * اعتبارسنجی شناسه با پرتاب استثنا
+     * 
+     * @param id شناسه برای بررسی
+     * @param entityName نام entity برای پیام خطا
+     * @throws IllegalArgumentException اگر شناسه نامعتبر باشد
+     */
+    public static void validateId(Long id, String entityName) {
+<span class="fc bfc" id="L346" title="All 2 branches covered.">        if (!isValidId(id)) {</span>
+<span class="fc" id="L347">            throw new IllegalArgumentException(entityName + &quot; شناسه باید مثبت باشد&quot;);</span>
+        }
+<span class="fc" id="L349">    }</span>
+    
+    // ==================== اعتبارسنجی منطق تجاری ====================
+    
+    /**
+     * بررسی اعتبار نقش کاربر
+     * 
+     * @param role نقش کاربر برای بررسی
+     * @return true اگر نقش معتبر باشد
+     */
+    public static boolean isValidUserRole(String role) {
+<span class="fc bfc" id="L360" title="All 4 branches covered.">        if (role == null || role.trim().isEmpty()) {</span>
+<span class="fc" id="L361">            return false;</span>
+        }
+<span class="fc" id="L363">        String upperRole = role.trim().toUpperCase();</span>
+<span class="fc bfc" id="L364" title="All 2 branches covered.">        return upperRole.equals(ApplicationConstants.BUSINESS.ROLE_BUYER) ||</span>
+<span class="fc bfc" id="L365" title="All 2 branches covered.">               upperRole.equals(ApplicationConstants.BUSINESS.ROLE_SELLER) ||</span>
+<span class="fc bfc" id="L366" title="All 2 branches covered.">               upperRole.equals(ApplicationConstants.BUSINESS.ROLE_COURIER) ||</span>
+<span class="fc bfc" id="L367" title="All 2 branches covered.">               upperRole.equals(ApplicationConstants.BUSINESS.ROLE_ADMIN);</span>
+    }
+    
+    /**
+     * بررسی اعتبار روش پرداخت
+     * 
+     * @param paymentMethod روش پرداخت برای بررسی
+     * @return true اگر روش پرداخت معتبر باشد
+     */
+    public static boolean isValidPaymentMethod(String paymentMethod) {
+<span class="pc bpc" id="L377" title="1 of 4 branches missed.">        if (paymentMethod == null || paymentMethod.trim().isEmpty()) {</span>
+<span class="fc" id="L378">            return false;</span>
+        }
+<span class="fc" id="L380">        String upperMethod = paymentMethod.trim().toUpperCase();</span>
+<span class="fc bfc" id="L381" title="All 2 branches covered.">        return upperMethod.equals(ApplicationConstants.BUSINESS.PAYMENT_CARD) ||</span>
+<span class="fc bfc" id="L382" title="All 2 branches covered.">               upperMethod.equals(ApplicationConstants.BUSINESS.PAYMENT_WALLET) ||</span>
+<span class="fc bfc" id="L383" title="All 2 branches covered.">               upperMethod.equals(ApplicationConstants.BUSINESS.PAYMENT_COD);</span>
+    }
+    
+    /**
+     * بررسی اعتبار وضعیت سفارش
+     * 
+     * @param status وضعیت سفارش برای بررسی
+     * @return true اگر وضعیت معتبر باشد
+     */
+    public static boolean isValidOrderStatus(String status) {
+<span class="pc bpc" id="L393" title="1 of 4 branches missed.">        if (status == null || status.trim().isEmpty()) {</span>
+<span class="fc" id="L394">            return false;</span>
+        }
+<span class="fc" id="L396">        String upperStatus = status.trim().toUpperCase();</span>
+<span class="fc bfc" id="L397" title="All 2 branches covered.">        return upperStatus.equals(ApplicationConstants.BUSINESS.ORDER_STATUS_PENDING) ||</span>
+<span class="fc bfc" id="L398" title="All 2 branches covered.">               upperStatus.equals(ApplicationConstants.BUSINESS.ORDER_STATUS_CONFIRMED) ||</span>
+<span class="fc bfc" id="L399" title="All 2 branches covered.">               upperStatus.equals(ApplicationConstants.BUSINESS.ORDER_STATUS_PREPARING) ||</span>
+<span class="fc bfc" id="L400" title="All 2 branches covered.">               upperStatus.equals(ApplicationConstants.BUSINESS.ORDER_STATUS_READY) ||</span>
+<span class="fc bfc" id="L401" title="All 2 branches covered.">               upperStatus.equals(ApplicationConstants.BUSINESS.ORDER_STATUS_PICKED_UP) ||</span>
+<span class="fc bfc" id="L402" title="All 2 branches covered.">               upperStatus.equals(ApplicationConstants.BUSINESS.ORDER_STATUS_DELIVERED) ||</span>
+<span class="fc bfc" id="L403" title="All 2 branches covered.">               upperStatus.equals(ApplicationConstants.BUSINESS.ORDER_STATUS_CANCELLED);</span>
+    }
+    
+    // ==================== اعتبارسنجی ترکیبی ====================
+    
+    /**
+     * اعتبارسنجی داده‌های ثبت‌نام کاربر
+     * 
+     * @param fullName نام کامل
+     * @param phone شماره تلفن
+     * @param password رمز عبور
+     * @param email ایمیل (اختیاری)
+     * @param role نقش کاربر
+     * @throws IllegalArgumentException اگر هر یک از داده‌ها نامعتبر باشد
+     */
+    public static void validateUserRegistration(String fullName, String phone, String password, String email, String role) {
+<span class="fc" id="L419">        validateName(fullName, &quot;نام کامل&quot;);</span>
+<span class="fc" id="L420">        validatePhone(phone);</span>
+<span class="fc" id="L421">        validatePassword(password);</span>
+        
+<span class="fc bfc" id="L423" title="All 2 branches covered.">        if (isNotEmpty(email)) {</span>
+<span class="fc" id="L424">            validateEmail(email);</span>
+        }
+        
+<span class="fc bfc" id="L427" title="All 2 branches covered.">        if (!isValidUserRole(role)) {</span>
+<span class="fc" id="L428">            throw new IllegalArgumentException(&quot;نقش کاربر نامعتبر: &quot; + role);</span>
+        }
+<span class="fc" id="L430">    }</span>
+    
+    /**
+     * اعتبارسنجی داده‌های آیتم غذا
+     * 
+     * @param name نام آیتم
+     * @param description توضیحات (اختیاری)
+     * @param price قیمت
+     * @param category دسته‌بندی
+     * @param quantity تعداد (اختیاری)
+     * @throws IllegalArgumentException اگر هر یک از داده‌ها نامعتبر باشد
+     */
+    public static void validateFoodItem(String name, String description, Double price, String category, Integer quantity) {
+<span class="fc" id="L443">        validateName(name, &quot;نام آیتم&quot;);</span>
+<span class="fc" id="L444">        validatePrice(price);</span>
+<span class="fc" id="L445">        validateRequiredString(category, &quot;دسته‌بندی&quot;);</span>
+        
+<span class="fc bfc" id="L447" title="All 2 branches covered.">        if (description != null) {</span>
+<span class="fc" id="L448">            validateStringLength(description, &quot;توضیحات&quot;, 0, ApplicationConstants.VALIDATION.MAX_DESCRIPTION_LENGTH);</span>
+        }
+        
+<span class="fc bfc" id="L451" title="All 2 branches covered.">        if (quantity != null) {</span>
+<span class="fc" id="L452">            validateQuantity(quantity);</span>
+        }
+<span class="fc" id="L454">    }</span>
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

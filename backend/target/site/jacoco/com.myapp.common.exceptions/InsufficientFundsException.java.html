@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InsufficientFundsException.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.common.exceptions</a> &gt; <span class="el_source">InsufficientFundsException.java</span></div><h1>InsufficientFundsException.java</h1><pre class="source lang-java linenums">package com.myapp.common.exceptions;
+
+/**
+ * Exception پرتاب می‌شود زمانی که موجودی کیف پول کافی نباشد
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+public class InsufficientFundsException extends RuntimeException {
+    
+    /**
+     * سازنده پیش‌فرض
+     */
+    public InsufficientFundsException() {
+<span class="fc" id="L16">        super(&quot;Insufficient funds&quot;);</span>
+<span class="fc" id="L17">    }</span>
+    
+    /**
+     * سازنده با پیام سفارشی
+     * 
+     * @param message پیام خطا
+     */
+    public InsufficientFundsException(String message) {
+<span class="fc" id="L25">        super(message);</span>
+<span class="fc" id="L26">    }</span>
+    
+    /**
+     * سازنده با پیام و علت
+     * 
+     * @param message پیام خطا
+     * @param cause علت اصلی خطا
+     */
+    public InsufficientFundsException(String message, Throwable cause) {
+<span class="fc" id="L35">        super(message, cause);</span>
+<span class="fc" id="L36">    }</span>
+    
+    /**
+     * ایجاد exception برای موجودی ناکافی کیف پول
+     * 
+     * @param currentBalance موجودی فعلی
+     * @param requiredAmount مبلغ مورد نیاز
+     * @return InsufficientFundsException با پیام مناسب
+     */
+    public static InsufficientFundsException forWallet(double currentBalance, double requiredAmount) {
+<span class="fc" id="L46">        return new InsufficientFundsException(</span>
+<span class="fc" id="L47">            String.format(&quot;Insufficient wallet balance. Current: %.2f, Required: %.2f&quot;, </span>
+<span class="fc" id="L48">                currentBalance, requiredAmount)</span>
+        );
+    }
+    
+    /**
+     * ایجاد exception برای موجودی ناکافی کیف پول با پیام ساده
+     * 
+     * @param requiredAmount مبلغ مورد نیاز
+     * @return InsufficientFundsException با پیام ساده
+     */
+    public static InsufficientFundsException forAmount(double requiredAmount) {
+<span class="fc" id="L59">        return new InsufficientFundsException(</span>
+<span class="fc" id="L60">            String.format(&quot;Insufficient wallet balance for amount: %.2f&quot;, requiredAmount)</span>
+        );
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

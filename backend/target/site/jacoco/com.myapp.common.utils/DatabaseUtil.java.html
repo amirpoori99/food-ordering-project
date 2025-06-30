@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DatabaseUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.common.utils</a> &gt; <span class="el_source">DatabaseUtil.java</span></div><h1>DatabaseUtil.java</h1><pre class="source lang-java linenums">package com.myapp.common.utils;
+
+// وارد کردن کلاس‌های Hibernate برای مدیریت دیتابیس
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+
+/**
+ * کلاس ابزاری دیتابیس - مدیریت اتصال به پایگاه داده با Hibernate
+ * این کلاس مسئول ایجاد و مدیریت SessionFactory برای کل برنامه است
+ * از الگوی Singleton Pattern برای یک نمونه SessionFactory استفاده می‌کند
+ */
+<span class="nc" id="L15">public class DatabaseUtil {</span>
+    // نمونه یکتای SessionFactory برای کل برنامه
+<span class="fc" id="L17">    private static final SessionFactory sessionFactory = buildSessionFactory();</span>
+
+    /**
+     * ساخت SessionFactory با استفاده از تنظیمات hibernate.cfg.xml
+     * این متد در ابتدای اجرای برنامه یک بار فراخوانی می‌شود
+     * 
+     * @return SessionFactory تنظیم شده برای اتصال به SQLite
+     * @throws ExceptionInInitializerError در صورت خطا در ایجاد SessionFactory
+     */
+    private static SessionFactory buildSessionFactory() {
+        try {
+            // استفاده از تنظیمات SQLite از فایل hibernate.cfg.xml
+<span class="fc" id="L29">            StandardServiceRegistryBuilder registryBuilder =</span>
+<span class="fc" id="L30">                    new StandardServiceRegistryBuilder().configure(); // خواندن hibernate.cfg.xml</span>
+    
+            // ایجاد service registry برای Hibernate
+<span class="fc" id="L33">            StandardServiceRegistry registry = registryBuilder.build();</span>
+            
+            // ایجاد metadata از منابع موجود (entity classes)
+<span class="fc" id="L36">            Metadata metadata = new MetadataSources(registry).getMetadataBuilder().build();</span>
+            
+            // ساخت و برگرداندن SessionFactory
+<span class="fc" id="L39">            return metadata.getSessionFactoryBuilder().build();</span>
+    
+<span class="nc" id="L41">        } catch (Exception e) {</span>
+            // در صورت خطا، پرتاب ExceptionInInitializerError
+<span class="nc" id="L43">            throw new ExceptionInInitializerError(</span>
+<span class="nc" id="L44">                    &quot;Initial SessionFactory failed &quot; + e.getMessage());</span>
+        }
+    }
+
+    /**
+     * دریافت نمونه SessionFactory برای استفاده در سایر کلاس‌ها
+     * این متد برای باز کردن Session و اجرای عملیات دیتابیس استفاده می‌شود
+     * 
+     * @return SessionFactory یکتای برنامه
+     */
+    public static SessionFactory getSessionFactory() {
+<span class="fc" id="L55">        return sessionFactory;</span>
+    }
+
+    /**
+     * بستن SessionFactory هنگام خاتمه برنامه
+     * این متد برای آزادسازی منابع و بستن اتصالات دیتابیس استفاده می‌شود
+     * معمولاً در shutdown hook یا در پایان برنامه فراخوانی می‌شود
+     */
+    public static void shutdown() {
+<span class="nc bnc" id="L64" title="All 2 branches missed.">        if (sessionFactory != null) {</span>
+<span class="nc" id="L65">            sessionFactory.close(); // بستن SessionFactory و آزادسازی منابع</span>
+        }
+<span class="nc" id="L67">    }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

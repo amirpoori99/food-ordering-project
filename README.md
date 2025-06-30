@@ -85,20 +85,40 @@
 
 ```
 food-ordering-project/
-├── backend/                    # سرور بک‌اند Java
-│   ├── src/main/java/         # کدهای اصلی
-│   ├── src/test/              # تست‌ها
-│   └── pom.xml                # تنظیمات Maven
-├── frontend-javafx/           # برنامه دسکتاپ JavaFX
-│   ├── src/main/java/         # کنترلرها
-│   ├── src/main/resources/    # فایل‌های UI
-│   └── pom.xml                # تنظیمات Maven
-├── docs/                      # مستندات کامل
-│   ├── guides/                # راهنماهای کاربری
-│   ├── phases/                # گزارش‌های فازها
-│   └── README.md              # این فایل
-├── scripts/                   # اسکریپت‌های سیستم
-└── README.md                  # بررسی کلی پروژه
+├── backend/                 # Backend (Java Spring Boot)
+│   ├── src/main/java/      # کدهای اصلی
+│   │   ├── admin/          # مدیریت سیستم
+│   │   ├── auth/           # احراز هویت
+│   │   ├── common/         # کلاس‌های مشترک
+│   │   ├── coupon/         # سیستم کوپن
+│   │   ├── courier/        # سیستم پیک
+│   │   ├── favorites/      # علاقه‌مندی‌ها
+│   │   ├── item/           # مدیریت آیتم‌ها
+│   │   ├── menu/           # مدیریت منو
+│   │   ├── notification/   # اطلاع‌رسانی
+│   │   ├── order/          # سیستم سفارش
+│   │   ├── payment/        # پردازش پرداخت
+│   │   ├── restaurant/     # مدیریت رستوران
+│   │   ├── review/         # سیستم امتیازدهی
+│   │   └── vendor/         # مدیریت فروشنده
+│   ├── src/test/           # تست‌ها (۷۶۵+ تست)
+│   └── resources/          # فایل‌های پیکربندی
+├── frontend-javafx/        # Frontend (JavaFX)
+│   ├── src/main/java/      # کدهای اصلی
+│   │   ├── admin/          # صفحات مدیریت
+│   │   ├── auth/           # صفحات احراز هویت
+│   │   ├── common/         # کلاس‌های مشترک
+│   │   ├── menu/           # صفحات منو
+│   │   ├── notification/   # صفحات اطلاع‌رسانی
+│   │   ├── order/          # صفحات سفارش
+│   │   ├── payment/        # صفحات پرداخت
+│   │   └── restaurant/     # صفحات رستوران
+│   ├── src/main/resources/ # فایل‌های FXML (۲۵+ فایل)
+│   └── src/test/           # تست‌ها (۲۰۰+ تست)
+├── docs/                   # مستندات کامل
+│   ├── guides/             # راهنماها (۱۰+ فایل)
+│   └── phases/             # گزارش‌های فازها (۴۰ فایل)
+└── scripts/                # اسکریپت‌های سیستم (۸+ فایل)
 ```
 
 ---

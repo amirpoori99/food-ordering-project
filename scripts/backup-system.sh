@@ -2,12 +2,17 @@
 
 # ================================================================
 # سیستم سفارش غذا - اسکریپت پیشرفته پشتیبان‌گیری
+# این اسکریپت مسئول پشتیبان‌گیری کامل از سیستم سفارش غذا است
+# شامل: دیتابیس، فایل‌های اپلیکیشن، تنظیمات و لاگ‌ها
 # نسخه: ۲.۰ - پیاده‌سازی فاز ۳۲
+# تاریخ آخرین به‌روزرسانی: تیر ۱۴۰۴
 # ================================================================
 
 set -euo pipefail  # تنظیمات امنیتی: خروج در صورت خطا، استفاده از متغیرهای تعریف نشده، و pipe failures
 
-# تنظیمات اولیه
+# ================================================================
+# تنظیمات اولیه و متغیرهای محیطی
+# ================================================================
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"  # مسیر دایرکتوری اسکریپت
 CONFIG_FILE="${SCRIPT_DIR}/backup.conf"  # فایل پیکربندی
 LOG_FILE="/var/log/food-ordering/backup.log"  # فایل لاگ
@@ -15,7 +20,9 @@ BACKUP_BASE_DIR="/var/backups/food-ordering"  # مسیر اصلی پشتیبان
 DATE=$(date +%Y%m%d_%H%M%S)  # تاریخ و زمان فعلی برای نام‌گذاری
 BACKUP_DIR="${BACKUP_BASE_DIR}/${DATE}"  # مسیر کامل پشتیبان‌گیری
 
+# ================================================================
 # تنظیمات پیش‌فرض دیتابیس (می‌تواند توسط backup.conf بازنویسی شود)
+# ================================================================
 DB_HOST="localhost"  # میزبان دیتابیس
 DB_PORT="5432"  # پورت دیتابیس
 DB_NAME="food_ordering_prod"  # نام دیتابیس
@@ -37,12 +44,16 @@ CLOUD_PROVIDER=""  # ارائه‌دهنده ابر
 CLOUD_BUCKET=""  # سطل ابر
 CLOUD_CREDENTIALS=""  # اعتبارنامه‌های ابر
 
+# ================================================================
 # بارگذاری پیکربندی اگر وجود داشته باشد
+# ================================================================
 if [[ -f "${CONFIG_FILE}" ]]; then
     source "${CONFIG_FILE}"  # بارگذاری تنظیمات از فایل پیکربندی
 fi
 
-# رنگ‌ها برای خروجی
+# ================================================================
+# رنگ‌ها برای خروجی رنگی و زیبا
+# ================================================================
 RED='\033[0;31m'  # قرمز برای خطاها
 GREEN='\033[0;32m'  # سبز برای موفقیت
 YELLOW='\033[1;33m'  # زرد برای هشدارها
@@ -51,7 +62,10 @@ PURPLE='\033[0;35m'  # بنفش برای debug
 CYAN='\033[0;36m'  # فیروزه‌ای برای عنوان‌ها
 NC='\033[0m'  # بدون رنگ
 
-# تابع پیشرفته لاگ‌گیری با چرخش
+# ================================================================
+# تابع پیشرفته لاگ‌گیری با چرخش خودکار
+# این تابع پیام‌ها را هم در کنسول نمایش می‌دهد و هم در فایل لاگ ذخیره می‌کند
+# ================================================================
 log() {
     local level=$1  # سطح لاگ (INFO, WARN, ERROR, SUCCESS, DEBUG)
     shift
@@ -67,14 +81,19 @@ log() {
     fi
 }
 
-# توابع کمکی برای لاگ‌گیری
+# ================================================================
+# توابع کمکی برای لاگ‌گیری با رنگ‌های مختلف
+# ================================================================
 info() { log "INFO" "$*"; }  # اطلاعات عمومی
 warn() { log "WARN" "${YELLOW}$*${NC}"; }  # هشدار
 error() { log "ERROR" "${RED}$*${NC}"; }  # خطا
 success() { log "SUCCESS" "${GREEN}$*${NC}"; }  # موفقیت
 debug() { log "DEBUG" "${BLUE}$*${NC}"; }  # اطلاعات debug
 
-# بررسی پیشرفته وابستگی‌ها
+# ================================================================
+# بررسی پیشرفته وابستگی‌های مورد نیاز
+# این تابع بررسی می‌کند که تمام ابزارهای مورد نیاز نصب شده باشند
+# ================================================================
 check_dependencies() {
     local deps=("pg_dump" "gzip" "tar")  # وابستگی‌های اجباری
     local optional_deps=("aws" "gcloud" "az" "openssl" "sha256sum")  # وابستگی‌های اختیاری
@@ -98,7 +117,10 @@ check_dependencies() {
     done
 }
 
+# ================================================================
 # ایجاد دایرکتوری پشتیبان‌گیری با ساختار پیشرفته
+# این تابع ساختار پوشه‌های مورد نیاز برای پشتیبان‌گیری را ایجاد می‌کند
+# ================================================================
 create_backup_dir() {
     if [[ ! -d "${BACKUP_DIR}" ]]; then
         mkdir -p "${BACKUP_DIR}"  # ایجاد دایرکتوری اصلی
@@ -111,7 +133,10 @@ create_backup_dir() {
     fi
 }
 
-# پشتیبان‌گیری پیشرفته دیتابیس با تأیید
+# ================================================================
+# پشتیبان‌گیری پیشرفته دیتابیس با تأیید یکپارچگی
+# این تابع از دیتابیس PostgreSQL پشتیبان می‌گیرد و صحت آن را تأیید می‌کند
+# ================================================================
 backup_database() {
     if [[ "${BACKUP_DATABASE}" != "true" ]]; then
         info "پشتیبان‌گیری دیتابیس رد شد (در پیکربندی غیرفعال شده)"
@@ -177,7 +202,10 @@ backup_database() {
     unset PGPASSWORD  # پاک کردن رمز عبور از محیط
 }
 
+# ================================================================
 # پشتیبان‌گیری پیشرفته فایل‌های اپلیکیشن
+# این تابع از فایل‌های اپلیکیشن، کدها و تنظیمات پشتیبان می‌گیرد
+# ================================================================
 backup_application_files() {
     if [[ "${BACKUP_APPLICATION}" != "true" ]]; then
         info "پشتیبان‌گیری فایل‌های اپلیکیشن رد شد (در پیکربندی غیرفعال شده)"
@@ -234,7 +262,10 @@ backup_application_files() {
     fi
 }
 
-# پشتیبان‌گیری پیشرفته تنظیمات
+# ================================================================
+# پشتیبان‌گیری پیشرفته تنظیمات سیستم
+# این تابع از تنظیمات سیستم، سرویس‌ها و پیکربندی‌ها پشتیبان می‌گیرد
+# ================================================================
 backup_configuration() {
     if [[ "${BACKUP_CONFIGURATION}" != "true" ]]; then
         info "پشتیبان‌گیری تنظیمات رد شد (در پیکربندی غیرفعال شده)"
@@ -287,7 +318,10 @@ backup_configuration() {
     fi
 }
 
-# New: Log files backup
+# ================================================================
+# پشتیبان‌گیری از فایل‌های لاگ
+# این تابع از فایل‌های لاگ سیستم پشتیبان می‌گیرد (فقط ۷ روز اخیر)
+# ================================================================
 backup_log_files() {
     if [[ "${BACKUP_LOGS}" != "true" ]]; then
         info "پشتیبان‌گیری لاگ‌ها رد شد (در پیکربندی غیرفعال شده)"
@@ -332,7 +366,10 @@ backup_log_files() {
     fi
 }
 
-# Enhanced backup verification
+# ================================================================
+# تأیید یکپارچگی پیشرفته پشتیبان‌گیری
+# این تابع صحت و یکپارچگی فایل‌های پشتیبان را بررسی می‌کند
+# ================================================================
 verify_backup() {
     if [[ "${VERIFY_BACKUPS}" != "true" ]]; then
         info "تأیید یکپارچگی پشتیبان‌گیری رد شد (در پیکربندی غیرفعال شده)"
@@ -343,7 +380,7 @@ verify_backup() {
     
     local verification_failed=false
     
-    # Verify checksums
+    # تأیید checksum ها
     for checksum_file in "${BACKUP_DIR}"/*/*.checksum*; do
         if [[ -f "${checksum_file}" ]]; then
             if ! sha256sum -c "${checksum_file}" &>/dev/null; then
@@ -355,7 +392,7 @@ verify_backup() {
         fi
     done
     
-    # Verify file sizes
+    # تأیید اندازه فایل‌ها
     for backup_file in "${BACKUP_DIR}"/*/*.{sql,tar}*; do
         if [[ -f "${backup_file}" ]]; then
             local file_size=$(stat -f%z "${backup_file}" 2>/dev/null || stat -c%s "${backup_file}" 2>/dev/null || echo 0)
@@ -376,7 +413,10 @@ verify_backup() {
     fi
 }
 
-# New: Cloud upload functionality
+# ================================================================
+# آپلود به ابر ذخیره‌سازی
+# این تابع پشتیبان‌ها را به سرویس‌های ابری آپلود می‌کند
+# ================================================================
 upload_to_cloud() {
     if [[ "${UPLOAD_TO_CLOUD}" != "true" ]]; then
         info "آپلود به ابر رد شد (در پیکربندی غیرفعال شده)"
@@ -433,15 +473,18 @@ upload_to_cloud() {
             fi
             ;;
         *)
-            warn "Unknown cloud provider: ${CLOUD_PROVIDER}"
+            warn "ارائه‌دهنده ابر ناشناخته: ${CLOUD_PROVIDER}"
             return 1
             ;;
     esac
 }
 
-# Enhanced backup cleanup
+# ================================================================
+# پاکسازی پشتیبان‌های قدیمی
+# این تابع پشتیبان‌های قدیمی‌تر از تعداد روزهای مشخص شده را حذف می‌کند
+# ================================================================
 cleanup_old_backups() {
-    info "Cleaning up old backups (retention: ${RETENTION_DAYS} days)..."
+    info "پاکسازی پشتیبان‌های قدیمی (نگهداری: ${RETENTION_DAYS} روز)..."
     
     local deleted_count=0
     local current_time=$(date +%s)
@@ -455,123 +498,132 @@ cleanup_old_backups() {
             if [[ "${dir_time}" -gt 0 ]] && [[ $((current_time - dir_time)) -gt "${retention_seconds}" ]]; then
                 rm -rf "${backup_dir}"
                 deleted_count=$((deleted_count + 1))
-                debug "Deleted old backup: ${dir_name}"
+                debug "پشتیبان قدیمی حذف شد: ${dir_name}"
             fi
         fi
     done
     
     if [[ "${deleted_count}" -gt 0 ]]; then
-        success "Cleaned up ${deleted_count} old backup(s)"
+        success "${deleted_count} پشتیبان قدیمی پاکسازی شد"
     else
-        info "No old backups to clean up"
+        info "هیچ پشتیبان قدیمی‌ای برای پاکسازی یافت نشد"
     fi
 }
 
-# Enhanced manifest creation
+# ================================================================
+# ایجاد فایل manifest پیشرفته
+# این تابع فایل‌های متادیتا و اطلاعات سیستم را ایجاد می‌کند
+# ================================================================
 create_manifest() {
-    info "Creating enhanced backup manifest..."
+    info "ایجاد فایل manifest پیشرفته..."
     
     local manifest_file="${BACKUP_DIR}/metadata/manifest.txt"
     local system_info_file="${BACKUP_DIR}/metadata/system_info.txt"
     
-    # Create main manifest
+    # ایجاد manifest اصلی
     cat > "${manifest_file}" << EOF
-# Food Ordering System Enhanced Backup Manifest
-# Version: 2.0
-# Created: $(date)
-# Backup Directory: ${BACKUP_DIR}
+# سیستم سفارش غذا - فایل manifest پشتیبان‌گیری پیشرفته
+# نسخه: ۲.۰
+# تاریخ ایجاد: $(date)
+# مسیر پشتیبان‌گیری: ${BACKUP_DIR}
 
-BACKUP_DATE=${DATE}
-DB_NAME=${DB_NAME}
-DB_HOST=${DB_HOST}
-DB_PORT=${DB_PORT}
-COMPRESSED=${COMPRESS_BACKUPS}
-VERIFIED=${VERIFY_BACKUPS}
-ENCRYPTED=${ENCRYPT_BACKUPS}
-UPLOADED_TO_CLOUD=${UPLOAD_TO_CLOUD}
-CLOUD_PROVIDER=${CLOUD_PROVIDER}
+تاریخ_پشتیبان‌گیری=${DATE}
+نام_دیتابیس=${DB_NAME}
+میزبان_دیتابیس=${DB_HOST}
+پورت_دیتابیس=${DB_PORT}
+فشرده_شده=${COMPRESS_BACKUPS}
+تأیید_شده=${VERIFY_BACKUPS}
+رمزنگاری_شده=${ENCRYPT_BACKUPS}
+آپلود_به_ابر=${UPLOAD_TO_CLOUD}
+ارائه_دهنده_ابر=${CLOUD_PROVIDER}
 
-# Backup Configuration:
-BACKUP_DATABASE=${BACKUP_DATABASE}
-BACKUP_APPLICATION=${BACKUP_APPLICATION}
-BACKUP_CONFIGURATION=${BACKUP_CONFIGURATION}
-BACKUP_LOGS=${BACKUP_LOGS}
+# تنظیمات پشتیبان‌گیری:
+پشتیبان_دیتابیس=${BACKUP_DATABASE}
+پشتیبان_اپلیکیشن=${BACKUP_APPLICATION}
+پشتیبان_تنظیمات=${BACKUP_CONFIGURATION}
+پشتیبان_لاگ‌ها=${BACKUP_LOGS}
 
-# Files in this backup:
+# فایل‌های موجود در این پشتیبان:
 EOF
     
     find "${BACKUP_DIR}" -type f -exec ls -la {} \; >> "${manifest_file}"
     
-    # Create system information
+    # ایجاد اطلاعات سیستم
     cat > "${system_info_file}" << EOF
-# System Information
-# Generated: $(date)
+# اطلاعات سیستم
+# تولید شده در: $(date)
 
-OS: $(uname -a)
-Hostname: $(hostname)
-Uptime: $(uptime)
-Disk Usage: $(df -h .)
-Memory Usage: $(free -h)
-Java Version: $(java -version 2>&1 | head -1)
-Maven Version: $(mvn -version 2>&1 | head -1)
+سیستم_عامل: $(uname -a)
+نام_میزبان: $(hostname)
+زمان_کارکرد: $(uptime)
+استفاده_دیسک: $(df -h .)
+استفاده_حافظه: $(free -h)
+نسخه_جاوا: $(java -version 2>&1 | head -1)
+نسخه_مون: $(mvn -version 2>&1 | head -1)
 EOF
     
-    # Calculate checksums for all files
+    # محاسبه checksum برای تمام فایل‌ها
     if command -v sha256sum &> /dev/null; then
         echo "" >> "${manifest_file}"
-        echo "# SHA256 Checksums:" >> "${manifest_file}"
+        echo "# Checksum های SHA256:" >> "${manifest_file}"
         cd "${BACKUP_DIR}"
         find . -type f -name "*.sql*" -o -name "*.tar*" -o -name "*.gz*" | \
             xargs sha256sum >> "${manifest_file}" 2>/dev/null || true
     fi
     
-    success "Enhanced manifest created: ${manifest_file}"
+    success "فایل manifest پیشرفته ایجاد شد: ${manifest_file}"
 }
 
-# Enhanced email notification
+# ================================================================
+# ارسال اعلان ایمیل پیشرفته
+# این تابع گزارش پشتیبان‌گیری را از طریق ایمیل ارسال می‌کند
+# ================================================================
 send_notification() {
     if [[ "${EMAIL_NOTIFICATIONS}" != "true" ]] || [[ -z "${EMAIL_TO}" ]]; then
         return 0
     fi
     
-    info "Sending email notification..."
+    info "ارسال اعلان ایمیل..."
     
-    local subject="Food Ordering System Backup - ${DATE}"
-    local body="Backup completed successfully at $(date)
-    
-Backup Directory: ${BACKUP_DIR}
-Database: ${DB_NAME}
-Compressed: ${COMPRESS_BACKUPS}
-Verified: ${VERIFY_BACKUPS}
-Encrypted: ${ENCRYPT_BACKUPS}
-Cloud Upload: ${UPLOAD_TO_CLOUD}
+    local subject="سیستم سفارش غذا - گزارش پشتیبان‌گیری - ${DATE}"
+    local body="پشتیبان‌گیری با موفقیت در $(date) تکمیل شد
 
-Total backup size: $(du -sh "${BACKUP_DIR}" | cut -f1)
+مسیر پشتیبان‌گیری: ${BACKUP_DIR}
+نام دیتابیس: ${DB_NAME}
+فشرده شده: ${COMPRESS_BACKUPS}
+تأیید شده: ${VERIFY_BACKUPS}
+رمزنگاری شده: ${ENCRYPT_BACKUPS}
+آپلود به ابر: ${UPLOAD_TO_CLOUD}
+
+حجم کل پشتیبان: $(du -sh "${BACKUP_DIR}" | cut -f1)
 "
     
     if command -v mail &> /dev/null; then
         echo "${body}" | mail -s "${subject}" "${EMAIL_TO}"
-        success "Email notification sent to ${EMAIL_TO}"
+        success "اعلان ایمیل به ${EMAIL_TO} ارسال شد"
     else
-        warn "Mail command not available, skipping email notification"
+        warn "دستور mail در دسترس نیست، اعلان ایمیل رد شد"
     fi
 }
 
-# Main execution function
+# ================================================================
+# تابع اصلی اجرا
+# این تابع تمام مراحل پشتیبان‌گیری را به ترتیب اجرا می‌کند
+# ================================================================
 main() {
-    info "Starting enhanced backup process..."
-    info "Backup directory: ${BACKUP_DIR}"
+    info "شروع فرآیند پشتیبان‌گیری پیشرفته..."
+    info "مسیر پشتیبان‌گیری: ${BACKUP_DIR}"
     
-    # Create log directory
+    # ایجاد دایرکتوری لاگ
     mkdir -p "$(dirname "${LOG_FILE}")"
     
-    # Check dependencies
+    # بررسی وابستگی‌ها
     check_dependencies
     
-    # Create backup directory
+    # ایجاد دایرکتوری پشتیبان‌گیری
     create_backup_dir
     
-    # Perform backups
+    # انجام پشتیبان‌گیری‌ها
     local backup_failed=false
     
     backup_database || backup_failed=true
@@ -579,33 +631,35 @@ main() {
     backup_configuration || backup_failed=true
     backup_log_files || backup_failed=true
     
-    # Verify backup if enabled
+    # تأیید پشتیبان‌گیری اگر فعال باشد
     if [[ "${backup_failed}" == "false" ]]; then
         verify_backup || backup_failed=true
     fi
     
-    # Upload to cloud if enabled
+    # آپلود به ابر اگر فعال باشد
     if [[ "${backup_failed}" == "false" ]]; then
-        upload_to_cloud || warn "Cloud upload failed, but backup completed"
+        upload_to_cloud || warn "آپلود به ابر ناموفق بود، اما پشتیبان‌گیری تکمیل شد"
     fi
     
-    # Create manifest
+    # ایجاد manifest
     create_manifest
     
-    # Cleanup old backups
+    # پاکسازی پشتیبان‌های قدیمی
     cleanup_old_backups
     
-    # Send notification
+    # ارسال اعلان
     if [[ "${backup_failed}" == "false" ]]; then
         send_notification
-        success "Enhanced backup process completed successfully"
-        info "Backup location: ${BACKUP_DIR}"
-        info "Total size: $(du -sh "${BACKUP_DIR}" | cut -f1)"
+        success "فرآیند پشتیبان‌گیری پیشرفته با موفقیت تکمیل شد"
+        info "مسیر پشتیبان‌گیری: ${BACKUP_DIR}"
+        info "حجم کل: $(du -sh "${BACKUP_DIR}" | cut -f1)"
     else
-        error "Backup process completed with errors"
+        error "فرآیند پشتیبان‌گیری با خطا تکمیل شد"
         exit 1
     fi
 }
 
-# Execute main function
+# ================================================================
+# اجرای تابع اصلی
+# ================================================================
 main "$@" 

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MenuRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.menu</a> &gt; <span class="el_source">MenuRepository.java</span></div><h1>MenuRepository.java</h1><pre class="source lang-java linenums">package com.myapp.menu;
+
+import com.myapp.common.models.FoodItem;
+import com.myapp.item.ItemRepository;
+
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Repository مدیریت منوی رستوران‌ها
+ * 
+ * این کلاس یک wrapper حول ItemRepository است که عملیات مخصوص منو را فراهم می‌کند:
+ * - مدیریت آیتم‌های منوی رستوران
+ * - دسته‌بندی آیتم‌های غذایی
+ * - مدیریت موجودی و در دسترس بودن
+ * - جستجو و فیلتر آیتم‌های منو
+ * - آمار و گزارش‌گیری از منو
+ * 
+ * این کلاس به جای اتصال مستقیم به دیتابیس، از ItemRepository استفاده می‌کند
+ * تا عملیات مربوط به منو را به شکل مفهومی و منطقی ارائه دهد.
+ * 
+ * Pattern های استفاده شده:
+ * - Repository Pattern: انتزاع لایه دسترسی داده
+ * - Facade Pattern: ساده‌سازی رابط با ItemRepository
+ * - Delegation Pattern: واگذاری عملیات به ItemRepository
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+public class MenuRepository {
+    
+    /** Repository آیتم‌های غذایی */
+    private final ItemRepository itemRepository;
+    
+    /**
+     * سازنده پیش‌فرض
+     * ItemRepository را به صورت خودکار ایجاد می‌کند
+     */
+<span class="fc" id="L40">    public MenuRepository() {</span>
+<span class="fc" id="L41">        this.itemRepository = new ItemRepository();</span>
+<span class="fc" id="L42">    }</span>
+    
+    /**
+     * سازنده برای dependency injection
+     * 
+     * @param itemRepository repository آیتم‌های غذایی تزریق شده
+     */
+<span class="fc" id="L49">    public MenuRepository(ItemRepository itemRepository) {</span>
+<span class="fc" id="L50">        this.itemRepository = itemRepository;</span>
+<span class="fc" id="L51">    }</span>
+    
+    /**
+     * افزودن آیتم جدید به منوی رستوران
+     * 
+     * @param foodItem آیتم غذایی جدید
+     * @return آیتم ذخیره شده با ID تولید شده
+     */
+    public FoodItem addMenuItem(FoodItem foodItem) {
+<span class="fc" id="L60">        return itemRepository.saveNew(foodItem);</span>
+    }
+    
+    /**
+     * به‌روزرسانی آیتم موجود در منو
+     * 
+     * @param foodItem آیتم غذایی برای به‌روزرسانی
+     * @return آیتم به‌روزرسانی شده
+     */
+    public FoodItem updateMenuItem(FoodItem foodItem) {
+<span class="fc" id="L70">        return itemRepository.save(foodItem);</span>
+    }
+    
+    /**
+     * دریافت منوی کامل یک رستوران
+     * 
+     * شامل تمام آیتم‌ها، در دسترس و غیر قابل دسترس
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست کامل آیتم‌های منو
+     */
+    public List&lt;FoodItem&gt; getMenuByRestaurant(Long restaurantId) {
+<span class="fc" id="L82">        return itemRepository.findByRestaurant(restaurantId);</span>
+    }
+    
+    /**
+     * دریافت آیتم‌های در دسترس منوی رستوران
+     * 
+     * فقط آیتم‌هایی که available=true و quantity&gt;0 هستند
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست آیتم‌های قابل سفارش
+     */
+    public List&lt;FoodItem&gt; getAvailableMenuByRestaurant(Long restaurantId) {
+<span class="fc" id="L94">        return itemRepository.findAvailableByRestaurant(restaurantId);</span>
+    }
+    
+    /**
+     * دریافت آیتم‌های منو بر اساس دسته‌بندی
+     * 
+     * @param restaurantId شناسه رستوران
+     * @param category دسته‌بندی (مثل پیتزا، برگر، نوشیدنی)
+     * @return لیست آیتم‌های یک دسته خاص
+     */
+    public List&lt;FoodItem&gt; getMenuByCategory(Long restaurantId, String category) {
+<span class="fc" id="L105">        return itemRepository.findByRestaurantAndCategory(restaurantId, category);</span>
+    }
+    
+    /**
+     * جستجوی آیتم‌های منو بر اساس کلیدواژه
+     * 
+     * در نام و توضیحات آیتم‌ها جستجو می‌کند
+     * 
+     * @param keyword کلیدواژه جستجو
+     * @return لیست آیتم‌های مطابق
+     */
+    public List&lt;FoodItem&gt; searchMenu(String keyword) {
+<span class="fc" id="L117">        return itemRepository.searchByKeyword(keyword);</span>
+    }
+    
+    /**
+     * دریافت آیتم منو بر اساس شناسه
+     * 
+     * @param itemId شناسه آیتم
+     * @return Optional حاوی آیتم یا خالی
+     */
+    public Optional&lt;FoodItem&gt; getMenuItem(Long itemId) {
+<span class="fc" id="L127">        return itemRepository.findById(itemId);</span>
+    }
+    
+    /**
+     * حذف آیتم از منو
+     * 
+     * این عمل آیتم را کاملاً از دیتابیس حذف می‌کند
+     * 
+     * @param itemId شناسه آیتم برای حذف
+     */
+    public void removeMenuItem(Long itemId) {
+<span class="fc" id="L138">        itemRepository.delete(itemId);</span>
+<span class="fc" id="L139">    }</span>
+    
+    /**
+     * به‌روزرسانی وضعیت در دسترس بودن آیتم
+     * 
+     * @param itemId شناسه آیتم
+     * @param available وضعیت جدید در دسترس بودن
+     */
+    public void updateItemAvailability(Long itemId, boolean available) {
+<span class="fc" id="L148">        itemRepository.updateAvailability(itemId, available);</span>
+<span class="fc" id="L149">    }</span>
+    
+    /**
+     * به‌روزرسانی موجودی آیتم
+     * 
+     * @param itemId شناسه آیتم
+     * @param quantity موجودی جدید
+     */
+    public void updateItemQuantity(Long itemId, Integer quantity) {
+<span class="fc" id="L158">        itemRepository.updateQuantity(itemId, quantity);</span>
+<span class="fc" id="L159">    }</span>
+    
+    /**
+     * بررسی داشتن آیتم در منوی رستوران
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return true اگر رستوران آیتم منو داشته باشد
+     */
+    public boolean hasMenuItems(Long restaurantId) {
+<span class="fc bfc" id="L168" title="All 2 branches covered.">        return !getMenuByRestaurant(restaurantId).isEmpty();</span>
+    }
+    
+    /**
+     * شمارش آیتم‌های در دسترس رستوران
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return تعداد آیتم‌های قابل سفارش
+     */
+    public long getAvailableItemCount(Long restaurantId) {
+<span class="fc" id="L178">        return getAvailableMenuByRestaurant(restaurantId).size();</span>
+    }
+    
+    /**
+     * دریافت تمام دسته‌بندی‌های منوی رستوران
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست دسته‌بندی‌های منحصر به فرد
+     */
+    public List&lt;String&gt; getCategories(Long restaurantId) {
+<span class="fc" id="L188">        return itemRepository.getCategoriesByRestaurant(restaurantId);</span>
+    }
+    
+    /**
+     * دریافت آیتم‌های کم موجودی رستوران
+     * 
+     * @param restaurantId شناسه رستوران
+     * @param threshold آستانه کم موجودی
+     * @return لیست آیتم‌های با موجودی پایین‌تر از آستانه
+     */
+    public List&lt;FoodItem&gt; getLowStockItems(Long restaurantId, int threshold) {
+<span class="fc" id="L199">        return itemRepository.findLowStockByRestaurant(restaurantId, threshold);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

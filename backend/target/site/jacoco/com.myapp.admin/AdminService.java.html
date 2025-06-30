@@ -1,0 +1,678 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.admin</a> &gt; <span class="el_source">AdminService.java</span></div><h1>AdminService.java</h1><pre class="source lang-java linenums">package com.myapp.admin;
+
+import com.myapp.auth.AuthRepository;
+import com.myapp.common.exceptions.NotFoundException;
+import com.myapp.common.models.*;
+import com.myapp.courier.DeliveryRepository;
+import com.myapp.order.OrderRepository;
+import com.myapp.payment.PaymentRepository;
+import com.myapp.restaurant.RestaurantRepository;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Service لایه منطق کسب‌وکار برای عملیات پنل مدیریت (Admin Dashboard)
+ * 
+ * این کلاس تمام منطق کسب‌وکار مربوط به مدیریت سیستم سفارش غذا را پیاده‌سازی می‌کند:
+ * 
+ * === مدیریت کاربران (User Management) ===
+ * - getAllUsers(): دریافت کاربران با pagination و فیلتر
+ * - countUsers(): شمارش کاربران با فیلتر
+ * - getUserById(): دریافت کاربر بر اساس شناسه
+ * - getUserStatsByRole(): آمار کاربران بر اساس نقش
+ * - updateUserStatus(): فعال/غیرفعال کردن کاربر
+ * 
+ * === مدیریت رستوران‌ها (Restaurant Management) ===
+ * - getAllRestaurants(): دریافت رستوران‌ها با pagination و فیلتر
+ * - countRestaurants(): شمارش رستوران‌ها
+ * - getRestaurantById(): دریافت رستوران بر اساس شناسه
+ * - getRestaurantStatsByStatus(): آمار رستوران‌ها
+ * - updateRestaurantStatus(): تایید/رد/تعلیق رستوران
+ * 
+ * === مدیریت سفارشات (Order Management) ===
+ * - getAllOrders(): دریافت سفارشات با فیلترهای پیشرفته
+ * - countOrders(): شمارش سفارشات
+ * - getOrderById(): دریافت سفارش بر اساس شناسه
+ * - getOrderStatsByStatus(): آمار سفارشات
+ * - updateOrderStatus(): تغییر وضعیت سفارش (admin override)
+ * 
+ * === مدیریت تراکنش‌ها (Transaction Management) ===
+ * - getAllTransactions(): دریافت تراکنش‌ها با فیلتر
+ * - countTransactions(): شمارش تراکنش‌ها
+ * - getTransactionById(): دریافت تراکنش بر اساس شناسه
+ * 
+ * === مدیریت تحویل (Delivery Management) ===
+ * - getAllDeliveries(): دریافت تحویل‌ها با فیلتر
+ * - countDeliveries(): شمارش تحویل‌ها
+ * - getDeliveryById(): دریافت تحویل بر اساس شناسه
+ * 
+ * === آمار سیستم (System Statistics) ===
+ * - getSystemStatistics(): دریافت آمار کلی سیستم
+ * - getDailyStatistics(): دریافت آمار روزانه
+ * 
+ * === مدیریت مجوزها (Permission Management) ===
+ * - verifyAdminPermissions(): تایید مجوزهای مدیریتی
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Business Logic Validation: اعتبارسنجی منطق کسب‌وکار
+ * - Permission Checks: بررسی مجوزهای دسترسی
+ * - Data Validation: اعتبارسنجی ورودی‌ها
+ * - Error Handling: مدیریت خطاها
+ * - Pagination Logic: منطق صفحه‌بندی
+ * - Enum Conversion: تبدیل string به enum
+ * - Security Enforcement: اجرای امنیت
+ * - Admin Privilege Verification: تایید مجوزهای ادمین
+ * - Business Rules: اجرای قوانین کسب‌وکار
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+public class AdminService {
+    
+    /** Repository لایه دسترسی داده مدیریت */
+    private final AdminRepository adminRepository;
+    /** Repository لایه دسترسی داده کاربران */
+    private final AuthRepository authRepository;
+    /** Repository لایه دسترسی داده رستوران‌ها */
+    private final RestaurantRepository restaurantRepository;
+    /** Repository لایه دسترسی داده سفارشات */
+    private final OrderRepository orderRepository;
+    /** Repository لایه دسترسی داده پرداخت‌ها */
+    private final PaymentRepository paymentRepository;
+    /** Repository لایه دسترسی داده تحویل‌ها */
+    private final DeliveryRepository deliveryRepository;
+    
+    /**
+     * سازنده با تزریق وابستگی‌ها
+     * 
+     * @param adminRepository repository مدیریت
+     * @param authRepository repository کاربران
+     * @param restaurantRepository repository رستوران‌ها
+     * @param orderRepository repository سفارشات
+     * @param paymentRepository repository پرداخت‌ها
+     * @param deliveryRepository repository تحویل‌ها
+     */
+    public AdminService(AdminRepository adminRepository, AuthRepository authRepository,
+                       RestaurantRepository restaurantRepository, OrderRepository orderRepository,
+<span class="fc" id="L99">                       PaymentRepository paymentRepository, DeliveryRepository deliveryRepository) {</span>
+<span class="fc" id="L100">        this.adminRepository = adminRepository;</span>
+<span class="fc" id="L101">        this.authRepository = authRepository;</span>
+<span class="fc" id="L102">        this.restaurantRepository = restaurantRepository;</span>
+<span class="fc" id="L103">        this.orderRepository = orderRepository;</span>
+<span class="fc" id="L104">        this.paymentRepository = paymentRepository;</span>
+<span class="fc" id="L105">        this.deliveryRepository = deliveryRepository;</span>
+<span class="fc" id="L106">    }</span>
+
+    // ==================== مدیریت کاربران (USER MANAGEMENT) ====================
+    
+    /**
+     * دریافت تمام کاربران با pagination و فیلتر
+     * 
+     * شامل اعتبارسنجی پارامترها و محدودیت‌های امنیتی
+     * 
+     * @param searchTerm عبارت جستجو (اختیاری)
+     * @param role نقش کاربر برای فیلتر (اختیاری)
+     * @param page شماره صفحه (شروع از 0)
+     * @param size تعداد رکوردها در صفحه
+     * @return لیست کاربران با pagination
+     * @throws IllegalArgumentException در صورت نقش نامعتبر
+     */
+    public List&lt;User&gt; getAllUsers(String searchTerm, String role, int page, int size) {
+        // اعتبارسنجی و تنظیم پارامترها
+<span class="fc bfc" id="L124" title="All 2 branches covered.">        if (page &lt; 0) page = 0;</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">        if (size &lt;= 0) size = 20;</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">        if (size &gt; 100) size = 100; // محدودیت حداکثر اندازه صفحه برای بهبود عملکرد</span>
+        
+        // تبدیل string به enum
+<span class="fc" id="L129">        User.Role roleEnum = null;</span>
+<span class="pc bpc" id="L130" title="1 of 4 branches missed.">        if (role != null &amp;&amp; !role.trim().isEmpty()) {</span>
+            try {
+<span class="fc" id="L132">                roleEnum = User.Role.valueOf(role.toUpperCase());</span>
+<span class="fc" id="L133">            } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L134">                throw new IllegalArgumentException(&quot;Invalid role: &quot; + role);</span>
+<span class="fc" id="L135">            }</span>
+        }
+        
+<span class="fc" id="L138">        int offset = page * size;</span>
+<span class="fc" id="L139">        return adminRepository.getAllUsers(searchTerm, roleEnum, size, offset);</span>
+    }
+    
+    /**
+     * شمارش کاربران با فیلتر
+     * 
+     * برای محاسبه pagination و نمایش آمار
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param role نقش کاربر
+     * @return تعداد کل کاربران
+     * @throws IllegalArgumentException در صورت نقش نامعتبر
+     */
+    public Long countUsers(String searchTerm, String role) {
+<span class="fc" id="L153">        User.Role roleEnum = null;</span>
+<span class="pc bpc" id="L154" title="2 of 4 branches missed.">        if (role != null &amp;&amp; !role.trim().isEmpty()) {</span>
+            try {
+<span class="fc" id="L156">                roleEnum = User.Role.valueOf(role.toUpperCase());</span>
+<span class="nc" id="L157">            } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L158">                throw new IllegalArgumentException(&quot;Invalid role: &quot; + role);</span>
+<span class="fc" id="L159">            }</span>
+        }
+        
+<span class="fc" id="L162">        return adminRepository.countUsers(searchTerm, roleEnum);</span>
+    }
+    
+    /**
+     * دریافت کاربر بر اساس شناسه
+     * 
+     * @param userId شناسه کاربر
+     * @return کاربر یافت شده
+     * @throws IllegalArgumentException در صورت شناسه نامعتبر
+     * @throws NotFoundException در صورت عدم وجود کاربر
+     */
+    public User getUserById(Long userId) {
+<span class="fc bfc" id="L174" title="All 4 branches covered.">        if (userId == null || userId &lt;= 0) {</span>
+<span class="fc" id="L175">            throw new IllegalArgumentException(&quot;User ID must be positive&quot;);</span>
+        }
+        
+<span class="fc" id="L178">        return authRepository.findById(userId)</span>
+<span class="fc" id="L179">            .orElseThrow(() -&gt; new NotFoundException(&quot;User&quot;, userId));</span>
+    }
+    
+    /**
+     * دریافت آمار کاربران بر اساس نقش
+     * 
+     * برای نمایش نمودار توزیع نقش‌ها در dashboard
+     * 
+     * @return Map حاوی تعداد کاربران هر نقش
+     */
+    public Map&lt;User.Role, Long&gt; getUserStatsByRole() {
+<span class="fc" id="L190">        return adminRepository.getUserStatsByRole();</span>
+    }
+    
+    /**
+     * فعال/غیرفعال کردن کاربر
+     * 
+     * قوانین کسب‌وکار:
+     * - فقط ادمین‌ها می‌توانند وضعیت کاربران را تغییر دهند
+     * - نمی‌توان وضعیت ادمین‌های دیگر را تغییر داد
+     * 
+     * @param userId شناسه کاربر هدف
+     * @param isActive وضعیت جدید (فعال/غیرفعال)
+     * @param adminId شناسه مدیر درخواست‌کننده
+     * @throws IllegalArgumentException در صورت پارامترهای نامعتبر یا عدم مجوز
+     * @throws NotFoundException در صورت عدم وجود کاربر یا ادمین
+     */
+    public void updateUserStatus(Long userId, boolean isActive, Long adminId) {
+<span class="pc bpc" id="L207" title="1 of 4 branches missed.">        if (userId == null || userId &lt;= 0) {</span>
+<span class="fc" id="L208">            throw new IllegalArgumentException(&quot;User ID must be positive&quot;);</span>
+        }
+<span class="fc bfc" id="L210" title="All 4 branches covered.">        if (adminId == null || adminId &lt;= 0) {</span>
+<span class="fc" id="L211">            throw new IllegalArgumentException(&quot;Admin ID must be positive&quot;);</span>
+        }
+        
+        // تایید وجود کاربر
+<span class="fc" id="L215">        User user = authRepository.findById(userId)</span>
+<span class="pc" id="L216">            .orElseThrow(() -&gt; new NotFoundException(&quot;User&quot;, userId));</span>
+        
+        // تایید وجود ادمین و بررسی نقش
+<span class="fc" id="L219">        User admin = authRepository.findById(adminId)</span>
+<span class="pc" id="L220">            .orElseThrow(() -&gt; new NotFoundException(&quot;Admin&quot;, adminId));</span>
+        
+<span class="fc bfc" id="L222" title="All 2 branches covered.">        if (admin.getRole() != User.Role.ADMIN) {</span>
+<span class="fc" id="L223">            throw new IllegalArgumentException(&quot;Only admins can update user status&quot;);</span>
+        }
+        
+        // نمی‌توان وضعیت ادمین دیگر را تغییر داد
+<span class="fc bfc" id="L227" title="All 2 branches covered.">        if (user.getRole() == User.Role.ADMIN) {</span>
+<span class="fc" id="L228">            throw new IllegalArgumentException(&quot;Cannot modify admin user status&quot;);</span>
+        }
+        
+<span class="fc" id="L231">        adminRepository.updateUserStatus(userId, isActive);</span>
+<span class="fc" id="L232">    }</span>
+
+    // ==================== مدیریت رستوران‌ها (RESTAURANT MANAGEMENT) ====================
+    
+    /**
+     * دریافت تمام رستوران‌ها با pagination و فیلتر
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت رستوران
+     * @param page شماره صفحه
+     * @param size اندازه صفحه
+     * @return لیست رستوران‌ها
+     * @throws IllegalArgumentException در صورت وضعیت نامعتبر
+     */
+    public List&lt;Restaurant&gt; getAllRestaurants(String searchTerm, String status, int page, int size) {
+<span class="pc bpc" id="L247" title="1 of 2 branches missed.">        if (page &lt; 0) page = 0;</span>
+<span class="pc bpc" id="L248" title="1 of 2 branches missed.">        if (size &lt;= 0) size = 20;</span>
+<span class="pc bpc" id="L249" title="1 of 2 branches missed.">        if (size &gt; 100) size = 100;</span>
+        
+<span class="fc" id="L251">        RestaurantStatus statusEnum = null;</span>
+<span class="pc bpc" id="L252" title="2 of 4 branches missed.">        if (status != null &amp;&amp; !status.trim().isEmpty()) {</span>
+            try {
+<span class="fc" id="L254">                statusEnum = RestaurantStatus.valueOf(status.toUpperCase());</span>
+<span class="fc" id="L255">            } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L256">                throw new IllegalArgumentException(&quot;Invalid restaurant status: &quot; + status);</span>
+<span class="fc" id="L257">            }</span>
+        }
+        
+<span class="fc" id="L260">        int offset = page * size;</span>
+<span class="fc" id="L261">        return adminRepository.getAllRestaurants(searchTerm, statusEnum, size, offset);</span>
+    }
+    
+    /**
+     * شمارش رستوران‌ها با فیلتر
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت رستوران
+     * @return تعداد کل رستوران‌ها
+     * @throws IllegalArgumentException در صورت وضعیت نامعتبر
+     */
+    public Long countRestaurants(String searchTerm, String status) {
+<span class="fc" id="L273">        RestaurantStatus statusEnum = null;</span>
+<span class="pc bpc" id="L274" title="2 of 4 branches missed.">        if (status != null &amp;&amp; !status.trim().isEmpty()) {</span>
+            try {
+<span class="fc" id="L276">                statusEnum = RestaurantStatus.valueOf(status.toUpperCase());</span>
+<span class="nc" id="L277">            } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L278">                throw new IllegalArgumentException(&quot;Invalid restaurant status: &quot; + status);</span>
+<span class="fc" id="L279">            }</span>
+        }
+        
+<span class="fc" id="L282">        return adminRepository.countRestaurants(searchTerm, statusEnum);</span>
+    }
+    
+    /**
+     * دریافت رستوران بر اساس شناسه
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return رستوران یافت شده
+     * @throws IllegalArgumentException در صورت شناسه نامعتبر
+     * @throws NotFoundException در صورت عدم وجود رستوران
+     */
+    public Restaurant getRestaurantById(Long restaurantId) {
+<span class="fc bfc" id="L294" title="All 4 branches covered.">        if (restaurantId == null || restaurantId &lt;= 0) {</span>
+<span class="fc" id="L295">            throw new IllegalArgumentException(&quot;Restaurant ID must be positive&quot;);</span>
+        }
+        
+<span class="fc" id="L298">        return restaurantRepository.findById(restaurantId)</span>
+<span class="pc" id="L299">            .orElseThrow(() -&gt; new NotFoundException(&quot;Restaurant&quot;, restaurantId));</span>
+    }
+    
+    /**
+     * دریافت آمار رستوران‌ها بر اساس وضعیت
+     * 
+     * @return Map حاوی تعداد رستوران‌های هر وضعیت
+     */
+    public Map&lt;RestaurantStatus, Long&gt; getRestaurantStatsByStatus() {
+<span class="fc" id="L308">        return adminRepository.getRestaurantStatsByStatus();</span>
+    }
+    
+    /**
+     * تغییر وضعیت رستوران (تایید/رد/تعلیق)
+     * 
+     * فقط ادمین‌ها می‌توانند وضعیت رستوران‌ها را تغییر دهند
+     * 
+     * @param restaurantId شناسه رستوران
+     * @param status وضعیت جدید
+     * @param adminId شناسه مدیر
+     * @throws IllegalArgumentException در صورت پارامترهای نامعتبر یا عدم مجوز
+     * @throws NotFoundException در صورت عدم وجود رستوران یا ادمین
+     */
+    public void updateRestaurantStatus(Long restaurantId, RestaurantStatus status, Long adminId) {
+<span class="pc bpc" id="L323" title="1 of 4 branches missed.">        if (restaurantId == null || restaurantId &lt;= 0) {</span>
+<span class="fc" id="L324">            throw new IllegalArgumentException(&quot;Restaurant ID must be positive&quot;);</span>
+        }
+<span class="fc bfc" id="L326" title="All 2 branches covered.">        if (status == null) {</span>
+<span class="fc" id="L327">            throw new IllegalArgumentException(&quot;Restaurant status cannot be null&quot;);</span>
+        }
+<span class="pc bpc" id="L329" title="2 of 4 branches missed.">        if (adminId == null || adminId &lt;= 0) {</span>
+<span class="nc" id="L330">            throw new IllegalArgumentException(&quot;Admin ID must be positive&quot;);</span>
+        }
+        
+        // تایید وجود رستوران
+<span class="fc" id="L334">        Restaurant restaurant = restaurantRepository.findById(restaurantId)</span>
+<span class="pc" id="L335">            .orElseThrow(() -&gt; new NotFoundException(&quot;Restaurant&quot;, restaurantId));</span>
+        
+        // تایید وجود ادمین و بررسی نقش
+<span class="fc" id="L338">        User admin = authRepository.findById(adminId)</span>
+<span class="pc" id="L339">            .orElseThrow(() -&gt; new NotFoundException(&quot;Admin&quot;, adminId));</span>
+        
+<span class="fc bfc" id="L341" title="All 2 branches covered.">        if (admin.getRole() != User.Role.ADMIN) {</span>
+<span class="fc" id="L342">            throw new IllegalArgumentException(&quot;Only admins can update restaurant status&quot;);</span>
+        }
+        
+        // تغییر وضعیت رستوران
+<span class="fc" id="L346">        restaurant.setStatus(status);</span>
+<span class="fc" id="L347">        restaurantRepository.update(restaurant);</span>
+<span class="fc" id="L348">    }</span>
+
+    // ==================== مدیریت سفارشات (ORDER MANAGEMENT) ====================
+    
+    /**
+     * دریافت تمام سفارشات با pagination و فیلترهای پیشرفته
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت سفارش
+     * @param customerId شناسه مشتری (اختیاری)
+     * @param restaurantId شناسه رستوران (اختیاری)
+     * @param page شماره صفحه
+     * @param size اندازه صفحه
+     * @return لیست سفارشات
+     * @throws IllegalArgumentException در صورت وضعیت نامعتبر
+     */
+    public List&lt;Order&gt; getAllOrders(String searchTerm, String status, Long customerId, Long restaurantId, int page, int size) {
+<span class="pc bpc" id="L365" title="1 of 2 branches missed.">        if (page &lt; 0) page = 0;</span>
+<span class="pc bpc" id="L366" title="1 of 2 branches missed.">        if (size &lt;= 0) size = 20;</span>
+<span class="pc bpc" id="L367" title="1 of 2 branches missed.">        if (size &gt; 100) size = 100;</span>
+        
+<span class="fc" id="L369">        OrderStatus statusEnum = null;</span>
+<span class="pc bpc" id="L370" title="2 of 4 branches missed.">        if (status != null &amp;&amp; !status.trim().isEmpty()) {</span>
+            try {
+<span class="fc" id="L372">                statusEnum = OrderStatus.valueOf(status.toUpperCase());</span>
+<span class="fc" id="L373">            } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L374">                throw new IllegalArgumentException(&quot;Invalid order status: &quot; + status);</span>
+<span class="fc" id="L375">            }</span>
+        }
+        
+<span class="fc" id="L378">        int offset = page * size;</span>
+<span class="fc" id="L379">        return adminRepository.getAllOrders(searchTerm, statusEnum, customerId, restaurantId, size, offset);</span>
+    }
+    
+    /**
+     * شمارش سفارشات با فیلتر
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت سفارش
+     * @param customerId شناسه مشتری
+     * @param restaurantId شناسه رستوران
+     * @return تعداد کل سفارشات
+     * @throws IllegalArgumentException در صورت وضعیت نامعتبر
+     */
+    public Long countOrders(String searchTerm, String status, Long customerId, Long restaurantId) {
+<span class="fc" id="L393">        OrderStatus statusEnum = null;</span>
+<span class="pc bpc" id="L394" title="2 of 4 branches missed.">        if (status != null &amp;&amp; !status.trim().isEmpty()) {</span>
+            try {
+<span class="fc" id="L396">                statusEnum = OrderStatus.valueOf(status.toUpperCase());</span>
+<span class="nc" id="L397">            } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L398">                throw new IllegalArgumentException(&quot;Invalid order status: &quot; + status);</span>
+<span class="fc" id="L399">            }</span>
+        }
+        
+<span class="fc" id="L402">        return adminRepository.countOrders(searchTerm, statusEnum, customerId, restaurantId);</span>
+    }
+    
+    /**
+     * دریافت سفارش بر اساس شناسه
+     * 
+     * @param orderId شناسه سفارش
+     * @return سفارش یافت شده
+     * @throws IllegalArgumentException در صورت شناسه نامعتبر
+     * @throws NotFoundException در صورت عدم وجود سفارش
+     */
+    public Order getOrderById(Long orderId) {
+<span class="fc bfc" id="L414" title="All 4 branches covered.">        if (orderId == null || orderId &lt;= 0) {</span>
+<span class="fc" id="L415">            throw new IllegalArgumentException(&quot;Order ID must be positive&quot;);</span>
+        }
+        
+<span class="fc" id="L418">        return orderRepository.findById(orderId)</span>
+<span class="pc" id="L419">            .orElseThrow(() -&gt; new NotFoundException(&quot;Order&quot;, orderId));</span>
+    }
+    
+    /**
+     * دریافت آمار سفارشات بر اساس وضعیت
+     * 
+     * @return Map حاوی تعداد سفارشات هر وضعیت
+     */
+    public Map&lt;OrderStatus, Long&gt; getOrderStatsByStatus() {
+<span class="fc" id="L428">        return adminRepository.getOrderStatsByStatus();</span>
+    }
+    
+    /**
+     * تغییر وضعیت سفارش (admin override)
+     * 
+     * ادمین‌ها می‌توانند وضعیت سفارشات را در موارد ضروری تغییر دهند
+     * 
+     * @param orderId شناسه سفارش
+     * @param status وضعیت جدید
+     * @param adminId شناسه مدیر
+     * @throws IllegalArgumentException در صورت پارامترهای نامعتبر یا عدم مجوز
+     * @throws NotFoundException در صورت عدم وجود سفارش یا ادمین
+     */
+    public void updateOrderStatus(Long orderId, OrderStatus status, Long adminId) {
+<span class="pc bpc" id="L443" title="1 of 4 branches missed.">        if (orderId == null || orderId &lt;= 0) {</span>
+<span class="fc" id="L444">            throw new IllegalArgumentException(&quot;Order ID must be positive&quot;);</span>
+        }
+<span class="fc bfc" id="L446" title="All 2 branches covered.">        if (status == null) {</span>
+<span class="fc" id="L447">            throw new IllegalArgumentException(&quot;Order status cannot be null&quot;);</span>
+        }
+<span class="pc bpc" id="L449" title="2 of 4 branches missed.">        if (adminId == null || adminId &lt;= 0) {</span>
+<span class="nc" id="L450">            throw new IllegalArgumentException(&quot;Admin ID must be positive&quot;);</span>
+        }
+        
+        // تایید وجود سفارش
+<span class="fc" id="L454">        Order order = orderRepository.findById(orderId)</span>
+<span class="pc" id="L455">            .orElseThrow(() -&gt; new NotFoundException(&quot;Order&quot;, orderId));</span>
+        
+        // تایید وجود ادمین و بررسی نقش
+<span class="fc" id="L458">        User admin = authRepository.findById(adminId)</span>
+<span class="pc" id="L459">            .orElseThrow(() -&gt; new NotFoundException(&quot;Admin&quot;, adminId));</span>
+        
+<span class="pc bpc" id="L461" title="1 of 2 branches missed.">        if (admin.getRole() != User.Role.ADMIN) {</span>
+<span class="nc" id="L462">            throw new IllegalArgumentException(&quot;Only admins can override order status&quot;);</span>
+        }
+        
+        // تغییر وضعیت سفارش
+<span class="fc" id="L466">        order.setStatus(status);</span>
+<span class="fc" id="L467">        orderRepository.update(order);</span>
+<span class="fc" id="L468">    }</span>
+
+    // ==================== مدیریت تراکنش‌ها (TRANSACTION MANAGEMENT) ====================
+    
+    /**
+     * دریافت تمام تراکنش‌ها با pagination و فیلتر
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت تراکنش
+     * @param type نوع تراکنش
+     * @param userId شناسه کاربر
+     * @param page شماره صفحه
+     * @param size اندازه صفحه
+     * @return لیست تراکنش‌ها
+     * @throws IllegalArgumentException در صورت وضعیت یا نوع نامعتبر
+     */
+    public List&lt;Transaction&gt; getAllTransactions(String searchTerm, String status, String type, Long userId, int page, int size) {
+<span class="pc bpc" id="L485" title="1 of 2 branches missed.">        if (page &lt; 0) page = 0;</span>
+<span class="pc bpc" id="L486" title="1 of 2 branches missed.">        if (size &lt;= 0) size = 20;</span>
+<span class="pc bpc" id="L487" title="1 of 2 branches missed.">        if (size &gt; 100) size = 100;</span>
+        
+<span class="fc" id="L489">        TransactionStatus statusEnum = null;</span>
+<span class="pc bpc" id="L490" title="1 of 4 branches missed.">        if (status != null &amp;&amp; !status.trim().isEmpty()) {</span>
+            try {
+<span class="fc" id="L492">                statusEnum = TransactionStatus.valueOf(status.toUpperCase());</span>
+<span class="fc" id="L493">            } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L494">                throw new IllegalArgumentException(&quot;Invalid transaction status: &quot; + status);</span>
+<span class="fc" id="L495">            }</span>
+        }
+        
+<span class="fc" id="L498">        TransactionType typeEnum = null;</span>
+<span class="pc bpc" id="L499" title="2 of 4 branches missed.">        if (type != null &amp;&amp; !type.trim().isEmpty()) {</span>
+            try {
+<span class="fc" id="L501">                typeEnum = TransactionType.valueOf(type.toUpperCase());</span>
+<span class="fc" id="L502">            } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L503">                throw new IllegalArgumentException(&quot;Invalid transaction type: &quot; + type);</span>
+<span class="fc" id="L504">            }</span>
+        }
+        
+<span class="fc" id="L507">        int offset = page * size;</span>
+<span class="fc" id="L508">        return adminRepository.getAllTransactions(searchTerm, statusEnum, typeEnum, userId, size, offset);</span>
+    }
+    
+    /**
+     * شمارش تراکنش‌ها با فیلتر
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت تراکنش
+     * @param type نوع تراکنش
+     * @param userId شناسه کاربر
+     * @return تعداد کل تراکنش‌ها
+     * @throws IllegalArgumentException در صورت وضعیت یا نوع نامعتبر
+     */
+    public Long countTransactions(String searchTerm, String status, String type, Long userId) {
+<span class="fc" id="L522">        TransactionStatus statusEnum = null;</span>
+<span class="pc bpc" id="L523" title="2 of 4 branches missed.">        if (status != null &amp;&amp; !status.trim().isEmpty()) {</span>
+            try {
+<span class="fc" id="L525">                statusEnum = TransactionStatus.valueOf(status.toUpperCase());</span>
+<span class="nc" id="L526">            } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L527">                throw new IllegalArgumentException(&quot;Invalid transaction status: &quot; + status);</span>
+<span class="fc" id="L528">            }</span>
+        }
+        
+<span class="fc" id="L531">        TransactionType typeEnum = null;</span>
+<span class="pc bpc" id="L532" title="2 of 4 branches missed.">        if (type != null &amp;&amp; !type.trim().isEmpty()) {</span>
+            try {
+<span class="fc" id="L534">                typeEnum = TransactionType.valueOf(type.toUpperCase());</span>
+<span class="nc" id="L535">            } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L536">                throw new IllegalArgumentException(&quot;Invalid transaction type: &quot; + type);</span>
+<span class="fc" id="L537">            }</span>
+        }
+        
+<span class="fc" id="L540">        return adminRepository.countTransactions(searchTerm, statusEnum, typeEnum, userId);</span>
+    }
+    
+    /**
+     * دریافت تراکنش بر اساس شناسه
+     * 
+     * @param transactionId شناسه تراکنش
+     * @return تراکنش یافت شده
+     * @throws IllegalArgumentException در صورت شناسه نامعتبر
+     * @throws NotFoundException در صورت عدم وجود تراکنش
+     */
+    public Transaction getTransactionById(Long transactionId) {
+<span class="fc bfc" id="L552" title="All 4 branches covered.">        if (transactionId == null || transactionId &lt;= 0) {</span>
+<span class="fc" id="L553">            throw new IllegalArgumentException(&quot;Transaction ID must be positive&quot;);</span>
+        }
+        
+<span class="fc" id="L556">        return paymentRepository.findById(transactionId)</span>
+<span class="pc" id="L557">            .orElseThrow(() -&gt; new NotFoundException(&quot;Transaction&quot;, transactionId));</span>
+    }
+
+    // ==================== مدیریت تحویل (DELIVERY MANAGEMENT) ====================
+    
+    /**
+     * دریافت تمام تحویل‌ها با pagination و فیلتر
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت تحویل
+     * @param courierId شناسه پیک
+     * @param page شماره صفحه
+     * @param size اندازه صفحه
+     * @return لیست تحویل‌ها
+     * @throws IllegalArgumentException در صورت وضعیت نامعتبر
+     */
+    public List&lt;Delivery&gt; getAllDeliveries(String searchTerm, String status, Long courierId, int page, int size) {
+<span class="pc bpc" id="L574" title="1 of 2 branches missed.">        if (page &lt; 0) page = 0;</span>
+<span class="pc bpc" id="L575" title="1 of 2 branches missed.">        if (size &lt;= 0) size = 20;</span>
+<span class="pc bpc" id="L576" title="1 of 2 branches missed.">        if (size &gt; 100) size = 100;</span>
+        
+<span class="fc" id="L578">        DeliveryStatus statusEnum = null;</span>
+<span class="pc bpc" id="L579" title="2 of 4 branches missed.">        if (status != null &amp;&amp; !status.trim().isEmpty()) {</span>
+            try {
+<span class="fc" id="L581">                statusEnum = DeliveryStatus.valueOf(status.toUpperCase());</span>
+<span class="fc" id="L582">            } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L583">                throw new IllegalArgumentException(&quot;Invalid delivery status: &quot; + status);</span>
+<span class="fc" id="L584">            }</span>
+        }
+        
+<span class="fc" id="L587">        int offset = page * size;</span>
+<span class="fc" id="L588">        return adminRepository.getAllDeliveries(searchTerm, statusEnum, courierId, size, offset);</span>
+    }
+    
+    /**
+     * شمارش تحویل‌ها با فیلتر
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت تحویل
+     * @param courierId شناسه پیک
+     * @return تعداد کل تحویل‌ها
+     * @throws IllegalArgumentException در صورت وضعیت نامعتبر
+     */
+    public Long countDeliveries(String searchTerm, String status, Long courierId) {
+<span class="fc" id="L601">        DeliveryStatus statusEnum = null;</span>
+<span class="pc bpc" id="L602" title="2 of 4 branches missed.">        if (status != null &amp;&amp; !status.trim().isEmpty()) {</span>
+            try {
+<span class="fc" id="L604">                statusEnum = DeliveryStatus.valueOf(status.toUpperCase());</span>
+<span class="nc" id="L605">            } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L606">                throw new IllegalArgumentException(&quot;Invalid delivery status: &quot; + status);</span>
+<span class="fc" id="L607">            }</span>
+        }
+        
+<span class="fc" id="L610">        return adminRepository.countDeliveries(searchTerm, statusEnum, courierId);</span>
+    }
+    
+    /**
+     * دریافت تحویل بر اساس شناسه
+     * 
+     * @param deliveryId شناسه تحویل
+     * @return تحویل یافت شده
+     * @throws IllegalArgumentException در صورت شناسه نامعتبر
+     * @throws NotFoundException در صورت عدم وجود تحویل
+     */
+    public Delivery getDeliveryById(Long deliveryId) {
+<span class="fc bfc" id="L622" title="All 4 branches covered.">        if (deliveryId == null || deliveryId &lt;= 0) {</span>
+<span class="fc" id="L623">            throw new IllegalArgumentException(&quot;Delivery ID must be positive&quot;);</span>
+        }
+        
+<span class="fc" id="L626">        return deliveryRepository.findById(deliveryId)</span>
+<span class="pc" id="L627">            .orElseThrow(() -&gt; new NotFoundException(&quot;Delivery&quot;, deliveryId));</span>
+    }
+
+    // ==================== آمار سیستم (SYSTEM STATISTICS) ====================
+    
+    /**
+     * دریافت آمار کلی سیستم
+     * 
+     * شامل تمام معیارهای کلیدی عملکرد سیستم
+     * 
+     * @return آمار کلی سیستم
+     */
+    public AdminRepository.SystemStatistics getSystemStatistics() {
+<span class="fc" id="L640">        return adminRepository.getSystemStatistics();</span>
+    }
+    
+    /**
+     * دریافت آمار روزانه برای چند روز گذشته
+     * 
+     * @param days تعداد روزهای گذشته (حداکثر 90 روز)
+     * @return لیست آمار روزانه
+     */
+    public List&lt;AdminRepository.DailyStatistics&gt; getDailyStatistics(int days) {
+<span class="fc bfc" id="L650" title="All 2 branches covered.">        if (days &lt;= 0) days = 7;</span>
+<span class="fc bfc" id="L651" title="All 2 branches covered.">        if (days &gt; 90) days = 90; // محدودیت به 90 روز</span>
+        
+<span class="fc" id="L653">        return adminRepository.getDailyStatistics(days);</span>
+    }
+    
+    /**
+     * تایید مجوزهای مدیریتی
+     * 
+     * بررسی اینکه کاربر دارای نقش ادمین است یا خیر
+     * 
+     * @param adminId شناسه کاربر
+     * @throws IllegalArgumentException در صورت شناسه نامعتبر یا عدم مجوز
+     * @throws NotFoundException در صورت عدم وجود کاربر
+     */
+    public void verifyAdminPermissions(Long adminId) {
+<span class="pc bpc" id="L666" title="2 of 4 branches missed.">        if (adminId == null || adminId &lt;= 0) {</span>
+<span class="nc" id="L667">            throw new IllegalArgumentException(&quot;Admin ID must be positive&quot;);</span>
+        }
+        
+<span class="fc" id="L670">        User admin = authRepository.findById(adminId)</span>
+<span class="pc" id="L671">            .orElseThrow(() -&gt; new NotFoundException(&quot;Admin&quot;, adminId));</span>
+        
+<span class="pc bpc" id="L673" title="1 of 2 branches missed.">        if (admin.getRole() != User.Role.ADMIN) {</span>
+<span class="nc" id="L674">            throw new IllegalArgumentException(&quot;Access denied: Admin privileges required&quot;);</span>
+        }
+<span class="fc" id="L676">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

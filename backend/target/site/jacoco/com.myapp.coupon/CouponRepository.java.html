@@ -1,0 +1,584 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CouponRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.coupon</a> &gt; <span class="el_source">CouponRepository.java</span></div><h1>CouponRepository.java</h1><pre class="source lang-java linenums">package com.myapp.coupon;
+
+import com.myapp.common.models.Coupon;
+import com.myapp.common.models.Restaurant;
+import com.myapp.common.utils.DatabaseUtil;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Repository لایه دسترسی داده برای entity های Coupon
+ * 
+ * این کلاس تمام عملیات پایگاه داده مربوط به مدیریت کوپن‌های تخفیف را ارائه می‌دهد:
+ * 
+ * === عملیات CRUD پایه ===
+ * - save(): ذخیره کوپن جدید
+ * - update(): به‌روزرسانی کوپن موجود
+ * - findById(): جستجو بر اساس شناسه
+ * - findByCode(): جستجو بر اساس کد کوپن
+ * - delete(): حذف کوپن
+ * - existsByCode(): بررسی وجود کد کوپن
+ * 
+ * === جستجوهای وضعیت ===
+ * - findActiveCoupons(): کوپن‌های فعال
+ * - findValidCoupons(): کوپن‌های معتبر (فعال + در بازه زمانی)
+ * - findExpiredCoupons(): کوپن‌های منقضی
+ * - findCouponsExpiringSoon(): کوپن‌های نزدیک به انقضا
+ * 
+ * === جستجوهای تخصصی ===
+ * - findByRestaurant(): کوپن‌های رستوران خاص
+ * - findGlobalCoupons(): کوپن‌های سراسری
+ * - findByType(): کوپن‌ها بر اساس نوع (درصد/مبلغ ثابت)
+ * - findByCreatedBy(): کوپن‌های ایجاد شده توسط کاربر خاص
+ * - findApplicableCoupons(): کوپن‌های قابل اعمال برای سفارش
+ * 
+ * === صفحه‌بندی و آمار ===
+ * - findWithPagination(): دریافت با صفحه‌بندی
+ * - findAll(): تمام کوپن‌ها
+ * - countAll(): تعداد کل کوپن‌ها
+ * - countActive(): تعداد کوپن‌های فعال
+ * 
+ * === مدیریت استفاده ===
+ * - incrementUsageCount(): افزایش تعداد استفاده
+ * - decrementUsageCount(): کاهش تعداد استفاده (برای استرداد)
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Complex Business Queries: queries پیچیده برای منطق کسب‌وکار
+ * - Date Range Validation: اعتبارسنجی بازه زمانی
+ * - Usage Tracking: ردیابی تعداد استفاده
+ * - Restaurant Scoping: پشتیبانی از کوپن‌های عمومی و اختصاصی
+ * - Transaction Management: مدیریت تراکنش‌ها
+ * - Error Handling: مدیریت خطاها با try-catch
+ * - Logging: ثبت تمام عملیات
+ * - HQL Queries: استفاده از Hibernate Query Language
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+<span class="nc" id="L66">public class CouponRepository {</span>
+    
+    /** Logger برای ثبت عملیات و خطاها */
+<span class="fc" id="L69">    private static final Logger logger = LoggerFactory.getLogger(CouponRepository.class);</span>
+    
+    // ==================== BASIC CRUD OPERATIONS ====================
+    
+    /**
+     * ذخیره کوپن جدید در پایگاه داده
+     * 
+     * @param coupon شیء کوپن برای ذخیره
+     * @return کوپن ذخیره شده با ID تخصیص داده شده
+     * @throws RuntimeException در صورت خطا در ذخیره‌سازی
+     */
+    public Coupon save(Coupon coupon) {
+<span class="nc" id="L81">        Transaction tx = null;</span>
+<span class="nc" id="L82">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L83">            tx = session.beginTransaction();</span>
+<span class="nc" id="L84">            session.save(coupon);</span>
+<span class="nc" id="L85">            tx.commit();</span>
+<span class="nc" id="L86">            logger.info(&quot;Saved new coupon with ID: {}&quot;, coupon.getId());</span>
+<span class="nc" id="L87">            return coupon;</span>
+<span class="nc" id="L88">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">            if (tx != null) tx.rollback();</span>
+<span class="nc" id="L90">            logger.error(&quot;Error saving coupon: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L91">            throw new RuntimeException(&quot;Failed to save coupon&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * به‌روزرسانی کوپن موجود
+     * 
+     * تاریخ updatedAt به صورت خودکار به‌روزرسانی می‌شود
+     * 
+     * @param coupon شیء کوپن برای به‌روزرسانی
+     * @return کوپن به‌روزرسانی شده
+     * @throws RuntimeException در صورت خطا در به‌روزرسانی
+     */
+    public Coupon update(Coupon coupon) {
+<span class="nc" id="L105">        Transaction tx = null;</span>
+<span class="nc" id="L106">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L107">            tx = session.beginTransaction();</span>
+<span class="nc" id="L108">            coupon.setUpdatedAt(LocalDateTime.now());</span>
+<span class="nc" id="L109">            session.update(coupon);</span>
+<span class="nc" id="L110">            tx.commit();</span>
+<span class="nc" id="L111">            logger.info(&quot;Updated coupon with ID: {}&quot;, coupon.getId());</span>
+<span class="nc" id="L112">            return coupon;</span>
+<span class="nc" id="L113">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">            if (tx != null) tx.rollback();</span>
+<span class="nc" id="L115">            logger.error(&quot;Error updating coupon: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L116">            throw new RuntimeException(&quot;Failed to update coupon&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * جستجوی کوپن بر اساس شناسه
+     * 
+     * @param id شناسه کوپن
+     * @return Optional حاوی کوپن یا empty در صورت عدم وجود
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public Optional&lt;Coupon&gt; findById(Long id) {
+<span class="nc" id="L128">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L129">            Coupon coupon = session.get(Coupon.class, id);</span>
+<span class="nc" id="L130">            return Optional.ofNullable(coupon);</span>
+<span class="nc" id="L131">        } catch (Exception e) {</span>
+<span class="nc" id="L132">            logger.error(&quot;Error finding coupon by ID {}: {}&quot;, id, e.getMessage());</span>
+<span class="nc" id="L133">            throw new RuntimeException(&quot;Failed to find coupon&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * جستجوی کوپن بر اساس کد کوپن
+     * 
+     * کد کوپن یکتا است و برای اعتبارسنجی استفاده می‌شود
+     * 
+     * @param code کد کوپن
+     * @return Optional حاوی کوپن یا empty در صورت عدم وجود
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public Optional&lt;Coupon&gt; findByCode(String code) {
+<span class="nc" id="L147">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L148">            Query&lt;Coupon&gt; query = session.createQuery(</span>
+                &quot;FROM Coupon c WHERE c.code = :code&quot;, Coupon.class);
+<span class="nc" id="L150">            query.setParameter(&quot;code&quot;, code);</span>
+<span class="nc" id="L151">            return query.uniqueResultOptional();</span>
+<span class="nc" id="L152">        } catch (Exception e) {</span>
+<span class="nc" id="L153">            logger.error(&quot;Error finding coupon by code {}: {}&quot;, code, e.getMessage());</span>
+<span class="nc" id="L154">            throw new RuntimeException(&quot;Failed to find coupon&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * بررسی وجود کد کوپن در سیستم
+     * 
+     * برای جلوگیری از ایجاد کد تکراری استفاده می‌شود
+     * 
+     * @param code کد کوپن برای بررسی
+     * @return true اگر کد وجود داشته باشد، false در غیر این صورت
+     * @throws RuntimeException در صورت خطا در بررسی
+     */
+    public boolean existsByCode(String code) {
+<span class="nc" id="L168">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L169">            Query&lt;Long&gt; query = session.createQuery(</span>
+                &quot;SELECT COUNT(c) FROM Coupon c WHERE c.code = :code&quot;, Long.class);
+<span class="nc" id="L171">            query.setParameter(&quot;code&quot;, code);</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">            return query.uniqueResult() &gt; 0;</span>
+<span class="nc" id="L173">        } catch (Exception e) {</span>
+<span class="nc" id="L174">            logger.error(&quot;Error checking coupon existence by code {}: {}&quot;, code, e.getMessage());</span>
+<span class="nc" id="L175">            throw new RuntimeException(&quot;Failed to check coupon existence&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * حذف کوپن بر اساس شناسه
+     * 
+     * @param id شناسه کوپن
+     * @return true در صورت حذف موفق، false در صورت عدم وجود
+     * @throws RuntimeException در صورت خطا در حذف
+     */
+    public boolean delete(Long id) {
+<span class="nc" id="L187">        Transaction tx = null;</span>
+<span class="nc" id="L188">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L189">            tx = session.beginTransaction();</span>
+<span class="nc" id="L190">            Coupon coupon = session.get(Coupon.class, id);</span>
+<span class="nc bnc" id="L191" title="All 2 branches missed.">            if (coupon != null) {</span>
+<span class="nc" id="L192">                session.delete(coupon);</span>
+<span class="nc" id="L193">                tx.commit();</span>
+<span class="nc" id="L194">                logger.info(&quot;Deleted coupon with ID: {}&quot;, id);</span>
+<span class="nc" id="L195">                return true;</span>
+            }
+<span class="nc" id="L197">            tx.commit();</span>
+<span class="nc" id="L198">            return false;</span>
+<span class="nc bnc" id="L199" title="All 2 branches missed.">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L200" title="All 2 branches missed.">            if (tx != null) tx.rollback();</span>
+<span class="nc" id="L201">            logger.error(&quot;Error deleting coupon with ID {}: {}&quot;, id, e.getMessage());</span>
+<span class="nc" id="L202">            throw new RuntimeException(&quot;Failed to delete coupon&quot;, e);</span>
+        }
+    }
+    
+    // ==================== QUERY METHODS ====================
+    
+    /**
+     * دریافت تمام کوپن‌های فعال
+     * 
+     * کوپن‌هایی که isActive = true دارند
+     * 
+     * @return لیست کوپن‌های فعال (مرتب شده بر اساس تاریخ ایجاد)
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Coupon&gt; findActiveCoupons() {
+<span class="nc" id="L217">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L218">            Query&lt;Coupon&gt; query = session.createQuery(</span>
+                &quot;FROM Coupon c WHERE c.isActive = true ORDER BY c.createdAt DESC&quot;, Coupon.class);
+<span class="nc" id="L220">            return query.list();</span>
+<span class="nc" id="L221">        } catch (Exception e) {</span>
+<span class="nc" id="L222">            logger.error(&quot;Error finding active coupons: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L223">            throw new RuntimeException(&quot;Failed to find active coupons&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * دریافت تمام کوپن‌های معتبر
+     * 
+     * کوپن‌هایی که:
+     * - فعال هستند (isActive = true)
+     * - در بازه زمانی معتبر قرار دارند
+     * - هنوز محدودیت استفاده را نداشته‌اند
+     * 
+     * @return لیست کوپن‌های معتبر
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Coupon&gt; findValidCoupons() {
+<span class="nc" id="L239">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L240">            LocalDateTime now = LocalDateTime.now();</span>
+<span class="nc" id="L241">            Query&lt;Coupon&gt; query = session.createQuery(</span>
+                &quot;FROM Coupon c WHERE c.isActive = true &quot; +
+                &quot;AND c.validFrom &lt;= :now AND c.validUntil &gt; :now &quot; +
+                &quot;AND (c.usageLimit IS NULL OR c.usedCount &lt; c.usageLimit) &quot; +
+                &quot;ORDER BY c.createdAt DESC&quot;, Coupon.class);
+<span class="nc" id="L246">            query.setParameter(&quot;now&quot;, now);</span>
+<span class="nc" id="L247">            return query.list();</span>
+<span class="nc" id="L248">        } catch (Exception e) {</span>
+<span class="nc" id="L249">            logger.error(&quot;Error finding valid coupons: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L250">            throw new RuntimeException(&quot;Failed to find valid coupons&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * دریافت کوپن‌های مربوط به رستوران خاص
+     * 
+     * @param restaurant شیء رستوران (null برای کوپن‌های سراسری)
+     * @return لیست کوپن‌های رستوران یا سراسری
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Coupon&gt; findByRestaurant(Restaurant restaurant) {
+<span class="nc" id="L262">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+            Query&lt;Coupon&gt; query;
+<span class="nc bnc" id="L264" title="All 2 branches missed.">            if (restaurant == null) {</span>
+                // کوپن‌های سراسری
+<span class="nc" id="L266">                query = session.createQuery(</span>
+                    &quot;FROM Coupon c WHERE c.restaurant IS NULL ORDER BY c.createdAt DESC&quot;, Coupon.class);
+            } else {
+                // کوپن‌های اختصاصی رستوران
+<span class="nc" id="L270">                query = session.createQuery(</span>
+                    &quot;FROM Coupon c WHERE c.restaurant = :restaurant ORDER BY c.createdAt DESC&quot;, Coupon.class);
+<span class="nc" id="L272">                query.setParameter(&quot;restaurant&quot;, restaurant);</span>
+            }
+<span class="nc" id="L274">            return query.list();</span>
+<span class="nc" id="L275">        } catch (Exception e) {</span>
+<span class="nc" id="L276">            logger.error(&quot;Error finding coupons by restaurant: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L277">            throw new RuntimeException(&quot;Failed to find coupons by restaurant&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * دریافت کوپن‌های مربوط به رستوران خاص (بر اساس ID)
+     * 
+     * @param restaurantId شناسه رستوران (null برای کوپن‌های سراسری)
+     * @return لیست کوپن‌های رستوران یا سراسری
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Coupon&gt; findByRestaurantId(Long restaurantId) {
+<span class="nc" id="L289">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+            Query&lt;Coupon&gt; query;
+<span class="nc bnc" id="L291" title="All 2 branches missed.">            if (restaurantId == null) {</span>
+                // کوپن‌های سراسری
+<span class="nc" id="L293">                query = session.createQuery(</span>
+                    &quot;FROM Coupon c WHERE c.restaurant IS NULL ORDER BY c.createdAt DESC&quot;, Coupon.class);
+            } else {
+                // کوپن‌های اختصاصی رستوران
+<span class="nc" id="L297">                query = session.createQuery(</span>
+                    &quot;FROM Coupon c WHERE c.restaurant.id = :restaurantId ORDER BY c.createdAt DESC&quot;, Coupon.class);
+<span class="nc" id="L299">                query.setParameter(&quot;restaurantId&quot;, restaurantId);</span>
+            }
+<span class="nc" id="L301">            return query.list();</span>
+<span class="nc" id="L302">        } catch (Exception e) {</span>
+<span class="nc" id="L303">            logger.error(&quot;Error finding coupons by restaurant ID {}: {}&quot;, restaurantId, e.getMessage());</span>
+<span class="nc" id="L304">            throw new RuntimeException(&quot;Failed to find coupons by restaurant&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * دریافت کوپن‌های سراسری
+     * 
+     * کوپن‌هایی که برای تمام رستوران‌ها قابل استفاده هستند
+     * 
+     * @return لیست کوپن‌های سراسری
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Coupon&gt; findGlobalCoupons() {
+<span class="nc" id="L317">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L318">            Query&lt;Coupon&gt; query = session.createQuery(</span>
+                &quot;FROM Coupon c WHERE c.restaurant IS NULL ORDER BY c.createdAt DESC&quot;, Coupon.class);
+<span class="nc" id="L320">            return query.list();</span>
+<span class="nc" id="L321">        } catch (Exception e) {</span>
+<span class="nc" id="L322">            logger.error(&quot;Error finding global coupons: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L323">            throw new RuntimeException(&quot;Failed to find global coupons&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * دریافت کوپن‌های منقضی شده
+     * 
+     * کوپن‌هایی که تاریخ انقضایشان گذشته است
+     * 
+     * @return لیست کوپن‌های منقضی (مرتب شده بر اساس تاریخ انقضا)
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Coupon&gt; findExpiredCoupons() {
+<span class="nc" id="L336">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L337">            LocalDateTime now = LocalDateTime.now();</span>
+<span class="nc" id="L338">            Query&lt;Coupon&gt; query = session.createQuery(</span>
+                &quot;FROM Coupon c WHERE c.validUntil &lt;= :now ORDER BY c.validUntil DESC&quot;, Coupon.class);
+<span class="nc" id="L340">            query.setParameter(&quot;now&quot;, now);</span>
+<span class="nc" id="L341">            return query.list();</span>
+<span class="nc" id="L342">        } catch (Exception e) {</span>
+<span class="nc" id="L343">            logger.error(&quot;Error finding expired coupons: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L344">            throw new RuntimeException(&quot;Failed to find expired coupons&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * دریافت کوپن‌های نزدیک به انقضا
+     * 
+     * کوپن‌هایی که در چند روز آینده منقضی می‌شوند
+     * برای هشدار و اطلاع‌رسانی به کاربران استفاده می‌شود
+     * 
+     * @param days تعداد روزهای آینده
+     * @return لیست کوپن‌های نزدیک به انقضا (مرتب شده بر اساس تاریخ انقضا)
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Coupon&gt; findCouponsExpiringSoon(int days) {
+<span class="nc" id="L359">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L360">            LocalDateTime now = LocalDateTime.now();</span>
+<span class="nc" id="L361">            LocalDateTime future = now.plusDays(days);</span>
+<span class="nc" id="L362">            Query&lt;Coupon&gt; query = session.createQuery(</span>
+                &quot;FROM Coupon c WHERE c.isActive = true &quot; +
+                &quot;AND c.validUntil &gt; :now AND c.validUntil &lt;= :future &quot; +
+                &quot;ORDER BY c.validUntil ASC&quot;, Coupon.class);
+<span class="nc" id="L366">            query.setParameter(&quot;now&quot;, now);</span>
+<span class="nc" id="L367">            query.setParameter(&quot;future&quot;, future);</span>
+<span class="nc" id="L368">            return query.list();</span>
+<span class="nc" id="L369">        } catch (Exception e) {</span>
+<span class="nc" id="L370">            logger.error(&quot;Error finding coupons expiring soon: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L371">            throw new RuntimeException(&quot;Failed to find expiring coupons&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * دریافت کوپن‌ها بر اساس نوع
+     * 
+     * @param type نوع کوپن (PERCENTAGE، FIXED_AMOUNT)
+     * @return لیست کوپن‌های از نوع مشخص شده
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Coupon&gt; findByType(Coupon.CouponType type) {
+<span class="nc" id="L383">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L384">            Query&lt;Coupon&gt; query = session.createQuery(</span>
+                &quot;FROM Coupon c WHERE c.type = :type ORDER BY c.createdAt DESC&quot;, Coupon.class);
+<span class="nc" id="L386">            query.setParameter(&quot;type&quot;, type);</span>
+<span class="nc" id="L387">            return query.list();</span>
+<span class="nc" id="L388">        } catch (Exception e) {</span>
+<span class="nc" id="L389">            logger.error(&quot;Error finding coupons by type {}: {}&quot;, type, e.getMessage());</span>
+<span class="nc" id="L390">            throw new RuntimeException(&quot;Failed to find coupons by type&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * دریافت کوپن‌های ایجاد شده توسط کاربر خاص
+     * 
+     * برای مدیریت کوپن‌ها توسط ادمین‌ها یا مالکان رستوران‌ها
+     * 
+     * @param createdBy شناسه کاربر ایجادکننده
+     * @return لیست کوپن‌های ایجاد شده توسط کاربر
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Coupon&gt; findByCreatedBy(Long createdBy) {
+<span class="nc" id="L404">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L405">            Query&lt;Coupon&gt; query = session.createQuery(</span>
+                &quot;FROM Coupon c WHERE c.createdBy = :createdBy ORDER BY c.createdAt DESC&quot;, Coupon.class);
+<span class="nc" id="L407">            query.setParameter(&quot;createdBy&quot;, createdBy);</span>
+<span class="nc" id="L408">            return query.list();</span>
+<span class="nc" id="L409">        } catch (Exception e) {</span>
+<span class="nc" id="L410">            logger.error(&quot;Error finding coupons by creator {}: {}&quot;, createdBy, e.getMessage());</span>
+<span class="nc" id="L411">            throw new RuntimeException(&quot;Failed to find coupons by creator&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * دریافت کوپن‌ها با صفحه‌بندی
+     * 
+     * برای بهبود عملکرد در صفحات مدیریت با تعداد زیاد کوپن
+     * 
+     * @param page شماره صفحه (شروع از 0)
+     * @param size تعداد رکورد در هر صفحه
+     * @return لیست کوپن‌ها با صفحه‌بندی
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Coupon&gt; findWithPagination(int page, int size) {
+<span class="nc" id="L426">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L427">            Query&lt;Coupon&gt; query = session.createQuery(</span>
+                &quot;FROM Coupon c ORDER BY c.createdAt DESC&quot;, Coupon.class);
+<span class="nc" id="L429">            query.setFirstResult(page * size);</span>
+<span class="nc" id="L430">            query.setMaxResults(size);</span>
+<span class="nc" id="L431">            return query.list();</span>
+<span class="nc" id="L432">        } catch (Exception e) {</span>
+<span class="nc" id="L433">            logger.error(&quot;Error finding coupons with pagination: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L434">            throw new RuntimeException(&quot;Failed to find coupons with pagination&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * شمارش کل تعداد کوپن‌ها
+     * 
+     * برای آمارهای کلی و محاسبه pagination
+     * 
+     * @return تعداد کل کوپن‌ها
+     * @throws RuntimeException در صورت خطا در شمارش
+     */
+    public Long countAll() {
+<span class="nc" id="L447">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L448">            Query&lt;Long&gt; query = session.createQuery(&quot;SELECT COUNT(c) FROM Coupon c&quot;, Long.class);</span>
+<span class="nc" id="L449">            return query.uniqueResult();</span>
+<span class="nc" id="L450">        } catch (Exception e) {</span>
+<span class="nc" id="L451">            logger.error(&quot;Error counting all coupons: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L452">            throw new RuntimeException(&quot;Failed to count coupons&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * شمارش تعداد کوپن‌های فعال
+     * 
+     * برای آمارهای dashboard
+     * 
+     * @return تعداد کوپن‌های فعال
+     * @throws RuntimeException در صورت خطا در شمارش
+     */
+    public Long countActive() {
+<span class="nc" id="L465">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L466">            Query&lt;Long&gt; query = session.createQuery(</span>
+                &quot;SELECT COUNT(c) FROM Coupon c WHERE c.isActive = true&quot;, Long.class);
+<span class="nc" id="L468">            return query.uniqueResult();</span>
+<span class="nc" id="L469">        } catch (Exception e) {</span>
+<span class="nc" id="L470">            logger.error(&quot;Error counting active coupons: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L471">            throw new RuntimeException(&quot;Failed to count active coupons&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * دریافت تمام کوپن‌ها
+     * 
+     * برای مدیریت کلی سیستم توسط ادمین‌ها
+     * 
+     * @return لیست تمام کوپن‌ها (مرتب شده بر اساس تاریخ ایجاد)
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Coupon&gt; findAll() {
+<span class="nc" id="L484">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L485">            Query&lt;Coupon&gt; query = session.createQuery(</span>
+                &quot;FROM Coupon c ORDER BY c.createdAt DESC&quot;, Coupon.class);
+<span class="nc" id="L487">            return query.list();</span>
+<span class="nc" id="L488">        } catch (Exception e) {</span>
+<span class="nc" id="L489">            logger.error(&quot;Error finding all coupons: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L490">            throw new RuntimeException(&quot;Failed to find all coupons&quot;, e);</span>
+        }
+    }
+    
+    // ==================== BUSINESS LOGIC QUERIES ====================
+    
+    /**
+     * یافتن کوپن‌های قابل اعمال برای سفارش خاص
+     * 
+     * این متد پیچیده‌ترین query است که شامل:
+     * - بررسی فعال بودن کوپن
+     * - بررسی بازه زمانی معتبر
+     * - بررسی محدودیت استفاده
+     * - بررسی حداقل مبلغ سفارش
+     * - بررسی تطبیق با رستوران (عمومی یا اختصاصی)
+     * 
+     * @param orderAmount مبلغ سفارش
+     * @param restaurantId شناسه رستوران
+     * @return لیست کوپن‌های قابل اعمال (مرتب شده بر اساس نوع و مقدار)
+     * @throws RuntimeException در صورت خطا در جستجو
+     */
+    public List&lt;Coupon&gt; findApplicableCoupons(Double orderAmount, Long restaurantId) {
+<span class="nc" id="L512">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L513">            LocalDateTime now = LocalDateTime.now();</span>
+<span class="nc" id="L514">            Query&lt;Coupon&gt; query = session.createQuery(</span>
+                &quot;FROM Coupon c WHERE c.isActive = true &quot; +
+                &quot;AND c.validFrom &lt;= :now AND c.validUntil &gt; :now &quot; +
+                &quot;AND (c.usageLimit IS NULL OR c.usedCount &lt; c.usageLimit) &quot; +
+                &quot;AND (c.minOrderAmount IS NULL OR c.minOrderAmount &lt;= :orderAmount) &quot; +
+                &quot;AND (c.restaurant IS NULL OR c.restaurant.id = :restaurantId) &quot; +
+                &quot;ORDER BY c.type, c.value DESC&quot;, Coupon.class);
+<span class="nc" id="L521">            query.setParameter(&quot;now&quot;, now);</span>
+<span class="nc" id="L522">            query.setParameter(&quot;orderAmount&quot;, orderAmount);</span>
+<span class="nc" id="L523">            query.setParameter(&quot;restaurantId&quot;, restaurantId);</span>
+<span class="nc" id="L524">            return query.list();</span>
+<span class="nc" id="L525">        } catch (Exception e) {</span>
+<span class="nc" id="L526">            logger.error(&quot;Error finding applicable coupons: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L527">            throw new RuntimeException(&quot;Failed to find applicable coupons&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * افزایش تعداد استفاده کوپن
+     * 
+     * زمانی که کوپن در سفارش استفاده می‌شود، باید تعداد استفاده آن افزایش یابد
+     * تاریخ updatedAt نیز به‌روزرسانی می‌شود
+     * 
+     * @param couponId شناسه کوپن
+     * @throws RuntimeException در صورت خطا در به‌روزرسانی
+     */
+    public void incrementUsageCount(Long couponId) {
+<span class="nc" id="L541">        Transaction tx = null;</span>
+<span class="nc" id="L542">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L543">            tx = session.beginTransaction();</span>
+<span class="nc" id="L544">            Query query = session.createQuery(</span>
+                &quot;UPDATE Coupon c SET c.usedCount = c.usedCount + 1, c.updatedAt = :now WHERE c.id = :id&quot;);
+<span class="nc" id="L546">            query.setParameter(&quot;now&quot;, LocalDateTime.now());</span>
+<span class="nc" id="L547">            query.setParameter(&quot;id&quot;, couponId);</span>
+<span class="nc" id="L548">            query.executeUpdate();</span>
+<span class="nc" id="L549">            tx.commit();</span>
+<span class="nc" id="L550">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L551" title="All 2 branches missed.">            if (tx != null) tx.rollback();</span>
+<span class="nc" id="L552">            logger.error(&quot;Error incrementing usage count for coupon {}: {}&quot;, couponId, e.getMessage());</span>
+<span class="nc" id="L553">            throw new RuntimeException(&quot;Failed to increment usage count&quot;, e);</span>
+<span class="nc" id="L554">        }</span>
+<span class="nc" id="L555">    }</span>
+    
+    /**
+     * کاهش تعداد استفاده کوپن
+     * 
+     * برای مواقع استرداد سفارش یا لغو استفاده از کوپن
+     * تعداد استفاده نمی‌تواند کمتر از 0 شود
+     * 
+     * @param couponId شناسه کوپن
+     * @throws RuntimeException در صورت خطا در به‌روزرسانی
+     */
+    public void decrementUsageCount(Long couponId) {
+<span class="nc" id="L567">        Transaction tx = null;</span>
+<span class="nc" id="L568">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L569">            tx = session.beginTransaction();</span>
+<span class="nc" id="L570">            Query query = session.createQuery(</span>
+                &quot;UPDATE Coupon c SET c.usedCount = CASE WHEN c.usedCount &gt; 0 THEN c.usedCount - 1 ELSE 0 END, &quot; +
+                &quot;c.updatedAt = :now WHERE c.id = :id&quot;);
+<span class="nc" id="L573">            query.setParameter(&quot;now&quot;, LocalDateTime.now());</span>
+<span class="nc" id="L574">            query.setParameter(&quot;id&quot;, couponId);</span>
+<span class="nc" id="L575">            query.executeUpdate();</span>
+<span class="nc" id="L576">            tx.commit();</span>
+<span class="nc" id="L577">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L578" title="All 2 branches missed.">            if (tx != null) tx.rollback();</span>
+<span class="nc" id="L579">            logger.error(&quot;Error decrementing usage count for coupon {}: {}&quot;, couponId, e.getMessage());</span>
+<span class="nc" id="L580">            throw new RuntimeException(&quot;Failed to decrement usage count&quot;, e);</span>
+<span class="nc" id="L581">        }</span>
+<span class="nc" id="L582">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

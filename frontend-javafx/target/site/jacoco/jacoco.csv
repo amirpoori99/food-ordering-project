@@ -1,18 +1,4 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-Food Ordering Frontend,default,VendorSearchController,3,0,0,0,1,0,1,0,1,0
-Food Ordering Frontend,default,ItemManagementController,3,0,0,0,1,0,1,0,1,0
-Food Ordering Frontend,default,AdminUserController,3,0,0,0,1,0,1,0,1,0
-Food Ordering Frontend,default,EditRestaurantController,3,0,0,0,1,0,1,0,1,0
-Food Ordering Frontend,default,ReviewController,3,0,0,0,1,0,1,0,1,0
-Food Ordering Frontend,default,WalletController,3,0,0,0,1,0,1,0,1,0
-Food Ordering Frontend,default,CouponController,3,0,0,0,1,0,1,0,1,0
-Food Ordering Frontend,default,CourierAvailableController,3,0,0,0,1,0,1,0,1,0
-Food Ordering Frontend,default,OrderDetailController,3,0,0,0,1,0,1,0,1,0
-Food Ordering Frontend,default,CouponManagementController,3,0,0,0,1,0,1,0,1,0
-Food Ordering Frontend,default,AdminOrderController,3,0,0,0,1,0,1,0,1,0
-Food Ordering Frontend,default,AdminTransactionController,3,0,0,0,1,0,1,0,1,0
-Food Ordering Frontend,default,CourierHistoryController,3,0,0,0,1,0,1,0,1,0
-Food Ordering Frontend,default,CreateRestaurantController,3,0,0,0,1,0,1,0,1,0
 Food Ordering Frontend,com.myapp.ui.common,FrontendConstants.FILES,5,0,0,0,1,0,1,0,1,0
 Food Ordering Frontend,com.myapp.ui.common,SessionManager,16,51,6,2,4,20,6,8,2,8
 Food Ordering Frontend,com.myapp.ui.common,FrontendConstants,7,0,0,0,2,0,1,0,1,0

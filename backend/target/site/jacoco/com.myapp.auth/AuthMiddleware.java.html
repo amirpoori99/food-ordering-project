@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthMiddleware.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.auth</a> &gt; <span class="el_source">AuthMiddleware.java</span></div><h1>AuthMiddleware.java</h1><pre class="source lang-java linenums">package com.myapp.auth;
+
+import com.myapp.common.utils.JWTUtil;
+import com.sun.net.httpserver.HttpExchange;
+import io.jsonwebtoken.JwtException;
+
+/**
+ * میان‌افزار احراز هویت برای اعتبارسنجی JWT token
+ * این کلاس متدهایی برای احراز هویت درخواست‌ها و استخراج اطلاعات کاربر فراهم می‌کند
+ * تمام عملیات امنیتی مربوط به JWT در این کلاس متمرکز شده است
+ */
+<span class="nc" id="L12">public class AuthMiddleware {</span>
+    
+    /**
+     * احراز هویت درخواست با استفاده از JWT token از header Authorization
+     * 
+     * @param exchange HTTP exchange حاوی درخواست
+     * @return AuthResult حاوی اطلاعات احراز هویت
+     */
+    public static AuthResult authenticate(HttpExchange exchange) {
+        // استخراج header Authorization از درخواست
+<span class="fc" id="L22">        String authHeader = exchange.getRequestHeaders().getFirst(&quot;Authorization&quot;);</span>
+        
+<span class="fc bfc" id="L24" title="All 2 branches covered.">        if (authHeader == null) {</span>
+<span class="fc" id="L25">            return AuthResult.unauthenticated(&quot;Missing Authorization header&quot;);</span>
+        }
+        
+        // استخراج token از header (فرمت: Bearer &lt;token&gt;)
+<span class="fc" id="L29">        String token = JWTUtil.extractBearerToken(authHeader);</span>
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">        if (token == null) {</span>
+<span class="fc" id="L31">            return AuthResult.unauthenticated(&quot;Invalid Authorization header format. Use 'Bearer &lt;token&gt;'&quot;);</span>
+        }
+        
+<span class="nc" id="L34">        return authenticateToken(token);  // اعتبارسنجی token</span>
+    }
+    
+    /**
+     * احراز هویت مستقیم با استفاده از JWT token
+     * 
+     * @param token JWT token برای اعتبارسنجی
+     * @return AuthResult حاوی اطلاعات احراز هویت
+     */
+    public static AuthResult authenticateToken(String token) {
+        try {
+            // بررسی معتبر بودن token
+<span class="fc bfc" id="L46" title="All 2 branches covered.">            if (!JWTUtil.validateToken(token)) {</span>
+<span class="fc" id="L47">                return AuthResult.unauthenticated(&quot;Invalid token&quot;);</span>
+            }
+            
+            // بررسی انقضای token
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">            if (JWTUtil.isTokenExpired(token)) {</span>
+<span class="nc" id="L52">                return AuthResult.unauthenticated(&quot;Token expired&quot;);</span>
+            }
+            
+            // بررسی نوع token (باید Access Token باشد)
+<span class="fc bfc" id="L56" title="All 2 branches covered.">            if (!JWTUtil.isAccessToken(token)) {</span>
+<span class="fc" id="L57">                return AuthResult.unauthenticated(&quot;Invalid token type. Access token required&quot;);</span>
+            }
+            
+            // استخراج اطلاعات کاربر از token
+<span class="fc" id="L61">            Long userId = JWTUtil.getUserIdFromToken(token);</span>
+<span class="fc" id="L62">            String phone = JWTUtil.getPhoneFromToken(token);</span>
+<span class="fc" id="L63">            String role = JWTUtil.getRoleFromToken(token);</span>
+            
+<span class="fc" id="L65">            return AuthResult.authenticated(userId, phone, role, token);</span>
+            
+<span class="nc" id="L67">        } catch (JwtException e) {</span>
+<span class="nc" id="L68">            return AuthResult.unauthenticated(&quot;Token validation failed: &quot; + e.getMessage());</span>
+<span class="nc" id="L69">        } catch (Exception e) {</span>
+<span class="nc" id="L70">            return AuthResult.unauthenticated(&quot;Authentication error: &quot; + e.getMessage());</span>
+        }
+    }
+    
+    /**
+     * بررسی داشتن نقش مورد نیاز توسط کاربر
+     * 
+     * @param authResult نتیجه احراز هویت
+     * @param requiredRole نقش مورد نیاز
+     * @return true اگر کاربر نقش مورد نیاز را داشته باشد، در غیر اینصورت false
+     */
+    public static boolean hasRole(AuthResult authResult, String requiredRole) {
+<span class="pc bpc" id="L82" title="1 of 4 branches missed.">        return authResult.isAuthenticated() &amp;&amp; requiredRole.equals(authResult.getRole());</span>
+    }
+    
+    /**
+     * بررسی داشتن هر یک از نقش‌های مورد نیاز توسط کاربر
+     * 
+     * @param authResult نتیجه احراز هویت
+     * @param requiredRoles آرایه نقش‌های مورد نیاز
+     * @return true اگر کاربر حداقل یکی از نقش‌ها را داشته باشد، در غیر اینصورت false
+     */
+    public static boolean hasAnyRole(AuthResult authResult, String... requiredRoles) {
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">        if (!authResult.isAuthenticated()) {</span>
+<span class="nc" id="L94">            return false;</span>
+        }
+        
+<span class="fc" id="L97">        String userRole = authResult.getRole();</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        for (String role : requiredRoles) {</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">            if (role.equals(userRole)) {</span>
+<span class="fc" id="L100">                return true;</span>
+            }
+        }
+<span class="fc" id="L103">        return false;</span>
+    }
+    
+    /**
+     * بررسی اینکه آیا کاربر احراز هویت شده همان کاربر درخواست شده است
+     * یا اینکه کاربر دارای مجوز مدیریت است
+     * 
+     * @param authResult نتیجه احراز هویت
+     * @param requestedUserId شناسه کاربر درخواست شده
+     * @return true اگر همان کاربر باشد یا مجوز مدیریت داشته باشد
+     */
+    public static boolean isSameUserOrAdmin(AuthResult authResult, Long requestedUserId) {
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">        if (!authResult.isAuthenticated()) {</span>
+<span class="nc" id="L116">            return false;</span>
+        }
+        
+        // بررسی همان کاربر بودن
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        if (authResult.getUserId().equals(requestedUserId)) {</span>
+<span class="fc" id="L121">            return true;</span>
+        }
+        
+        // بررسی مجوز مدیریت (برای پیاده‌سازی آینده نقش admin)
+<span class="fc" id="L125">        return &quot;admin&quot;.equals(authResult.getRole());</span>
+    }
+    
+    /**
+     * تجدید Access Token با استفاده از Refresh Token
+     * 
+     * @param refreshToken Refresh Token برای تجدید
+     * @param authRepository مخزن احراز هویت برای اعتبارسنجی کاربر
+     * @return AuthResult حاوی Access Token جدید یا خطا
+     */
+    public static AuthResult refreshAccessToken(String refreshToken, AuthRepository authRepository) {
+        try {
+            // بررسی معتبر بودن Refresh Token
+<span class="fc bfc" id="L138" title="All 2 branches covered.">            if (!JWTUtil.validateToken(refreshToken)) {</span>
+<span class="fc" id="L139">                return AuthResult.unauthenticated(&quot;Invalid refresh token&quot;);</span>
+            }
+            
+            // بررسی انقضای Refresh Token
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">            if (JWTUtil.isTokenExpired(refreshToken)) {</span>
+<span class="nc" id="L144">                return AuthResult.unauthenticated(&quot;Refresh token expired&quot;);</span>
+            }
+            
+            // بررسی نوع token (باید Refresh Token باشد)
+<span class="fc bfc" id="L148" title="All 2 branches covered.">            if (!JWTUtil.isRefreshToken(refreshToken)) {</span>
+<span class="fc" id="L149">                return AuthResult.unauthenticated(&quot;Invalid token type. Refresh token required&quot;);</span>
+            }
+            
+            // استخراج شناسه کاربر از token
+<span class="fc" id="L153">            Long userId = JWTUtil.getUserIdFromToken(refreshToken);</span>
+            
+            // بررسی وجود کاربر در دیتابیس
+<span class="fc" id="L156">            var userOpt = authRepository.findById(userId);</span>
+<span class="fc bfc" id="L157" title="All 2 branches covered.">            if (userOpt.isEmpty()) {</span>
+<span class="fc" id="L158">                return AuthResult.unauthenticated(&quot;User not found&quot;);</span>
+            }
+            
+            // تولید جفت token جدید
+<span class="fc" id="L162">            var user = userOpt.get();</span>
+<span class="fc" id="L163">            String[] tokens = JWTUtil.generateTokenPair(user.getId(), user.getPhone(), user.getRole().toString());</span>
+            
+<span class="fc" id="L165">            return AuthResult.refreshed(user.getId(), user.getPhone(), user.getRole().toString(), tokens[0], tokens[1]);</span>
+            
+<span class="nc" id="L167">        } catch (JwtException e) {</span>
+<span class="nc" id="L168">            return AuthResult.unauthenticated(&quot;Token refresh failed: &quot; + e.getMessage());</span>
+<span class="nc" id="L169">        } catch (Exception e) {</span>
+<span class="nc" id="L170">            return AuthResult.unauthenticated(&quot;Refresh error: &quot; + e.getMessage());</span>
+        }
+    }
+    
+    /**
+     * استخراج شناسه کاربر از پارامتر مسیر درخواست
+     * 
+     * @param exchange HTTP exchange
+     * @param paramName نام پارامتر (مثل &quot;userId&quot;)
+     * @return شناسه کاربر یا null در صورت عدم یافتن یا نامعتبر بودن
+     */
+    public static Long extractUserIdFromPath(HttpExchange exchange, String paramName) {
+        try {
+<span class="fc" id="L183">            String path = exchange.getRequestURI().getPath();</span>
+<span class="fc" id="L184">            String[] segments = path.split(&quot;/&quot;);</span>
+            
+            // جستجو برای پارامتر مشخص شده
+<span class="pc bpc" id="L187" title="1 of 2 branches missed.">            for (int i = 0; i &lt; segments.length - 1; i++) {</span>
+<span class="pc bpc" id="L188" title="1 of 4 branches missed.">                if (segments[i].equals(paramName) &amp;&amp; i + 1 &lt; segments.length) {</span>
+<span class="fc" id="L189">                    return Long.parseLong(segments[i + 1]);</span>
+                }
+            }
+            
+            // روش جایگزین: جستجو برای بخش عددی بعد از الگوهای شناخته شده
+<span class="nc bnc" id="L194" title="All 4 branches missed.">            if (path.contains(&quot;/users/&quot;) || path.contains(&quot;/user/&quot;)) {</span>
+<span class="nc bnc" id="L195" title="All 2 branches missed.">                for (String segment : segments) {</span>
+                    try {
+<span class="nc" id="L197">                        return Long.parseLong(segment);</span>
+<span class="nc" id="L198">                    } catch (NumberFormatException ignored) {</span>
+                        // ادامه جستجو
+                    }
+                }
+            }
+            
+<span class="fc" id="L204">        } catch (Exception e) {</span>
+            // در محیط production باید خطا log شود
+<span class="nc" id="L206">        }</span>
+        
+<span class="fc" id="L208">        return null;</span>
+    }
+    
+    /**
+     * بررسی اینکه آیا درخواست نیاز به احراز هویت دارد بر اساس مسیر
+     * 
+     * @param path مسیر درخواست
+     * @return true اگر احراز هویت لازم باشد، در غیر اینصورت false
+     */
+    public static boolean requiresAuthentication(String path) {
+        // endpoint های عمومی که نیاز به احراز هویت ندارند
+<span class="fc" id="L219">        String[] publicPaths = {</span>
+            &quot;/api/auth/register&quot;,    // ثبت نام
+            &quot;/api/auth/login&quot;,       // ورود
+            &quot;/api/auth/refresh&quot;,     // تجدید token
+            &quot;/api/health&quot;,           // بررسی سلامت
+            &quot;/api/status&quot;            // وضعیت سیستم
+        };
+        
+        // بررسی اینکه آیا مسیر در لیست عمومی است
+<span class="fc bfc" id="L228" title="All 2 branches covered.">        for (String publicPath : publicPaths) {</span>
+<span class="fc bfc" id="L229" title="All 2 branches covered.">            if (path.startsWith(publicPath)) {</span>
+<span class="fc" id="L230">                return false;</span>
+            }
+        }
+        
+        // تمام endpoint های دیگر API نیاز به احراز هویت دارند
+<span class="fc" id="L235">        return path.startsWith(&quot;/api/&quot;);</span>
+    }
+    
+    /**
+     * دریافت نقش مورد نیاز برای endpoint خاص
+     * 
+     * @param path مسیر درخواست
+     * @param method متد HTTP
+     * @return نقش مورد نیاز یا null اگر نقش خاصی لازم نباشد
+     */
+    public static String getRequiredRole(String path, String method) {
+        // مدیریت رستوران - فقط فروشندگان
+<span class="pc bpc" id="L247" title="1 of 8 branches missed.">        if (path.startsWith(&quot;/api/restaurants&quot;) &amp;&amp; (&quot;POST&quot;.equals(method) || &quot;PUT&quot;.equals(method) || &quot;DELETE&quot;.equals(method))) {</span>
+<span class="fc" id="L248">            return &quot;seller&quot;;</span>
+        }
+        
+        // مدیریت تحویل - فقط پیک‌ها
+<span class="pc bpc" id="L252" title="1 of 6 branches missed.">        if (path.startsWith(&quot;/api/delivery&quot;) &amp;&amp; (&quot;PUT&quot;.equals(method) || &quot;POST&quot;.equals(method))) {</span>
+<span class="fc" id="L253">            return &quot;delivery&quot;;</span>
+        }
+        
+        // endpoint های مدیریت (برای پیاده‌سازی آینده)
+<span class="pc bpc" id="L257" title="1 of 2 branches missed.">        if (path.startsWith(&quot;/api/admin/&quot;)) {</span>
+<span class="fc" id="L258">            return &quot;admin&quot;;</span>
+        }
+        
+        // اکثر endpoint ها برای هر کاربر احراز هویت شده قابل دسترسی هستند
+<span class="nc" id="L262">        return null;</span>
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

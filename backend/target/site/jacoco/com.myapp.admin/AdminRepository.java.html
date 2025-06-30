@@ -1,0 +1,823 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.admin</a> &gt; <span class="el_source">AdminRepository.java</span></div><h1>AdminRepository.java</h1><pre class="source lang-java linenums">package com.myapp.admin;
+
+import com.myapp.common.models.*;
+import com.myapp.common.utils.DatabaseUtil;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Optional;
+
+/**
+ * Repository لایه دسترسی داده برای عملیات پنل مدیریت (Admin Dashboard)
+ * 
+ * این کلاس تمام عملیات پایگاه داده مربوط به مدیریت سیستم سفارش غذا را ارائه می‌دهد:
+ * 
+ * === مدیریت کاربران (User Management) ===
+ * - getAllUsers(): دریافت تمام کاربران با فیلتر و جستجو
+ * - countUsers(): شمارش کاربران با فیلتر
+ * - getUserStatsByRole(): آمار کاربران بر اساس نقش
+ * - updateUserStatus(): فعال/غیرفعال کردن کاربر
+ * 
+ * === مدیریت رستوران‌ها (Restaurant Management) ===
+ * - getAllRestaurants(): دریافت تمام رستوران‌ها با فیلتر
+ * - countRestaurants(): شمارش رستوران‌ها
+ * - getRestaurantStatsByStatus(): آمار رستوران‌ها بر اساس وضعیت
+ * 
+ * === مدیریت سفارشات (Order Management) ===
+ * - getAllOrders(): دریافت تمام سفارشات با فیلترهای پیشرفته
+ * - countOrders(): شمارش سفارشات
+ * - getOrderStatsByStatus(): آمار سفارشات بر اساس وضعیت
+ * 
+ * === مدیریت تراکنش‌ها (Transaction Management) ===
+ * - getAllTransactions(): دریافت تمام تراکنش‌ها با فیلتر
+ * - countTransactions(): شمارش تراکنش‌ها
+ * 
+ * === مدیریت تحویل (Delivery Management) ===
+ * - getAllDeliveries(): دریافت تمام تحویل‌ها با فیلتر
+ * - countDeliveries(): شمارش تحویل‌ها
+ * 
+ * === آمار سیستم (System Statistics) ===
+ * - getSystemStatistics(): آمار کلی سیستم
+ * - getDailyStatistics(): آمار روزانه
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Advanced Filtering: فیلترهای پیشرفته برای همه entities
+ * - Search Functionality: جستجوی متنی در تمام بخش‌ها
+ * - Pagination Support: پشتیبانی از صفحه‌بندی
+ * - Statistical Queries: queries آماری پیچیده
+ * - Dynamic Query Building: ساخت پویای queries
+ * - Performance Optimization: بهینه‌سازی کارایی queries
+ * - Comprehensive Admin Operations: عملیات جامع مدیریتی
+ * - Real-time Statistics: آمار real-time سیستم
+ * 
+ * === Inner Classes ===
+ * - SystemStatistics: کلاس آمار کلی سیستم
+ * - DailyStatistics: کلاس آمار روزانه
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+<span class="nc" id="L65">public class AdminRepository {</span>
+
+    // ==================== مدیریت کاربران (USER MANAGEMENT) ====================
+    
+    /**
+     * دریافت تمام کاربران با فیلتر و جستجوی پیشرفته
+     * 
+     * این متد امکان جستجو و فیلتر کاربران را بر اساس معیارهای مختلف فراهم می‌کند:
+     * - جستجو در نام، ایمیل و شماره تلفن
+     * - فیلتر بر اساس نقش کاربر
+     * - صفحه‌بندی برای بهبود عملکرد
+     * 
+     * @param searchTerm عبارت جستجو (در نام، ایمیل، تلفن)
+     * @param role نقش کاربر برای فیلتر (اختیاری)
+     * @param limit تعداد رکوردها در هر صفحه (0 = نامحدود)
+     * @param offset شروع از رکورد (برای pagination)
+     * @return لیست کاربران فیلتر شده
+     */
+    public List&lt;User&gt; getAllUsers(String searchTerm, User.Role role, int limit, int offset) {
+<span class="nc" id="L84">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L85">            StringBuilder hql = new StringBuilder(&quot;FROM User u WHERE 1=1&quot;);</span>
+            
+<span class="nc bnc" id="L87" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L88">                hql.append(&quot; AND (LOWER(u.fullName) LIKE :search OR LOWER(u.email) LIKE :search OR u.phone LIKE :search)&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L91" title="All 2 branches missed.">            if (role != null) {</span>
+<span class="nc" id="L92">                hql.append(&quot; AND u.role = :role&quot;);</span>
+            }
+            
+<span class="nc" id="L95">            hql.append(&quot; ORDER BY u.id DESC&quot;);</span>
+            
+<span class="nc" id="L97">            Query&lt;User&gt; query = session.createQuery(hql.toString(), User.class);</span>
+            
+<span class="nc bnc" id="L99" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L100">                String searchPattern = &quot;%&quot; + searchTerm.toLowerCase() + &quot;%&quot;;</span>
+<span class="nc" id="L101">                query.setParameter(&quot;search&quot;, searchPattern);</span>
+            }
+            
+<span class="nc bnc" id="L104" title="All 2 branches missed.">            if (role != null) {</span>
+<span class="nc" id="L105">                query.setParameter(&quot;role&quot;, role);</span>
+            }
+            
+<span class="nc bnc" id="L108" title="All 2 branches missed.">            if (limit &gt; 0) {</span>
+<span class="nc" id="L109">                query.setMaxResults(limit);</span>
+            }
+<span class="nc bnc" id="L111" title="All 2 branches missed.">            if (offset &gt; 0) {</span>
+<span class="nc" id="L112">                query.setFirstResult(offset);</span>
+            }
+            
+<span class="nc" id="L115">            return query.list();</span>
+        }
+    }
+    
+    /**
+     * شمارش کل کاربران با فیلترهای اعمال شده
+     * 
+     * برای محاسبه pagination و آمارگیری
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param role نقش کاربر
+     * @return تعداد کل کاربران
+     */
+    public Long countUsers(String searchTerm, User.Role role) {
+<span class="nc" id="L129">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L130">            StringBuilder hql = new StringBuilder(&quot;SELECT COUNT(u) FROM User u WHERE 1=1&quot;);</span>
+            
+<span class="nc bnc" id="L132" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L133">                hql.append(&quot; AND (LOWER(u.fullName) LIKE :search OR LOWER(u.email) LIKE :search OR u.phone LIKE :search)&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L136" title="All 2 branches missed.">            if (role != null) {</span>
+<span class="nc" id="L137">                hql.append(&quot; AND u.role = :role&quot;);</span>
+            }
+            
+<span class="nc" id="L140">            Query&lt;Long&gt; query = session.createQuery(hql.toString(), Long.class);</span>
+            
+<span class="nc bnc" id="L142" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L143">                String searchPattern = &quot;%&quot; + searchTerm.toLowerCase() + &quot;%&quot;;</span>
+<span class="nc" id="L144">                query.setParameter(&quot;search&quot;, searchPattern);</span>
+            }
+            
+<span class="nc bnc" id="L147" title="All 2 branches missed.">            if (role != null) {</span>
+<span class="nc" id="L148">                query.setParameter(&quot;role&quot;, role);</span>
+            }
+            
+<span class="nc" id="L151">            return query.uniqueResult();</span>
+        }
+    }
+    
+    /**
+     * دریافت آمار کاربران بر اساس نقش
+     * 
+     * برای نمایش نمودار توزیع کاربران در پنل مدیریت
+     * 
+     * @return Map حاوی تعداد کاربران هر نقش
+     */
+    public Map&lt;User.Role, Long&gt; getUserStatsByRole() {
+<span class="nc" id="L163">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L164">            Query&lt;Object[]&gt; query = session.createQuery(</span>
+                &quot;SELECT u.role, COUNT(u) FROM User u GROUP BY u.role&quot;, Object[].class);
+            
+<span class="nc" id="L167">            List&lt;Object[]&gt; results = query.list();</span>
+<span class="nc" id="L168">            Map&lt;User.Role, Long&gt; stats = new HashMap&lt;&gt;();</span>
+            
+<span class="nc bnc" id="L170" title="All 2 branches missed.">            for (Object[] result : results) {</span>
+<span class="nc" id="L171">                User.Role role = (User.Role) result[0];</span>
+<span class="nc" id="L172">                Long count = (Long) result[1];</span>
+<span class="nc" id="L173">                stats.put(role, count);</span>
+<span class="nc" id="L174">            }</span>
+            
+<span class="nc" id="L176">            return stats;</span>
+        }
+    }
+    
+    /**
+     * فعال/غیرفعال کردن کاربر
+     * 
+     * مدیران می‌توانند کاربران را مسدود یا فعال کنند
+     * 
+     * @param userId شناسه کاربر
+     * @param isActive وضعیت فعال/غیرفعال
+     */
+    public void updateUserStatus(Long userId, boolean isActive) {
+<span class="nc" id="L189">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L190">            session.beginTransaction();</span>
+            
+<span class="nc" id="L192">            User user = session.get(User.class, userId);</span>
+<span class="nc bnc" id="L193" title="All 2 branches missed.">            if (user != null) {</span>
+<span class="nc" id="L194">                user.setIsActive(isActive);</span>
+<span class="nc" id="L195">                session.merge(user);</span>
+            }
+            
+<span class="nc" id="L198">            session.getTransaction().commit();</span>
+        }
+<span class="nc" id="L200">    }</span>
+
+    // ==================== مدیریت رستوران‌ها (RESTAURANT MANAGEMENT) ====================
+    
+    /**
+     * دریافت تمام رستوران‌ها با فیلتر و جستجو
+     * 
+     * @param searchTerm عبارت جستجو (در نام و آدرس رستوران)
+     * @param status وضعیت رستوران برای فیلتر
+     * @param limit تعداد رکوردها در هر صفحه
+     * @param offset شروع از رکورد
+     * @return لیست رستوران‌های فیلتر شده
+     */
+    public List&lt;Restaurant&gt; getAllRestaurants(String searchTerm, RestaurantStatus status, int limit, int offset) {
+<span class="nc" id="L214">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L215">            StringBuilder hql = new StringBuilder(&quot;FROM Restaurant r WHERE 1=1&quot;);</span>
+            
+<span class="nc bnc" id="L217" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L218">                hql.append(&quot; AND (LOWER(r.name) LIKE :search OR LOWER(r.address) LIKE :search)&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L221" title="All 2 branches missed.">            if (status != null) {</span>
+<span class="nc" id="L222">                hql.append(&quot; AND r.status = :status&quot;);</span>
+            }
+            
+<span class="nc" id="L225">            hql.append(&quot; ORDER BY r.id DESC&quot;);</span>
+            
+<span class="nc" id="L227">            Query&lt;Restaurant&gt; query = session.createQuery(hql.toString(), Restaurant.class);</span>
+            
+<span class="nc bnc" id="L229" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L230">                String searchPattern = &quot;%&quot; + searchTerm.toLowerCase() + &quot;%&quot;;</span>
+<span class="nc" id="L231">                query.setParameter(&quot;search&quot;, searchPattern);</span>
+            }
+            
+<span class="nc bnc" id="L234" title="All 2 branches missed.">            if (status != null) {</span>
+<span class="nc" id="L235">                query.setParameter(&quot;status&quot;, status);</span>
+            }
+            
+<span class="nc bnc" id="L238" title="All 2 branches missed.">            if (limit &gt; 0) {</span>
+<span class="nc" id="L239">                query.setMaxResults(limit);</span>
+            }
+<span class="nc bnc" id="L241" title="All 2 branches missed.">            if (offset &gt; 0) {</span>
+<span class="nc" id="L242">                query.setFirstResult(offset);</span>
+            }
+            
+<span class="nc" id="L245">            return query.list();</span>
+        }
+    }
+    
+    /**
+     * شمارش رستوران‌ها با فیلترهای اعمال شده
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت رستوران
+     * @return تعداد کل رستوران‌ها
+     */
+    public Long countRestaurants(String searchTerm, RestaurantStatus status) {
+<span class="nc" id="L257">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L258">            StringBuilder hql = new StringBuilder(&quot;SELECT COUNT(r) FROM Restaurant r WHERE 1=1&quot;);</span>
+            
+<span class="nc bnc" id="L260" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L261">                hql.append(&quot; AND (LOWER(r.name) LIKE :search OR LOWER(r.address) LIKE :search)&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L264" title="All 2 branches missed.">            if (status != null) {</span>
+<span class="nc" id="L265">                hql.append(&quot; AND r.status = :status&quot;);</span>
+            }
+            
+<span class="nc" id="L268">            Query&lt;Long&gt; query = session.createQuery(hql.toString(), Long.class);</span>
+            
+<span class="nc bnc" id="L270" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L271">                String searchPattern = &quot;%&quot; + searchTerm.toLowerCase() + &quot;%&quot;;</span>
+<span class="nc" id="L272">                query.setParameter(&quot;search&quot;, searchPattern);</span>
+            }
+            
+<span class="nc bnc" id="L275" title="All 2 branches missed.">            if (status != null) {</span>
+<span class="nc" id="L276">                query.setParameter(&quot;status&quot;, status);</span>
+            }
+            
+<span class="nc" id="L279">            return query.uniqueResult();</span>
+        }
+    }
+    
+    /**
+     * دریافت آمار رستوران‌ها بر اساس وضعیت
+     * 
+     * برای نمایش نمودار توزیع وضعیت رستوران‌ها
+     * 
+     * @return Map حاوی تعداد رستوران‌های هر وضعیت
+     */
+    public Map&lt;RestaurantStatus, Long&gt; getRestaurantStatsByStatus() {
+<span class="nc" id="L291">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L292">            Query&lt;Object[]&gt; query = session.createQuery(</span>
+                &quot;SELECT r.status, COUNT(r) FROM Restaurant r GROUP BY r.status&quot;, Object[].class);
+            
+<span class="nc" id="L295">            List&lt;Object[]&gt; results = query.list();</span>
+<span class="nc" id="L296">            Map&lt;RestaurantStatus, Long&gt; stats = new HashMap&lt;&gt;();</span>
+            
+<span class="nc bnc" id="L298" title="All 2 branches missed.">            for (Object[] result : results) {</span>
+<span class="nc" id="L299">                RestaurantStatus status = (RestaurantStatus) result[0];</span>
+<span class="nc" id="L300">                Long count = (Long) result[1];</span>
+<span class="nc" id="L301">                stats.put(status, count);</span>
+<span class="nc" id="L302">            }</span>
+            
+<span class="nc" id="L304">            return stats;</span>
+        }
+    }
+
+    // ==================== مدیریت سفارشات (ORDER MANAGEMENT) ====================
+    
+    /**
+     * دریافت تمام سفارشات با فیلترهای پیشرفته
+     * 
+     * امکان فیلتر پیچیده سفارشات بر اساس:
+     * - جستجو در آدرس تحویل و شماره تلفن
+     * - وضعیت سفارش
+     * - کاربر مشخص
+     * - رستوران مشخص
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت سفارش
+     * @param customerId شناسه مشتری (اختیاری)
+     * @param restaurantId شناسه رستوران (اختیاری)
+     * @param limit تعداد رکوردها
+     * @param offset شروع از رکورد
+     * @return لیست سفارشات فیلتر شده
+     */
+    public List&lt;Order&gt; getAllOrders(String searchTerm, OrderStatus status, Long customerId, Long restaurantId, int limit, int offset) {
+<span class="nc" id="L328">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L329">            StringBuilder hql = new StringBuilder(&quot;FROM Order o WHERE 1=1&quot;);</span>
+            
+<span class="nc bnc" id="L331" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L332">                hql.append(&quot; AND (LOWER(o.deliveryAddress) LIKE :search OR o.phone LIKE :search)&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L335" title="All 2 branches missed.">            if (status != null) {</span>
+<span class="nc" id="L336">                hql.append(&quot; AND o.status = :status&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L339" title="All 2 branches missed.">            if (customerId != null) {</span>
+<span class="nc" id="L340">                hql.append(&quot; AND o.customer.id = :customerId&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L343" title="All 2 branches missed.">            if (restaurantId != null) {</span>
+<span class="nc" id="L344">                hql.append(&quot; AND o.restaurant.id = :restaurantId&quot;);</span>
+            }
+            
+<span class="nc" id="L347">            hql.append(&quot; ORDER BY o.orderDate DESC&quot;);</span>
+            
+<span class="nc" id="L349">            Query&lt;Order&gt; query = session.createQuery(hql.toString(), Order.class);</span>
+            
+<span class="nc bnc" id="L351" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L352">                String searchPattern = &quot;%&quot; + searchTerm.toLowerCase() + &quot;%&quot;;</span>
+<span class="nc" id="L353">                query.setParameter(&quot;search&quot;, searchPattern);</span>
+            }
+            
+<span class="nc bnc" id="L356" title="All 2 branches missed.">            if (status != null) {</span>
+<span class="nc" id="L357">                query.setParameter(&quot;status&quot;, status);</span>
+            }
+            
+<span class="nc bnc" id="L360" title="All 2 branches missed.">            if (customerId != null) {</span>
+<span class="nc" id="L361">                query.setParameter(&quot;customerId&quot;, customerId);</span>
+            }
+            
+<span class="nc bnc" id="L364" title="All 2 branches missed.">            if (restaurantId != null) {</span>
+<span class="nc" id="L365">                query.setParameter(&quot;restaurantId&quot;, restaurantId);</span>
+            }
+            
+<span class="nc bnc" id="L368" title="All 2 branches missed.">            if (limit &gt; 0) {</span>
+<span class="nc" id="L369">                query.setMaxResults(limit);</span>
+            }
+<span class="nc bnc" id="L371" title="All 2 branches missed.">            if (offset &gt; 0) {</span>
+<span class="nc" id="L372">                query.setFirstResult(offset);</span>
+            }
+            
+<span class="nc" id="L375">            return query.list();</span>
+        }
+    }
+    
+    /**
+     * شمارش سفارشات با فیلترهای اعمال شده
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت سفارش
+     * @param customerId شناسه مشتری
+     * @param restaurantId شناسه رستوران
+     * @return تعداد کل سفارشات
+     */
+    public Long countOrders(String searchTerm, OrderStatus status, Long customerId, Long restaurantId) {
+<span class="nc" id="L389">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L390">            StringBuilder hql = new StringBuilder(&quot;SELECT COUNT(o) FROM Order o WHERE 1=1&quot;);</span>
+            
+<span class="nc bnc" id="L392" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L393">                hql.append(&quot; AND (LOWER(o.deliveryAddress) LIKE :search OR o.phone LIKE :search)&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L396" title="All 2 branches missed.">            if (status != null) {</span>
+<span class="nc" id="L397">                hql.append(&quot; AND o.status = :status&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L400" title="All 2 branches missed.">            if (customerId != null) {</span>
+<span class="nc" id="L401">                hql.append(&quot; AND o.customer.id = :customerId&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L404" title="All 2 branches missed.">            if (restaurantId != null) {</span>
+<span class="nc" id="L405">                hql.append(&quot; AND o.restaurant.id = :restaurantId&quot;);</span>
+            }
+            
+<span class="nc" id="L408">            Query&lt;Long&gt; query = session.createQuery(hql.toString(), Long.class);</span>
+            
+<span class="nc bnc" id="L410" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L411">                String searchPattern = &quot;%&quot; + searchTerm.toLowerCase() + &quot;%&quot;;</span>
+<span class="nc" id="L412">                query.setParameter(&quot;search&quot;, searchPattern);</span>
+            }
+            
+<span class="nc bnc" id="L415" title="All 2 branches missed.">            if (status != null) {</span>
+<span class="nc" id="L416">                query.setParameter(&quot;status&quot;, status);</span>
+            }
+            
+<span class="nc bnc" id="L419" title="All 2 branches missed.">            if (customerId != null) {</span>
+<span class="nc" id="L420">                query.setParameter(&quot;customerId&quot;, customerId);</span>
+            }
+            
+<span class="nc bnc" id="L423" title="All 2 branches missed.">            if (restaurantId != null) {</span>
+<span class="nc" id="L424">                query.setParameter(&quot;restaurantId&quot;, restaurantId);</span>
+            }
+            
+<span class="nc" id="L427">            return query.uniqueResult();</span>
+        }
+    }
+    
+    /**
+     * دریافت آمار سفارشات بر اساس وضعیت
+     * 
+     * برای نمایش نمودار وضعیت سفارشات در dashboard
+     * 
+     * @return Map حاوی تعداد سفارشات هر وضعیت
+     */
+    public Map&lt;OrderStatus, Long&gt; getOrderStatsByStatus() {
+<span class="nc" id="L439">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L440">            Query&lt;Object[]&gt; query = session.createQuery(</span>
+                &quot;SELECT o.status, COUNT(o) FROM Order o GROUP BY o.status&quot;, Object[].class);
+            
+<span class="nc" id="L443">            List&lt;Object[]&gt; results = query.list();</span>
+<span class="nc" id="L444">            Map&lt;OrderStatus, Long&gt; stats = new HashMap&lt;&gt;();</span>
+            
+<span class="nc bnc" id="L446" title="All 2 branches missed.">            for (Object[] result : results) {</span>
+<span class="nc" id="L447">                OrderStatus status = (OrderStatus) result[0];</span>
+<span class="nc" id="L448">                Long count = (Long) result[1];</span>
+<span class="nc" id="L449">                stats.put(status, count);</span>
+<span class="nc" id="L450">            }</span>
+            
+<span class="nc" id="L452">            return stats;</span>
+        }
+    }
+
+    // ==================== مدیریت تراکنش‌ها (TRANSACTION MANAGEMENT) ====================
+    
+    /**
+     * دریافت تمام تراکنش‌ها با فیلترهای پیشرفته
+     * 
+     * امکان جستجو و فیلتر تراکنش‌ها بر اساس:
+     * - شناسه مرجع، توضیحات و روش پرداخت
+     * - وضعیت تراکنش
+     * - نوع تراکنش
+     * - کاربر مشخص
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت تراکنش
+     * @param type نوع تراکنش
+     * @param userId شناسه کاربر
+     * @param limit تعداد رکوردها
+     * @param offset شروع از رکورد
+     * @return لیست تراکنش‌های فیلتر شده
+     */
+    public List&lt;Transaction&gt; getAllTransactions(String searchTerm, TransactionStatus status, TransactionType type, Long userId, int limit, int offset) {
+<span class="nc" id="L476">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L477">            StringBuilder hql = new StringBuilder(&quot;FROM Transaction t WHERE 1=1&quot;);</span>
+            
+<span class="nc bnc" id="L479" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L480">                hql.append(&quot; AND (t.referenceId LIKE :search OR LOWER(t.description) LIKE :search OR t.paymentMethod LIKE :search)&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L483" title="All 2 branches missed.">            if (status != null) {</span>
+<span class="nc" id="L484">                hql.append(&quot; AND t.status = :status&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L487" title="All 2 branches missed.">            if (type != null) {</span>
+<span class="nc" id="L488">                hql.append(&quot; AND t.type = :type&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L491" title="All 2 branches missed.">            if (userId != null) {</span>
+<span class="nc" id="L492">                hql.append(&quot; AND t.userId = :userId&quot;);</span>
+            }
+            
+<span class="nc" id="L495">            hql.append(&quot; ORDER BY t.createdAt DESC&quot;);</span>
+            
+<span class="nc" id="L497">            Query&lt;Transaction&gt; query = session.createQuery(hql.toString(), Transaction.class);</span>
+            
+<span class="nc bnc" id="L499" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L500">                String searchPattern = &quot;%&quot; + searchTerm.toLowerCase() + &quot;%&quot;;</span>
+<span class="nc" id="L501">                query.setParameter(&quot;search&quot;, searchPattern);</span>
+            }
+            
+<span class="nc bnc" id="L504" title="All 2 branches missed.">            if (status != null) {</span>
+<span class="nc" id="L505">                query.setParameter(&quot;status&quot;, status);</span>
+            }
+            
+<span class="nc bnc" id="L508" title="All 2 branches missed.">            if (type != null) {</span>
+<span class="nc" id="L509">                query.setParameter(&quot;type&quot;, type);</span>
+            }
+            
+<span class="nc bnc" id="L512" title="All 2 branches missed.">            if (userId != null) {</span>
+<span class="nc" id="L513">                query.setParameter(&quot;userId&quot;, userId);</span>
+            }
+            
+<span class="nc bnc" id="L516" title="All 2 branches missed.">            if (limit &gt; 0) {</span>
+<span class="nc" id="L517">                query.setMaxResults(limit);</span>
+            }
+<span class="nc bnc" id="L519" title="All 2 branches missed.">            if (offset &gt; 0) {</span>
+<span class="nc" id="L520">                query.setFirstResult(offset);</span>
+            }
+            
+<span class="nc" id="L523">            return query.list();</span>
+        }
+    }
+    
+    /**
+     * شمارش تراکنش‌ها با فیلترهای اعمال شده
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت تراکنش
+     * @param type نوع تراکنش
+     * @param userId شناسه کاربر
+     * @return تعداد کل تراکنش‌ها
+     */
+    public Long countTransactions(String searchTerm, TransactionStatus status, TransactionType type, Long userId) {
+<span class="nc" id="L537">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L538">            StringBuilder hql = new StringBuilder(&quot;SELECT COUNT(t) FROM Transaction t WHERE 1=1&quot;);</span>
+            
+<span class="nc bnc" id="L540" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L541">                hql.append(&quot; AND (t.referenceId LIKE :search OR LOWER(t.description) LIKE :search OR t.paymentMethod LIKE :search)&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L544" title="All 2 branches missed.">            if (status != null) {</span>
+<span class="nc" id="L545">                hql.append(&quot; AND t.status = :status&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L548" title="All 2 branches missed.">            if (type != null) {</span>
+<span class="nc" id="L549">                hql.append(&quot; AND t.type = :type&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L552" title="All 2 branches missed.">            if (userId != null) {</span>
+<span class="nc" id="L553">                hql.append(&quot; AND t.userId = :userId&quot;);</span>
+            }
+            
+<span class="nc" id="L556">            Query&lt;Long&gt; query = session.createQuery(hql.toString(), Long.class);</span>
+            
+<span class="nc bnc" id="L558" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L559">                String searchPattern = &quot;%&quot; + searchTerm.toLowerCase() + &quot;%&quot;;</span>
+<span class="nc" id="L560">                query.setParameter(&quot;search&quot;, searchPattern);</span>
+            }
+            
+<span class="nc bnc" id="L563" title="All 2 branches missed.">            if (status != null) {</span>
+<span class="nc" id="L564">                query.setParameter(&quot;status&quot;, status);</span>
+            }
+            
+<span class="nc bnc" id="L567" title="All 2 branches missed.">            if (type != null) {</span>
+<span class="nc" id="L568">                query.setParameter(&quot;type&quot;, type);</span>
+            }
+            
+<span class="nc bnc" id="L571" title="All 2 branches missed.">            if (userId != null) {</span>
+<span class="nc" id="L572">                query.setParameter(&quot;userId&quot;, userId);</span>
+            }
+            
+<span class="nc" id="L575">            return query.uniqueResult();</span>
+        }
+    }
+
+    // ==================== مدیریت تحویل (DELIVERY MANAGEMENT) ====================
+    
+    /**
+     * دریافت تمام تحویل‌ها با فیلتر و جستجو
+     * 
+     * @param searchTerm عبارت جستجو (در یادداشت‌های تحویل)
+     * @param status وضعیت تحویل
+     * @param courierId شناسه پیک
+     * @param limit تعداد رکوردها
+     * @param offset شروع از رکورد
+     * @return لیست تحویل‌های فیلتر شده
+     */
+    public List&lt;Delivery&gt; getAllDeliveries(String searchTerm, DeliveryStatus status, Long courierId, int limit, int offset) {
+<span class="nc" id="L592">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L593">            StringBuilder hql = new StringBuilder(&quot;FROM Delivery d WHERE 1=1&quot;);</span>
+            
+<span class="nc bnc" id="L595" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L596">                hql.append(&quot; AND (LOWER(d.deliveryNotes) LIKE :search OR LOWER(d.courierNotes) LIKE :search)&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L599" title="All 2 branches missed.">            if (status != null) {</span>
+<span class="nc" id="L600">                hql.append(&quot; AND d.status = :status&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L603" title="All 2 branches missed.">            if (courierId != null) {</span>
+<span class="nc" id="L604">                hql.append(&quot; AND d.courier.id = :courierId&quot;);</span>
+            }
+            
+<span class="nc" id="L607">            hql.append(&quot; ORDER BY d.id DESC&quot;);</span>
+            
+<span class="nc" id="L609">            Query&lt;Delivery&gt; query = session.createQuery(hql.toString(), Delivery.class);</span>
+            
+<span class="nc bnc" id="L611" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L612">                String searchPattern = &quot;%&quot; + searchTerm.toLowerCase() + &quot;%&quot;;</span>
+<span class="nc" id="L613">                query.setParameter(&quot;search&quot;, searchPattern);</span>
+            }
+            
+<span class="nc bnc" id="L616" title="All 2 branches missed.">            if (status != null) {</span>
+<span class="nc" id="L617">                query.setParameter(&quot;status&quot;, status);</span>
+            }
+            
+<span class="nc bnc" id="L620" title="All 2 branches missed.">            if (courierId != null) {</span>
+<span class="nc" id="L621">                query.setParameter(&quot;courierId&quot;, courierId);</span>
+            }
+            
+<span class="nc bnc" id="L624" title="All 2 branches missed.">            if (limit &gt; 0) {</span>
+<span class="nc" id="L625">                query.setMaxResults(limit);</span>
+            }
+<span class="nc bnc" id="L627" title="All 2 branches missed.">            if (offset &gt; 0) {</span>
+<span class="nc" id="L628">                query.setFirstResult(offset);</span>
+            }
+            
+<span class="nc" id="L631">            return query.list();</span>
+        }
+    }
+    
+    /**
+     * شمارش تحویل‌ها با فیلترهای اعمال شده
+     * 
+     * @param searchTerm عبارت جستجو
+     * @param status وضعیت تحویل
+     * @param courierId شناسه پیک
+     * @return تعداد کل تحویل‌ها
+     */
+    public Long countDeliveries(String searchTerm, DeliveryStatus status, Long courierId) {
+<span class="nc" id="L644">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L645">            StringBuilder hql = new StringBuilder(&quot;SELECT COUNT(d) FROM Delivery d WHERE 1=1&quot;);</span>
+            
+<span class="nc bnc" id="L647" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L648">                hql.append(&quot; AND (LOWER(d.deliveryNotes) LIKE :search OR LOWER(d.courierNotes) LIKE :search)&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L651" title="All 2 branches missed.">            if (status != null) {</span>
+<span class="nc" id="L652">                hql.append(&quot; AND d.status = :status&quot;);</span>
+            }
+            
+<span class="nc bnc" id="L655" title="All 2 branches missed.">            if (courierId != null) {</span>
+<span class="nc" id="L656">                hql.append(&quot; AND d.courier.id = :courierId&quot;);</span>
+            }
+            
+<span class="nc" id="L659">            Query&lt;Long&gt; query = session.createQuery(hql.toString(), Long.class);</span>
+            
+<span class="nc bnc" id="L661" title="All 4 branches missed.">            if (searchTerm != null &amp;&amp; !searchTerm.trim().isEmpty()) {</span>
+<span class="nc" id="L662">                String searchPattern = &quot;%&quot; + searchTerm.toLowerCase() + &quot;%&quot;;</span>
+<span class="nc" id="L663">                query.setParameter(&quot;search&quot;, searchPattern);</span>
+            }
+            
+<span class="nc bnc" id="L666" title="All 2 branches missed.">            if (status != null) {</span>
+<span class="nc" id="L667">                query.setParameter(&quot;status&quot;, status);</span>
+            }
+            
+<span class="nc bnc" id="L670" title="All 2 branches missed.">            if (courierId != null) {</span>
+<span class="nc" id="L671">                query.setParameter(&quot;courierId&quot;, courierId);</span>
+            }
+            
+<span class="nc" id="L674">            return query.uniqueResult();</span>
+        }
+    }
+
+    // ==================== آمار سیستم (SYSTEM STATISTICS) ====================
+    
+    /**
+     * دریافت آمار کلی سیستم
+     * 
+     * این متد امکان دریافت آمار کلی سیستم را برای مدیریت پنل مدیریت فراهم می‌کند
+     * 
+     * @return آمار کلی سیستم
+     */
+    public SystemStatistics getSystemStatistics() {
+<span class="nc" id="L688">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+            // Total counts
+<span class="nc" id="L690">            Long totalUsers = session.createQuery(&quot;SELECT COUNT(u) FROM User u&quot;, Long.class).uniqueResult();</span>
+<span class="nc" id="L691">            Long totalRestaurants = session.createQuery(&quot;SELECT COUNT(r) FROM Restaurant r&quot;, Long.class).uniqueResult();</span>
+<span class="nc" id="L692">            Long totalOrders = session.createQuery(&quot;SELECT COUNT(o) FROM Order o&quot;, Long.class).uniqueResult();</span>
+<span class="nc" id="L693">            Long totalDeliveries = session.createQuery(&quot;SELECT COUNT(d) FROM Delivery d&quot;, Long.class).uniqueResult();</span>
+            
+            // Revenue statistics  
+<span class="nc" id="L696">            Double totalRevenue = session.createQuery(&quot;SELECT COALESCE(SUM(t.amount), 0.0) FROM Transaction t WHERE t.type = :paymentType AND t.status = :completedStatus&quot;, Double.class)</span>
+<span class="nc" id="L697">                .setParameter(&quot;paymentType&quot;, TransactionType.PAYMENT)</span>
+<span class="nc" id="L698">                .setParameter(&quot;completedStatus&quot;, TransactionStatus.COMPLETED).uniqueResult();</span>
+<span class="nc" id="L699">            Double totalRefunds = session.createQuery(&quot;SELECT COALESCE(SUM(t.amount), 0.0) FROM Transaction t WHERE t.type = :refundType AND t.status = :completedStatus&quot;, Double.class)</span>
+<span class="nc" id="L700">                .setParameter(&quot;refundType&quot;, TransactionType.REFUND)</span>
+<span class="nc" id="L701">                .setParameter(&quot;completedStatus&quot;, TransactionStatus.COMPLETED).uniqueResult();</span>
+            
+            // Today's statistics
+<span class="nc" id="L704">            LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);</span>
+<span class="nc" id="L705">            Long todayOrders = session.createQuery(&quot;SELECT COUNT(o) FROM Order o WHERE o.orderDate &gt;= :startOfDay&quot;, Long.class)</span>
+<span class="nc" id="L706">                .setParameter(&quot;startOfDay&quot;, startOfDay).uniqueResult();</span>
+<span class="nc" id="L707">            Double todayRevenue = session.createQuery(&quot;SELECT COALESCE(SUM(t.amount), 0.0) FROM Transaction t WHERE t.type = :paymentType AND t.status = :completedStatus AND t.createdAt &gt;= :startOfDay&quot;, Double.class)</span>
+<span class="nc" id="L708">                .setParameter(&quot;paymentType&quot;, TransactionType.PAYMENT)</span>
+<span class="nc" id="L709">                .setParameter(&quot;completedStatus&quot;, TransactionStatus.COMPLETED)</span>
+<span class="nc" id="L710">                .setParameter(&quot;startOfDay&quot;, startOfDay).uniqueResult();</span>
+            
+            // Active counts
+<span class="nc" id="L713">            Long activeRestaurants = session.createQuery(&quot;SELECT COUNT(r) FROM Restaurant r WHERE r.status = 'APPROVED'&quot;, Long.class).uniqueResult();</span>
+<span class="nc" id="L714">            Long pendingOrders = session.createQuery(&quot;SELECT COUNT(o) FROM Order o WHERE o.status = 'PENDING'&quot;, Long.class).uniqueResult();</span>
+<span class="nc" id="L715">            Long activeDeliveries = session.createQuery(&quot;SELECT COUNT(d) FROM Delivery d WHERE d.status IN ('PENDING', 'ASSIGNED', 'PICKED_UP')&quot;, Long.class).uniqueResult();</span>
+            
+<span class="nc" id="L717">            return new SystemStatistics(</span>
+                totalUsers, totalRestaurants, totalOrders, totalDeliveries,
+                totalRevenue, totalRefunds, todayOrders, todayRevenue,
+                activeRestaurants, pendingOrders, activeDeliveries
+            );
+        }
+    }
+    
+    /**
+     * دریافت آمار روزانه
+     * 
+     * این متد امکان دریافت آمار روزانه سیستم را برای مدیریت پنل مدیریت فراهم می‌کند
+     * 
+     * @param days تعداد روزهای گذشته برای دریافت آمار
+     * @return آمار روزانه
+     */
+    public List&lt;DailyStatistics&gt; getDailyStatistics(int days) {
+<span class="nc" id="L734">        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {</span>
+<span class="nc" id="L735">            LocalDateTime startDate = LocalDateTime.now().minusDays(days).withHour(0).withMinute(0).withSecond(0).withNano(0);</span>
+            
+<span class="nc" id="L737">            Query&lt;Object[]&gt; query = session.createQuery(</span>
+                &quot;SELECT DATE(o.orderDate), COUNT(o), COALESCE(SUM(o.totalAmount), 0.0) &quot; +
+                &quot;FROM Order o WHERE o.orderDate &gt;= :startDate &quot; +
+                &quot;GROUP BY DATE(o.orderDate) &quot; +
+                &quot;ORDER BY DATE(o.orderDate) DESC&quot;, Object[].class);
+<span class="nc" id="L742">            query.setParameter(&quot;startDate&quot;, startDate);</span>
+            
+<span class="nc" id="L744">            List&lt;Object[]&gt; results = query.list();</span>
+<span class="nc" id="L745">            return results.stream()</span>
+<span class="nc" id="L746">                .map(result -&gt; new DailyStatistics(</span>
+                    (java.sql.Date) result[0],
+                    (Long) result[1],
+                    (Double) result[2]
+                ))
+<span class="nc" id="L751">                .toList();</span>
+        }
+    }
+
+    // ==================== HELPER CLASSES ====================
+    
+    /**
+     * کلاس آمار کلی سیستم
+     */
+    public static class SystemStatistics {
+        private final Long totalUsers;
+        private final Long totalRestaurants;
+        private final Long totalOrders;
+        private final Long totalDeliveries;
+        private final Double totalRevenue;
+        private final Double totalRefunds;
+        private final Long todayOrders;
+        private final Double todayRevenue;
+        private final Long activeRestaurants;
+        private final Long pendingOrders;
+        private final Long activeDeliveries;
+        
+        public SystemStatistics(Long totalUsers, Long totalRestaurants, Long totalOrders, Long totalDeliveries,
+                              Double totalRevenue, Double totalRefunds, Long todayOrders, Double todayRevenue,
+<span class="fc" id="L775">                              Long activeRestaurants, Long pendingOrders, Long activeDeliveries) {</span>
+<span class="fc" id="L776">            this.totalUsers = totalUsers;</span>
+<span class="fc" id="L777">            this.totalRestaurants = totalRestaurants;</span>
+<span class="fc" id="L778">            this.totalOrders = totalOrders;</span>
+<span class="fc" id="L779">            this.totalDeliveries = totalDeliveries;</span>
+<span class="fc" id="L780">            this.totalRevenue = totalRevenue;</span>
+<span class="fc" id="L781">            this.totalRefunds = totalRefunds;</span>
+<span class="fc" id="L782">            this.todayOrders = todayOrders;</span>
+<span class="fc" id="L783">            this.todayRevenue = todayRevenue;</span>
+<span class="fc" id="L784">            this.activeRestaurants = activeRestaurants;</span>
+<span class="fc" id="L785">            this.pendingOrders = pendingOrders;</span>
+<span class="fc" id="L786">            this.activeDeliveries = activeDeliveries;</span>
+<span class="fc" id="L787">        }</span>
+        
+        // Getters
+<span class="fc" id="L790">        public Long getTotalUsers() { return totalUsers; }</span>
+<span class="fc" id="L791">        public Long getTotalRestaurants() { return totalRestaurants; }</span>
+<span class="fc" id="L792">        public Long getTotalOrders() { return totalOrders; }</span>
+<span class="fc" id="L793">        public Long getTotalDeliveries() { return totalDeliveries; }</span>
+<span class="fc" id="L794">        public Double getTotalRevenue() { return totalRevenue; }</span>
+<span class="fc" id="L795">        public Double getTotalRefunds() { return totalRefunds; }</span>
+<span class="fc" id="L796">        public Long getTodayOrders() { return todayOrders; }</span>
+<span class="fc" id="L797">        public Double getTodayRevenue() { return todayRevenue; }</span>
+<span class="fc" id="L798">        public Long getActiveRestaurants() { return activeRestaurants; }</span>
+<span class="fc" id="L799">        public Long getPendingOrders() { return pendingOrders; }</span>
+<span class="fc" id="L800">        public Long getActiveDeliveries() { return activeDeliveries; }</span>
+    }
+    
+    /**
+     * کلاس آمار روزانه
+     */
+    public static class DailyStatistics {
+        private final java.sql.Date date;
+        private final Long orderCount;
+        private final Double revenue;
+        
+<span class="fc" id="L811">        public DailyStatistics(java.sql.Date date, Long orderCount, Double revenue) {</span>
+<span class="fc" id="L812">            this.date = date;</span>
+<span class="fc" id="L813">            this.orderCount = orderCount;</span>
+<span class="fc" id="L814">            this.revenue = revenue;</span>
+<span class="fc" id="L815">        }</span>
+        
+        // Getters
+<span class="fc" id="L818">        public java.sql.Date getDate() { return date; }</span>
+<span class="fc" id="L819">        public Long getOrderCount() { return orderCount; }</span>
+<span class="fc" id="L820">        public Double getRevenue() { return revenue; }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

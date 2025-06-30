@@ -1,0 +1,1315 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NotificationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.notification</a> &gt; <span class="el_source">NotificationController.java</span></div><h1>NotificationController.java</h1><pre class="source lang-java linenums">package com.myapp.notification;
+
+import com.myapp.common.models.Notification;
+import com.myapp.common.models.Notification.NotificationType;
+import com.myapp.common.models.Notification.NotificationPriority;
+import com.myapp.common.models.OrderStatus;
+import com.myapp.common.utils.JsonUtil;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+/**
+ * کنترلر REST API سیستم اعلان‌ها
+ * 
+ * این کلاس تمام endpoint های HTTP مربوط به مدیریت اعلان‌ها را ارائه می‌دهد:
+ * 
+ * === عملیات CRUD پایه ===
+ * GET    /api/notifications                              - دریافت اعلان‌های کاربر
+ * GET    /api/notification/{id}                          - دریافت اعلان خاص
+ * POST   /api/notifications                              - ایجاد اعلان جدید
+ * PUT    /api/notifications/{id}/read                    - علامت‌گذاری خوانده شده
+ * PUT    /api/notifications/{id}/unread                  - علامت‌گذاری خوانده نشده
+ * DELETE /api/notifications/{id}                         - حذف اعلان
+ * PUT    /api/notifications/{id}/restore                 - بازیابی اعلان
+ * 
+ * === دریافت با فیلتر ===
+ * GET    /api/notifications/unread?userId={id}           - اعلان‌های خوانده نشده
+ * GET    /api/notifications/type?userId={id}&amp;type={type} - فیلتر بر اساس نوع
+ * GET    /api/notifications/priority?userId={id}&amp;priority={p} - فیلتر بر اساس اولویت
+ * GET    /api/notifications/high-priority?userId={id}    - اعلان‌های فوری
+ * GET    /api/notifications/recent?userId={id}&amp;days={d}  - اعلان‌های اخیر
+ * 
+ * === صفحه‌بندی ===
+ * GET    /api/notifications?userId={id}&amp;page={p}&amp;size={s} - اعلان‌ها با pagination
+ * 
+ * === آمار و شمارش ===
+ * GET    /api/notifications/count/unread?userId={id}       - تعداد خوانده نشده
+ * GET    /api/notifications/count/type?userId={id}&amp;type={t} - تعداد بر اساس نوع
+ * GET    /api/notifications/count/high-priority-unread?userId={id} - تعداد فوری خوانده نشده
+ * GET    /api/notifications/latest?userId={id}             - آخرین اعلان
+ * GET    /api/notifications/has-high-priority-unread?userId={id} - چک وجود فوری
+ * 
+ * === entity-specific queries ===
+ * GET    /api/notifications/orders?orderId={id}           - اعلان‌های سفارش
+ * GET    /api/notifications/orders?userId={uid}&amp;orderId={oid} - اعلان‌های سفارش کاربر
+ * GET    /api/notifications/restaurants?restaurantId={id} - اعلان‌های رستوران
+ * GET    /api/notifications/deliveries?deliveryId={id}    - اعلان‌های تحویل
+ * 
+ * === عملیات گروهی ===
+ * PUT    /api/notifications/all/read?userId={id}          - خواندن همه
+ * PUT    /api/notifications/type/read?userId={id}&amp;type={t} - خواندن بر اساس نوع
+ * 
+ * === Factory Methods ===
+ * POST   /api/notifications/order/created                 - اعلان ثبت سفارش
+ * POST   /api/notifications/order/status-changed          - اعلان تغییر وضعیت
+ * POST   /api/notifications/delivery/assigned             - اعلان اختصاص پیک
+ * 
+ * === نگهداری سیستم ===
+ * GET    /api/notifications/maintenance?action=daily      - نگهداری روزانه
+ * GET    /api/notifications/maintenance?action=cleanup&amp;days={d} - پاکسازی قدیمی‌ها
+ * GET    /api/notifications/maintenance?action=purge&amp;days={d}   - حذف کامل
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Flexible URL Pattern: پشتیبانی از /api/notifications و /notifications
+ * - RESTful Design: طراحی مطابق استانداردهای REST
+ * - Rich Query Support: پشتیبانی گسترده از query parameters
+ * - Error Handling: مدیریت جامع خطاها و HTTP status codes
+ * - JSON Processing: پردازش کامل JSON requests/responses
+ * - Path-based Routing: مسیریابی پیشرفته بر اساس URL patterns
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+public class NotificationController implements HttpHandler {
+    /** سرویس مدیریت منطق کسب‌وکار اعلان‌ها */
+    private final NotificationService notificationService;
+
+    /**
+     * سازنده کنترلر با dependency injection
+     * 
+     * @param notificationService سرویس اعلان‌ها
+     */
+<span class="fc" id="L92">    public NotificationController(NotificationService notificationService) {</span>
+<span class="fc" id="L93">        this.notificationService = notificationService;</span>
+<span class="fc" id="L94">    }</span>
+
+    /**
+     * هندلر اصلی HTTP requests
+     * 
+     * تمام درخواست‌های HTTP را بر اساس method مسیریابی می‌کند
+     * شامل error handling جامع برای انواع مختلف خطاها
+     * 
+     * @param exchange شیء HTTP request/response
+     * @throws IOException در صورت خطا در پردازش HTTP
+     */
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+<span class="fc" id="L107">        String method = exchange.getRequestMethod();</span>
+<span class="fc" id="L108">        String path = exchange.getRequestURI().getPath();</span>
+<span class="fc" id="L109">        String query = exchange.getRequestURI().getQuery();</span>
+
+        try {
+            // مسیریابی بر اساس HTTP method
+<span class="fc bfc" id="L113" title="All 5 branches covered.">            switch (method) {</span>
+<span class="fc" id="L114">                case &quot;GET&quot; -&gt; handleGet(exchange, path, query);</span>
+<span class="fc" id="L115">                case &quot;POST&quot; -&gt; handlePost(exchange, path);</span>
+<span class="fc" id="L116">                case &quot;PUT&quot; -&gt; handlePut(exchange, path);</span>
+<span class="fc" id="L117">                case &quot;DELETE&quot; -&gt; handleDelete(exchange, path);</span>
+<span class="fc" id="L118">                default -&gt; sendErrorResponse(exchange, 405, &quot;Method not allowed&quot;);</span>
+            }
+<span class="nc" id="L120">        } catch (IllegalArgumentException e) {</span>
+            // خطای پارامتر نامعتبر - 400 Bad Request
+<span class="nc" id="L122">            sendErrorResponse(exchange, 400, &quot;Bad request: &quot; + e.getMessage());</span>
+<span class="nc" id="L123">        } catch (Exception e) {</span>
+            // خطای سرور - 500 Internal Server Error
+<span class="nc" id="L125">            e.printStackTrace();</span>
+<span class="nc" id="L126">            sendErrorResponse(exchange, 500, &quot;Internal server error: &quot; + e.getMessage());</span>
+<span class="pc" id="L127">        }</span>
+<span class="fc" id="L128">    }</span>
+
+    /**
+     * مدیریت تمام GET requests
+     * 
+     * این متد پیچیده‌ترین بخش کنترلر است و انواع مختلف GET endpoints را پشتیبانی می‌کند:
+     * - دریافت اعلان‌ها با فیلترهای مختلف
+     * - صفحه‌بندی اعلان‌ها
+     * - آمار و شمارش
+     * - جستجوهای تخصصی بر اساس entity ها
+     * 
+     * @param exchange HTTP exchange object
+     * @param path مسیر درخواست
+     * @param query query string پارامترها
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGet(HttpExchange exchange, String path, String query) throws IOException {
+<span class="fc" id="L145">        String[] pathParts = path.split(&quot;/&quot;);</span>
+<span class="fc" id="L146">        Map&lt;String, String&gt; queryParams = parseQueryParams(query);</span>
+
+        // پشتیبانی از هر دو فرمت /api/notifications و /notifications
+<span class="pc bpc" id="L149" title="2 of 4 branches missed.">        boolean hasApiPrefix = pathParts.length &gt; 1 &amp;&amp; &quot;api&quot;.equals(pathParts[1]);</span>
+<span class="pc bpc" id="L150" title="1 of 2 branches missed.">        int baseIndex = hasApiPrefix ? 2 : 1;</span>
+
+        // GET /api/notifications یا /notifications
+<span class="pc bpc" id="L153" title="2 of 4 branches missed.">        if (pathParts.length &gt;= baseIndex + 1 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex])) {</span>
+            // بررسی endpoint های تخصصی ابتدا
+<span class="fc bfc" id="L155" title="All 2 branches covered.">            if (pathParts.length &gt;= baseIndex + 2) {</span>
+<span class="fc" id="L156">                String param = pathParts[baseIndex + 1];</span>
+                
+                // مسیریابی به endpoint های مختلف
+<span class="fc bfc" id="L159" title="All 2 branches covered.">                if (&quot;unread&quot;.equals(param)) {</span>
+                    // GET /api/notifications/unread?userId={id}
+<span class="fc" id="L161">                    String userId = queryParams.get(&quot;userId&quot;);</span>
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">                    if (userId != null) {</span>
+<span class="fc" id="L163">                        handleGetUnreadNotifications(exchange, userId);</span>
+<span class="fc" id="L164">                        return;</span>
+                    }
+<span class="pc bfc" id="L166" title="All 2 branches covered.">                } else if (&quot;type&quot;.equals(param)) {</span>
+                    // GET /api/notifications/type?userId={id}&amp;type={type}
+<span class="fc" id="L168">                    String userId = queryParams.get(&quot;userId&quot;);</span>
+<span class="fc" id="L169">                    String type = queryParams.get(&quot;type&quot;);</span>
+<span class="pc bpc" id="L170" title="2 of 4 branches missed.">                    if (userId != null &amp;&amp; type != null) {</span>
+<span class="fc" id="L171">                        handleGetNotificationsByType(exchange, userId, type);</span>
+<span class="fc" id="L172">                        return;</span>
+                    }
+<span class="pc bfc" id="L174" title="All 2 branches covered.">                } else if (&quot;priority&quot;.equals(param)) {</span>
+                    // GET /api/notifications/priority?userId={id}&amp;priority={priority}
+<span class="fc" id="L176">                    String userId = queryParams.get(&quot;userId&quot;);</span>
+<span class="fc" id="L177">                    String priority = queryParams.get(&quot;priority&quot;);</span>
+<span class="pc bpc" id="L178" title="2 of 4 branches missed.">                    if (userId != null &amp;&amp; priority != null) {</span>
+<span class="fc" id="L179">                        handleGetNotificationsByPriority(exchange, userId, priority);</span>
+<span class="fc" id="L180">                        return;</span>
+                    }
+<span class="pc bfc" id="L182" title="All 2 branches covered.">                } else if (&quot;high-priority&quot;.equals(param)) {</span>
+                    // GET /api/notifications/high-priority?userId={id}
+<span class="fc" id="L184">                    String userId = queryParams.get(&quot;userId&quot;);</span>
+<span class="pc bpc" id="L185" title="1 of 2 branches missed.">                    if (userId != null) {</span>
+<span class="fc" id="L186">                        handleGetHighPriorityNotifications(exchange, userId);</span>
+<span class="fc" id="L187">                        return;</span>
+                    }
+<span class="pc bfc" id="L189" title="All 2 branches covered.">                } else if (&quot;recent&quot;.equals(param)) {</span>
+                    // GET /api/notifications/recent?userId={id}&amp;days={days}
+<span class="fc" id="L191">                    String userId = queryParams.get(&quot;userId&quot;);</span>
+<span class="fc" id="L192">                    String days = queryParams.get(&quot;days&quot;);</span>
+<span class="pc bpc" id="L193" title="2 of 4 branches missed.">                    if (userId != null &amp;&amp; days != null) {</span>
+<span class="fc" id="L194">                        handleGetRecentNotifications(exchange, userId, Integer.parseInt(days));</span>
+<span class="fc" id="L195">                        return;</span>
+                    }
+<span class="pc bfc" id="L197" title="All 2 branches covered.">                } else if (&quot;count&quot;.equals(param)) {</span>
+                    // مسیرهای مختلف count
+<span class="pc bpc" id="L199" title="1 of 4 branches missed.">                    if (pathParts.length &gt;= baseIndex + 3 &amp;&amp; &quot;unread&quot;.equals(pathParts[baseIndex + 2])) {</span>
+                        // GET /api/notifications/count/unread?userId={id}
+<span class="fc" id="L201">                        String userId = queryParams.get(&quot;userId&quot;);</span>
+<span class="pc bpc" id="L202" title="1 of 2 branches missed.">                        if (userId != null) {</span>
+<span class="fc" id="L203">                            handleGetUnreadCount(exchange, userId);</span>
+<span class="fc" id="L204">                            return;</span>
+                        }
+                    }
+<span class="pc bpc" id="L207" title="1 of 4 branches missed.">                    if (pathParts.length &gt;= baseIndex + 3 &amp;&amp; &quot;type&quot;.equals(pathParts[baseIndex + 2])) {</span>
+                        // GET /api/notifications/count/type?userId={id}&amp;type={type}
+<span class="fc" id="L209">                        String userId = queryParams.get(&quot;userId&quot;);</span>
+<span class="fc" id="L210">                        String type = queryParams.get(&quot;type&quot;);</span>
+<span class="pc bpc" id="L211" title="2 of 4 branches missed.">                        if (userId != null &amp;&amp; type != null) {</span>
+<span class="fc" id="L212">                            handleGetNotificationCountByType(exchange, userId, type);</span>
+<span class="fc" id="L213">                            return;</span>
+                        }
+                    }
+<span class="pc bpc" id="L216" title="2 of 4 branches missed.">                    if (pathParts.length &gt;= baseIndex + 3 &amp;&amp; &quot;high-priority-unread&quot;.equals(pathParts[baseIndex + 2])) {</span>
+                        // GET /api/notifications/count/high-priority-unread?userId={id}
+<span class="fc" id="L218">                        String userId = queryParams.get(&quot;userId&quot;);</span>
+<span class="pc bpc" id="L219" title="1 of 2 branches missed.">                        if (userId != null) {</span>
+<span class="fc" id="L220">                            handleGetHighPriorityUnreadCount(exchange, userId);</span>
+<span class="fc" id="L221">                            return;</span>
+                        }
+<span class="nc" id="L223">                    }</span>
+<span class="pc bpc" id="L224" title="1 of 2 branches missed.">                } else if (&quot;orders&quot;.equals(param)) {</span>
+                    // اعلان‌های مربوط به سفارشات
+<span class="nc" id="L226">                    String orderId = queryParams.get(&quot;orderId&quot;);</span>
+<span class="nc" id="L227">                    String userId = queryParams.get(&quot;userId&quot;);</span>
+<span class="nc bnc" id="L228" title="All 2 branches missed.">                    if (orderId != null) {</span>
+<span class="nc" id="L229">                        handleGetOrderNotifications(exchange, orderId);</span>
+<span class="nc" id="L230">                        return;</span>
+<span class="nc bnc" id="L231" title="All 2 branches missed.">                    } else if (userId != null) {</span>
+<span class="nc" id="L232">                        handleGetUserOrderNotifications(exchange, userId);</span>
+<span class="nc" id="L233">                        return;</span>
+                    }
+<span class="pc bpc" id="L235" title="1 of 2 branches missed.">                } else if (&quot;restaurants&quot;.equals(param)) {</span>
+                    // اعلان‌های مربوط به رستوران‌ها
+<span class="nc" id="L237">                    String restaurantId = queryParams.get(&quot;restaurantId&quot;);</span>
+<span class="nc bnc" id="L238" title="All 2 branches missed.">                    if (restaurantId != null) {</span>
+<span class="nc" id="L239">                        handleGetRestaurantNotifications(exchange, restaurantId);</span>
+<span class="nc" id="L240">                        return;</span>
+                    }
+<span class="pc bpc" id="L242" title="1 of 2 branches missed.">                } else if (&quot;deliveries&quot;.equals(param)) {</span>
+                    // اعلان‌های مربوط به تحویل‌ها
+<span class="nc" id="L244">                    String deliveryId = queryParams.get(&quot;deliveryId&quot;);</span>
+<span class="nc bnc" id="L245" title="All 2 branches missed.">                    if (deliveryId != null) {</span>
+<span class="nc" id="L246">                        handleGetDeliveryNotifications(exchange, deliveryId);</span>
+<span class="nc" id="L247">                        return;</span>
+                    }
+<span class="pc bpc" id="L249" title="1 of 2 branches missed.">                } else if (&quot;maintenance&quot;.equals(param)) {</span>
+                    // عملیات نگهداری سیستم
+<span class="nc bnc" id="L251" title="All 2 branches missed.">                    if (&quot;daily&quot;.equals(queryParams.get(&quot;action&quot;))) {</span>
+<span class="nc" id="L252">                        handlePerformDailyMaintenance(exchange);</span>
+<span class="nc" id="L253">                        return;</span>
+<span class="nc bnc" id="L254" title="All 2 branches missed.">                    } else if (&quot;cleanup&quot;.equals(queryParams.get(&quot;action&quot;))) {</span>
+<span class="nc" id="L255">                        String days = queryParams.get(&quot;days&quot;);</span>
+<span class="nc bnc" id="L256" title="All 2 branches missed.">                        handleCleanupOldNotifications(exchange, days != null ? Integer.parseInt(days) : 30);</span>
+<span class="nc" id="L257">                        return;</span>
+<span class="nc bnc" id="L258" title="All 2 branches missed.">                    } else if (&quot;purge&quot;.equals(queryParams.get(&quot;action&quot;))) {</span>
+<span class="nc" id="L259">                        String days = queryParams.get(&quot;days&quot;);</span>
+<span class="nc bnc" id="L260" title="All 2 branches missed.">                        handlePurgeOldNotifications(exchange, days != null ? Integer.parseInt(days) : 90);</span>
+<span class="nc" id="L261">                        return;</span>
+                    }
+<span class="fc bfc" id="L263" title="All 2 branches covered.">                } else if (&quot;latest&quot;.equals(param)) {</span>
+                    // آخرین اعلان کاربر
+<span class="fc" id="L265">                    String userId = queryParams.get(&quot;userId&quot;);</span>
+<span class="pc bpc" id="L266" title="1 of 2 branches missed.">                    if (userId != null) {</span>
+<span class="fc" id="L267">                        handleGetLatestNotification(exchange, userId);</span>
+<span class="fc" id="L268">                        return;</span>
+                    }
+<span class="pc bpc" id="L270" title="1 of 2 branches missed.">                } else if (&quot;stats&quot;.equals(param)) {</span>
+                    // آمارهای مختلف
+<span class="nc" id="L272">                    String userId = queryParams.get(&quot;userId&quot;);</span>
+<span class="nc" id="L273">                    String type = queryParams.get(&quot;type&quot;);</span>
+<span class="nc bnc" id="L274" title="All 4 branches missed.">                    if (userId != null &amp;&amp; type != null) {</span>
+<span class="nc" id="L275">                        handleGetNotificationCountByType(exchange, userId, type);</span>
+<span class="nc" id="L276">                        return;</span>
+<span class="nc bnc" id="L277" title="All 4 branches missed.">                    } else if (userId != null &amp;&amp; queryParams.containsKey(&quot;highPriority&quot;)) {</span>
+<span class="nc" id="L278">                        handleGetHighPriorityUnreadCount(exchange, userId);</span>
+<span class="nc" id="L279">                        return;</span>
+<span class="nc bnc" id="L280" title="All 4 branches missed.">                    } else if (userId != null &amp;&amp; queryParams.containsKey(&quot;hasUnreadHighPriority&quot;)) {</span>
+<span class="nc" id="L281">                        handleCheckIfUserHasUnreadHighPriorityNotifications(exchange, userId);</span>
+<span class="nc" id="L282">                        return;</span>
+                    }
+<span class="pc bfc" id="L284" title="All 2 branches covered.">                } else if (&quot;has-high-priority-unread&quot;.equals(param)) {</span>
+                    // بررسی وجود اعلان فوری خوانده نشده
+<span class="fc" id="L286">                    String userId = queryParams.get(&quot;userId&quot;);</span>
+<span class="pc bpc" id="L287" title="1 of 2 branches missed.">                    if (userId != null) {</span>
+<span class="fc" id="L288">                        handleCheckIfUserHasUnreadHighPriorityNotifications(exchange, userId);</span>
+<span class="fc" id="L289">                        return;</span>
+                    }
+                }
+<span class="fc" id="L292">            } else {</span>
+                // GET /api/notifications با query parameters
+<span class="fc" id="L294">                String userId = queryParams.get(&quot;userId&quot;);</span>
+<span class="fc" id="L295">                String page = queryParams.get(&quot;page&quot;);</span>
+<span class="fc" id="L296">                String size = queryParams.get(&quot;size&quot;);</span>
+                
+<span class="fc bfc" id="L298" title="All 2 branches covered.">                if (userId != null) {</span>
+<span class="pc bpc" id="L299" title="1 of 4 branches missed.">                    if (page != null &amp;&amp; size != null) {</span>
+                        // صفحه‌بندی
+<span class="fc" id="L301">                        handleGetUserNotificationsPaginated(exchange, userId, Integer.parseInt(page), Integer.parseInt(size));</span>
+<span class="fc" id="L302">                        return;</span>
+                    } else {
+                        // تمام اعلان‌های کاربر
+<span class="fc" id="L305">                        handleGetUserNotifications(exchange, userId, queryParams);</span>
+<span class="fc" id="L306">                        return;</span>
+                    }
+                } else {
+                    // خطا: userId الزامی است
+<span class="fc" id="L310">                    sendErrorResponse(exchange, 400, &quot;userId parameter is required&quot;);</span>
+<span class="fc" id="L311">                    return;</span>
+                }
+            }
+        }
+
+        // پشتیبانی از endpoint های path-based تخصصی
+        
+        // GET /api/notifications/order/{orderId}
+<span class="pc bpc" id="L319" title="1 of 6 branches missed.">        if (pathParts.length == baseIndex + 3 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex]) &amp;&amp; &quot;order&quot;.equals(pathParts[baseIndex + 1])) {</span>
+<span class="fc" id="L320">            handleGetOrderNotifications(exchange, pathParts[baseIndex + 2]);</span>
+<span class="fc" id="L321">            return;</span>
+        }
+        
+        // GET /api/notifications/user/{userId}/order/{orderId}
+<span class="pc bpc" id="L325" title="1 of 4 branches missed.">        if (pathParts.length == baseIndex + 5 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex]) &amp;&amp; </span>
+<span class="pc bpc" id="L326" title="2 of 4 branches missed.">            &quot;user&quot;.equals(pathParts[baseIndex + 1]) &amp;&amp; &quot;order&quot;.equals(pathParts[baseIndex + 3])) {</span>
+<span class="fc" id="L327">            handleGetUserOrderNotifications(exchange, pathParts[baseIndex + 2], pathParts[baseIndex + 4]);</span>
+<span class="fc" id="L328">            return;</span>
+        }
+        
+        // GET /api/notifications/restaurant/{restaurantId}
+<span class="pc bpc" id="L332" title="1 of 6 branches missed.">        if (pathParts.length == baseIndex + 3 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex]) &amp;&amp; &quot;restaurant&quot;.equals(pathParts[baseIndex + 1])) {</span>
+<span class="fc" id="L333">            handleGetRestaurantNotifications(exchange, pathParts[baseIndex + 2]);</span>
+<span class="fc" id="L334">            return;</span>
+        }
+        
+        // GET /api/notifications/delivery/{deliveryId}
+<span class="pc bpc" id="L338" title="2 of 6 branches missed.">        if (pathParts.length == baseIndex + 3 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex]) &amp;&amp; &quot;delivery&quot;.equals(pathParts[baseIndex + 1])) {</span>
+<span class="fc" id="L339">            handleGetDeliveryNotifications(exchange, pathParts[baseIndex + 2]);</span>
+<span class="fc" id="L340">            return;</span>
+        }
+
+        // GET /api/notification/{id} - فرم مفرد
+<span class="pc bpc" id="L344" title="1 of 4 branches missed.">        if (pathParts.length == baseIndex + 2 &amp;&amp; &quot;notification&quot;.equals(pathParts[baseIndex])) {</span>
+<span class="nc" id="L345">            handleGetNotificationById(exchange, pathParts[baseIndex + 1]);</span>
+<span class="nc" id="L346">            return;</span>
+        }
+        
+        // GET /api/notifications/{id} - زمانی که فقط شناسه اعلان است
+<span class="pc bpc" id="L350" title="1 of 4 branches missed.">        if (pathParts.length == baseIndex + 2 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex])) {</span>
+            // بررسی آیا قسمت دوم عدد است (شناسه اعلان) یا endpoint خاص
+<span class="fc" id="L352">            String param = pathParts[baseIndex + 1];</span>
+            try {
+<span class="fc" id="L354">                Long.parseLong(param);</span>
+                // عدد است، به عنوان شناسه اعلان در نظر بگیر
+<span class="fc" id="L356">                handleGetNotificationById(exchange, param);</span>
+<span class="fc" id="L357">                return;</span>
+<span class="nc" id="L358">            } catch (NumberFormatException e) {</span>
+                // عدد نیست، به عنوان endpoint دیگر ادامه پردازش
+            }
+        }
+
+        // endpoint یافت نشد
+<span class="fc" id="L364">        sendErrorResponse(exchange, 404, &quot;Endpoint not found&quot;);</span>
+<span class="fc" id="L365">    }</span>
+
+    /**
+     * مدیریت تمام POST requests
+     * 
+     * شامل ایجاد اعلان‌های جدید و factory methods برای انواع خاص اعلان‌ها
+     * 
+     * @param exchange HTTP exchange object
+     * @param path مسیر درخواست
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handlePost(HttpExchange exchange, String path) throws IOException {
+<span class="fc" id="L377">        String[] pathParts = path.split(&quot;/&quot;);</span>
+
+        // پشتیبانی از هر دو فرمت /api/notifications و /notifications
+<span class="pc bpc" id="L380" title="2 of 4 branches missed.">        boolean hasApiPrefix = pathParts.length &gt; 1 &amp;&amp; &quot;api&quot;.equals(pathParts[1]);</span>
+<span class="pc bpc" id="L381" title="1 of 2 branches missed.">        int baseIndex = hasApiPrefix ? 2 : 1;</span>
+
+        // POST /api/notifications - ایجاد اعلان عمومی
+<span class="pc bpc" id="L384" title="1 of 4 branches missed.">        if (pathParts.length == baseIndex + 1 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex])) {</span>
+<span class="fc" id="L385">            handleCreateNotification(exchange);</span>
+<span class="fc" id="L386">            return;</span>
+        }
+        
+        // POST /api/notifications/order/created - اعلان ثبت سفارش
+<span class="pc bpc" id="L390" title="2 of 4 branches missed.">        if (pathParts.length == baseIndex + 3 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex]) &amp;&amp; </span>
+<span class="fc bfc" id="L391" title="All 4 branches covered.">            &quot;order&quot;.equals(pathParts[baseIndex + 1]) &amp;&amp; &quot;created&quot;.equals(pathParts[baseIndex + 2])) {</span>
+<span class="fc" id="L392">            handleCreateOrderNotification(exchange);</span>
+<span class="fc" id="L393">            return;</span>
+        }
+        
+        // POST /api/notifications/order/status-changed - اعلان تغییر وضعیت سفارش
+<span class="pc bpc" id="L397" title="2 of 4 branches missed.">        if (pathParts.length == baseIndex + 3 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex]) &amp;&amp; </span>
+<span class="pc bpc" id="L398" title="1 of 4 branches missed.">            &quot;order&quot;.equals(pathParts[baseIndex + 1]) &amp;&amp; &quot;status-changed&quot;.equals(pathParts[baseIndex + 2])) {</span>
+<span class="fc" id="L399">            handleCreateOrderStatusChangedNotification(exchange);</span>
+<span class="fc" id="L400">            return;</span>
+        }
+        
+        // POST /api/notifications/delivery/assigned - اعلان اختصاص پیک
+<span class="pc bpc" id="L404" title="2 of 4 branches missed.">        if (pathParts.length == baseIndex + 3 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex]) &amp;&amp; </span>
+<span class="pc bpc" id="L405" title="1 of 4 branches missed.">            &quot;delivery&quot;.equals(pathParts[baseIndex + 1]) &amp;&amp; &quot;assigned&quot;.equals(pathParts[baseIndex + 2])) {</span>
+<span class="fc" id="L406">            handleCreateDeliveryAssignedNotification(exchange);</span>
+<span class="fc" id="L407">            return;</span>
+        }
+        
+        // POST /api/notifications/maintenance/daily - نگهداری روزانه
+<span class="pc bpc" id="L411" title="2 of 4 branches missed.">        if (pathParts.length == baseIndex + 3 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex]) &amp;&amp; </span>
+<span class="pc bpc" id="L412" title="1 of 4 branches missed.">            &quot;maintenance&quot;.equals(pathParts[baseIndex + 1]) &amp;&amp; &quot;daily&quot;.equals(pathParts[baseIndex + 2])) {</span>
+<span class="fc" id="L413">            handlePerformDailyMaintenance(exchange);</span>
+<span class="fc" id="L414">            return;</span>
+        }
+        
+        // POST /api/notifications/maintenance/cleanup - پاکسازی اعلان‌های قدیمی
+<span class="pc bpc" id="L418" title="2 of 4 branches missed.">        if (pathParts.length == baseIndex + 3 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex]) &amp;&amp; </span>
+<span class="pc bpc" id="L419" title="1 of 4 branches missed.">            &quot;maintenance&quot;.equals(pathParts[baseIndex + 1]) &amp;&amp; &quot;cleanup&quot;.equals(pathParts[baseIndex + 2])) {</span>
+<span class="fc" id="L420">            String query = exchange.getRequestURI().getQuery();</span>
+<span class="fc" id="L421">            Map&lt;String, String&gt; queryParams = parseQueryParams(query);</span>
+<span class="fc" id="L422">            String days = queryParams.get(&quot;days&quot;);</span>
+<span class="pc bpc" id="L423" title="1 of 2 branches missed.">            handleCleanupOldNotifications(exchange, days != null ? Integer.parseInt(days) : 30);</span>
+<span class="fc" id="L424">            return;</span>
+        }
+        
+        // POST /api/notifications/maintenance/purge - حذف کامل اعلان‌های منقضی
+<span class="pc bpc" id="L428" title="2 of 4 branches missed.">        if (pathParts.length == baseIndex + 3 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex]) &amp;&amp; </span>
+<span class="pc bpc" id="L429" title="2 of 4 branches missed.">            &quot;maintenance&quot;.equals(pathParts[baseIndex + 1]) &amp;&amp; &quot;purge&quot;.equals(pathParts[baseIndex + 2])) {</span>
+<span class="fc" id="L430">            String query = exchange.getRequestURI().getQuery();</span>
+<span class="fc" id="L431">            Map&lt;String, String&gt; queryParams = parseQueryParams(query);</span>
+<span class="fc" id="L432">            String days = queryParams.get(&quot;days&quot;);</span>
+<span class="pc bpc" id="L433" title="1 of 2 branches missed.">            handlePurgeOldNotifications(exchange, days != null ? Integer.parseInt(days) : 90);</span>
+<span class="fc" id="L434">            return;</span>
+        }
+
+<span class="nc" id="L437">        sendErrorResponse(exchange, 404, &quot;Endpoint not found&quot;);</span>
+<span class="nc" id="L438">    }</span>
+
+    /**
+     * مدیریت تمام PUT requests
+     * 
+     * شامل عملیات‌های به‌روزرسانی وضعیت اعلان‌ها و عملیات گروهی
+     * 
+     * @param exchange HTTP exchange object
+     * @param path مسیر درخواست
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handlePut(HttpExchange exchange, String path) throws IOException {
+<span class="fc" id="L450">        String[] pathParts = path.split(&quot;/&quot;);</span>
+<span class="fc" id="L451">        String query = exchange.getRequestURI().getQuery();</span>
+<span class="fc" id="L452">        Map&lt;String, String&gt; queryParams = parseQueryParams(query);</span>
+
+        // پشتیبانی از هر دو فرمت /api/notifications و /notifications
+<span class="pc bpc" id="L455" title="2 of 4 branches missed.">        boolean hasApiPrefix = pathParts.length &gt; 1 &amp;&amp; &quot;api&quot;.equals(pathParts[1]);</span>
+<span class="pc bpc" id="L456" title="1 of 2 branches missed.">        int baseIndex = hasApiPrefix ? 2 : 1;</span>
+
+        // PUT /api/notifications/{id}/read - علامت‌گذاری خوانده شده
+<span class="pc bpc" id="L459" title="1 of 6 branches missed.">        if (pathParts.length == baseIndex + 3 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex]) &amp;&amp; &quot;read&quot;.equals(pathParts[baseIndex + 2])) {</span>
+<span class="fc" id="L460">            handleMarkAsRead(exchange, pathParts[baseIndex + 1]);</span>
+<span class="fc" id="L461">            return;</span>
+        }
+        
+        // PUT /api/notifications/{id}/unread - علامت‌گذاری خوانده نشده
+<span class="pc bpc" id="L465" title="1 of 6 branches missed.">        if (pathParts.length == baseIndex + 3 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex]) &amp;&amp; &quot;unread&quot;.equals(pathParts[baseIndex + 2])) {</span>
+<span class="fc" id="L466">            handleMarkAsUnread(exchange, pathParts[baseIndex + 1]);</span>
+<span class="fc" id="L467">            return;</span>
+        }
+        
+        // PUT /api/notifications/all/read - علامت‌گذاری همه به عنوان خوانده شده
+<span class="pc bpc" id="L471" title="4 of 8 branches missed.">        if (pathParts.length == baseIndex + 3 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex]) &amp;&amp; &quot;all&quot;.equals(pathParts[baseIndex + 1]) &amp;&amp; &quot;read&quot;.equals(pathParts[baseIndex + 2])) {</span>
+<span class="nc" id="L472">            String userId = queryParams.get(&quot;userId&quot;);</span>
+<span class="nc bnc" id="L473" title="All 2 branches missed.">            if (userId != null) {</span>
+<span class="nc" id="L474">                handleMarkAllAsRead(exchange, userId);</span>
+<span class="nc" id="L475">                return;</span>
+            }
+        }
+        
+        // PUT /api/notifications/type/read - علامت‌گذاری بر اساس نوع
+<span class="pc bpc" id="L480" title="4 of 8 branches missed.">        if (pathParts.length == baseIndex + 3 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex]) &amp;&amp; &quot;type&quot;.equals(pathParts[baseIndex + 1]) &amp;&amp; &quot;read&quot;.equals(pathParts[baseIndex + 2])) {</span>
+<span class="nc" id="L481">            String userId = queryParams.get(&quot;userId&quot;);</span>
+<span class="nc" id="L482">            String type = queryParams.get(&quot;type&quot;);</span>
+<span class="nc bnc" id="L483" title="All 4 branches missed.">            if (userId != null &amp;&amp; type != null) {</span>
+<span class="nc" id="L484">                handleMarkNotificationsByTypeAsRead(exchange, userId, type);</span>
+<span class="nc" id="L485">                return;</span>
+            }
+        }
+        
+        // PUT /api/notifications/mark-all-read - فرمت جایگزین
+<span class="pc bpc" id="L490" title="1 of 6 branches missed.">        if (pathParts.length == baseIndex + 2 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex]) &amp;&amp; &quot;mark-all-read&quot;.equals(pathParts[baseIndex + 1])) {</span>
+<span class="fc" id="L491">            String userId = queryParams.get(&quot;userId&quot;);</span>
+<span class="pc bpc" id="L492" title="1 of 2 branches missed.">            if (userId != null) {</span>
+<span class="fc" id="L493">                handleMarkAllAsRead(exchange, userId);</span>
+<span class="fc" id="L494">                return;</span>
+            }
+        }
+        
+        // PUT /api/notifications/mark-read-by-type - فرمت جایگزین
+<span class="pc bpc" id="L499" title="2 of 6 branches missed.">        if (pathParts.length == baseIndex + 2 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex]) &amp;&amp; &quot;mark-read-by-type&quot;.equals(pathParts[baseIndex + 1])) {</span>
+<span class="fc" id="L500">            String userId = queryParams.get(&quot;userId&quot;);</span>
+<span class="fc" id="L501">            String type = queryParams.get(&quot;type&quot;);</span>
+<span class="pc bpc" id="L502" title="2 of 4 branches missed.">            if (userId != null &amp;&amp; type != null) {</span>
+<span class="fc" id="L503">                handleMarkNotificationsByTypeAsRead(exchange, userId, type);</span>
+<span class="fc" id="L504">                return;</span>
+            }
+        }
+        
+        // PUT /api/notifications/{id}/restore - بازیابی اعلان حذف شده
+<span class="pc bpc" id="L509" title="3 of 6 branches missed.">        if (pathParts.length == baseIndex + 3 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex]) &amp;&amp; &quot;restore&quot;.equals(pathParts[baseIndex + 2])) {</span>
+<span class="fc" id="L510">            handleRestoreNotification(exchange, pathParts[baseIndex + 1]);</span>
+<span class="fc" id="L511">            return;</span>
+        }
+
+<span class="nc" id="L514">        sendErrorResponse(exchange, 404, &quot;Endpoint not found&quot;);</span>
+<span class="nc" id="L515">    }</span>
+
+    /**
+     * مدیریت تمام DELETE requests
+     * 
+     * شامل حذف منطقی اعلان‌ها
+     * 
+     * @param exchange HTTP exchange object
+     * @param path مسیر درخواست
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleDelete(HttpExchange exchange, String path) throws IOException {
+<span class="fc" id="L527">        String[] pathParts = path.split(&quot;/&quot;);</span>
+<span class="fc" id="L528">        String query = exchange.getRequestURI().getQuery();</span>
+<span class="fc" id="L529">        Map&lt;String, String&gt; queryParams = parseQueryParams(query);</span>
+
+        // پشتیبانی از هر دو فرمت /api/notifications و /notifications
+<span class="pc bpc" id="L532" title="2 of 4 branches missed.">        boolean hasApiPrefix = pathParts.length &gt; 1 &amp;&amp; &quot;api&quot;.equals(pathParts[1]);</span>
+<span class="pc bpc" id="L533" title="1 of 2 branches missed.">        int baseIndex = hasApiPrefix ? 2 : 1;</span>
+
+        // DELETE /api/notifications/{id} - حذف اعلان
+<span class="pc bpc" id="L536" title="2 of 4 branches missed.">        if (pathParts.length == baseIndex + 2 &amp;&amp; &quot;notifications&quot;.equals(pathParts[baseIndex])) {</span>
+<span class="fc" id="L537">            handleDeleteNotification(exchange, pathParts[baseIndex + 1]);</span>
+<span class="fc" id="L538">            return;</span>
+        }
+
+<span class="nc" id="L541">        sendErrorResponse(exchange, 404, &quot;Endpoint not found&quot;);</span>
+<span class="nc" id="L542">    }</span>
+
+    // ==================== HANDLER IMPLEMENTATIONS ====================
+    
+    /**
+     * دریافت تمام اعلان‌های کاربر
+     * 
+     * @param exchange HTTP exchange
+     * @param userIdStr شناسه کاربر به صورت رشته
+     * @param queryParams پارامترهای اضافی query
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGetUserNotifications(HttpExchange exchange, String userIdStr, Map&lt;String, String&gt; queryParams) throws IOException {
+        try {
+<span class="fc" id="L556">            Long userId = Long.parseLong(userIdStr);</span>
+<span class="fc" id="L557">            List&lt;Notification&gt; notifications = notificationService.getUserNotifications(userId);</span>
+<span class="fc" id="L558">            sendSuccessResponse(exchange, notifications);</span>
+<span class="nc" id="L559">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L560">            sendErrorResponse(exchange, 400, &quot;Invalid user ID format&quot;);</span>
+<span class="fc" id="L561">        } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L562">            sendErrorResponse(exchange, 400, e.getMessage());</span>
+<span class="fc" id="L563">        } catch (Exception e) {</span>
+<span class="fc" id="L564">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L565">        }</span>
+<span class="fc" id="L566">    }</span>
+
+    /**
+     * دریافت اعلان خاص بر اساس شناسه
+     * 
+     * @param exchange HTTP exchange
+     * @param idStr شناسه اعلان به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGetNotificationById(HttpExchange exchange, String idStr) throws IOException {
+        try {
+<span class="fc" id="L577">            Long id = Long.parseLong(idStr);</span>
+<span class="fc" id="L578">            Optional&lt;Notification&gt; notification = notificationService.getNotificationById(id);</span>
+<span class="fc bfc" id="L579" title="All 2 branches covered.">            if (notification.isPresent()) {</span>
+<span class="fc" id="L580">                sendSuccessResponse(exchange, notification.get());</span>
+            } else {
+<span class="fc" id="L582">                sendErrorResponse(exchange, 404, &quot;Notification not found&quot;);</span>
+            }
+<span class="nc" id="L584">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L585">            sendErrorResponse(exchange, 400, &quot;Invalid notification ID format&quot;);</span>
+<span class="nc" id="L586">        } catch (Exception e) {</span>
+<span class="nc" id="L587">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L588">        }</span>
+<span class="fc" id="L589">    }</span>
+
+    /**
+     * ایجاد اعلان جدید عمومی
+     * 
+     * JSON Request Body:
+     * {
+     *   &quot;userId&quot;: number,
+     *   &quot;title&quot;: string,
+     *   &quot;message&quot;: string,
+     *   &quot;type&quot;: string,
+     *   &quot;priority&quot;: string (اختیاری)
+     * }
+     * 
+     * @param exchange HTTP exchange
+     * @throws IOException در صورت خطا در پردازش
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    private void handleCreateNotification(HttpExchange exchange) throws IOException {
+        try {
+<span class="fc" id="L609">            String requestBody = new String(exchange.getRequestBody().readAllBytes());</span>
+<span class="fc" id="L610">            Map&lt;String, Object&gt; data = JsonUtil.fromJson(requestBody, Map.class);</span>
+            
+<span class="fc" id="L612">            Long userId = ((Number) data.get(&quot;userId&quot;)).longValue();</span>
+<span class="fc" id="L613">            String title = (String) data.get(&quot;title&quot;);</span>
+<span class="fc" id="L614">            String message = (String) data.get(&quot;message&quot;);</span>
+<span class="fc" id="L615">            String typeStr = (String) data.get(&quot;type&quot;);</span>
+<span class="fc" id="L616">            String priorityStr = (String) data.get(&quot;priority&quot;);</span>
+            
+<span class="fc" id="L618">            NotificationType type = NotificationType.valueOf(typeStr.toUpperCase());</span>
+            
+            Notification notification;
+<span class="fc bfc" id="L621" title="All 2 branches covered.">            if (priorityStr != null) {</span>
+<span class="fc" id="L622">                NotificationPriority priority = NotificationPriority.valueOf(priorityStr.toUpperCase());</span>
+<span class="fc" id="L623">                notification = notificationService.createNotification(userId, title, message, type, priority);</span>
+<span class="fc" id="L624">            } else {</span>
+<span class="fc" id="L625">                notification = notificationService.createNotification(userId, title, message, type);</span>
+            }
+            
+<span class="fc" id="L628">            sendSuccessResponse(exchange, notification, 201);</span>
+<span class="fc" id="L629">        } catch (Exception e) {</span>
+<span class="fc" id="L630">            sendErrorResponse(exchange, 400, e.getMessage());</span>
+<span class="fc" id="L631">        }</span>
+<span class="fc" id="L632">    }</span>
+
+    /**
+     * علامت‌گذاری اعلان به عنوان خوانده شده
+     * 
+     * @param exchange HTTP exchange
+     * @param idStr شناسه اعلان به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleMarkAsRead(HttpExchange exchange, String idStr) throws IOException {
+        try {
+<span class="fc" id="L643">            Long id = Long.parseLong(idStr);</span>
+<span class="fc" id="L644">            Notification notification = notificationService.markAsRead(id);</span>
+<span class="fc" id="L645">            sendSuccessResponse(exchange, notification);</span>
+<span class="fc" id="L646">        } catch (NumberFormatException e) {</span>
+<span class="fc" id="L647">            sendErrorResponse(exchange, 400, &quot;Invalid notification ID format&quot;);</span>
+<span class="fc" id="L648">        } catch (Exception e) {</span>
+<span class="pc bpc" id="L649" title="2 of 4 branches missed.">            if (e.getMessage() != null &amp;&amp; e.getMessage().contains(&quot;not found&quot;)) {</span>
+<span class="fc" id="L650">                sendErrorResponse(exchange, 404, e.getMessage());</span>
+            } else {
+<span class="nc" id="L652">                sendErrorResponse(exchange, 500, e.getMessage());</span>
+            }
+<span class="fc" id="L654">        }</span>
+<span class="fc" id="L655">    }</span>
+
+    /**
+     * حذف منطقی اعلان
+     * 
+     * @param exchange HTTP exchange
+     * @param idStr شناسه اعلان به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleDeleteNotification(HttpExchange exchange, String idStr) throws IOException {
+        try {
+<span class="fc" id="L666">            Long id = Long.parseLong(idStr);</span>
+<span class="fc" id="L667">            notificationService.deleteNotification(id);</span>
+<span class="fc" id="L668">            sendSuccessResponse(exchange, Map.of(&quot;message&quot;, &quot;Notification deleted successfully&quot;));</span>
+<span class="fc" id="L669">        } catch (NumberFormatException e) {</span>
+<span class="fc" id="L670">            sendErrorResponse(exchange, 400, &quot;Invalid notification ID format&quot;);</span>
+<span class="fc" id="L671">        } catch (Exception e) {</span>
+<span class="pc bpc" id="L672" title="2 of 4 branches missed.">            if (e.getMessage() != null &amp;&amp; e.getMessage().contains(&quot;not found&quot;)) {</span>
+<span class="fc" id="L673">                sendErrorResponse(exchange, 404, e.getMessage());</span>
+            } else {
+<span class="nc" id="L675">                sendErrorResponse(exchange, 500, e.getMessage());</span>
+            }
+<span class="fc" id="L677">        }</span>
+<span class="fc" id="L678">    }</span>
+
+    /**
+     * بازیابی اعلان حذف شده
+     * 
+     * @param exchange HTTP exchange
+     * @param idStr شناسه اعلان به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleRestoreNotification(HttpExchange exchange, String idStr) throws IOException {
+        try {
+<span class="fc" id="L689">            Long id = Long.parseLong(idStr);</span>
+<span class="fc" id="L690">            notificationService.restoreNotification(id);</span>
+<span class="fc" id="L691">            sendSuccessResponse(exchange, Map.of(&quot;message&quot;, &quot;Notification restored successfully&quot;));</span>
+<span class="nc" id="L692">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L693">            sendErrorResponse(exchange, 400, &quot;Invalid notification ID format&quot;);</span>
+<span class="nc" id="L694">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L695" title="All 4 branches missed.">            if (e.getMessage() != null &amp;&amp; e.getMessage().contains(&quot;not found&quot;)) {</span>
+<span class="nc" id="L696">                sendErrorResponse(exchange, 404, e.getMessage());</span>
+            } else {
+<span class="nc" id="L698">                sendErrorResponse(exchange, 500, e.getMessage());</span>
+            }
+<span class="pc" id="L700">        }</span>
+<span class="fc" id="L701">    }</span>
+
+    /**
+     * دریافت اعلان‌های خوانده نشده کاربر
+     * 
+     * @param exchange HTTP exchange
+     * @param userIdStr شناسه کاربر به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGetUnreadNotifications(HttpExchange exchange, String userIdStr) throws IOException {
+        try {
+<span class="fc" id="L712">            Long userId = Long.parseLong(userIdStr);</span>
+<span class="fc" id="L713">            List&lt;Notification&gt; notifications = notificationService.getUnreadNotifications(userId);</span>
+<span class="fc" id="L714">            sendSuccessResponse(exchange, notifications);</span>
+<span class="nc" id="L715">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L716">            sendErrorResponse(exchange, 400, &quot;Invalid user ID format&quot;);</span>
+<span class="nc" id="L717">        } catch (Exception e) {</span>
+<span class="nc" id="L718">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L719">        }</span>
+<span class="fc" id="L720">    }</span>
+
+    /**
+     * دریافت اعلان‌ها بر اساس نوع
+     * 
+     * @param exchange HTTP exchange
+     * @param userIdStr شناسه کاربر به صورت رشته
+     * @param typeStr نوع اعلان به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGetNotificationsByType(HttpExchange exchange, String userIdStr, String typeStr) throws IOException {
+        try {
+<span class="fc" id="L732">            Long userId = Long.parseLong(userIdStr);</span>
+<span class="fc" id="L733">            NotificationType type = NotificationType.valueOf(typeStr.toUpperCase());</span>
+<span class="fc" id="L734">            List&lt;Notification&gt; notifications = notificationService.getNotificationsByType(userId, type);</span>
+<span class="fc" id="L735">            sendSuccessResponse(exchange, notifications);</span>
+<span class="nc" id="L736">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L737">            sendErrorResponse(exchange, 400, &quot;Invalid user ID format&quot;);</span>
+<span class="nc" id="L738">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L739">            sendErrorResponse(exchange, 400, &quot;Invalid notification type&quot;);</span>
+<span class="nc" id="L740">        } catch (Exception e) {</span>
+<span class="nc" id="L741">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L742">        }</span>
+<span class="fc" id="L743">    }</span>
+
+    /**
+     * دریافت اعلان‌ها بر اساس اولویت
+     * 
+     * @param exchange HTTP exchange
+     * @param userIdStr شناسه کاربر به صورت رشته
+     * @param priorityStr اولویت اعلان به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGetNotificationsByPriority(HttpExchange exchange, String userIdStr, String priorityStr) throws IOException {
+        try {
+<span class="fc" id="L755">            Long userId = Long.parseLong(userIdStr);</span>
+<span class="fc" id="L756">            NotificationPriority priority = NotificationPriority.valueOf(priorityStr.toUpperCase());</span>
+<span class="fc" id="L757">            List&lt;Notification&gt; notifications = notificationService.getNotificationsByPriority(userId, priority);</span>
+<span class="fc" id="L758">            sendSuccessResponse(exchange, notifications);</span>
+<span class="nc" id="L759">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L760">            sendErrorResponse(exchange, 400, &quot;Invalid user ID format&quot;);</span>
+<span class="nc" id="L761">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L762">            sendErrorResponse(exchange, 400, &quot;Invalid notification priority&quot;);</span>
+<span class="nc" id="L763">        } catch (Exception e) {</span>
+<span class="nc" id="L764">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L765">        }</span>
+<span class="fc" id="L766">    }</span>
+
+    /**
+     * دریافت اعلان‌های با اولویت بالا
+     * 
+     * @param exchange HTTP exchange
+     * @param userIdStr شناسه کاربر به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGetHighPriorityNotifications(HttpExchange exchange, String userIdStr) throws IOException {
+        try {
+<span class="fc" id="L777">            Long userId = Long.parseLong(userIdStr);</span>
+<span class="fc" id="L778">            List&lt;Notification&gt; notifications = notificationService.getHighPriorityNotifications(userId);</span>
+<span class="fc" id="L779">            sendSuccessResponse(exchange, notifications);</span>
+<span class="nc" id="L780">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L781">            sendErrorResponse(exchange, 400, &quot;Invalid user ID format&quot;);</span>
+<span class="nc" id="L782">        } catch (Exception e) {</span>
+<span class="nc" id="L783">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L784">        }</span>
+<span class="fc" id="L785">    }</span>
+
+    /**
+     * دریافت اعلان‌های اخیر کاربر
+     * 
+     * @param exchange HTTP exchange
+     * @param userIdStr شناسه کاربر به صورت رشته
+     * @param hours تعداد ساعات گذشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGetRecentNotifications(HttpExchange exchange, String userIdStr, int hours) throws IOException {
+        try {
+<span class="fc" id="L797">            Long userId = Long.parseLong(userIdStr);</span>
+<span class="fc" id="L798">            List&lt;Notification&gt; notifications = notificationService.getRecentNotifications(userId, hours);</span>
+<span class="fc" id="L799">            sendSuccessResponse(exchange, notifications);</span>
+<span class="nc" id="L800">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L801">            sendErrorResponse(exchange, 400, &quot;Invalid user ID format&quot;);</span>
+<span class="nc" id="L802">        } catch (Exception e) {</span>
+<span class="nc" id="L803">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L804">        }</span>
+<span class="fc" id="L805">    }</span>
+
+    /**
+     * دریافت تعداد اعلان‌های خوانده نشده
+     * 
+     * @param exchange HTTP exchange
+     * @param userIdStr شناسه کاربر به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGetUnreadCount(HttpExchange exchange, String userIdStr) throws IOException {
+        try {
+<span class="fc" id="L816">            Long userId = Long.parseLong(userIdStr);</span>
+<span class="fc" id="L817">            Long count = notificationService.getUnreadCount(userId);</span>
+<span class="fc" id="L818">            sendSuccessResponse(exchange, Map.of(&quot;count&quot;, count));</span>
+<span class="nc" id="L819">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L820">            sendErrorResponse(exchange, 400, &quot;Invalid user ID format&quot;);</span>
+<span class="nc" id="L821">        } catch (Exception e) {</span>
+<span class="nc" id="L822">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L823">        }</span>
+<span class="fc" id="L824">    }</span>
+
+    /**
+     * دریافت اعلان‌های کاربر با صفحه‌بندی
+     * 
+     * @param exchange HTTP exchange
+     * @param userIdStr شناسه کاربر به صورت رشته
+     * @param page شماره صفحه (شروع از 0)
+     * @param size تعداد رکورد در هر صفحه
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGetUserNotificationsPaginated(HttpExchange exchange, String userIdStr, int page, int size) throws IOException {
+        try {
+<span class="fc" id="L837">            Long userId = Long.parseLong(userIdStr);</span>
+<span class="fc" id="L838">            List&lt;Notification&gt; notifications = notificationService.getUserNotificationsPaginated(userId, page, size);</span>
+<span class="fc" id="L839">            sendSuccessResponse(exchange, notifications);</span>
+<span class="nc" id="L840">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L841">            sendErrorResponse(exchange, 400, &quot;Invalid user ID format&quot;);</span>
+<span class="nc" id="L842">        } catch (Exception e) {</span>
+<span class="nc" id="L843">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L844">        }</span>
+<span class="fc" id="L845">    }</span>
+
+    /**
+     * دریافت اعلان‌های مربوط به سفارش خاص
+     * 
+     * @param exchange HTTP exchange
+     * @param orderIdStr شناسه سفارش به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGetOrderNotifications(HttpExchange exchange, String orderIdStr) throws IOException {
+        try {
+<span class="fc" id="L856">            Long orderId = Long.parseLong(orderIdStr);</span>
+<span class="fc" id="L857">            List&lt;Notification&gt; notifications = notificationService.getOrderNotifications(orderId);</span>
+<span class="fc" id="L858">            sendSuccessResponse(exchange, notifications);</span>
+<span class="nc" id="L859">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L860">            sendErrorResponse(exchange, 400, &quot;Invalid order ID format&quot;);</span>
+<span class="nc" id="L861">        } catch (Exception e) {</span>
+<span class="nc" id="L862">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L863">        }</span>
+<span class="fc" id="L864">    }</span>
+
+    /**
+     * دریافت اعلان‌های سفارشات کاربر (overload 1)
+     * 
+     * روش ساده که تمام اعلان‌های نوع ORDER_CREATED کاربر را برمی‌گرداند
+     * 
+     * @param exchange HTTP exchange
+     * @param userIdStr شناسه کاربر به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGetUserOrderNotifications(HttpExchange exchange, String userIdStr) throws IOException {
+        try {
+<span class="nc" id="L877">            Long userId = Long.parseLong(userIdStr);</span>
+            // به سادگی، همه اعلان‌های سفارش کاربر را برمی‌گردانیم
+            // این باید با فیلتر سفارش مناسب پیاده‌سازی شود
+<span class="nc" id="L880">            List&lt;Notification&gt; notifications = notificationService.getNotificationsByType(userId, NotificationType.ORDER_CREATED);</span>
+<span class="nc" id="L881">            sendSuccessResponse(exchange, notifications);</span>
+<span class="nc" id="L882">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L883">            sendErrorResponse(exchange, 400, &quot;Invalid user ID format&quot;);</span>
+<span class="nc" id="L884">        } catch (Exception e) {</span>
+<span class="nc" id="L885">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="nc" id="L886">        }</span>
+<span class="nc" id="L887">    }</span>
+
+    /**
+     * دریافت اعلان‌های سفارش خاص کاربر (overload 2)
+     * 
+     * @param exchange HTTP exchange
+     * @param userIdStr شناسه کاربر به صورت رشته
+     * @param orderIdStr شناسه سفارش به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGetUserOrderNotifications(HttpExchange exchange, String userIdStr, String orderIdStr) throws IOException {
+        try {
+<span class="fc" id="L899">            Long userId = Long.parseLong(userIdStr);</span>
+<span class="fc" id="L900">            Long orderId = Long.parseLong(orderIdStr);</span>
+<span class="fc" id="L901">            List&lt;Notification&gt; notifications = notificationService.getUserOrderNotifications(userId, orderId);</span>
+<span class="fc" id="L902">            sendSuccessResponse(exchange, notifications);</span>
+<span class="nc" id="L903">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L904">            sendErrorResponse(exchange, 400, &quot;Invalid ID format&quot;);</span>
+<span class="nc" id="L905">        } catch (Exception e) {</span>
+<span class="nc" id="L906">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L907">        }</span>
+<span class="fc" id="L908">    }</span>
+
+    /**
+     * دریافت اعلان‌های مربوط به رستوران
+     * 
+     * @param exchange HTTP exchange
+     * @param restaurantIdStr شناسه رستوران به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGetRestaurantNotifications(HttpExchange exchange, String restaurantIdStr) throws IOException {
+        try {
+<span class="fc" id="L919">            Long restaurantId = Long.parseLong(restaurantIdStr);</span>
+<span class="fc" id="L920">            List&lt;Notification&gt; notifications = notificationService.getRestaurantNotifications(restaurantId);</span>
+<span class="fc" id="L921">            sendSuccessResponse(exchange, notifications);</span>
+<span class="nc" id="L922">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L923">            sendErrorResponse(exchange, 400, &quot;Invalid restaurant ID format&quot;);</span>
+<span class="nc" id="L924">        } catch (Exception e) {</span>
+<span class="nc" id="L925">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L926">        }</span>
+<span class="fc" id="L927">    }</span>
+
+    /**
+     * دریافت اعلان‌های مربوط به تحویل
+     * 
+     * @param exchange HTTP exchange
+     * @param deliveryIdStr شناسه تحویل به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGetDeliveryNotifications(HttpExchange exchange, String deliveryIdStr) throws IOException {
+        try {
+<span class="fc" id="L938">            Long deliveryId = Long.parseLong(deliveryIdStr);</span>
+<span class="fc" id="L939">            List&lt;Notification&gt; notifications = notificationService.getDeliveryNotifications(deliveryId);</span>
+<span class="fc" id="L940">            sendSuccessResponse(exchange, notifications);</span>
+<span class="nc" id="L941">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L942">            sendErrorResponse(exchange, 400, &quot;Invalid delivery ID format&quot;);</span>
+<span class="nc" id="L943">        } catch (Exception e) {</span>
+<span class="nc" id="L944">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L945">        }</span>
+<span class="fc" id="L946">    }</span>
+
+    /**
+     * دریافت آخرین اعلان کاربر
+     * 
+     * @param exchange HTTP exchange
+     * @param userIdStr شناسه کاربر به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGetLatestNotification(HttpExchange exchange, String userIdStr) throws IOException {
+        try {
+<span class="fc" id="L957">            Long userId = Long.parseLong(userIdStr);</span>
+<span class="fc" id="L958">            Optional&lt;Notification&gt; notification = notificationService.getLatestNotification(userId);</span>
+<span class="fc bfc" id="L959" title="All 2 branches covered.">            if (notification.isPresent()) {</span>
+<span class="fc" id="L960">                sendSuccessResponse(exchange, notification.get());</span>
+            } else {
+<span class="fc" id="L962">                sendErrorResponse(exchange, 404, &quot;No notifications found&quot;);</span>
+            }
+<span class="nc" id="L964">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L965">            sendErrorResponse(exchange, 400, &quot;Invalid user ID format&quot;);</span>
+<span class="nc" id="L966">        } catch (Exception e) {</span>
+<span class="nc" id="L967">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L968">        }</span>
+<span class="fc" id="L969">    }</span>
+
+    /**
+     * دریافت تعداد اعلان‌ها بر اساس نوع
+     * 
+     * @param exchange HTTP exchange
+     * @param userIdStr شناسه کاربر به صورت رشته
+     * @param typeStr نوع اعلان به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGetNotificationCountByType(HttpExchange exchange, String userIdStr, String typeStr) throws IOException {
+        try {
+<span class="fc" id="L981">            Long userId = Long.parseLong(userIdStr);</span>
+<span class="fc" id="L982">            NotificationType type = NotificationType.valueOf(typeStr.toUpperCase());</span>
+<span class="fc" id="L983">            Long count = notificationService.getNotificationCountByType(userId, type);</span>
+<span class="fc" id="L984">            sendSuccessResponse(exchange, Map.of(&quot;count&quot;, count));</span>
+<span class="nc" id="L985">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L986">            sendErrorResponse(exchange, 400, &quot;Invalid user ID format&quot;);</span>
+<span class="nc" id="L987">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L988">            sendErrorResponse(exchange, 400, &quot;Invalid notification type&quot;);</span>
+<span class="nc" id="L989">        } catch (Exception e) {</span>
+<span class="nc" id="L990">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L991">        }</span>
+<span class="fc" id="L992">    }</span>
+
+    /**
+     * دریافت تعداد اعلان‌های فوری خوانده نشده
+     * 
+     * @param exchange HTTP exchange
+     * @param userIdStr شناسه کاربر به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGetHighPriorityUnreadCount(HttpExchange exchange, String userIdStr) throws IOException {
+        try {
+<span class="fc" id="L1003">            Long userId = Long.parseLong(userIdStr);</span>
+<span class="fc" id="L1004">            Long count = notificationService.getHighPriorityUnreadCount(userId);</span>
+<span class="fc" id="L1005">            sendSuccessResponse(exchange, Map.of(&quot;count&quot;, count));</span>
+<span class="nc" id="L1006">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L1007">            sendErrorResponse(exchange, 400, &quot;Invalid user ID format&quot;);</span>
+<span class="nc" id="L1008">        } catch (Exception e) {</span>
+<span class="nc" id="L1009">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L1010">        }</span>
+<span class="fc" id="L1011">    }</span>
+
+    /**
+     * بررسی وجود اعلان فوری خوانده نشده
+     * 
+     * @param exchange HTTP exchange
+     * @param userIdStr شناسه کاربر به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleCheckIfUserHasUnreadHighPriorityNotifications(HttpExchange exchange, String userIdStr) throws IOException {
+        try {
+<span class="fc" id="L1022">            Long userId = Long.parseLong(userIdStr);</span>
+<span class="fc" id="L1023">            boolean hasUnread = notificationService.hasUnreadHighPriorityNotifications(userId);</span>
+<span class="fc" id="L1024">            sendSuccessResponse(exchange, Map.of(&quot;hasHighPriorityUnread&quot;, hasUnread));</span>
+<span class="nc" id="L1025">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L1026">            sendErrorResponse(exchange, 400, &quot;Invalid user ID format&quot;);</span>
+<span class="nc" id="L1027">        } catch (Exception e) {</span>
+<span class="nc" id="L1028">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L1029">        }</span>
+<span class="fc" id="L1030">    }</span>
+
+    /**
+     * علامت‌گذاری اعلان به عنوان خوانده نشده
+     * 
+     * @param exchange HTTP exchange
+     * @param idStr شناسه اعلان به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleMarkAsUnread(HttpExchange exchange, String idStr) throws IOException {
+        try {
+<span class="fc" id="L1041">            Long id = Long.parseLong(idStr);</span>
+<span class="fc" id="L1042">            Notification notification = notificationService.markAsUnread(id);</span>
+<span class="fc" id="L1043">            sendSuccessResponse(exchange, notification);</span>
+<span class="nc" id="L1044">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L1045">            sendErrorResponse(exchange, 400, &quot;Invalid notification ID format&quot;);</span>
+<span class="nc" id="L1046">        } catch (Exception e) {</span>
+<span class="nc" id="L1047">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L1048">        }</span>
+<span class="fc" id="L1049">    }</span>
+
+    /**
+     * علامت‌گذاری همه اعلان‌های کاربر به عنوان خوانده شده
+     * 
+     * @param exchange HTTP exchange
+     * @param userIdStr شناسه کاربر به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleMarkAllAsRead(HttpExchange exchange, String userIdStr) throws IOException {
+        try {
+<span class="fc" id="L1060">            Long userId = Long.parseLong(userIdStr);</span>
+<span class="fc" id="L1061">            int count = notificationService.markAllAsRead(userId);</span>
+<span class="fc" id="L1062">            sendSuccessResponse(exchange, Map.of(&quot;updated&quot;, count));</span>
+<span class="nc" id="L1063">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L1064">            sendErrorResponse(exchange, 400, &quot;Invalid user ID format&quot;);</span>
+<span class="nc" id="L1065">        } catch (Exception e) {</span>
+<span class="nc" id="L1066">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L1067">        }</span>
+<span class="fc" id="L1068">    }</span>
+
+    /**
+     * علامت‌گذاری اعلان‌ها بر اساس نوع به عنوان خوانده شده
+     * 
+     * @param exchange HTTP exchange
+     * @param userIdStr شناسه کاربر به صورت رشته
+     * @param typeStr نوع اعلان به صورت رشته
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleMarkNotificationsByTypeAsRead(HttpExchange exchange, String userIdStr, String typeStr) throws IOException {
+        try {
+<span class="fc" id="L1080">            Long userId = Long.parseLong(userIdStr);</span>
+<span class="fc" id="L1081">            NotificationType type = NotificationType.valueOf(typeStr.toUpperCase());</span>
+<span class="fc" id="L1082">            int count = notificationService.markAllAsReadByType(userId, type);</span>
+<span class="fc" id="L1083">            sendSuccessResponse(exchange, Map.of(&quot;updated&quot;, count));</span>
+<span class="nc" id="L1084">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L1085">            sendErrorResponse(exchange, 400, &quot;Invalid user ID format&quot;);</span>
+<span class="nc" id="L1086">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L1087">            sendErrorResponse(exchange, 400, &quot;Invalid notification type&quot;);</span>
+<span class="nc" id="L1088">        } catch (Exception e) {</span>
+<span class="nc" id="L1089">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="pc" id="L1090">        }</span>
+<span class="fc" id="L1091">    }</span>
+
+    /**
+     * انجام نگهداری روزانه سیستم اعلان‌ها
+     * 
+     * @param exchange HTTP exchange
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handlePerformDailyMaintenance(HttpExchange exchange) throws IOException {
+        try {
+<span class="fc" id="L1101">            notificationService.performDailyMaintenance();</span>
+<span class="fc" id="L1102">            sendSuccessResponse(exchange, Map.of(&quot;message&quot;, &quot;Daily maintenance completed successfully&quot;));</span>
+<span class="nc" id="L1103">        } catch (Exception e) {</span>
+<span class="nc" id="L1104">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="fc" id="L1105">        }</span>
+<span class="fc" id="L1106">    }</span>
+
+    /**
+     * پاکسازی اعلان‌های قدیمی (حذف منطقی)
+     * 
+     * @param exchange HTTP exchange
+     * @param days تعداد روزهای گذشته برای پاکسازی
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleCleanupOldNotifications(HttpExchange exchange, int days) throws IOException {
+        try {
+<span class="fc" id="L1117">            int count = notificationService.cleanupOldNotifications(days);</span>
+<span class="fc" id="L1118">            sendSuccessResponse(exchange, Map.of(&quot;cleaned&quot;, count));</span>
+<span class="nc" id="L1119">        } catch (Exception e) {</span>
+<span class="nc" id="L1120">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="fc" id="L1121">        }</span>
+<span class="fc" id="L1122">    }</span>
+
+    /**
+     * حذف کامل اعلان‌های منقضی از پایگاه داده
+     * 
+     * @param exchange HTTP exchange
+     * @param days تعداد روزهای گذشته برای حذف کامل
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handlePurgeOldNotifications(HttpExchange exchange, int days) throws IOException {
+        try {
+<span class="fc" id="L1133">            int count = notificationService.purgeOldNotifications(days);</span>
+<span class="fc" id="L1134">            sendSuccessResponse(exchange, Map.of(&quot;purged&quot;, count));</span>
+<span class="nc" id="L1135">        } catch (Exception e) {</span>
+<span class="nc" id="L1136">            sendErrorResponse(exchange, 500, e.getMessage());</span>
+<span class="fc" id="L1137">        }</span>
+<span class="fc" id="L1138">    }</span>
+
+    // ==================== FACTORY METHODS ====================
+
+    /**
+     * Factory Method: ایجاد اعلان ثبت سفارش
+     * 
+     * JSON Request Body:
+     * {
+     *   &quot;userId&quot;: number,
+     *   &quot;orderId&quot;: number,
+     *   &quot;restaurantName&quot;: string
+     * }
+     * 
+     * @param exchange HTTP exchange
+     * @throws IOException در صورت خطا در پردازش
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    private void handleCreateOrderNotification(HttpExchange exchange) throws IOException {
+        try {
+<span class="fc" id="L1158">            String requestBody = new String(exchange.getRequestBody().readAllBytes());</span>
+<span class="fc" id="L1159">            Map&lt;String, Object&gt; data = JsonUtil.fromJson(requestBody, Map.class);</span>
+            
+<span class="fc" id="L1161">            Long userId = ((Number) data.get(&quot;userId&quot;)).longValue();</span>
+<span class="fc" id="L1162">            Long orderId = ((Number) data.get(&quot;orderId&quot;)).longValue();</span>
+<span class="fc" id="L1163">            String restaurantName = (String) data.get(&quot;restaurantName&quot;);</span>
+            
+<span class="fc" id="L1165">            Notification notification = notificationService.notifyOrderCreated(userId, orderId, restaurantName);</span>
+<span class="fc" id="L1166">            sendSuccessResponse(exchange, notification, 201);</span>
+<span class="nc" id="L1167">        } catch (Exception e) {</span>
+<span class="nc" id="L1168">            sendErrorResponse(exchange, 400, e.getMessage());</span>
+<span class="fc" id="L1169">        }</span>
+<span class="fc" id="L1170">    }</span>
+
+    /**
+     * Factory Method: ایجاد اعلان تغییر وضعیت سفارش
+     * 
+     * JSON Request Body:
+     * {
+     *   &quot;userId&quot;: number,
+     *   &quot;orderId&quot;: number,
+     *   &quot;newStatus&quot;: string,
+     *   &quot;oldStatus&quot;: string (اختیاری)
+     * }
+     * 
+     * @param exchange HTTP exchange
+     * @throws IOException در صورت خطا در پردازش
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    private void handleCreateOrderStatusChangedNotification(HttpExchange exchange) throws IOException {
+        try {
+<span class="fc" id="L1189">            String requestBody = new String(exchange.getRequestBody().readAllBytes());</span>
+<span class="fc" id="L1190">            Map&lt;String, Object&gt; data = JsonUtil.fromJson(requestBody, Map.class);</span>
+            
+<span class="fc" id="L1192">            Long userId = ((Number) data.get(&quot;userId&quot;)).longValue();</span>
+<span class="fc" id="L1193">            Long orderId = ((Number) data.get(&quot;orderId&quot;)).longValue();</span>
+<span class="fc" id="L1194">            String newStatusStr = (String) data.get(&quot;newStatus&quot;);</span>
+<span class="fc" id="L1195">            String oldStatusStr = (String) data.get(&quot;oldStatus&quot;);</span>
+            
+<span class="fc" id="L1197">            OrderStatus newStatus = OrderStatus.valueOf(newStatusStr.toUpperCase());</span>
+<span class="pc bpc" id="L1198" title="1 of 2 branches missed.">            OrderStatus oldStatus = oldStatusStr != null ? OrderStatus.valueOf(oldStatusStr.toUpperCase()) : null;</span>
+            
+            // حذف پارامتر oldStatus چون متد NotificationService فقط 3 پارامتر می‌گیرد
+<span class="fc" id="L1201">            Notification notification = notificationService.notifyOrderStatusChanged(userId, orderId, newStatus);</span>
+<span class="fc" id="L1202">            sendSuccessResponse(exchange, notification, 201);</span>
+<span class="nc" id="L1203">        } catch (Exception e) {</span>
+<span class="nc" id="L1204">            sendErrorResponse(exchange, 400, e.getMessage());</span>
+<span class="fc" id="L1205">        }</span>
+<span class="fc" id="L1206">    }</span>
+
+    /**
+     * Factory Method: ایجاد اعلان اختصاص پیک
+     * 
+     * JSON Request Body:
+     * {
+     *   &quot;userId&quot;: number,
+     *   &quot;orderId&quot;: number,
+     *   &quot;deliveryId&quot;: number,
+     *   &quot;courierName&quot;: string,
+     *   &quot;estimatedDeliveryTime&quot;: string (اختیاری)
+     * }
+     * 
+     * @param exchange HTTP exchange
+     * @throws IOException در صورت خطا در پردازش
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    private void handleCreateDeliveryAssignedNotification(HttpExchange exchange) throws IOException {
+        try {
+<span class="fc" id="L1226">            String requestBody = new String(exchange.getRequestBody().readAllBytes());</span>
+<span class="fc" id="L1227">            Map&lt;String, Object&gt; data = JsonUtil.fromJson(requestBody, Map.class);</span>
+            
+<span class="fc" id="L1229">            Long userId = ((Number) data.get(&quot;userId&quot;)).longValue();</span>
+<span class="fc" id="L1230">            Long orderId = ((Number) data.get(&quot;orderId&quot;)).longValue();</span>
+<span class="fc" id="L1231">            Long deliveryId = ((Number) data.get(&quot;deliveryId&quot;)).longValue();</span>
+<span class="fc" id="L1232">            String courierName = (String) data.get(&quot;courierName&quot;);</span>
+<span class="fc" id="L1233">            String estimatedDeliveryTimeStr = (String) data.get(&quot;estimatedDeliveryTime&quot;);</span>
+            
+<span class="fc" id="L1235">            LocalDateTime estimatedDeliveryTime = null;</span>
+<span class="pc bpc" id="L1236" title="1 of 2 branches missed.">            if (estimatedDeliveryTimeStr != null) {</span>
+<span class="nc" id="L1237">                estimatedDeliveryTime = LocalDateTime.parse(estimatedDeliveryTimeStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);</span>
+            }
+            
+            // استفاده از orderId و deliveryId جداگانه از JSON request
+<span class="fc" id="L1241">            Notification notification = notificationService.notifyDeliveryAssigned(userId, orderId, deliveryId, courierName);</span>
+<span class="fc" id="L1242">            sendSuccessResponse(exchange, notification, 201);</span>
+<span class="nc" id="L1243">        } catch (Exception e) {</span>
+<span class="nc" id="L1244">            sendErrorResponse(exchange, 400, e.getMessage());</span>
+<span class="fc" id="L1245">        }</span>
+<span class="fc" id="L1246">    }</span>
+
+    // ==================== UTILITY METHODS ====================
+
+    /**
+     * پارس کردن Query Parameters از URL
+     * 
+     * @param query رشته query parameters
+     * @return Map کلید-مقدار پارامترها
+     */
+    private Map&lt;String, String&gt; parseQueryParams(String query) {
+<span class="fc" id="L1257">        Map&lt;String, String&gt; params = new java.util.HashMap&lt;&gt;();</span>
+<span class="pc bpc" id="L1258" title="1 of 4 branches missed.">        if (query != null &amp;&amp; !query.isEmpty()) {</span>
+<span class="fc" id="L1259">            String[] pairs = query.split(&quot;&amp;&quot;);</span>
+<span class="fc bfc" id="L1260" title="All 2 branches covered.">            for (String pair : pairs) {</span>
+<span class="fc" id="L1261">                String[] keyValue = pair.split(&quot;=&quot;);</span>
+<span class="pc bpc" id="L1262" title="1 of 2 branches missed.">                if (keyValue.length == 2) {</span>
+<span class="fc" id="L1263">                    params.put(keyValue[0], keyValue[1]);</span>
+                }
+            }
+        }
+<span class="fc" id="L1267">        return params;</span>
+    }
+
+    /**
+     * ارسال پاسخ موفق با status code 200
+     * 
+     * @param exchange HTTP exchange
+     * @param data داده برای ارسال
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void sendSuccessResponse(HttpExchange exchange, Object data) throws IOException {
+<span class="fc" id="L1278">        sendSuccessResponse(exchange, data, 200);</span>
+<span class="fc" id="L1279">    }</span>
+
+    /**
+     * ارسال پاسخ موفق با status code دلخواه
+     * 
+     * @param exchange HTTP exchange
+     * @param data داده برای ارسال
+     * @param statusCode HTTP status code
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void sendSuccessResponse(HttpExchange exchange, Object data, int statusCode) throws IOException {
+<span class="fc" id="L1290">        String jsonResponse = JsonUtil.toJson(data);</span>
+<span class="fc" id="L1291">        exchange.getResponseHeaders().set(&quot;Content-Type&quot;, &quot;application/json&quot;);</span>
+<span class="fc" id="L1292">        exchange.sendResponseHeaders(statusCode, jsonResponse.getBytes().length);</span>
+<span class="fc" id="L1293">        try (OutputStream os = exchange.getResponseBody()) {</span>
+<span class="fc" id="L1294">            os.write(jsonResponse.getBytes());</span>
+        }
+<span class="fc" id="L1296">    }</span>
+
+    /**
+     * ارسال پاسخ خطا
+     * 
+     * @param exchange HTTP exchange
+     * @param statusCode HTTP error status code
+     * @param message پیام خطا
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void sendErrorResponse(HttpExchange exchange, int statusCode, String message) throws IOException {
+<span class="fc" id="L1307">        String jsonResponse = JsonUtil.toJson(Map.of(&quot;error&quot;, message, &quot;status&quot;, statusCode));</span>
+<span class="fc" id="L1308">        exchange.getResponseHeaders().set(&quot;Content-Type&quot;, &quot;application/json&quot;);</span>
+<span class="fc" id="L1309">        exchange.sendResponseHeaders(statusCode, jsonResponse.getBytes().length);</span>
+<span class="fc" id="L1310">        try (OutputStream os = exchange.getResponseBody()) {</span>
+<span class="fc" id="L1311">            os.write(jsonResponse.getBytes());</span>
+        }
+<span class="fc" id="L1313">    }</span>
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

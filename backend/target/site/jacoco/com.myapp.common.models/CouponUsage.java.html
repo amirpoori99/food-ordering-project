@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CouponUsage.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.common.models</a> &gt; <span class="el_source">CouponUsage.java</span></div><h1>CouponUsage.java</h1><pre class="source lang-java linenums">package com.myapp.common.models;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+/**
+ * مدل استفاده از کوپن - نماینده استفاده فردی کاربران از کوپن‌های تخفیف
+ * 
+ * این کلاس سیستم ردیابی و محدودیت استفاده از کوپن‌ها را پیاده‌سازی می‌کند:
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - ردیابی استفاده تک‌تک کاربران از کوپن‌ها
+ * - اعمال محدودیت‌های per-user
+ * - ذخیره تاریخچه استفاده برای آمارگیری
+ * - پشتیبانی از revert (بازگشت) در صورت لغو سفارش
+ * - ثبت دقیق مبالغ تخفیف و سفارش در زمان استفاده
+ * 
+ * === قوانین کسب‌وکار ===
+ * - هر کاربر برای هر کوپن محدودیت استفاده دارد
+ * - ترکیب یکتا: کوپن + کاربر + سفارش
+ * - امکان بازگشت در صورت لغو سفارش
+ * - ذخیره snapshot مبالغ در زمان استفاده
+ * 
+ * === استفاده در سیستم ===
+ * - اعتبارسنجی محدودیت‌های کوپن
+ * - گزارش‌گیری از استفاده کوپن‌ها
+ * - audit trail برای مالیات و حسابداری
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+@Entity
+@Table(name = &quot;coupon_usage&quot;, 
+       uniqueConstraints = @UniqueConstraint(columnNames = {&quot;coupon_id&quot;, &quot;user_id&quot;, &quot;order_id&quot;}))
+public class CouponUsage {
+    
+    /** شناسه یکتای استفاده از کوپن */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    /** کوپن استفاده شده (رابطه چند‌به‌یک) */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = &quot;coupon_id&quot;, nullable = false)
+    private Coupon coupon;
+    
+    /** شناسه کاربر استفاده‌کننده */
+    @Column(name = &quot;user_id&quot;, nullable = false)
+    private Long userId;
+    
+    /** شناسه سفارش مربوطه */
+    @Column(name = &quot;order_id&quot;, nullable = false)
+    private Long orderId;
+    
+    /** مبلغ تخفیف اعمال شده در زمان استفاده */
+    @Column(name = &quot;discount_amount&quot;, nullable = false)
+    private Double discountAmount;
+    
+    /** مبلغ کل سفارش در زمان استفاده (snapshot) */
+    @Column(name = &quot;order_amount&quot;, nullable = false)
+    private Double orderAmount;
+    
+    /** زمان استفاده از کوپن */
+    @Column(name = &quot;used_at&quot;, nullable = false)
+    private LocalDateTime usedAt;
+    
+    /** زمان بازگشت استفاده (در صورت لغو سفارش) */
+    @Column(name = &quot;reverted_at&quot;)
+    private LocalDateTime revertedAt;
+    
+    /** وضعیت فعال بودن استفاده (false = بازگشت داده شده) */
+<span class="fc" id="L74">    @Column(name = &quot;is_active&quot;, nullable = false)</span>
+<span class="fc" id="L75">    private Boolean isActive = true;</span>
+    
+    // ==================== CONSTRUCTORS ====================
+    
+    /**
+     * سازنده پیش‌فرض
+     * زمان استفاده را به زمان فعلی تنظیم می‌کند
+     */
+<span class="fc" id="L83">    public CouponUsage() {</span>
+<span class="fc" id="L84">        this.usedAt = LocalDateTime.now();</span>
+<span class="fc" id="L85">    }</span>
+    
+    /**
+     * سازنده کامل برای ایجاد استفاده جدید از کوپن
+     * 
+     * @param coupon کوپن استفاده شده
+     * @param userId شناسه کاربر
+     * @param orderId شناسه سفارش
+     * @param discountAmount مبلغ تخفیف
+     * @param orderAmount مبلغ کل سفارش
+     */
+    public CouponUsage(Coupon coupon, Long userId, Long orderId, Double discountAmount, Double orderAmount) {
+<span class="fc" id="L97">        this();</span>
+<span class="fc" id="L98">        this.coupon = coupon;</span>
+<span class="fc" id="L99">        this.userId = userId;</span>
+<span class="fc" id="L100">        this.orderId = orderId;</span>
+<span class="fc" id="L101">        this.discountAmount = discountAmount;</span>
+<span class="fc" id="L102">        this.orderAmount = orderAmount;</span>
+<span class="fc" id="L103">    }</span>
+    
+    // ==================== BUSINESS METHODS ====================
+    
+    /**
+     * بازگشت استفاده از کوپن
+     * 
+     * این متد زمانی فراخوانی می‌شود که سفارش لغو شده یا کوپن باید برگردانده شود
+     * 
+     * @throws IllegalStateException اگر استفاده قبلاً برگردانده شده باشد
+     */
+    public void revert() {
+<span class="nc bnc" id="L115" title="All 2 branches missed.">        if (!isActive) {</span>
+<span class="nc" id="L116">            throw new IllegalStateException(&quot;استفاده از کوپن قبلاً برگردانده شده است&quot;);</span>
+        }
+<span class="nc" id="L118">        this.isActive = false;</span>
+<span class="nc" id="L119">        this.revertedAt = LocalDateTime.now();</span>
+<span class="nc" id="L120">    }</span>
+    
+    /**
+     * بررسی برگردانده شدن استفاده
+     * 
+     * @return true اگر استفاده برگردانده شده باشد
+     */
+    public boolean isReverted() {
+<span class="nc bnc" id="L128" title="All 2 branches missed.">        return !isActive;</span>
+    }
+    
+    /**
+     * محاسبه درصد تخفیف اعمال شده
+     * 
+     * @return درصد تخفیف نسبت به مبلغ سفارش
+     */
+    public Double getDiscountPercentage() {
+<span class="nc bnc" id="L137" title="All 4 branches missed.">        if (orderAmount == null || orderAmount == 0) {</span>
+<span class="nc" id="L138">            return 0.0;</span>
+        }
+<span class="nc" id="L140">        return (discountAmount / orderAmount) * 100.0;</span>
+    }
+    
+    /**
+     * بررسی اعتبار استفاده
+     * 
+     * @return true اگر استفاده معتبر و فعال باشد
+     */
+    public boolean isValid() {
+<span class="nc bnc" id="L149" title="All 4 branches missed.">        return isActive &amp;&amp; discountAmount &gt; 0;</span>
+    }
+    
+    // ==================== GETTERS AND SETTERS ====================
+    
+    /** @return شناسه استفاده */
+<span class="nc" id="L155">    public Long getId() { return id; }</span>
+    
+    /** @param id شناسه استفاده */
+<span class="nc" id="L158">    public void setId(Long id) { this.id = id; }</span>
+    
+    /** @return کوپن استفاده شده */
+<span class="nc" id="L161">    public Coupon getCoupon() { return coupon; }</span>
+    
+    /** @param coupon کوپن استفاده شده */
+<span class="nc" id="L164">    public void setCoupon(Coupon coupon) { this.coupon = coupon; }</span>
+    
+    /** @return شناسه کاربر */
+<span class="nc" id="L167">    public Long getUserId() { return userId; }</span>
+    
+    /** @param userId شناسه کاربر */
+<span class="nc" id="L170">    public void setUserId(Long userId) { this.userId = userId; }</span>
+    
+    /** @return شناسه سفارش */
+<span class="nc" id="L173">    public Long getOrderId() { return orderId; }</span>
+    
+    /** @param orderId شناسه سفارش */
+<span class="nc" id="L176">    public void setOrderId(Long orderId) { this.orderId = orderId; }</span>
+    
+    /** @return مبلغ تخفیف */
+<span class="nc" id="L179">    public Double getDiscountAmount() { return discountAmount; }</span>
+    
+    /** @param discountAmount مبلغ تخفیف */
+<span class="nc" id="L182">    public void setDiscountAmount(Double discountAmount) { this.discountAmount = discountAmount; }</span>
+    
+    /** @return مبلغ سفارش */
+<span class="nc" id="L185">    public Double getOrderAmount() { return orderAmount; }</span>
+    
+    /** @param orderAmount مبلغ سفارش */
+<span class="nc" id="L188">    public void setOrderAmount(Double orderAmount) { this.orderAmount = orderAmount; }</span>
+    
+    /** @return زمان استفاده */
+<span class="nc" id="L191">    public LocalDateTime getUsedAt() { return usedAt; }</span>
+    
+    /** @param usedAt زمان استفاده */
+<span class="nc" id="L194">    public void setUsedAt(LocalDateTime usedAt) { this.usedAt = usedAt; }</span>
+    
+    /** @return زمان بازگشت */
+<span class="nc" id="L197">    public LocalDateTime getRevertedAt() { return revertedAt; }</span>
+    
+    /** @param revertedAt زمان بازگشت */
+<span class="nc" id="L200">    public void setRevertedAt(LocalDateTime revertedAt) { this.revertedAt = revertedAt; }</span>
+    
+    /** @return وضعیت فعال بودن */
+<span class="nc" id="L203">    public Boolean getIsActive() { return isActive; }</span>
+    
+    /** @param isActive وضعیت فعال بودن */
+<span class="nc" id="L206">    public void setIsActive(Boolean isActive) { this.isActive = isActive; }</span>
+    
+    // ==================== OBJECT METHODS ====================
+    
+    /**
+     * بررسی تساوی دو استفاده از کوپن
+     * 
+     * @param o شیء مقایسه
+     * @return true در صورت برابری
+     */
+    @Override
+    public boolean equals(Object o) {
+<span class="nc bnc" id="L218" title="All 2 branches missed.">        if (this == o) return true;</span>
+<span class="nc bnc" id="L219" title="All 4 branches missed.">        if (o == null || getClass() != o.getClass()) return false;</span>
+<span class="nc" id="L220">        CouponUsage that = (CouponUsage) o;</span>
+<span class="nc" id="L221">        return Objects.equals(id, that.id);</span>
+    }
+    
+    /**
+     * محاسبه hash code
+     * 
+     * @return hash code بر اساس شناسه
+     */
+    @Override
+    public int hashCode() {
+<span class="nc" id="L231">        return Objects.hash(id);</span>
+    }
+    
+    /**
+     * نمایش رشته‌ای استفاده از کوپن
+     * 
+     * @return اطلاعات کلیدی برای debugging
+     */
+    @Override
+    public String toString() {
+<span class="nc" id="L241">        return &quot;CouponUsage{&quot; +</span>
+                &quot;id=&quot; + id +
+                &quot;, userId=&quot; + userId +
+                &quot;, orderId=&quot; + orderId +
+                &quot;, discountAmount=&quot; + discountAmount +
+                &quot;, orderAmount=&quot; + orderAmount +
+                &quot;, usedAt=&quot; + usedAt +
+                &quot;, isActive=&quot; + isActive +
+                '}';
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

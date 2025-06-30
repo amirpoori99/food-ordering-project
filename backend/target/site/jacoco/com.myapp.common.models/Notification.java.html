@@ -1,0 +1,592 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Notification.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.common.models</a> &gt; <span class="el_source">Notification.java</span></div><h1>Notification.java</h1><pre class="source lang-java linenums">package com.myapp.common.models;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+/**
+ * Entity مدل اعلان‌های سیستم سفارش غذا
+ * 
+ * این کلاس تمام انواع اعلان‌های سیستم را مدیریت می‌کند:
+ * 
+ * === انواع اعلان‌ها ===
+ * - اعلان‌های سفارش (ثبت، تغییر وضعیت، تحویل)
+ * - اعلان‌های پرداخت (موفق، ناموفق، استرداد)
+ * - اعلان‌های رستوران (تایید، به‌روزرسانی)
+ * - اعلان‌های تبلیغاتی و سیستمی
+ * - اعلان‌های نگهداری و یادآوری
+ * 
+ * === سطوح اولویت ===
+ * - LOW: اطلاعات عمومی غیر ضروری
+ * - NORMAL: اطلاعات معمولی
+ * - MEDIUM: اطلاعات مهم
+ * - HIGH: اطلاعات فوری
+ * - URGENT: اطلاعات اضطراری
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Soft Delete Pattern: حذف منطقی بدون از دست دادن داده
+ * - Factory Methods: ایجاد آسان انواع مختلف اعلان
+ * - Business Logic Methods: مدیریت وضعیت‌های اعلان
+ * - Entity Linking: ارتباط با سفارش، رستوران، تحویل
+ * - Metadata Support: ذخیره اطلاعات اضافی در JSON
+ * - Multi-language Support: پشتیبانی از متن‌های فارسی
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+@Entity
+@Table(name = &quot;notifications&quot;)
+public class Notification {
+    /** شناسه یکتای اعلان */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    /** شناسه کاربر دریافت‌کننده اعلان */
+    @Column(nullable = false)
+    private Long userId;
+    
+    /** عنوان اعلان (حداکثر 100 کاراکتر) */
+    @Column(nullable = false, length = 100)
+    private String title;
+    
+    /** متن پیام اعلان (حداکثر 500 کاراکتر) */
+    @Column(nullable = false, length = 500)
+    private String message;
+    
+    /** نوع اعلان (سفارش، پرداخت، رستوران، سیستم، تبلیغ) */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private NotificationType type;
+    
+    /** سطح اولویت اعلان */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private NotificationPriority priority;
+    
+    /** وضعیت خوانده شدن اعلان (پیش‌فرض: false) */
+<span class="fc" id="L69">    @Column(nullable = false)</span>
+<span class="fc" id="L70">    private Boolean isRead = false;</span>
+    
+    /** وضعیت حذف منطقی اعلان (پیش‌فرض: false) */
+<span class="fc" id="L73">    @Column(nullable = false)</span>
+<span class="fc" id="L74">    private Boolean isDeleted = false;</span>
+    
+    /** زمان ایجاد اعلان */
+    @Column(name = &quot;created_at&quot;, nullable = false)
+    private LocalDateTime createdAt;
+    
+    /** زمان خوانده شدن اعلان */
+    @Column(name = &quot;read_at&quot;)
+    private LocalDateTime readAt;
+    
+    // ==================== ENTITY LINKING FIELDS ====================
+    
+    /** شناسه سفارش مرتبط (برای اعلان‌های سفارش) */
+    @Column(name = &quot;order_id&quot;)
+    private Long orderId;
+    
+    /** شناسه رستوران مرتبط (برای اعلان‌های رستوران) */
+    @Column(name = &quot;restaurant_id&quot;) 
+    private Long restaurantId;
+    
+    /** شناسه تحویل مرتبط (برای اعلان‌های تحویل) */
+    @Column(name = &quot;delivery_id&quot;)
+    private Long deliveryId;
+    
+    /** شناسه کلی entity مرتبط (برای انعطاف‌پذیری) */
+    @Column(name = &quot;related_entity_id&quot;)
+    private Long relatedEntityId;
+    
+    /** زمان حذف منطقی */
+    @Column(name = &quot;deleted_at&quot;)
+    private LocalDateTime deletedAt;
+    
+    /** داده‌های اضافی در فرمت JSON (حداکثر 1000 کاراکتر) */
+    @Column(length = 1000)
+    private String metadata;
+
+    // ==================== CONSTRUCTORS ====================
+    
+    /**
+     * سازنده پیش‌فرض
+     * زمان ایجاد را به زمان فعلی تنظیم می‌کند
+     */
+<span class="fc" id="L116">    public Notification() {</span>
+<span class="fc" id="L117">        this.createdAt = LocalDateTime.now();</span>
+<span class="fc" id="L118">    }</span>
+
+    /**
+     * سازنده اعلان با اولویت معمولی
+     * 
+     * @param userId شناسه کاربر
+     * @param title عنوان اعلان
+     * @param message متن پیام
+     * @param type نوع اعلان
+     */
+    public Notification(Long userId, String title, String message, NotificationType type) {
+<span class="fc" id="L129">        this();</span>
+<span class="fc" id="L130">        this.userId = userId;</span>
+<span class="fc" id="L131">        this.title = title;</span>
+<span class="fc" id="L132">        this.message = message;</span>
+<span class="fc" id="L133">        this.type = type;</span>
+<span class="fc" id="L134">        this.priority = NotificationPriority.NORMAL;</span>
+<span class="fc" id="L135">    }</span>
+
+    /**
+     * سازنده اعلان با اولویت دلخواه
+     * 
+     * @param userId شناسه کاربر
+     * @param title عنوان اعلان
+     * @param message متن پیام
+     * @param type نوع اعلان
+     * @param priority سطح اولویت
+     */
+    public Notification(Long userId, String title, String message, NotificationType type, NotificationPriority priority) {
+<span class="fc" id="L147">        this(userId, title, message, type);</span>
+<span class="fc" id="L148">        this.priority = priority;</span>
+<span class="fc" id="L149">    }</span>
+
+    // ==================== BUSINESS LOGIC METHODS ====================
+    
+    /**
+     * علامت‌گذاری اعلان به عنوان خوانده شده
+     * 
+     * فقط در صورتی که اعلان خوانده نشده باشد، عمل کند
+     * زمان خوانده شدن را ثبت می‌کند
+     */
+    public void markAsRead() {
+<span class="pc bpc" id="L160" title="1 of 2 branches missed.">        if (!this.isRead) {</span>
+<span class="fc" id="L161">            this.isRead = true;</span>
+<span class="fc" id="L162">            this.readAt = LocalDateTime.now();</span>
+        }
+<span class="fc" id="L164">    }</span>
+    
+    /**
+     * علامت‌گذاری اعلان به عنوان خوانده نشده
+     * 
+     * زمان خوانده شدن را پاک می‌کند
+     */
+    public void markAsUnread() {
+<span class="fc" id="L172">        this.isRead = false;</span>
+<span class="fc" id="L173">        this.readAt = null;</span>
+<span class="fc" id="L174">    }</span>
+    
+    /**
+     * حذف منطقی اعلان
+     * 
+     * اعلان را حذف نمی‌کند بلکه فقط علامت حذف می‌زند
+     * برای نگهداری تاریخچه و امکان بازیابی
+     */
+    public void softDelete() {
+<span class="fc" id="L183">        this.isDeleted = true;</span>
+<span class="fc" id="L184">        this.deletedAt = LocalDateTime.now();</span>
+<span class="fc" id="L185">    }</span>
+    
+    /**
+     * بازیابی اعلان حذف شده
+     * 
+     * علامت حذف را برمی‌دارد و زمان حذف را پاک می‌کند
+     */
+    public void restore() {
+<span class="fc" id="L193">        this.isDeleted = false;</span>
+<span class="fc" id="L194">        this.deletedAt = null;</span>
+<span class="fc" id="L195">    }</span>
+    
+    /**
+     * بررسی انقضای اعلان
+     * 
+     * @param expirationDays تعداد روزهای انقضا
+     * @return true اگر اعلان منقضی شده باشد
+     */
+    public boolean isExpired(int expirationDays) {
+<span class="fc" id="L204">        return this.createdAt.plusDays(expirationDays).isBefore(LocalDateTime.now());</span>
+    }
+    
+    /**
+     * بررسی اولویت بالای اعلان
+     * 
+     * @return true اگر اعلان اولویت HIGH یا URGENT داشته باشد
+     */
+    public boolean isHighPriority() {
+<span class="fc bfc" id="L213" title="All 4 branches covered.">        return this.priority == NotificationPriority.HIGH || this.priority == NotificationPriority.URGENT;</span>
+    }
+    
+    /**
+     * بررسی مرتبط بودن با سفارش
+     * 
+     * @return true اگر اعلان مربوط به سفارش باشد
+     */
+    public boolean isOrderRelated() {
+<span class="fc bfc" id="L222" title="All 2 branches covered.">        return this.orderId != null;</span>
+    }
+    
+    /**
+     * بررسی مرتبط بودن با رستوران
+     * 
+     * @return true اگر اعلان مربوط به رستوران باشد
+     */
+    public boolean isRestaurantRelated() {
+<span class="fc bfc" id="L231" title="All 2 branches covered.">        return this.restaurantId != null;</span>
+    }
+    
+    /**
+     * بررسی مرتبط بودن با تحویل
+     * 
+     * @return true اگر اعلان مربوط به تحویل باشد
+     */
+    public boolean isDeliveryRelated() {
+<span class="fc bfc" id="L240" title="All 2 branches covered.">        return this.deliveryId != null;</span>
+    }
+
+    // ==================== FACTORY METHODS ====================
+    
+    /**
+     * ایجاد اعلان ثبت سفارش جدید
+     * 
+     * @param userId شناسه کاربر
+     * @param orderId شناسه سفارش
+     * @param restaurantName نام رستوران
+     * @return اعلان ایجاد شده
+     */
+    public static Notification orderCreated(Long userId, Long orderId, String restaurantName) {
+<span class="fc" id="L254">        Notification notification = new Notification(</span>
+            userId,
+            &quot;سفارش جدید ثبت شد&quot;,
+            &quot;سفارش شما از رستوران &quot; + restaurantName + &quot; با موفقیت ثبت شد.&quot;,
+            NotificationType.ORDER_CREATED,
+            NotificationPriority.NORMAL
+        );
+<span class="fc" id="L261">        notification.setOrderId(orderId);</span>
+<span class="fc" id="L262">        notification.setRelatedEntityId(orderId);</span>
+<span class="fc" id="L263">        return notification;</span>
+    }
+    
+    /**
+     * ایجاد اعلان تغییر وضعیت سفارش
+     * 
+     * @param userId شناسه کاربر
+     * @param orderId شناسه سفارش
+     * @param newStatus وضعیت جدید سفارش
+     * @return اعلان ایجاد شده
+     */
+    public static Notification orderStatusChanged(Long userId, Long orderId, OrderStatus newStatus) {
+<span class="fc" id="L275">        String message = getOrderStatusMessage(newStatus);</span>
+<span class="fc" id="L276">        Notification notification = new Notification(</span>
+            userId,
+            &quot;تغییر وضعیت سفارش&quot;,
+            message,
+            NotificationType.ORDER_STATUS_CHANGED,
+            NotificationPriority.HIGH
+        );
+<span class="fc" id="L283">        notification.setOrderId(orderId);</span>
+<span class="fc" id="L284">        notification.setRelatedEntityId(orderId);</span>
+<span class="fc" id="L285">        return notification;</span>
+    }
+    
+    /**
+     * ایجاد اعلان اختصاص پیک
+     * 
+     * @param userId شناسه کاربر
+     * @param orderId شناسه سفارش
+     * @param deliveryId شناسه تحویل
+     * @param courierName نام پیک
+     * @return اعلان ایجاد شده
+     */
+    public static Notification deliveryAssigned(Long userId, Long orderId, Long deliveryId, String courierName) {
+<span class="fc" id="L298">        Notification notification = new Notification(</span>
+            userId,
+            &quot;پیک انتخاب شد&quot;,
+            &quot;پیک &quot; + courierName + &quot; برای تحویل سفارش شما انتخاب شد.&quot;,
+            NotificationType.DELIVERY_ASSIGNED,
+            NotificationPriority.HIGH
+        );
+<span class="fc" id="L305">        notification.setOrderId(orderId);</span>
+<span class="fc" id="L306">        notification.setDeliveryId(deliveryId);</span>
+<span class="fc" id="L307">        notification.setRelatedEntityId(orderId);</span>
+<span class="fc" id="L308">        return notification;</span>
+    }
+    
+    /**
+     * ایجاد اعلان پردازش پرداخت
+     * 
+     * @param userId شناسه کاربر
+     * @param orderId شناسه سفارش
+     * @param amount مبلغ پرداخت
+     * @param success وضعیت موفقیت پرداخت
+     * @return اعلان ایجاد شده
+     */
+    public static Notification paymentProcessed(Long userId, Long orderId, Double amount, boolean success) {
+<span class="fc bfc" id="L321" title="All 2 branches covered.">        String title = success ? &quot;پرداخت موفق&quot; : &quot;خطا در پرداخت&quot;;</span>
+<span class="fc bfc" id="L322" title="All 2 branches covered.">        String message = success ? </span>
+<span class="fc" id="L323">            &quot;پرداخت &quot; + amount + &quot; تومان با موفقیت انجام شد.&quot; :</span>
+<span class="fc" id="L324">            &quot;پرداخت &quot; + amount + &quot; تومان ناموفق بود. لطفاً دوباره تلاش کنید.&quot;;</span>
+<span class="fc bfc" id="L325" title="All 2 branches covered.">        NotificationPriority priority = success ? NotificationPriority.NORMAL : NotificationPriority.HIGH;</span>
+        
+<span class="fc" id="L327">        Notification notification = new Notification(</span>
+            userId,
+            title,
+            message,
+            NotificationType.PAYMENT_UPDATE,
+            priority
+        );
+<span class="fc" id="L334">        notification.setOrderId(orderId);</span>
+<span class="fc" id="L335">        return notification;</span>
+    }
+    
+    /**
+     * ایجاد اعلان تایید رستوران
+     * 
+     * @param userId شناسه کاربر (صاحب رستوران)
+     * @param restaurantId شناسه رستوران
+     * @param restaurantName نام رستوران
+     * @return اعلان ایجاد شده
+     */
+    public static Notification restaurantApproved(Long userId, Long restaurantId, String restaurantName) {
+<span class="fc" id="L347">        Notification notification = new Notification(</span>
+            userId,
+            &quot;رستوران تایید شد&quot;,
+            &quot;رستوران &quot; + restaurantName + &quot; شما توسط ادمین تایید شد.&quot;,
+            NotificationType.RESTAURANT_APPROVED,
+            NotificationPriority.HIGH
+        );
+<span class="fc" id="L354">        notification.setRestaurantId(restaurantId);</span>
+<span class="fc" id="L355">        notification.setRelatedEntityId(restaurantId);</span>
+<span class="fc" id="L356">        return notification;</span>
+    }
+    
+    /**
+     * ایجاد اعلان نگهداری سیستم
+     * 
+     * @param userId شناسه کاربر
+     * @param maintenanceTime زمان نگهداری
+     * @return اعلان ایجاد شده
+     */
+    public static Notification systemMaintenance(Long userId, LocalDateTime maintenanceTime) {
+<span class="fc" id="L367">        Notification notification = new Notification(</span>
+            userId,
+            &quot;نگهداری سیستم&quot;,
+<span class="fc" id="L370">            &quot;سیستم در زمان &quot; + maintenanceTime.toString() + &quot; به دلیل نگهداری موقتاً در دسترس نخواهد بود.&quot;,</span>
+            NotificationType.SYSTEM_MAINTENANCE,
+            NotificationPriority.HIGH
+        );
+<span class="fc" id="L374">        return notification;</span>
+    }
+    
+    /**
+     * تولید پیام فارسی بر اساس وضعیت سفارش
+     * 
+     * @param status وضعیت سفارش
+     * @return پیام مناسب به فارسی
+     */
+    private static String getOrderStatusMessage(OrderStatus status) {
+<span class="pc bpc" id="L384" title="1 of 8 branches missed.">        switch (status) {</span>
+            case PENDING:
+<span class="fc" id="L386">                return &quot;سفارش شما در انتظار تایید است.&quot;;</span>
+            case CONFIRMED:
+<span class="fc" id="L388">                return &quot;سفارش شما تایید شد و در حال آماده‌سازی است.&quot;;</span>
+            case PREPARING:
+<span class="fc" id="L390">                return &quot;رستوران در حال آماده‌سازی سفارش شما است.&quot;;</span>
+            case READY:
+<span class="fc" id="L392">                return &quot;سفارش شما آماده است و منتظر پیک می‌باشد.&quot;;</span>
+            case OUT_FOR_DELIVERY:
+<span class="fc" id="L394">                return &quot;سفارش شما توسط پیک دریافت شد و در راه است.&quot;;</span>
+            case DELIVERED:
+<span class="fc" id="L396">                return &quot;سفارش شما با موفقیت تحویل داده شد.&quot;;</span>
+            case CANCELLED:
+<span class="fc" id="L398">                return &quot;متأسفانه سفارش شما لغو شد.&quot;;</span>
+            default:
+<span class="nc" id="L400">                return &quot;وضعیت سفارش شما تغییر کرد.&quot;;</span>
+        }
+    }
+
+    // ==================== GETTERS AND SETTERS ====================
+    
+    /** @return شناسه اعلان */
+<span class="fc" id="L407">    public Long getId() { return id; }</span>
+<span class="fc" id="L408">    public void setId(Long id) { this.id = id; }</span>
+
+    /** @return شناسه کاربر */
+<span class="fc" id="L411">    public Long getUserId() { return userId; }</span>
+<span class="nc" id="L412">    public void setUserId(Long userId) { this.userId = userId; }</span>
+
+    /** @return عنوان اعلان */
+<span class="fc" id="L415">    public String getTitle() { return title; }</span>
+<span class="nc" id="L416">    public void setTitle(String title) { this.title = title; }</span>
+
+    /** @return متن پیام */
+<span class="fc" id="L419">    public String getMessage() { return message; }</span>
+<span class="nc" id="L420">    public void setMessage(String message) { this.message = message; }</span>
+
+    /** @return نوع اعلان */
+<span class="fc" id="L423">    public NotificationType getType() { return type; }</span>
+<span class="nc" id="L424">    public void setType(NotificationType type) { this.type = type; }</span>
+
+    /** @return سطح اولویت */
+<span class="fc" id="L427">    public NotificationPriority getPriority() { return priority; }</span>
+<span class="nc" id="L428">    public void setPriority(NotificationPriority priority) { this.priority = priority; }</span>
+
+    /** @return وضعیت خوانده شدن */
+<span class="fc" id="L431">    public Boolean getIsRead() { return isRead; }</span>
+<span class="nc" id="L432">    public void setIsRead(Boolean isRead) { this.isRead = isRead; }</span>
+
+    /** @return وضعیت حذف منطقی */
+<span class="fc" id="L435">    public Boolean getIsDeleted() { return isDeleted; }</span>
+<span class="nc" id="L436">    public void setIsDeleted(Boolean isDeleted) { this.isDeleted = isDeleted; }</span>
+    
+    // ==================== CONVENIENCE METHODS ====================
+    
+    /** @return true اگر اعلان خوانده شده باشد */
+<span class="fc" id="L441">    public boolean isRead() { return Boolean.TRUE.equals(isRead); }</span>
+    
+    /** @return true اگر اعلان حذف شده باشد */
+<span class="fc" id="L444">    public boolean isDeleted() { return Boolean.TRUE.equals(isDeleted); }</span>
+
+    /** @return زمان ایجاد */
+<span class="fc" id="L447">    public LocalDateTime getCreatedAt() { return createdAt; }</span>
+<span class="fc" id="L448">    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }</span>
+
+    /** @return زمان خوانده شدن */
+<span class="fc" id="L451">    public LocalDateTime getReadAt() { return readAt; }</span>
+<span class="nc" id="L452">    public void setReadAt(LocalDateTime readAt) { this.readAt = readAt; }</span>
+
+    /** @return شناسه سفارش */
+<span class="fc" id="L455">    public Long getOrderId() { return orderId; }</span>
+<span class="fc" id="L456">    public void setOrderId(Long orderId) { this.orderId = orderId; }</span>
+
+    /** @return شناسه رستوران */
+<span class="fc" id="L459">    public Long getRestaurantId() { return restaurantId; }</span>
+<span class="fc" id="L460">    public void setRestaurantId(Long restaurantId) { this.restaurantId = restaurantId; }</span>
+
+    /** @return شناسه تحویل */
+<span class="fc" id="L463">    public Long getDeliveryId() { return deliveryId; }</span>
+<span class="fc" id="L464">    public void setDeliveryId(Long deliveryId) { this.deliveryId = deliveryId; }</span>
+
+    /** @return داده‌های اضافی JSON */
+<span class="fc" id="L467">    public String getMetadata() { return metadata; }</span>
+<span class="nc" id="L468">    public void setMetadata(String metadata) { this.metadata = metadata; }</span>
+    
+    /** @return شناسه entity مرتبط */
+<span class="fc" id="L471">    public Long getRelatedEntityId() { return relatedEntityId; }</span>
+<span class="fc" id="L472">    public void setRelatedEntityId(Long relatedEntityId) { this.relatedEntityId = relatedEntityId; }</span>
+    
+    /** @return زمان حذف منطقی */
+<span class="fc" id="L475">    public LocalDateTime getDeletedAt() { return deletedAt; }</span>
+<span class="nc" id="L476">    public void setDeletedAt(LocalDateTime deletedAt) { this.deletedAt = deletedAt; }</span>
+
+    // ==================== ENUMS ====================
+    
+    /**
+     * انواع مختلف اعلان‌های سیستم
+     * 
+     * هر نوع اعلان دارای منطق و نمایش خاص خود است
+     */
+<span class="fc" id="L485">    public enum NotificationType {</span>
+        /** اعلان ثبت سفارش جدید */
+<span class="fc" id="L487">        ORDER_CREATED,</span>
+        
+        /** اعلان تغییر وضعیت سفارش */
+<span class="fc" id="L490">        ORDER_STATUS_CHANGED,</span>
+        
+        /** اعلان عمومی به‌روزرسانی سفارش */
+<span class="fc" id="L493">        ORDER_UPDATE,</span>
+        
+        /** اعلان اختصاص پیک به سفارش */
+<span class="fc" id="L496">        DELIVERY_ASSIGNED,</span>
+        
+        /** اعلان به‌روزرسانی وضعیت تحویل */
+<span class="fc" id="L499">        DELIVERY_UPDATE, </span>
+        
+        /** اعلان‌های مربوط به پرداخت */
+<span class="fc" id="L502">        PAYMENT_UPDATE,</span>
+        
+        /** اعلان تایید رستوران توسط ادمین */
+<span class="fc" id="L505">        RESTAURANT_APPROVED,</span>
+        
+        /** اعلان‌های عمومی رستوران */
+<span class="fc" id="L508">        RESTAURANT_UPDATE,</span>
+        
+        /** اعلان نگهداری سیستم */
+<span class="fc" id="L511">        SYSTEM_MAINTENANCE,</span>
+        
+        /** اعلان‌های عمومی سیستم */
+<span class="fc" id="L514">        SYSTEM_UPDATE,</span>
+        
+        /** اعلان‌های تبلیغاتی */
+<span class="fc" id="L517">        PROMOTIONAL,</span>
+        
+        /** اعلان‌های تبلیغاتی (مترادف) */
+<span class="fc" id="L520">        PROMOTION,</span>
+        
+        /** اعلان‌های یادآوری */
+<span class="fc" id="L523">        REMINDER</span>
+    }
+    
+    /**
+     * سطوح اولویت اعلان‌ها
+     * 
+     * برای تعیین اهمیت و ترتیب نمایش اعلان‌ها
+     */
+<span class="fc" id="L531">    public enum NotificationPriority {</span>
+        /** اولویت پایین - اطلاعات عمومی */
+<span class="fc" id="L533">        LOW,</span>
+        
+        /** اولویت معمولی - اطلاعات استاندارد */
+<span class="fc" id="L536">        NORMAL,</span>
+        
+        /** اولویت متوسط - اطلاعات مهم */
+<span class="fc" id="L539">        MEDIUM,</span>
+        
+        /** اولویت بالا - اطلاعات فوری */
+<span class="fc" id="L542">        HIGH,</span>
+        
+        /** اولویت اضطراری - نیاز به توجه فوری */
+<span class="fc" id="L545">        URGENT</span>
+    }
+
+    // ==================== STANDARD METHODS ====================
+    
+    /**
+     * مقایسه برابری دو اعلان بر اساس شناسه
+     * 
+     * @param o شیء برای مقایسه
+     * @return true اگر شناسه‌ها برابر باشند
+     */
+    @Override
+    public boolean equals(Object o) {
+<span class="fc bfc" id="L558" title="All 2 branches covered.">        if (this == o) return true;</span>
+<span class="pc bpc" id="L559" title="2 of 4 branches missed.">        if (o == null || getClass() != o.getClass()) return false;</span>
+<span class="fc" id="L560">        Notification that = (Notification) o;</span>
+<span class="fc" id="L561">        return Objects.equals(id, that.id);</span>
+    }
+
+    /**
+     * محاسبه hash code بر اساس شناسه
+     * 
+     * @return hash code شیء
+     */
+    @Override
+    public int hashCode() {
+<span class="fc" id="L571">        return Objects.hash(id);</span>
+    }
+
+    /**
+     * نمایش رشته‌ای اعلان
+     * 
+     * @return اطلاعات خلاصه اعلان
+     */
+    @Override
+    public String toString() {
+<span class="fc" id="L581">        return &quot;Notification{&quot; +</span>
+                &quot;id=&quot; + id +
+                &quot;, userId=&quot; + userId +
+                &quot;, title='&quot; + title + '\'' +
+                &quot;, type=&quot; + type +
+                &quot;, priority=&quot; + priority +
+                &quot;, isRead=&quot; + isRead +
+                &quot;, createdAt=&quot; + createdAt +
+                '}';
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

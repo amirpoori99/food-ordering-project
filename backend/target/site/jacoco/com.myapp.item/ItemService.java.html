@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ItemService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.item</a> &gt; <span class="el_source">ItemService.java</span></div><h1>ItemService.java</h1><pre class="source lang-java linenums">package com.myapp.item;
+
+import com.myapp.common.exceptions.NotFoundException;
+import com.myapp.common.models.FoodItem;
+import com.myapp.common.models.Restaurant;
+import com.myapp.restaurant.RestaurantRepository;
+
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * سرویس مدیریت آیتم‌های غذایی
+ * 
+ * این کلاس منطق کسب‌وکار مربوط به مدیریت آیتم‌های غذایی را پیاده‌سازی می‌کند:
+ * 
+ * === مدیریت آیتم‌ها ===
+ * - افزودن آیتم جدید به منوی رستوران
+ * - به‌روزرسانی اطلاعات آیتم‌ها
+ * - حذف آیتم از منو
+ * - دریافت اطلاعات آیتم‌ها
+ * 
+ * === مدیریت موجودی ===
+ * - کنترل موجودی آیتم‌ها
+ * - افزایش و کاهش موجودی
+ * - بررسی موجود بودن آیتم
+ * - شناسایی آیتم‌های کم موجودی
+ * 
+ * === جستجو و فیلتر ===
+ * - جستجوی آیتم‌ها بر اساس کلیدواژه
+ * - فیلتر بر اساس دسته‌بندی
+ * - فیلتر بر اساس رستوران
+ * - آیتم‌های در دسترس برای مشتریان
+ * 
+ * === اعتبارسنجی ===
+ * - بررسی مالکیت رستوران
+ * - اعتبارسنجی داده‌های ورودی
+ * - اعمال قوانین کسب‌وکار
+ * - کنترل محدودیت‌ها
+ * 
+ * === گزارش و آمار ===
+ * - آمار منوی رستوران
+ * - تحلیل موجودی
+ * - دسته‌بندی‌های رستوران
+ * 
+ * ویژگی‌های کلیدی:
+ * - Input Validation: اعتبارسنجی کامل ورودی‌ها
+ * - Business Rules: اعمال قوانین کسب‌وکار
+ * - Inventory Management: مدیریت هوشمند موجودی
+ * - Data Integrity: حفظ یکپارچگی داده‌ها
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+public class ItemService {
+    
+    /** Repository آیتم‌های غذایی */
+    private final ItemRepository itemRepository;
+    
+    /** Repository رستوران‌ها */
+    private final RestaurantRepository restaurantRepository;
+    
+    /**
+     * سازنده سرویس آیتم‌ها
+     * 
+     * @param itemRepository repository آیتم‌ها
+     * @param restaurantRepository repository رستوران‌ها
+     */
+<span class="fc" id="L69">    public ItemService(ItemRepository itemRepository, RestaurantRepository restaurantRepository) {</span>
+<span class="fc" id="L70">        this.itemRepository = itemRepository;</span>
+<span class="fc" id="L71">        this.restaurantRepository = restaurantRepository;</span>
+<span class="fc" id="L72">    }</span>
+    
+    /**
+     * افزودن آیتم جدید به منوی رستوران
+     * 
+     * مالکیت رستوران و صحت داده‌های آیتم بررسی می‌شود
+     * 
+     * @param restaurantId شناسه رستوران
+     * @param name نام آیتم
+     * @param description توضیحات آیتم
+     * @param price قیمت آیتم
+     * @param category دسته‌بندی آیتم
+     * @param imageUrl آدرس تصویر آیتم
+     * @param quantity موجودی اولیه
+     * @return آیتم ایجاد شده
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
+     * @throws IllegalArgumentException اگر داده‌ها نامعتبر باشند
+     */
+    public FoodItem addItem(Long restaurantId, String name, String description, 
+                           double price, String category, String imageUrl, int quantity) {
+        // بررسی وجود رستوران
+<span class="fc" id="L93">        Restaurant restaurant = restaurantRepository.findById(restaurantId)</span>
+<span class="fc" id="L94">            .orElseThrow(() -&gt; new NotFoundException(&quot;Restaurant&quot;, restaurantId));</span>
+        
+        // اعتبارسنجی داده‌های آیتم
+<span class="fc" id="L97">        validateItemData(name, description, price, category, quantity);</span>
+        
+        // ایجاد آیتم غذایی جدید
+<span class="fc" id="L100">        FoodItem item = FoodItem.forMenu(name, description, price, category, restaurant);</span>
+<span class="pc bpc" id="L101" title="1 of 4 branches missed.">        if (imageUrl != null &amp;&amp; !imageUrl.trim().isEmpty()) {</span>
+<span class="fc" id="L102">            item = FoodItem.forMenuWithImage(name, description, price, category, imageUrl, restaurant);</span>
+        }
+        
+        // تنظیم موجودی پس از ایجاد
+<span class="fc" id="L106">        item.setQuantity(quantity);</span>
+        
+<span class="fc" id="L108">        return itemRepository.saveNew(item);</span>
+    }
+    
+    /**
+     * به‌روزرسانی آیتم موجود در منو
+     * 
+     * مالکیت و قوانین کسب‌وکار بررسی می‌شود
+     * تنها فیلدهای ارائه شده به‌روزرسانی می‌شوند
+     * 
+     * @param itemId شناسه آیتم
+     * @param name نام جدید (اختیاری)
+     * @param description توضیحات جدید (اختیاری)
+     * @param price قیمت جدید (اختیاری)
+     * @param category دسته‌بندی جدید (اختیاری)
+     * @param imageUrl آدرس تصویر جدید (اختیاری)
+     * @param quantity موجودی جدید (اختیاری)
+     * @return آیتم به‌روزرسانی شده
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
+     * @throws IllegalArgumentException اگر داده‌ها نامعتبر باشند
+     */
+    public FoodItem updateItem(Long itemId, String name, String description, 
+                              double price, String category, String imageUrl, Integer quantity) {
+<span class="fc" id="L130">        FoodItem item = itemRepository.findById(itemId)</span>
+<span class="fc" id="L131">            .orElseThrow(() -&gt; new NotFoundException(&quot;Food item&quot;, itemId));</span>
+        
+        // به‌روزرسانی فیلدها در صورت ارائه
+<span class="pc bpc" id="L134" title="1 of 4 branches missed.">        if (name != null &amp;&amp; !name.trim().isEmpty()) {</span>
+<span class="fc" id="L135">            item.setName(name.trim());</span>
+        }
+<span class="pc bpc" id="L137" title="1 of 4 branches missed.">        if (description != null &amp;&amp; !description.trim().isEmpty()) {</span>
+<span class="fc" id="L138">            item.setDescription(description.trim());</span>
+        }
+<span class="fc bfc" id="L140" title="All 2 branches covered.">        if (price &gt; 0) {</span>
+<span class="fc" id="L141">            item.setPrice(price);</span>
+        }
+<span class="pc bpc" id="L143" title="1 of 4 branches missed.">        if (category != null &amp;&amp; !category.trim().isEmpty()) {</span>
+<span class="fc" id="L144">            item.setCategory(category.trim());</span>
+        }
+<span class="fc bfc" id="L146" title="All 2 branches covered.">        if (imageUrl != null) {</span>
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">            item.setImageUrl(imageUrl.trim().isEmpty() ? null : imageUrl.trim());</span>
+        }
+<span class="pc bpc" id="L149" title="1 of 4 branches missed.">        if (quantity != null &amp;&amp; quantity &gt;= 0) {</span>
+<span class="fc" id="L150">            item.setQuantity(quantity);</span>
+        }
+        
+<span class="fc" id="L153">        return itemRepository.save(item);</span>
+    }
+    
+    /**
+     * دریافت آیتم غذایی بر اساس شناسه
+     * 
+     * @param itemId شناسه آیتم
+     * @return آیتم غذایی
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
+     */
+    public FoodItem getItem(Long itemId) {
+<span class="fc" id="L164">        return itemRepository.findById(itemId)</span>
+<span class="fc" id="L165">            .orElseThrow(() -&gt; new NotFoundException(&quot;Food item&quot;, itemId));</span>
+    }
+    
+    /**
+     * دریافت تمام آیتم‌های یک رستوران
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست آیتم‌های رستوران
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
+     */
+    public List&lt;FoodItem&gt; getRestaurantItems(Long restaurantId) {
+        // بررسی وجود رستوران
+<span class="fc" id="L177">        restaurantRepository.findById(restaurantId)</span>
+<span class="fc" id="L178">            .orElseThrow(() -&gt; new NotFoundException(&quot;Restaurant&quot;, restaurantId));</span>
+        
+<span class="fc" id="L180">        return itemRepository.findByRestaurant(restaurantId);</span>
+    }
+    
+    /**
+     * دریافت آیتم‌های در دسترس رستوران (برای نمایش به مشتری)
+     * 
+     * فقط آیتم‌هایی که available=true و quantity&gt;0 هستند
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست آیتم‌های قابل سفارش
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
+     */
+    public List&lt;FoodItem&gt; getAvailableItems(Long restaurantId) {
+        // بررسی وجود رستوران
+<span class="fc" id="L194">        restaurantRepository.findById(restaurantId)</span>
+<span class="pc" id="L195">            .orElseThrow(() -&gt; new NotFoundException(&quot;Restaurant&quot;, restaurantId));</span>
+        
+<span class="fc" id="L197">        return itemRepository.findAvailableByRestaurant(restaurantId);</span>
+    }
+    
+    /**
+     * جستجوی آیتم‌های غذایی بر اساس کلیدواژه
+     * 
+     * در تمام رستوران‌ها جستجو می‌کند
+     * 
+     * @param keyword کلیدواژه جستجو
+     * @return لیست آیتم‌های مطابق
+     * @throws IllegalArgumentException اگر کلیدواژه خالی باشد
+     */
+    public List&lt;FoodItem&gt; searchItems(String keyword) {
+<span class="fc bfc" id="L210" title="All 4 branches covered.">        if (keyword == null || keyword.trim().isEmpty()) {</span>
+<span class="fc" id="L211">            throw new IllegalArgumentException(&quot;Search keyword cannot be empty&quot;);</span>
+        }
+<span class="fc" id="L213">        return itemRepository.searchByKeyword(keyword.trim());</span>
+    }
+    
+        /**
+     * دریافت آیتم‌های غذایی بر اساس دسته‌بندی
+     * 
+     * فقط آیتم‌های در دسترس (available=true) برگردانده می‌شوند
+     * 
+     * @param category نام دسته‌بندی برای جستجو
+     * @return لیست آیتم‌های موجود در دسته‌بندی
+     * @throws IllegalArgumentException اگر دسته‌بندی خالی باشد
+     */
+    public List&lt;FoodItem&gt; getItemsByCategory(String category) {
+<span class="pc bpc" id="L226" title="2 of 4 branches missed.">        if (category == null || category.trim().isEmpty()) {</span>
+<span class="nc" id="L227">            throw new IllegalArgumentException(&quot;Category cannot be empty&quot;);</span>
+        }
+<span class="fc" id="L229">        return itemRepository.findByCategory(category.trim());</span>
+    }
+
+    /**
+     * به‌روزرسانی وضعیت در دسترس بودن آیتم
+     * 
+     * این متد برای فعال/غیرفعال کردن آیتم‌ها استفاده می‌شود
+     * 
+     * @param itemId شناسه آیتم
+     * @param available وضعیت جدید در دسترس بودن (true/false)
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
+     */
+    public void updateAvailability(Long itemId, boolean available) {
+<span class="nc" id="L242">        FoodItem item = itemRepository.findById(itemId)</span>
+<span class="nc" id="L243">            .orElseThrow(() -&gt; new NotFoundException(&quot;Food item&quot;, itemId));</span>
+        
+<span class="nc" id="L245">        itemRepository.updateAvailability(itemId, available);</span>
+<span class="nc" id="L246">    }</span>
+
+    /**
+     * به‌روزرسانی موجودی آیتم (برای مدیریت انبار)
+     * 
+     * @param itemId شناسه آیتم
+     * @param newQuantity موجودی جدید (باید غیرمنفی باشد)
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
+     * @throws IllegalArgumentException اگر موجودی منفی باشد
+     */
+    public void updateQuantity(Long itemId, int newQuantity) {
+<span class="nc bnc" id="L257" title="All 2 branches missed.">        if (newQuantity &lt; 0) {</span>
+<span class="nc" id="L258">            throw new IllegalArgumentException(&quot;Quantity cannot be negative&quot;);</span>
+        }
+        
+<span class="nc" id="L261">        FoodItem item = itemRepository.findById(itemId)</span>
+<span class="nc" id="L262">            .orElseThrow(() -&gt; new NotFoundException(&quot;Food item&quot;, itemId));</span>
+        
+<span class="nc" id="L264">        itemRepository.updateQuantity(itemId, newQuantity);</span>
+<span class="nc" id="L265">    }</span>
+
+    /**
+     * کاهش موجودی آیتم (هنگام سفارش)
+     * 
+     * اگر موجودی کافی نباشد، false برمی‌گرداند
+     * 
+     * @param itemId شناسه آیتم
+     * @param amount مقدار کاهش موجودی
+     * @return true اگر موفق، false اگر موجودی ناکافی
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
+     * @throws IllegalArgumentException اگر مقدار غیرمثبت باشد
+     */
+    public boolean decreaseQuantity(Long itemId, int amount) {
+<span class="pc bpc" id="L279" title="1 of 2 branches missed.">        if (amount &lt;= 0) {</span>
+<span class="nc" id="L280">            throw new IllegalArgumentException(&quot;Amount must be positive&quot;);</span>
+        }
+        
+<span class="fc" id="L283">        FoodItem item = itemRepository.findById(itemId)</span>
+<span class="pc" id="L284">            .orElseThrow(() -&gt; new NotFoundException(&quot;Food item&quot;, itemId));</span>
+        
+<span class="fc bfc" id="L286" title="All 2 branches covered.">        if (item.getQuantity() &lt; amount) {</span>
+<span class="fc" id="L287">            return false; // موجودی ناکافی</span>
+        }
+        
+<span class="fc" id="L290">        item.decreaseQuantity(amount);</span>
+<span class="fc" id="L291">        itemRepository.save(item);</span>
+<span class="fc" id="L292">        return true;</span>
+    }
+
+    /**
+     * افزایش موجودی آیتم (هنگام تأمین مجدد)
+     * 
+     * @param itemId شناسه آیتم
+     * @param amount مقدار افزایش موجودی
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
+     * @throws IllegalArgumentException اگر مقدار غیرمثبت باشد
+     */
+    public void increaseQuantity(Long itemId, int amount) {
+<span class="pc bpc" id="L304" title="1 of 2 branches missed.">        if (amount &lt;= 0) {</span>
+<span class="nc" id="L305">            throw new IllegalArgumentException(&quot;Amount must be positive&quot;);</span>
+        }
+        
+<span class="fc" id="L308">        FoodItem item = itemRepository.findById(itemId)</span>
+<span class="pc" id="L309">            .orElseThrow(() -&gt; new NotFoundException(&quot;Food item&quot;, itemId));</span>
+        
+<span class="fc" id="L311">        item.increaseQuantity(amount);</span>
+<span class="fc" id="L312">        itemRepository.save(item);</span>
+<span class="fc" id="L313">    }</span>
+
+    /**
+     * بررسی موجود بودن آیتم در انبار
+     * 
+     * @param itemId شناسه آیتم
+     * @return true اگر موجود باشد (quantity &gt; 0)
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
+     */
+    public boolean isInStock(Long itemId) {
+<span class="fc" id="L323">        FoodItem item = itemRepository.findById(itemId)</span>
+<span class="pc" id="L324">            .orElseThrow(() -&gt; new NotFoundException(&quot;Food item&quot;, itemId));</span>
+        
+<span class="fc" id="L326">        return item.isInStock();</span>
+    }
+
+    /**
+     * دریافت آیتم‌های کم موجودی رستوران (موجودی &lt; 5)
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست آیتم‌های کم موجودی
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
+     */
+    public List&lt;FoodItem&gt; getLowStockItems(Long restaurantId) {
+        // بررسی وجود رستوران
+<span class="fc" id="L338">        restaurantRepository.findById(restaurantId)</span>
+<span class="pc" id="L339">            .orElseThrow(() -&gt; new NotFoundException(&quot;Restaurant&quot;, restaurantId));</span>
+        
+<span class="fc" id="L341">        return itemRepository.findByRestaurant(restaurantId).stream()</span>
+<span class="fc bfc" id="L342" title="All 2 branches covered.">            .filter(item -&gt; item.getQuantity() &lt; 5)</span>
+<span class="fc" id="L343">            .toList();</span>
+    }
+
+    /**
+     * حذف آیتم غذایی از منو
+     * 
+     * @param itemId شناسه آیتم برای حذف
+     * @throws NotFoundException اگر آیتم وجود نداشته باشد
+     */
+    public void deleteItem(Long itemId) {
+<span class="nc" id="L353">        FoodItem item = itemRepository.findById(itemId)</span>
+<span class="nc" id="L354">            .orElseThrow(() -&gt; new NotFoundException(&quot;Food item&quot;, itemId));</span>
+        
+<span class="nc" id="L356">        itemRepository.delete(itemId);</span>
+<span class="nc" id="L357">    }</span>
+    
+    /**
+     * اعتبارسنجی داده‌های آیتم برای ایجاد/به‌روزرسانی
+     * 
+     * بررسی محدودیت‌های طول، قیمت و موجودی
+     * 
+     * @param name نام آیتم
+     * @param description توضیحات آیتم
+     * @param price قیمت آیتم
+     * @param category دسته‌بندی آیتم
+     * @param quantity موجودی آیتم
+     * @throws IllegalArgumentException اگر داده‌ها نامعتبر باشند
+     */
+    private void validateItemData(String name, String description, double price, String category, int quantity) {
+<span class="fc bfc" id="L372" title="All 4 branches covered.">        if (name == null || name.trim().isEmpty()) {</span>
+<span class="fc" id="L373">            throw new IllegalArgumentException(&quot;Item name cannot be empty&quot;);</span>
+        }
+<span class="fc bfc" id="L375" title="All 2 branches covered.">        if (name.trim().length() &gt; 100) {</span>
+<span class="fc" id="L376">            throw new IllegalArgumentException(&quot;Item name cannot exceed 100 characters&quot;);</span>
+        }
+<span class="pc bpc" id="L378" title="1 of 4 branches missed.">        if (description == null || description.trim().isEmpty()) {</span>
+<span class="fc" id="L379">            throw new IllegalArgumentException(&quot;Item description cannot be empty&quot;);</span>
+        }
+<span class="fc bfc" id="L381" title="All 2 branches covered.">        if (description.trim().length() &gt; 500) {</span>
+<span class="fc" id="L382">            throw new IllegalArgumentException(&quot;Item description cannot exceed 500 characters&quot;);</span>
+        }
+<span class="fc bfc" id="L384" title="All 2 branches covered.">        if (price &lt;= 0) {</span>
+<span class="fc" id="L385">            throw new IllegalArgumentException(&quot;Item price must be positive&quot;);</span>
+        }
+<span class="fc bfc" id="L387" title="All 2 branches covered.">        if (price &gt; 10000) {</span>
+<span class="fc" id="L388">            throw new IllegalArgumentException(&quot;Item price cannot exceed 10,000&quot;);</span>
+        }
+<span class="fc bfc" id="L390" title="All 4 branches covered.">        if (category == null || category.trim().isEmpty()) {</span>
+<span class="fc" id="L391">            throw new IllegalArgumentException(&quot;Item category cannot be empty&quot;);</span>
+        }
+<span class="fc bfc" id="L393" title="All 2 branches covered.">        if (category.trim().length() &gt; 50) {</span>
+<span class="fc" id="L394">            throw new IllegalArgumentException(&quot;Item category cannot exceed 50 characters&quot;);</span>
+        }
+<span class="fc bfc" id="L396" title="All 2 branches covered.">        if (quantity &lt; 0) {</span>
+<span class="fc" id="L397">            throw new IllegalArgumentException(&quot;Item quantity cannot be negative&quot;);</span>
+        }
+<span class="fc" id="L399">    }</span>
+    
+    /**
+     * دریافت آمار منوی رستوران
+     * 
+     * شامل تعداد کل آیتم‌ها، آیتم‌های در دسترس، موجود در انبار، 
+     * کم موجودی و میانگین قیمت
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return آمار کامل منوی رستوران
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
+     */
+    public MenuStatistics getMenuStatistics(Long restaurantId) {
+        // بررسی وجود رستوران
+<span class="fc" id="L413">        restaurantRepository.findById(restaurantId)</span>
+<span class="pc" id="L414">            .orElseThrow(() -&gt; new NotFoundException(&quot;Restaurant&quot;, restaurantId));</span>
+        
+<span class="fc" id="L416">        List&lt;FoodItem&gt; items = itemRepository.findByRestaurant(restaurantId);</span>
+        
+<span class="fc" id="L418">        long totalItems = items.size();</span>
+<span class="fc" id="L419">        long availableItems = items.stream().filter(item -&gt; item.getAvailable()).count();</span>
+<span class="fc" id="L420">        long inStockItems = items.stream().filter(FoodItem::isInStock).count();</span>
+<span class="fc bfc" id="L421" title="All 2 branches covered.">        long lowStockItems = items.stream().filter(item -&gt; item.getQuantity() &lt; 5).count();</span>
+<span class="fc" id="L422">        double averagePrice = items.stream().mapToDouble(FoodItem::getPrice).average().orElse(0.0);</span>
+        
+<span class="fc" id="L424">        return new MenuStatistics(totalItems, availableItems, inStockItems, lowStockItems, averagePrice);</span>
+    }
+    
+    /**
+     * کلاس داده‌ای آمار منو
+     * 
+     * شامل اطلاعات کامل آماری منوی رستوران برای نمایش در dashboard
+     */
+    public static class MenuStatistics {
+        private final long totalItems;
+        private final long availableItems;
+        private final long inStockItems;
+        private final long lowStockItems;
+        private final double averagePrice;
+        
+        public MenuStatistics(long totalItems, long availableItems, long inStockItems, 
+<span class="fc" id="L440">                            long lowStockItems, double averagePrice) {</span>
+<span class="fc" id="L441">            this.totalItems = totalItems;</span>
+<span class="fc" id="L442">            this.availableItems = availableItems;</span>
+<span class="fc" id="L443">            this.inStockItems = inStockItems;</span>
+<span class="fc" id="L444">            this.lowStockItems = lowStockItems;</span>
+<span class="fc" id="L445">            this.averagePrice = averagePrice;</span>
+<span class="fc" id="L446">        }</span>
+        
+        // Getters
+<span class="fc" id="L449">        public long getTotalItems() { return totalItems; }</span>
+<span class="fc" id="L450">        public long getAvailableItems() { return availableItems; }</span>
+<span class="fc" id="L451">        public long getInStockItems() { return inStockItems; }</span>
+<span class="fc" id="L452">        public long getLowStockItems() { return lowStockItems; }</span>
+<span class="fc" id="L453">        public double getAveragePrice() { return averagePrice; }</span>
+        
+        @Override
+        public String toString() {
+<span class="nc" id="L457">            return String.format(&quot;MenuStatistics{totalItems=%d, availableItems=%d, inStockItems=%d, lowStockItems=%d, averagePrice=%.2f}&quot;, </span>
+<span class="nc" id="L458">                totalItems, availableItems, inStockItems, lowStockItems, averagePrice);</span>
+        }
+    }
+    
+    /**
+     * دریافت دسته‌بندی‌های متمایز رستوران
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست دسته‌بندی‌های موجود در منوی رستوران
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
+     */
+    public List&lt;String&gt; getRestaurantCategories(Long restaurantId) {
+        // بررسی وجود رستوران
+<span class="nc" id="L471">        restaurantRepository.findById(restaurantId)</span>
+<span class="nc" id="L472">            .orElseThrow(() -&gt; new NotFoundException(&quot;Restaurant&quot;, restaurantId));</span>
+        
+<span class="nc" id="L474">        return itemRepository.getCategoriesByRestaurant(restaurantId);</span>
+    }
+
+    /**
+     * دریافت آیتم‌های کم موجودی رستوران با آستانه مشخص
+     * 
+     * @param restaurantId شناسه رستوران
+     * @param threshold آستانه کم موجودی (پیش‌فرض 5)
+     * @return لیست آیتم‌های کم موجودی
+     * @throws NotFoundException اگر رستوران وجود نداشته باشد
+     */
+    public List&lt;FoodItem&gt; getLowStockItems(Long restaurantId, int threshold) {
+        // بررسی وجود رستوران
+<span class="nc" id="L487">        restaurantRepository.findById(restaurantId)</span>
+<span class="nc" id="L488">            .orElseThrow(() -&gt; new NotFoundException(&quot;Restaurant&quot;, restaurantId));</span>
+        
+<span class="nc" id="L490">        return itemRepository.findLowStockByRestaurant(restaurantId, threshold);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

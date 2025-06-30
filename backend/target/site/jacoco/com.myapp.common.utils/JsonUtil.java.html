@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JsonUtil.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.common.utils</a> &gt; <span class="el_source">JsonUtil.java</span></div><h1>JsonUtil.java</h1><pre class="source lang-java linenums">package com.myapp.common.utils;
+
+// وارد کردن کتابخانه‌های Jackson برای کار با JSON
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+/**
+ * کلاس ابزاری برای serialize و deserialize کردن JSON
+ * این کلاس عملیات تبدیل شیء به JSON و برعکس را فراهم می‌کند
+ * از کتابخانه Jackson استفاده می‌کند
+ */
+<span class="nc" id="L13">public class JsonUtil {</span>
+    
+    // نمونه ObjectMapper برای کل کلاس
+    private static final ObjectMapper objectMapper;
+    
+    // تنظیم اولیه ObjectMapper در static block
+    static {
+<span class="fc" id="L20">        objectMapper = new ObjectMapper();</span>
+<span class="fc" id="L21">        objectMapper.registerModule(new JavaTimeModule());                     // پشتیبانی از Java 8 Time API</span>
+<span class="fc" id="L22">        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);  // حذف فیلدهای null</span>
+<span class="fc" id="L23">    }</span>
+    
+    /**
+     * تبدیل شیء به رشته JSON
+     * 
+     * @param object شیء برای تبدیل به JSON
+     * @return رشته JSON
+     * @throws RuntimeException در صورت خطا در serialize
+     */
+    public static String toJson(Object object) {
+        try {
+<span class="fc" id="L34">            return objectMapper.writeValueAsString(object);</span>
+<span class="nc" id="L35">        } catch (Exception e) {</span>
+<span class="nc" id="L36">            throw new RuntimeException(&quot;Failed to serialize object to JSON&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * تبدیل رشته JSON به شیء
+     * 
+     * @param json رشته JSON
+     * @param clazz کلاس مقصد
+     * @param &lt;T&gt; نوع شیء مقصد
+     * @return شیء deserialize شده
+     * @throws RuntimeException در صورت خطا در deserialize
+     */
+    public static &lt;T&gt; T fromJson(String json, Class&lt;T&gt; clazz) {
+        try {
+<span class="fc" id="L51">            return objectMapper.readValue(json, clazz);</span>
+<span class="fc" id="L52">        } catch (Exception e) {</span>
+<span class="fc" id="L53">            throw new RuntimeException(&quot;Failed to deserialize JSON to object&quot;, e);</span>
+        }
+    }
+    
+    /**
+     * دریافت نمونه ObjectMapper برای استفاده‌های پیشرفته
+     * در صورت نیاز به تنظیمات خاص JSON
+     * 
+     * @return نمونه ObjectMapper
+     */
+    public static ObjectMapper getObjectMapper() {
+<span class="fc" id="L64">        return objectMapper;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

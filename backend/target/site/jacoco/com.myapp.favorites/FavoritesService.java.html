@@ -1,0 +1,608 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FavoritesService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.favorites</a> &gt; <span class="el_source">FavoritesService.java</span></div><h1>FavoritesService.java</h1><pre class="source lang-java linenums">package com.myapp.favorites;
+
+import com.myapp.auth.AuthRepository;
+import com.myapp.common.exceptions.NotFoundException;
+import com.myapp.common.models.Favorite;
+import com.myapp.common.models.Restaurant;
+import com.myapp.common.models.User;
+import com.myapp.restaurant.RestaurantRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * سرویس منطق کسب‌وکار برای مدیریت علاقه‌مندی‌ها
+ * 
+ * این کلاس تمام منطق کسب‌وکار مربوط به مدیریت علاقه‌مندی‌های کاربران را ارائه می‌دهد:
+ * 
+ * === عملیات اصلی ===
+ * - addFavorite(): اضافه کردن رستوران به علاقه‌مندی‌ها
+ * - removeFavorite(): حذف از علاقه‌مندی‌ها
+ * - updateFavoriteNotes(): به‌روزرسانی یادداشت‌ها
+ * - isFavorite(): بررسی وجود در علاقه‌مندی‌ها
+ * 
+ * === دریافت اطلاعات ===
+ * - getUserFavorites(): علاقه‌مندی‌های کاربر
+ * - getRestaurantFavorites(): کاربران علاقه‌مند به رستوران
+ * - getFavorite(): دریافت علاقه‌مندی خاص
+ * - getUserFavoriteForRestaurant(): علاقه‌مندی خاص کاربر به رستوران
+ * 
+ * === فیلترهای پیشرفته ===
+ * - getRecentFavorites(): علاقه‌مندی‌های اخیر
+ * - getFavoritesWithNotes(): دارای یادداشت
+ * - getFavoritesWithPagination(): با صفحه‌بندی
+ * 
+ * === آمار و شمارش ===
+ * - getRestaurantFavoriteCount(): تعداد علاقه‌مندان رستوران
+ * - getUserFavoriteCount(): تعداد علاقه‌مندی‌های کاربر
+ * - getTotalFavoriteCount(): کل تعداد علاقه‌مندی‌ها
+ * - getUserFavoriteStats(): آمارهای کامل کاربر
+ * 
+ * === مدیریت (Admin) ===
+ * - getAllFavorites(): تمام علاقه‌مندی‌ها
+ * - deleteFavorite(): حذف توسط ادمین
+ * 
+ * === قوانین کسب‌وکار ===
+ * 1. کاربران نمی‌توانند رستوران خودشان را علاقه‌مندی کنند
+ * 2. یک رستوران فقط یک بار قابل علاقه‌مندی است
+ * 3. تمام ورودی‌ها باید معتبر باشند
+ * 4. یادداشت‌ها اختیاری هستند
+ * 5. validation کامل برای تمام عملیات
+ * 
+ * === ویژگی‌های کلیدی ===
+ * - Business Logic Validation: اعتبارسنجی کامل
+ * - Cross-Repository Integration: تعامل با Auth و Restaurant
+ * - Exception Handling: مدیریت خطاهای مناسب
+ * - Statistics Generation: تولید آمارهای پیشرفته
+ * - Logging: ثبت عملیات مهم
+ * - Null Safety: بررسی null در تمام ورودی‌ها
+ * - Performance: بهینه‌سازی queries
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+public class FavoritesService {
+    
+    /** Logger برای ثبت عملیات و خطاها */
+<span class="fc" id="L70">    private static final Logger logger = LoggerFactory.getLogger(FavoritesService.class);</span>
+    
+    /** Repository برای مدیریت علاقه‌مندی‌ها */
+    private final FavoritesRepository favoritesRepository;
+    
+    /** Repository برای احراز هویت و مدیریت کاربران */
+    private final AuthRepository authRepository;
+    
+    /** Repository برای مدیریت رستوران‌ها */
+    private final RestaurantRepository restaurantRepository;
+    
+    /**
+     * سازنده پیش‌فرض - Dependency Injection خودکار
+     * 
+     * برای استفاده عادی در production
+     */
+<span class="fc" id="L86">    public FavoritesService() {</span>
+<span class="fc" id="L87">        this.favoritesRepository = new FavoritesRepository();</span>
+<span class="fc" id="L88">        this.authRepository = new AuthRepository();</span>
+<span class="fc" id="L89">        this.restaurantRepository = new RestaurantRepository();</span>
+<span class="fc" id="L90">    }</span>
+    
+    /**
+     * سازنده برای تست - Manual Dependency Injection
+     * 
+     * امکان inject کردن mock repositories برای تست‌های واحد
+     * 
+     * @param favoritesRepository repository علاقه‌مندی‌ها
+     * @param authRepository repository احراز هویت
+     * @param restaurantRepository repository رستوران‌ها
+     */
+    public FavoritesService(FavoritesRepository favoritesRepository, 
+                           AuthRepository authRepository, 
+<span class="fc" id="L103">                           RestaurantRepository restaurantRepository) {</span>
+<span class="fc" id="L104">        this.favoritesRepository = favoritesRepository;</span>
+<span class="fc" id="L105">        this.authRepository = authRepository;</span>
+<span class="fc" id="L106">        this.restaurantRepository = restaurantRepository;</span>
+<span class="fc" id="L107">    }</span>
+    
+    /**
+     * اضافه کردن رستوران به علاقه‌مندی‌های کاربر
+     * 
+     * این متد شامل validation های کاملی است:
+     * - بررسی وجود کاربر و رستوران
+     * - جلوگیری از علاقه‌مندی تکراری
+     * - منع علاقه‌مندی مالک به رستوران خودش
+     * 
+     * @param userId شناسه کاربر
+     * @param restaurantId شناسه رستوران
+     * @param notes یادداشت اختیاری کاربر
+     * @return علاقه‌مندی ایجاد شده
+     * @throws NotFoundException اگر کاربر یا رستوران یافت نشود
+     * @throws IllegalArgumentException در صورت نقض قوانین کسب‌وکار
+     */
+    public Favorite addFavorite(Long userId, Long restaurantId, String notes) {
+<span class="fc" id="L125">        logger.info(&quot;Adding favorite: userId={}, restaurantId={}&quot;, userId, restaurantId);</span>
+        
+        // اعتبارسنجی ورودی‌ها
+<span class="fc" id="L128">        validateFavoriteInputs(userId, restaurantId);</span>
+        
+        // دریافت کاربر و رستوران
+<span class="fc" id="L131">        User user = authRepository.findById(userId)</span>
+<span class="fc" id="L132">            .orElseThrow(() -&gt; new NotFoundException(&quot;User&quot;, userId));</span>
+<span class="fc" id="L133">        Restaurant restaurant = restaurantRepository.findById(restaurantId)</span>
+<span class="fc" id="L134">            .orElseThrow(() -&gt; new NotFoundException(&quot;Restaurant&quot;, restaurantId));</span>
+        
+        // بررسی عدم وجود علاقه‌مندی تکراری
+<span class="fc" id="L137">        Optional&lt;Favorite&gt; existingFavorite = favoritesRepository.findByUserAndRestaurant(user, restaurant);</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">        if (existingFavorite.isPresent()) {</span>
+<span class="fc" id="L139">            throw new IllegalArgumentException(&quot;Restaurant is already in user's favorites&quot;);</span>
+        }
+        
+        // قانون کسب‌وکار: مالک نمی‌تواند رستوران خودش را علاقه‌مندی کند
+<span class="fc bfc" id="L143" title="All 2 branches covered.">        if (restaurant.getOwnerId().equals(userId)) {</span>
+<span class="fc" id="L144">            throw new IllegalArgumentException(&quot;Restaurant owners cannot favorite their own restaurants&quot;);</span>
+        }
+        
+        // ایجاد و ذخیره علاقه‌مندی
+<span class="fc" id="L148">        Favorite favorite = new Favorite(user, restaurant, notes);</span>
+<span class="fc" id="L149">        Favorite savedFavorite = favoritesRepository.save(favorite);</span>
+        
+<span class="fc" id="L151">        logger.info(&quot;Added favorite with ID: {}&quot;, savedFavorite.getId());</span>
+<span class="fc" id="L152">        return savedFavorite;</span>
+    }
+    
+    /**
+     * متد Legacy برای سازگاری با نسخه قبل
+     * 
+     * اضافه کردن علاقه‌مندی بدون یادداشت
+     * 
+     * @param userId شناسه کاربر
+     * @param restaurantId شناسه رستوران
+     * @return علاقه‌مندی ایجاد شده
+     */
+    public Favorite addFavorite(Long userId, Long restaurantId) {
+<span class="fc" id="L165">        return addFavorite(userId, restaurantId, null);</span>
+    }
+    
+    /**
+     * حذف رستوران از علاقه‌مندی‌های کاربر
+     * 
+     * @param userId شناسه کاربر
+     * @param restaurantId شناسه رستوران
+     * @return true در صورت حذف موفق، false در غیر این صورت
+     * @throws NotFoundException اگر کاربر، رستوران یا علاقه‌مندی یافت نشود
+     */
+    public boolean removeFavorite(Long userId, Long restaurantId) {
+<span class="fc" id="L177">        logger.info(&quot;Removing favorite: userId={}, restaurantId={}&quot;, userId, restaurantId);</span>
+        
+        // اعتبارسنجی ورودی‌ها
+<span class="fc" id="L180">        validateFavoriteInputs(userId, restaurantId);</span>
+        
+        // دریافت کاربر و رستوران
+<span class="fc" id="L183">        User user = authRepository.findById(userId)</span>
+<span class="pc" id="L184">            .orElseThrow(() -&gt; new NotFoundException(&quot;User&quot;, userId));</span>
+<span class="fc" id="L185">        Restaurant restaurant = restaurantRepository.findById(restaurantId)</span>
+<span class="pc" id="L186">            .orElseThrow(() -&gt; new NotFoundException(&quot;Restaurant&quot;, restaurantId));</span>
+        
+        // یافتن علاقه‌مندی موجود
+<span class="fc" id="L189">        Optional&lt;Favorite&gt; favorite = favoritesRepository.findByUserAndRestaurant(user, restaurant);</span>
+<span class="fc bfc" id="L190" title="All 2 branches covered.">        if (favorite.isEmpty()) {</span>
+<span class="fc" id="L191">            throw new NotFoundException(&quot;Favorite&quot;, &quot;user=&quot; + userId + &quot;, restaurant=&quot; + restaurantId);</span>
+        }
+        
+        // حذف علاقه‌مندی
+<span class="fc" id="L195">        boolean deleted = favoritesRepository.delete(favorite.get().getId());</span>
+<span class="pc bpc" id="L196" title="1 of 2 branches missed.">        if (deleted) {</span>
+<span class="fc" id="L197">            logger.info(&quot;Removed favorite: userId={}, restaurantId={}&quot;, userId, restaurantId);</span>
+        }
+<span class="fc" id="L199">        return deleted;</span>
+    }
+    
+    /**
+     * به‌روزرسانی یادداشت علاقه‌مندی
+     * 
+     * @param favoriteId شناسه علاقه‌مندی
+     * @param notes یادداشت جدید
+     * @return علاقه‌مندی به‌روزرسانی شده
+     * @throws NotFoundException اگر علاقه‌مندی یافت نشود
+     */
+    public Favorite updateFavoriteNotes(Long favoriteId, String notes) {
+<span class="fc" id="L211">        logger.info(&quot;Updating favorite notes: favoriteId={}&quot;, favoriteId);</span>
+        
+<span class="fc bfc" id="L213" title="All 2 branches covered.">        if (favoriteId == null) {</span>
+<span class="fc" id="L214">            throw new IllegalArgumentException(&quot;Favorite ID cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L217">        Favorite favorite = favoritesRepository.findById(favoriteId)</span>
+<span class="fc" id="L218">            .orElseThrow(() -&gt; new NotFoundException(&quot;Favorite&quot;, favoriteId));</span>
+        
+<span class="fc" id="L220">        favorite.updateNotes(notes);</span>
+<span class="fc" id="L221">        Favorite updatedFavorite = favoritesRepository.save(favorite);</span>
+        
+<span class="fc" id="L223">        logger.info(&quot;Updated favorite notes for ID: {}&quot;, favoriteId);</span>
+<span class="fc" id="L224">        return updatedFavorite;</span>
+    }
+    
+    /**
+     * دریافت علاقه‌مندی بر اساس شناسه
+     * 
+     * @param favoriteId شناسه علاقه‌مندی
+     * @return علاقه‌مندی یافت شده
+     * @throws NotFoundException اگر علاقه‌مندی یافت نشود
+     */
+    public Favorite getFavorite(Long favoriteId) {
+<span class="fc bfc" id="L235" title="All 2 branches covered.">        if (favoriteId == null) {</span>
+<span class="fc" id="L236">            throw new IllegalArgumentException(&quot;Favorite ID cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L239">        return favoritesRepository.findById(favoriteId)</span>
+<span class="fc" id="L240">            .orElseThrow(() -&gt; new NotFoundException(&quot;Favorite&quot;, favoriteId));</span>
+    }
+    
+    /**
+     * دریافت تمام علاقه‌مندی‌های یک کاربر
+     * 
+     * @param userId شناسه کاربر
+     * @return لیست علاقه‌مندی‌های کاربر (مرتب شده بر اساس تاریخ)
+     * @throws NotFoundException اگر کاربر یافت نشود
+     */
+    public List&lt;Favorite&gt; getUserFavorites(Long userId) {
+<span class="fc bfc" id="L251" title="All 2 branches covered.">        if (userId == null) {</span>
+<span class="fc" id="L252">            throw new IllegalArgumentException(&quot;User ID cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L255">        User user = authRepository.findById(userId)</span>
+<span class="fc" id="L256">            .orElseThrow(() -&gt; new NotFoundException(&quot;User&quot;, userId));</span>
+        
+<span class="fc" id="L258">        return favoritesRepository.findByUser(user);</span>
+    }
+    
+    /**
+     * دریافت لیست کاربرانی که رستوران خاص را علاقه‌مندی کرده‌اند
+     * 
+     * برای آمارگیری و تحلیل محبوبیت رستوران استفاده می‌شود
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست علاقه‌مندی‌های رستوران
+     * @throws NotFoundException اگر رستوران یافت نشود
+     */
+    public List&lt;Favorite&gt; getRestaurantFavorites(Long restaurantId) {
+<span class="nc bnc" id="L271" title="All 2 branches missed.">        if (restaurantId == null) {</span>
+<span class="nc" id="L272">            throw new IllegalArgumentException(&quot;Restaurant ID cannot be null&quot;);</span>
+        }
+        
+<span class="nc" id="L275">        Restaurant restaurant = restaurantRepository.findById(restaurantId)</span>
+<span class="nc" id="L276">            .orElseThrow(() -&gt; new NotFoundException(&quot;Restaurant&quot;, restaurantId));</span>
+        
+<span class="nc" id="L278">        return favoritesRepository.findByRestaurant(restaurant);</span>
+    }
+    
+    /**
+     * بررسی اینکه آیا کاربر خاص، رستوران خاص را علاقه‌مندی کرده است
+     * 
+     * این متد برخلاف سایر متدها exception نمی‌اندازد و false برمی‌گرداند
+     * 
+     * @param userId شناسه کاربر
+     * @param restaurantId شناسه رستوران
+     * @return true اگر علاقه‌مندی باشد، false در غیر این صورت
+     */
+    public boolean isFavorite(Long userId, Long restaurantId) {
+<span class="fc bfc" id="L291" title="All 4 branches covered.">        if (userId == null || restaurantId == null) {</span>
+<span class="fc" id="L292">            return false;</span>
+        }
+        
+        try {
+<span class="fc" id="L296">            User user = authRepository.findById(userId).orElse(null);</span>
+<span class="fc" id="L297">            Restaurant restaurant = restaurantRepository.findById(restaurantId).orElse(null);</span>
+            
+<span class="fc bfc" id="L299" title="All 4 branches covered.">            if (user == null || restaurant == null) {</span>
+<span class="fc" id="L300">                return false;</span>
+            }
+            
+<span class="fc" id="L303">            return favoritesRepository.findByUserAndRestaurant(user, restaurant).isPresent();</span>
+<span class="nc" id="L304">        } catch (Exception e) {</span>
+<span class="nc" id="L305">            logger.error(&quot;Error checking if user {} favorited restaurant {}: {}&quot;, </span>
+<span class="nc" id="L306">                        userId, restaurantId, e.getMessage());</span>
+<span class="nc" id="L307">            return false;</span>
+        }
+    }
+    
+    /**
+     * دریافت علاقه‌مندی خاص کاربر برای رستوران مشخص
+     * 
+     * برای دریافت جزئیات کامل علاقه‌مندی شامل یادداشت و تاریخ
+     * 
+     * @param userId شناسه کاربر
+     * @param restaurantId شناسه رستوران
+     * @return Optional حاوی علاقه‌مندی یا empty
+     */
+    public Optional&lt;Favorite&gt; getUserFavoriteForRestaurant(Long userId, Long restaurantId) {
+<span class="fc bfc" id="L321" title="All 4 branches covered.">        if (userId == null || restaurantId == null) {</span>
+<span class="fc" id="L322">            return Optional.empty();</span>
+        }
+        
+        try {
+<span class="fc" id="L326">            User user = authRepository.findById(userId).orElse(null);</span>
+<span class="fc" id="L327">            Restaurant restaurant = restaurantRepository.findById(restaurantId).orElse(null);</span>
+            
+<span class="pc bpc" id="L329" title="1 of 4 branches missed.">            if (user == null || restaurant == null) {</span>
+<span class="fc" id="L330">                return Optional.empty();</span>
+            }
+            
+<span class="fc" id="L333">            return favoritesRepository.findByUserAndRestaurant(user, restaurant);</span>
+<span class="fc" id="L334">        } catch (Exception e) {</span>
+<span class="fc" id="L335">            logger.error(&quot;Error getting user {} favorite for restaurant {}: {}&quot;, </span>
+<span class="fc" id="L336">                        userId, restaurantId, e.getMessage());</span>
+<span class="fc" id="L337">            return Optional.empty();</span>
+        }
+    }
+    
+    /**
+     * دریافت علاقه‌مندی‌های اخیر (در چند روز گذشته)
+     * 
+     * برای تحلیل تrendها و الگوهای رفتاری کاربران
+     * 
+     * @param days تعداد روزهای گذشته
+     * @return لیست علاقه‌مندی‌های اخیر
+     * @throws IllegalArgumentException اگر days منفی باشد
+     */
+    public List&lt;Favorite&gt; getRecentFavorites(int days) {
+<span class="fc bfc" id="L351" title="All 2 branches covered.">        if (days &lt; 1) {</span>
+<span class="fc" id="L352">            throw new IllegalArgumentException(&quot;Days must be positive&quot;);</span>
+        }
+        
+<span class="fc" id="L355">        return favoritesRepository.findRecentFavorites(days);</span>
+    }
+    
+    /**
+     * دریافت علاقه‌مندی‌های دارای یادداشت
+     * 
+     * برای تحلیل engagement کاربران و کیفیت علاقه‌مندی‌ها
+     * 
+     * @return لیست علاقه‌مندی‌های دارای یادداشت
+     */
+    public List&lt;Favorite&gt; getFavoritesWithNotes() {
+<span class="fc" id="L366">        return favoritesRepository.findFavoritesWithNotes();</span>
+    }
+    
+    /**
+     * دریافت تعداد علاقه‌مندان یک رستوران
+     * 
+     * برای محاسبه امتیاز محبوبیت و رتبه‌بندی
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return تعداد علاقه‌مندان
+     * @throws NotFoundException اگر رستوران یافت نشود
+     */
+    public Long getRestaurantFavoriteCount(Long restaurantId) {
+<span class="pc bpc" id="L379" title="1 of 2 branches missed.">        if (restaurantId == null) {</span>
+<span class="nc" id="L380">            throw new IllegalArgumentException(&quot;Restaurant ID cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L383">        Restaurant restaurant = restaurantRepository.findById(restaurantId)</span>
+<span class="pc" id="L384">            .orElseThrow(() -&gt; new NotFoundException(&quot;Restaurant&quot;, restaurantId));</span>
+        
+<span class="fc" id="L386">        return favoritesRepository.countByRestaurant(restaurant);</span>
+    }
+    
+    /**
+     * دریافت تعداد علاقه‌مندی‌های یک کاربر
+     * 
+     * برای نمایش در پروفایل کاربر
+     * 
+     * @param userId شناسه کاربر
+     * @return تعداد علاقه‌مندی‌ها
+     * @throws NotFoundException اگر کاربر یافت نشود
+     */
+    public Long getUserFavoriteCount(Long userId) {
+<span class="pc bpc" id="L399" title="1 of 2 branches missed.">        if (userId == null) {</span>
+<span class="nc" id="L400">            throw new IllegalArgumentException(&quot;User ID cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L403">        User user = authRepository.findById(userId)</span>
+<span class="pc" id="L404">            .orElseThrow(() -&gt; new NotFoundException(&quot;User&quot;, userId));</span>
+        
+<span class="fc" id="L406">        return favoritesRepository.countByUser(user);</span>
+    }
+    
+    /**
+     * دریافت تمام علاقه‌مندی‌ها (تنها برای ادمین)
+     * 
+     * برای مدیریت سیستم و آمارهای کلی
+     * 
+     * @return لیست تمام علاقه‌مندی‌ها
+     */
+    public List&lt;Favorite&gt; getAllFavorites() {
+<span class="fc" id="L417">        return favoritesRepository.findAll();</span>
+    }
+    
+    /**
+     * دریافت علاقه‌مندی‌ها با صفحه‌بندی
+     * 
+     * برای بهبود عملکرد در UI های با تعداد زیاد داده
+     * 
+     * @param page شماره صفحه (شروع از 0)
+     * @param size تعداد آیتم در هر صفحه
+     * @return لیست علاقه‌مندی‌ها با صفحه‌بندی
+     * @throws IllegalArgumentException اگر پارامترها نامعتبر باشند
+     */
+    public List&lt;Favorite&gt; getFavoritesWithPagination(int page, int size) {
+<span class="fc bfc" id="L431" title="All 4 branches covered.">        if (page &lt; 0 || size &lt; 1) {</span>
+<span class="fc" id="L432">            throw new IllegalArgumentException(&quot;Page must be non-negative and size must be positive&quot;);</span>
+        }
+        
+<span class="fc" id="L435">        int offset = page * size;</span>
+<span class="fc" id="L436">        return favoritesRepository.findWithPagination(offset, size);</span>
+    }
+    
+    /**
+     * دریافت کل تعداد علاقه‌مندی‌ها در سیستم
+     * 
+     * برای آمارهای کلی و محاسبه pagination
+     * 
+     * @return تعداد کل علاقه‌مندی‌ها
+     */
+    public Long getTotalFavoriteCount() {
+<span class="fc" id="L447">        return favoritesRepository.countAll();</span>
+    }
+    
+    /**
+     * حذف علاقه‌مندی توسط ادمین
+     * 
+     * برای مواقع اضطراری یا مدیریت محتوا
+     * 
+     * @param favoriteId شناسه علاقه‌مندی
+     * @return true در صورت حذف موفق
+     * @throws IllegalArgumentException اگر favoriteId null باشد
+     */
+    public boolean deleteFavorite(Long favoriteId) {
+<span class="fc bfc" id="L460" title="All 2 branches covered.">        if (favoriteId == null) {</span>
+<span class="fc" id="L461">            throw new IllegalArgumentException(&quot;Favorite ID cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L464">        boolean deleted = favoritesRepository.delete(favoriteId);</span>
+<span class="pc bpc" id="L465" title="1 of 2 branches missed.">        if (deleted) {</span>
+<span class="fc" id="L466">            logger.info(&quot;Deleted favorite with ID: {}&quot;, favoriteId);</span>
+        }
+<span class="fc" id="L468">        return deleted;</span>
+    }
+    
+    /**
+     * دریافت آمارهای کامل علاقه‌مندی‌های یک کاربر
+     * 
+     * شامل تعداد کل، دارای یادداشت، اخیر و درصدها
+     * 
+     * @param userId شناسه کاربر
+     * @return آبجکت حاوی تمام آمارها
+     * @throws NotFoundException اگر کاربر یافت نشود
+     */
+    public FavoriteStats getUserFavoriteStats(Long userId) {
+<span class="pc bpc" id="L481" title="1 of 2 branches missed.">        if (userId == null) {</span>
+<span class="nc" id="L482">            throw new IllegalArgumentException(&quot;User ID cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L485">        User user = authRepository.findById(userId)</span>
+<span class="pc" id="L486">            .orElseThrow(() -&gt; new NotFoundException(&quot;User&quot;, userId));</span>
+        
+<span class="fc" id="L488">        List&lt;Favorite&gt; favorites = favoritesRepository.findByUser(user);</span>
+<span class="fc" id="L489">        Long totalCount = (long) favorites.size();</span>
+<span class="fc" id="L490">        Long withNotesCount = favorites.stream()</span>
+<span class="fc bfc" id="L491" title="All 2 branches covered.">            .mapToLong(f -&gt; f.hasNotes() ? 1L : 0L)</span>
+<span class="fc" id="L492">            .sum();</span>
+<span class="fc" id="L493">        Long recentCount = favorites.stream()</span>
+<span class="fc bfc" id="L494" title="All 2 branches covered.">            .mapToLong(f -&gt; f.isRecent() ? 1L : 0L)</span>
+<span class="fc" id="L495">            .sum();</span>
+        
+<span class="fc" id="L497">        return new FavoriteStats(totalCount, withNotesCount, recentCount);</span>
+    }
+    
+    // ==================== PRIVATE HELPER METHODS ====================
+    
+    /**
+     * اعتبارسنجی ورودی‌های عملیات علاقه‌مندی
+     * 
+     * @param userId شناسه کاربر
+     * @param restaurantId شناسه رستوران
+     * @throws IllegalArgumentException اگر هر کدام null باشند
+     */
+    private void validateFavoriteInputs(Long userId, Long restaurantId) {
+<span class="fc bfc" id="L510" title="All 2 branches covered.">        if (userId == null) {</span>
+<span class="fc" id="L511">            throw new IllegalArgumentException(&quot;User ID cannot be null&quot;);</span>
+        }
+<span class="fc bfc" id="L513" title="All 2 branches covered.">        if (restaurantId == null) {</span>
+<span class="fc" id="L514">            throw new IllegalArgumentException(&quot;Restaurant ID cannot be null&quot;);</span>
+        }
+<span class="fc" id="L516">    }</span>
+    
+    /**
+     * کلاس داخلی برای آمارهای علاقه‌مندی
+     * 
+     * این کلاس اطلاعات آماری کاملی از علاقه‌مندی‌های کاربر ارائه می‌دهد
+     * شامل محاسبات درصد و متدهای کمکی
+     */
+    public static class FavoriteStats {
+        /** تعداد کل علاقه‌مندی‌ها */
+        private final Long totalFavorites;
+        
+        /** تعداد علاقه‌مندی‌های دارای یادداشت */
+        private final Long favoritesWithNotes;
+        
+        /** تعداد علاقه‌مندی‌های اخیر */
+        private final Long recentFavorites;
+        
+        /**
+         * سازنده کلاس آمارها
+         * 
+         * @param totalFavorites تعداد کل
+         * @param favoritesWithNotes تعداد دارای یادداشت
+         * @param recentFavorites تعداد اخیر
+         */
+<span class="fc" id="L541">        public FavoriteStats(Long totalFavorites, Long favoritesWithNotes, Long recentFavorites) {</span>
+<span class="fc bfc" id="L542" title="All 2 branches covered.">            this.totalFavorites = totalFavorites != null ? totalFavorites : 0L;</span>
+<span class="fc bfc" id="L543" title="All 2 branches covered.">            this.favoritesWithNotes = favoritesWithNotes != null ? favoritesWithNotes : 0L;</span>
+<span class="fc bfc" id="L544" title="All 2 branches covered.">            this.recentFavorites = recentFavorites != null ? recentFavorites : 0L;</span>
+<span class="fc" id="L545">        }</span>
+        
+        /**
+         * @return تعداد کل علاقه‌مندی‌ها
+         */
+        public Long getTotalFavorites() {
+<span class="fc" id="L551">            return totalFavorites;</span>
+        }
+        
+        /**
+         * @return تعداد علاقه‌مندی‌های دارای یادداشت
+         */
+        public Long getFavoritesWithNotes() {
+<span class="fc" id="L558">            return favoritesWithNotes;</span>
+        }
+        
+        /**
+         * @return تعداد علاقه‌مندی‌های اخیر
+         */
+        public Long getRecentFavorites() {
+<span class="fc" id="L565">            return recentFavorites;</span>
+        }
+        
+        /**
+         * بررسی وجود علاقه‌مندی
+         * 
+         * @return true اگر حداقل یک علاقه‌مندی داشته باشد
+         */
+        public boolean hasFavorites() {
+<span class="fc bfc" id="L574" title="All 2 branches covered.">            return totalFavorites &gt; 0;</span>
+        }
+        
+        /**
+         * محاسبه درصد علاقه‌مندی‌های دارای یادداشت
+         * 
+         * @return درصد یادداشت‌دار (0-100)
+         */
+        public double getNotesPercentage() {
+<span class="fc bfc" id="L583" title="All 2 branches covered.">            return totalFavorites &gt; 0 ? (favoritesWithNotes.doubleValue() / totalFavorites.doubleValue()) * 100 : 0.0;</span>
+        }
+        
+        /**
+         * محاسبه درصد علاقه‌مندی‌های اخیر
+         * 
+         * @return درصد اخیر (0-100)
+         */
+        public double getRecentPercentage() {
+<span class="fc bfc" id="L592" title="All 2 branches covered.">            return totalFavorites &gt; 0 ? (recentFavorites.doubleValue() / totalFavorites.doubleValue()) * 100 : 0.0;</span>
+        }
+        
+        /**
+         * نمایش متنی آمارها
+         */
+        @Override
+        public String toString() {
+<span class="fc" id="L600">            return &quot;FavoriteStats{&quot; +</span>
+                    &quot;totalFavorites=&quot; + totalFavorites +
+                    &quot;, favoritesWithNotes=&quot; + favoritesWithNotes +
+                    &quot;, recentFavorites=&quot; + recentFavorites +
+                    '}';
+        }
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

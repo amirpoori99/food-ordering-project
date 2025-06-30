@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrderService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.order</a> &gt; <span class="el_source">OrderService.java</span></div><h1>OrderService.java</h1><pre class="source lang-java linenums">package com.myapp.order;
+
+import com.myapp.common.exceptions.NotFoundException;
+import com.myapp.common.models.*;
+import com.myapp.item.ItemRepository;
+import com.myapp.restaurant.RestaurantRepository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * سرویس مدیریت سفارشات و عملیات سبد خرید
+ * 
+ * این کلاس مسئول پردازش تمام منطق کسب‌وکار مربوط به سفارشات است:
+ * 
+ * === عملیات سبد خرید ===
+ * - ایجاد سفارش جدید (سبد خرید خالی)
+ * - افزودن/حذف آیتم‌ها از سبد
+ * - به‌روزرسانی تعداد آیتم‌ها
+ * - محاسبه قیمت کل سفارش
+ * 
+ * === مدیریت چرخه حیات سفارش ===
+ * - ثبت نهایی سفارش (از PENDING به CONFIRMED)
+ * - پیگیری مراحل آماده‌سازی (PREPARING → READY)
+ * - مدیریت تحویل (OUT_FOR_DELIVERY → DELIVERED)
+ * - لغو سفارش در مراحل مجاز
+ * 
+ * === اعتبارسنجی کسب‌وکار ===
+ * - بررسی موجودی آیتم‌ها
+ * - اعتبارسنجی تعلق آیتم به رستوران
+ * - چک کردن وضعیت رستوران
+ * - مدیریت تبدیل وضعیت‌های مجاز
+ * 
+ * === آمار و گزارش‌گیری ===
+ * - آمار سفارش‌های مشتری
+ * - محاسبه مبلغ کل خرید
+ * - تعداد سفارش‌های موفق/ناموفق
+ * 
+ * ویژگی‌های کلیدی:
+ * - Inventory Management: مدیریت موجودی در زمان ثبت سفارش
+ * - Business Rules: اعمال قوانین کسب‌وکار پیچیده
+ * - Data Integrity: حفظ یکپارچگی داده‌ها
+ * - Error Handling: مدیریت خطاهای مختلف
+ * - Status Validation: بررسی صحت تغییر وضعیت‌ها
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+public class OrderService {
+    
+    // Repository های مورد نیاز برای دسترسی به داده
+    private final OrderRepository orderRepository;
+    private final ItemRepository itemRepository;
+    private final RestaurantRepository restaurantRepository;
+    
+    /**
+     * سازنده سرویس سفارش با تزریق وابستگی‌ها
+     * 
+     * @param orderRepository repository سفارشات
+     * @param itemRepository repository آیتم‌های غذایی
+     * @param restaurantRepository repository رستوران‌ها
+     */
+<span class="fc" id="L65">    public OrderService(OrderRepository orderRepository, ItemRepository itemRepository, RestaurantRepository restaurantRepository) {</span>
+<span class="fc" id="L66">        this.orderRepository = orderRepository;</span>
+<span class="fc" id="L67">        this.itemRepository = itemRepository;</span>
+<span class="fc" id="L68">        this.restaurantRepository = restaurantRepository;</span>
+<span class="fc" id="L69">    }</span>
+    
+    /**
+     * ایجاد سفارش جدید برای مشتری و رستوران مشخص
+     * این عملیات معادل ایجاد سبد خرید است
+     * 
+     * @param customerId شناسه مشتری
+     * @param restaurantId شناسه رستوران
+     * @param deliveryAddress آدرس تحویل
+     * @param phone شماره تلفن تماس
+     * @return سفارش ایجاد شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن ورودی‌ها
+     * @throws NotFoundException در صورت یافت نشدن رستوران
+     */
+    public Order createOrder(Long customerId, Long restaurantId, String deliveryAddress, String phone) {
+        // اعتبارسنجی ورودی‌ها
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        if (customerId == null) {</span>
+<span class="fc" id="L86">            throw new IllegalArgumentException(&quot;Customer ID cannot be null&quot;);</span>
+        }
+<span class="fc bfc" id="L88" title="All 2 branches covered.">        if (restaurantId == null) {</span>
+<span class="fc" id="L89">            throw new IllegalArgumentException(&quot;Restaurant ID cannot be null&quot;);</span>
+        }
+<span class="fc bfc" id="L91" title="All 4 branches covered.">        if (deliveryAddress == null || deliveryAddress.trim().isEmpty()) {</span>
+<span class="fc" id="L92">            throw new IllegalArgumentException(&quot;Delivery address cannot be empty&quot;);</span>
+        }
+<span class="fc bfc" id="L94" title="All 4 branches covered.">        if (phone == null || phone.trim().isEmpty()) {</span>
+<span class="fc" id="L95">            throw new IllegalArgumentException(&quot;Phone number cannot be empty&quot;);</span>
+        }
+        
+        // بررسی وجود و در دسترس بودن رستوران
+<span class="fc" id="L99">        Optional&lt;Restaurant&gt; restaurantOpt = restaurantRepository.findById(restaurantId);</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">        if (restaurantOpt.isEmpty()) {</span>
+<span class="fc" id="L101">            throw new NotFoundException(&quot;Restaurant&quot;, restaurantId);</span>
+        }
+        
+<span class="fc" id="L104">        Restaurant restaurant = restaurantOpt.get();</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        if (restaurant.getStatus() != RestaurantStatus.APPROVED) {</span>
+<span class="fc" id="L106">            throw new IllegalArgumentException(&quot;Restaurant is not available for orders. Status: &quot; + restaurant.getStatus());</span>
+        }
+        
+        // ایجاد شیء کاربر (در برنامه واقعی از UserRepository دریافت می‌شود)
+<span class="fc" id="L110">        User customer = new User();</span>
+<span class="fc" id="L111">        customer.setId(customerId);</span>
+        
+        // ایجاد سفارش جدید
+<span class="fc" id="L114">        Order order = Order.createNew(customer, restaurant, deliveryAddress.trim(), phone.trim());</span>
+<span class="fc" id="L115">        return orderRepository.saveNew(order);</span>
+    }
+    
+    /**
+     * افزودن آیتم به سبد خرید (سفارش)
+     * 
+     * @param orderId شناسه سفارش
+     * @param itemId شناسه آیتم غذایی
+     * @param quantity تعداد مورد نظر
+     * @return سفارش به‌روزرسانی شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     * @throws NotFoundException در صورت یافت نشدن سفارش یا آیتم
+     */
+    public Order addItemToCart(Long orderId, Long itemId, int quantity) {
+        // اعتبارسنجی ورودی‌ها
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">        if (orderId == null) {</span>
+<span class="nc" id="L131">            throw new IllegalArgumentException(&quot;Order ID cannot be null&quot;);</span>
+        }
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">        if (itemId == null) {</span>
+<span class="nc" id="L134">            throw new IllegalArgumentException(&quot;Item ID cannot be null&quot;);</span>
+        }
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">        if (quantity &lt;= 0) {</span>
+<span class="nc" id="L137">            throw new IllegalArgumentException(&quot;Quantity must be positive, got: &quot; + quantity);</span>
+        }
+        
+        // یافتن سفارش
+<span class="fc" id="L141">        Optional&lt;Order&gt; orderOpt = orderRepository.findById(orderId);</span>
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">        if (orderOpt.isEmpty()) {</span>
+<span class="nc" id="L143">            throw new NotFoundException(&quot;Order&quot;, orderId);</span>
+        }
+        
+<span class="fc" id="L146">        Order order = orderOpt.get();</span>
+        
+        // بررسی اینکه سفارش هنوز قابل تغییر است (وضعیت PENDING)
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">        if (order.getStatus() != OrderStatus.PENDING) {</span>
+<span class="nc" id="L150">            throw new IllegalArgumentException(&quot;Cannot modify order with status: &quot; + order.getStatus());</span>
+        }
+        
+        // یافتن آیتم غذایی
+<span class="fc" id="L154">        Optional&lt;FoodItem&gt; itemOpt = itemRepository.findById(itemId);</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">        if (itemOpt.isEmpty()) {</span>
+<span class="nc" id="L156">            throw new NotFoundException(&quot;Food item&quot;, itemId);</span>
+        }
+        
+<span class="fc" id="L159">        FoodItem item = itemOpt.get();</span>
+        
+        // بررسی تعلق آیتم به همان رستوران سفارش
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        if (!item.getRestaurant().getId().equals(order.getRestaurant().getId())) {</span>
+<span class="fc" id="L163">            throw new IllegalArgumentException(&quot;Item does not belong to the order's restaurant&quot;);</span>
+        }
+        
+        // بررسی در دسترس بودن آیتم
+<span class="fc bfc" id="L167" title="All 2 branches covered.">        if (!item.getAvailable()) {</span>
+<span class="fc" id="L168">            throw new IllegalArgumentException(&quot;Item is not available: &quot; + item.getName());</span>
+        }
+        
+        // بررسی موجودی کافی
+<span class="pc bpc" id="L172" title="1 of 4 branches missed.">        if (!item.isInStock() || item.getQuantity() &lt; quantity) {</span>
+<span class="fc" id="L173">            throw new IllegalArgumentException(&quot;Insufficient stock for item: &quot; + item.getName() + </span>
+<span class="fc" id="L174">                                             &quot;. Available: &quot; + item.getQuantity() + &quot;, Requested: &quot; + quantity);</span>
+        }
+        
+        // افزودن آیتم به سفارش
+<span class="fc" id="L178">        order.addItem(item, quantity);</span>
+        
+<span class="fc" id="L180">        return orderRepository.save(order);</span>
+    }
+    
+    /**
+     * حذف آیتم از سبد خرید
+     * 
+     * @param orderId شناسه سفارش
+     * @param itemId شناسه آیتم غذایی
+     * @return سفارش به‌روزرسانی شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     * @throws NotFoundException در صورت یافت نشدن سفارش یا آیتم
+     */
+    public Order removeItemFromCart(Long orderId, Long itemId) {
+<span class="fc bfc" id="L193" title="All 2 branches covered.">        if (orderId == null) {</span>
+<span class="fc" id="L194">            throw new IllegalArgumentException(&quot;Order ID cannot be null&quot;);</span>
+        }
+<span class="fc bfc" id="L196" title="All 2 branches covered.">        if (itemId == null) {</span>
+<span class="fc" id="L197">            throw new IllegalArgumentException(&quot;Item ID cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L200">        Optional&lt;Order&gt; orderOpt = orderRepository.findById(orderId);</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">        if (orderOpt.isEmpty()) {</span>
+<span class="fc" id="L202">            throw new NotFoundException(&quot;Order&quot;, orderId);</span>
+        }
+        
+<span class="fc" id="L205">        Order order = orderOpt.get();</span>
+        
+<span class="fc bfc" id="L207" title="All 2 branches covered.">        if (order.getStatus() != OrderStatus.PENDING) {</span>
+<span class="fc" id="L208">            throw new IllegalArgumentException(&quot;Cannot modify order with status: &quot; + order.getStatus());</span>
+        }
+        
+<span class="fc" id="L211">        Optional&lt;FoodItem&gt; itemOpt = itemRepository.findById(itemId);</span>
+<span class="fc bfc" id="L212" title="All 2 branches covered.">        if (itemOpt.isEmpty()) {</span>
+<span class="fc" id="L213">            throw new NotFoundException(&quot;Food item&quot;, itemId);</span>
+        }
+        
+<span class="fc" id="L216">        FoodItem item = itemOpt.get();</span>
+<span class="fc" id="L217">        order.removeItem(item);</span>
+        
+<span class="fc" id="L219">        return orderRepository.save(order);</span>
+    }
+    
+    /**
+     * به‌روزرسانی تعداد آیتم در سبد خرید
+     * 
+     * اگر تعداد جدید صفر یا منفی باشد، آیتم از سبد حذف می‌شود
+     * 
+     * @param orderId شناسه سفارش
+     * @param itemId شناسه آیتم غذایی
+     * @param newQuantity تعداد جدید
+     * @return سفارش به‌روزرسانی شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     * @throws NotFoundException در صورت یافت نشدن سفارش یا آیتم
+     */
+    public Order updateItemQuantity(Long orderId, Long itemId, int newQuantity) {
+<span class="pc bpc" id="L235" title="1 of 2 branches missed.">        if (orderId == null) {</span>
+<span class="nc" id="L236">            throw new IllegalArgumentException(&quot;Order ID cannot be null&quot;);</span>
+        }
+<span class="pc bpc" id="L238" title="1 of 2 branches missed.">        if (itemId == null) {</span>
+<span class="nc" id="L239">            throw new IllegalArgumentException(&quot;Item ID cannot be null&quot;);</span>
+        }
+<span class="fc bfc" id="L241" title="All 2 branches covered.">        if (newQuantity &lt;= 0) {</span>
+<span class="fc" id="L242">            return removeItemFromCart(orderId, itemId);</span>
+        }
+        
+        // Find the order
+<span class="fc" id="L246">        Optional&lt;Order&gt; orderOpt = orderRepository.findById(orderId);</span>
+<span class="pc bpc" id="L247" title="1 of 2 branches missed.">        if (orderOpt.isEmpty()) {</span>
+<span class="nc" id="L248">            throw new NotFoundException(&quot;Order&quot;, orderId);</span>
+        }
+        
+<span class="fc" id="L251">        Order order = orderOpt.get();</span>
+        
+        // Validate order is still pending (can be modified)
+<span class="pc bpc" id="L254" title="1 of 2 branches missed.">        if (order.getStatus() != OrderStatus.PENDING) {</span>
+<span class="nc" id="L255">            throw new IllegalArgumentException(&quot;Cannot modify order with status: &quot; + order.getStatus());</span>
+        }
+        
+        // Find the item
+<span class="fc" id="L259">        Optional&lt;FoodItem&gt; itemOpt = itemRepository.findById(itemId);</span>
+<span class="fc bfc" id="L260" title="All 2 branches covered.">        if (itemOpt.isEmpty()) {</span>
+<span class="fc" id="L261">            throw new NotFoundException(&quot;Food item&quot;, itemId);</span>
+        }
+        
+<span class="fc" id="L264">        FoodItem item = itemOpt.get();</span>
+        
+        // Validate item belongs to the same restaurant
+<span class="pc bpc" id="L267" title="1 of 2 branches missed.">        if (!item.getRestaurant().getId().equals(order.getRestaurant().getId())) {</span>
+<span class="nc" id="L268">            throw new IllegalArgumentException(&quot;Item does not belong to the order's restaurant&quot;);</span>
+        }
+        
+        // Validate item is available
+<span class="pc bpc" id="L272" title="1 of 2 branches missed.">        if (!item.getAvailable()) {</span>
+<span class="nc" id="L273">            throw new IllegalArgumentException(&quot;Item is not available: &quot; + item.getName());</span>
+        }
+        
+        // Set the new quantity directly
+<span class="fc" id="L277">        order.setItemQuantity(item, newQuantity);</span>
+        
+<span class="fc" id="L279">        return orderRepository.save(order);</span>
+    }
+    
+    /**
+     * ثبت نهایی سفارش (تأیید سبد خرید)
+     * 
+     * این عملیات سفارش را از وضعیت PENDING به CONFIRMED منتقل می‌کند
+     * موجودی آیتم‌ها کاهش یافته و سفارش قابل تغییر نخواهد بود
+     * 
+     * @param orderId شناسه سفارش
+     * @return سفارش تأیید شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن وضعیت یا خالی بودن سبد
+     * @throws NotFoundException در صورت یافت نشدن سفارش
+     */
+    public Order placeOrder(Long orderId) {
+<span class="fc bfc" id="L294" title="All 2 branches covered.">        if (orderId == null) {</span>
+<span class="fc" id="L295">            throw new IllegalArgumentException(&quot;Order ID cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L298">        Optional&lt;Order&gt; orderOpt = orderRepository.findById(orderId);</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">        if (orderOpt.isEmpty()) {</span>
+<span class="fc" id="L300">            throw new NotFoundException(&quot;Order&quot;, orderId);</span>
+        }
+        
+<span class="fc" id="L303">        Order order = orderOpt.get();</span>
+        
+<span class="fc bfc" id="L305" title="All 2 branches covered.">        if (order.getStatus() != OrderStatus.PENDING) {</span>
+<span class="fc" id="L306">            throw new IllegalArgumentException(&quot;Order cannot be placed. Current status: &quot; + order.getStatus());</span>
+        }
+        
+<span class="fc bfc" id="L309" title="All 2 branches covered.">        if (order.getOrderItems().isEmpty()) {</span>
+<span class="fc" id="L310">            throw new IllegalArgumentException(&quot;Cannot place empty order&quot;);</span>
+        }
+        
+        // Validate all items are still available and in stock
+<span class="fc bfc" id="L314" title="All 2 branches covered.">        for (OrderItem orderItem : order.getOrderItems()) {</span>
+<span class="fc" id="L315">            FoodItem item = orderItem.getFoodItem();</span>
+            
+            // Refresh item from database to get latest stock info
+<span class="fc" id="L318">            Optional&lt;FoodItem&gt; currentItemOpt = itemRepository.findById(item.getId());</span>
+<span class="pc bpc" id="L319" title="1 of 2 branches missed.">            if (currentItemOpt.isEmpty()) {</span>
+<span class="nc" id="L320">                throw new IllegalArgumentException(&quot;Item no longer exists: &quot; + item.getName());</span>
+            }
+            
+<span class="fc" id="L323">            FoodItem currentItem = currentItemOpt.get();</span>
+<span class="fc bfc" id="L324" title="All 2 branches covered.">            if (!currentItem.getAvailable()) {</span>
+<span class="fc" id="L325">                throw new IllegalArgumentException(&quot;Item is no longer available: &quot; + item.getName());</span>
+            }
+            
+<span class="fc bfc" id="L328" title="All 2 branches covered.">            if (currentItem.getQuantity() &lt; orderItem.getQuantity()) {</span>
+<span class="fc" id="L329">                throw new IllegalArgumentException(&quot;Insufficient stock for item: &quot; + item.getName() + </span>
+<span class="fc" id="L330">                                                 &quot;. Available: &quot; + currentItem.getQuantity() + </span>
+<span class="fc" id="L331">                                                 &quot;, Ordered: &quot; + orderItem.getQuantity());</span>
+            }
+<span class="fc" id="L333">        }</span>
+        
+        // Decrease inventory for all items
+<span class="fc bfc" id="L336" title="All 2 branches covered.">        for (OrderItem orderItem : order.getOrderItems()) {</span>
+<span class="fc" id="L337">            FoodItem item = orderItem.getFoodItem();</span>
+<span class="fc" id="L338">            item.decreaseQuantity(orderItem.getQuantity());</span>
+<span class="fc" id="L339">            itemRepository.save(item);</span>
+<span class="fc" id="L340">        }</span>
+        
+        // Confirm the order
+<span class="fc" id="L343">        order.confirm();</span>
+        
+        // Set estimated delivery time (30-60 minutes from now)
+<span class="fc" id="L346">        LocalDateTime estimatedDelivery = LocalDateTime.now().plusMinutes(30 + (int)(Math.random() * 30));</span>
+<span class="fc" id="L347">        order.setEstimatedDeliveryTime(estimatedDelivery);</span>
+        
+<span class="fc" id="L349">        return orderRepository.save(order);</span>
+    }
+    
+    /**
+     * لغو سفارش در صورت امکان‌پذیر بودن
+     * 
+     * سفارش‌هایی که در وضعیت‌های PENDING، CONFIRMED، یا PREPARING هستند قابل لغو هستند
+     * در صورت لغو، موجودی آیتم‌ها (در صورت نیاز) بازگردانده می‌شود
+     * 
+     * @param orderId شناسه سفارش
+     * @param reason دلیل لغو (اختیاری)
+     * @return سفارش لغو شده
+     * @throws IllegalArgumentException در صورت عدم امکان لغو
+     * @throws NotFoundException در صورت یافت نشدن سفارش
+     */
+    public Order cancelOrder(Long orderId, String reason) {
+<span class="fc bfc" id="L365" title="All 2 branches covered.">        if (orderId == null) {</span>
+<span class="fc" id="L366">            throw new IllegalArgumentException(&quot;Order ID cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L369">        Optional&lt;Order&gt; orderOpt = orderRepository.findById(orderId);</span>
+<span class="fc bfc" id="L370" title="All 2 branches covered.">        if (orderOpt.isEmpty()) {</span>
+<span class="fc" id="L371">            throw new NotFoundException(&quot;Order&quot;, orderId);</span>
+        }
+        
+<span class="fc" id="L374">        Order order = orderOpt.get();</span>
+        
+<span class="pc bpc" id="L376" title="1 of 2 branches missed.">        if (!order.canBeCancelled()) {</span>
+<span class="nc" id="L377">            throw new IllegalArgumentException(&quot;Order cannot be cancelled. Current status: &quot; + order.getStatus());</span>
+        }
+        
+        // If order was confirmed, restore inventory
+<span class="pc bpc" id="L381" title="1 of 4 branches missed.">        if (order.getStatus() == OrderStatus.CONFIRMED || order.getStatus() == OrderStatus.PREPARING) {</span>
+<span class="fc bfc" id="L382" title="All 2 branches covered.">            for (OrderItem orderItem : order.getOrderItems()) {</span>
+<span class="fc" id="L383">                FoodItem item = orderItem.getFoodItem();</span>
+<span class="fc" id="L384">                item.increaseQuantity(orderItem.getQuantity());</span>
+<span class="fc" id="L385">                itemRepository.save(item);</span>
+<span class="fc" id="L386">            }</span>
+        }
+        
+<span class="fc" id="L389">        order.cancel();</span>
+<span class="pc bpc" id="L390" title="2 of 4 branches missed.">        if (reason != null &amp;&amp; !reason.trim().isEmpty()) {</span>
+<span class="fc" id="L391">            order.setNotes(reason.trim());</span>
+        }
+        
+<span class="fc" id="L394">        return orderRepository.save(order);</span>
+    }
+    
+    /**
+     * دریافت جزئیات سفارش بر اساس شناسه
+     * 
+     * @param orderId شناسه سفارش
+     * @return جزئیات کامل سفارش
+     * @throws IllegalArgumentException در صورت null بودن شناسه
+     * @throws NotFoundException در صورت یافت نشدن سفارش
+     */
+    public Order getOrder(Long orderId) {
+<span class="fc bfc" id="L406" title="All 2 branches covered.">        if (orderId == null) {</span>
+<span class="fc" id="L407">            throw new IllegalArgumentException(&quot;Order ID cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L410">        Optional&lt;Order&gt; orderOpt = orderRepository.findById(orderId);</span>
+<span class="fc bfc" id="L411" title="All 2 branches covered.">        if (orderOpt.isEmpty()) {</span>
+<span class="fc" id="L412">            throw new NotFoundException(&quot;Order&quot;, orderId);</span>
+        }
+        
+<span class="fc" id="L415">        return orderOpt.get();</span>
+    }
+    
+    /**
+     * دریافت تمام سفارش‌های یک مشتری
+     * 
+     * @param customerId شناسه مشتری
+     * @return لیست سفارش‌های مشتری مرتب شده بر اساس تاریخ (جدیدترین ابتدا)
+     * @throws IllegalArgumentException در صورت null بودن شناسه
+     */
+    public List&lt;Order&gt; getCustomerOrders(Long customerId) {
+<span class="fc bfc" id="L426" title="All 2 branches covered.">        if (customerId == null) {</span>
+<span class="fc" id="L427">            throw new IllegalArgumentException(&quot;Customer ID cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L430">        return orderRepository.findByCustomer(customerId);</span>
+    }
+    
+    /**
+     * دریافت تمام سفارش‌های یک رستوران
+     * 
+     * @param restaurantId شناسه رستوران
+     * @return لیست سفارش‌های رستوران مرتب شده بر اساس تاریخ
+     * @throws IllegalArgumentException در صورت null بودن شناسه
+     */
+    public List&lt;Order&gt; getRestaurantOrders(Long restaurantId) {
+<span class="fc bfc" id="L441" title="All 2 branches covered.">        if (restaurantId == null) {</span>
+<span class="fc" id="L442">            throw new IllegalArgumentException(&quot;Restaurant ID cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L445">        return orderRepository.findByRestaurant(restaurantId);</span>
+    }
+    
+    /**
+     * دریافت سفارش‌ها بر اساس وضعیت
+     * 
+     * @param status وضعیت سفارش (PENDING, CONFIRMED, PREPARING, ...)
+     * @return لیست سفارش‌های با وضعیت مشخص
+     * @throws IllegalArgumentException در صورت null بودن وضعیت
+     */
+    public List&lt;Order&gt; getOrdersByStatus(OrderStatus status) {
+<span class="fc bfc" id="L456" title="All 2 branches covered.">        if (status == null) {</span>
+<span class="fc" id="L457">            throw new IllegalArgumentException(&quot;Status cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L460">        return orderRepository.findByStatus(status);</span>
+    }
+    
+    /**
+     * به‌روزرسانی وضعیت سفارش (برای رستوران/ادمین)
+     * 
+     * تنها تغییرات مجاز بین وضعیت‌ها امکان‌پذیر است
+     * 
+     * @param orderId شناسه سفارش
+     * @param newStatus وضعیت جدید
+     * @return سفارش به‌روزرسانی شده
+     * @throws IllegalArgumentException در صورت تغییر غیرمجاز وضعیت
+     * @throws NotFoundException در صورت یافت نشدن سفارش
+     */
+    public Order updateOrderStatus(Long orderId, OrderStatus newStatus) {
+<span class="fc bfc" id="L475" title="All 2 branches covered.">        if (orderId == null) {</span>
+<span class="fc" id="L476">            throw new IllegalArgumentException(&quot;Order ID cannot be null&quot;);</span>
+        }
+<span class="fc bfc" id="L478" title="All 2 branches covered.">        if (newStatus == null) {</span>
+<span class="fc" id="L479">            throw new IllegalArgumentException(&quot;Status cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L482">        Optional&lt;Order&gt; orderOpt = orderRepository.findById(orderId);</span>
+<span class="fc bfc" id="L483" title="All 2 branches covered.">        if (orderOpt.isEmpty()) {</span>
+<span class="fc" id="L484">            throw new NotFoundException(&quot;Order&quot;, orderId);</span>
+        }
+        
+<span class="fc" id="L487">        Order order = orderOpt.get();</span>
+        
+        // Validate status transition
+<span class="fc" id="L490">        OrderStatus currentStatus = order.getStatus();</span>
+<span class="fc bfc" id="L491" title="All 2 branches covered.">        if (!isValidStatusTransition(currentStatus, newStatus)) {</span>
+<span class="fc" id="L492">            throw new IllegalArgumentException(&quot;Invalid status transition from &quot; + currentStatus + &quot; to &quot; + newStatus);</span>
+        }
+        
+        // Handle special status changes
+<span class="fc bfc" id="L496" title="All 2 branches covered.">        if (newStatus == OrderStatus.DELIVERED) {</span>
+<span class="fc" id="L497">            order.markAsDelivered();</span>
+        } else {
+<span class="fc" id="L499">            orderRepository.updateStatus(orderId, newStatus);</span>
+<span class="fc" id="L500">            order.setStatus(newStatus);</span>
+        }
+        
+<span class="fc" id="L503">        return orderRepository.save(order);</span>
+    }
+    
+    /**
+     * Validates if a status transition is allowed.
+     */
+    private boolean isValidStatusTransition(OrderStatus from, OrderStatus to) {
+<span class="pc bpc" id="L510" title="3 of 7 branches missed.">        switch (from) {</span>
+            case PENDING:
+<span class="nc bnc" id="L512" title="All 4 branches missed.">                return to == OrderStatus.CONFIRMED || to == OrderStatus.CANCELLED;</span>
+            case CONFIRMED:
+<span class="fc bfc" id="L514" title="All 4 branches covered.">                return to == OrderStatus.PREPARING || to == OrderStatus.CANCELLED;</span>
+            case PREPARING:
+<span class="pc bpc" id="L516" title="3 of 4 branches missed.">                return to == OrderStatus.READY || to == OrderStatus.CANCELLED;</span>
+            case READY:
+<span class="pc bpc" id="L518" title="1 of 2 branches missed.">                return to == OrderStatus.OUT_FOR_DELIVERY;</span>
+            case OUT_FOR_DELIVERY:
+<span class="pc bpc" id="L520" title="1 of 2 branches missed.">                return to == OrderStatus.DELIVERED;</span>
+            case DELIVERED:
+            case CANCELLED:
+<span class="nc" id="L523">                return false; // Terminal states</span>
+            default:
+<span class="nc" id="L525">                return false;</span>
+        }
+    }
+    
+    /**
+     * Gets active orders (not delivered or cancelled).
+     */
+    public List&lt;Order&gt; getActiveOrders() {
+<span class="fc" id="L533">        return orderRepository.findActiveOrders();</span>
+    }
+    
+    /**
+     * Gets pending orders waiting for confirmation.
+     */
+    public List&lt;Order&gt; getPendingOrders() {
+<span class="fc" id="L540">        return orderRepository.findPendingOrders();</span>
+    }
+    
+    /**
+     * Calculates order statistics for a customer.
+     */
+    public OrderStatistics getCustomerOrderStatistics(Long customerId) {
+<span class="fc bfc" id="L547" title="All 2 branches covered.">        if (customerId == null) {</span>
+<span class="fc" id="L548">            throw new IllegalArgumentException(&quot;Customer ID cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L551">        List&lt;Order&gt; orders = getCustomerOrders(customerId);</span>
+        
+<span class="fc" id="L553">        int totalOrders = orders.size();</span>
+<span class="fc bfc" id="L554" title="All 2 branches covered.">        int completedOrders = (int) orders.stream().filter(o -&gt; o.getStatus() == OrderStatus.DELIVERED).count();</span>
+<span class="fc bfc" id="L555" title="All 2 branches covered.">        int cancelledOrders = (int) orders.stream().filter(o -&gt; o.getStatus() == OrderStatus.CANCELLED).count();</span>
+<span class="fc" id="L556">        double totalSpent = orders.stream()</span>
+<span class="fc bfc" id="L557" title="All 2 branches covered.">                .filter(o -&gt; o.getStatus() == OrderStatus.DELIVERED)</span>
+<span class="fc" id="L558">                .mapToDouble(Order::getTotalAmount)</span>
+<span class="fc" id="L559">                .sum();</span>
+        
+<span class="fc" id="L561">        return new OrderStatistics(totalOrders, completedOrders, cancelledOrders, totalSpent);</span>
+    }
+    
+    /**
+     * کلاس آماری برای اطلاعات سفارش‌ها
+     * 
+     * حاوی آمار کلی فعالیت سفارش‌گیری یک مشتری شامل:
+     * - تعداد کل سفارش‌ها
+     * - تعداد سفارش‌های تکمیل شده و لغو شده
+     * - مبلغ کل خرید و میانگین ارزش سفارش
+     */
+    public static class OrderStatistics {
+        private final int totalOrders;
+        private final int completedOrders;
+        private final int cancelledOrders;
+        private final double totalSpent;
+        
+<span class="fc" id="L578">        public OrderStatistics(int totalOrders, int completedOrders, int cancelledOrders, double totalSpent) {</span>
+<span class="fc" id="L579">            this.totalOrders = totalOrders;</span>
+<span class="fc" id="L580">            this.completedOrders = completedOrders;</span>
+<span class="fc" id="L581">            this.cancelledOrders = cancelledOrders;</span>
+<span class="fc" id="L582">            this.totalSpent = totalSpent;</span>
+<span class="fc" id="L583">        }</span>
+        
+<span class="fc" id="L585">        public int getTotalOrders() { return totalOrders; }</span>
+<span class="fc" id="L586">        public int getCompletedOrders() { return completedOrders; }</span>
+<span class="fc" id="L587">        public int getCancelledOrders() { return cancelledOrders; }</span>
+<span class="fc" id="L588">        public double getTotalSpent() { return totalSpent; }</span>
+<span class="fc" id="L589">        public int getActiveOrders() { return totalOrders - completedOrders - cancelledOrders; }</span>
+        public double getAverageOrderValue() { 
+<span class="fc bfc" id="L591" title="All 2 branches covered.">            return completedOrders &gt; 0 ? totalSpent / completedOrders : 0.0; </span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

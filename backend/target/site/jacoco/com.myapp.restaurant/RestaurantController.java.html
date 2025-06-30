@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RestaurantController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.restaurant</a> &gt; <span class="el_source">RestaurantController.java</span></div><h1>RestaurantController.java</h1><pre class="source lang-java linenums">package com.myapp.restaurant;
+
+import com.myapp.common.exceptions.NotFoundException;
+import com.myapp.common.models.Restaurant;
+import com.myapp.common.models.RestaurantStatus;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
+/**
+ * کنترلر REST API برای مدیریت رستوران‌ها
+ * 
+ * این کلاس مسئول مدیریت تمام درخواست‌های HTTP مربوط به:
+ * - ثبت رستوران جدید توسط فروشندگان
+ * - مشاهده لیست رستوران‌های تأیید شده (عمومی)
+ * - مدیریت اطلاعات رستوران‌ها
+ * - تغییر وضعیت رستوران‌ها (مدیریتی)
+ * - آمار و گزارش‌گیری رستوران‌ها
+ * 
+ * Endpoints:
+ * POST   /api/restaurants                    - ثبت رستوران جدید
+ * GET    /api/restaurants                    - دریافت رستوران‌های تأیید شده (عمومی)
+ * GET    /api/restaurants/{id}               - دریافت رستوران با شناسه
+ * PUT    /api/restaurants/{id}               - به‌روزرسانی اطلاعات رستوران
+ * DELETE /api/restaurants/{id}               - حذف رستوران
+ * GET    /api/restaurants/owner/{ownerId}    - دریافت رستوران‌های یک مالک
+ * GET    /api/restaurants/status/{status}    - دریافت رستوران‌ها بر اساس وضعیت
+ * PUT    /api/restaurants/{id}/status        - به‌روزرسانی وضعیت رستوران (مدیر)
+ * GET    /api/restaurants/statistics         - دریافت آمار رستوران‌ها (مدیر)
+ * POST   /api/restaurants/{id}/approve       - تأیید رستوران (مدیر)
+ * POST   /api/restaurants/{id}/reject        - رد رستوران (مدیر)
+ * POST   /api/restaurants/{id}/suspend       - تعلیق رستوران (مدیر)
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+public class RestaurantController implements HttpHandler {
+    
+    /** سرویس مدیریت رستوران‌ها برای پردازش منطق کسب‌وکار */
+    private final RestaurantService restaurantService;
+    
+    /**
+     * سازنده پیش‌فرض - ایجاد instance جدید از RestaurantService
+     */
+<span class="nc" id="L52">    public RestaurantController() {</span>
+<span class="nc" id="L53">        this.restaurantService = new RestaurantService();</span>
+<span class="nc" id="L54">    }</span>
+    
+    /**
+     * سازنده برای تزریق وابستگی (Dependency Injection)
+     * برای تست‌ها و configuration سفارشی استفاده می‌شود
+     * 
+     * @param restaurantService سرویس رستوران از بیرون تزریق شده
+     */
+<span class="nc" id="L62">    public RestaurantController(RestaurantService restaurantService) {</span>
+<span class="nc" id="L63">        this.restaurantService = restaurantService;</span>
+<span class="nc" id="L64">    }</span>
+    
+    /**
+     * متد اصلی پردازش درخواست‌های HTTP
+     * تمام درخواست‌ها را بر اساس method و path مسیریابی می‌کند
+     * 
+     * @param exchange شیء HttpExchange حاوی اطلاعات درخواست و پاسخ
+     * @throws IOException در صورت خطا در پردازش I/O
+     */
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        // دریافت method (GET, POST, PUT, DELETE) و path درخواست
+<span class="nc" id="L76">        String method = exchange.getRequestMethod();</span>
+<span class="nc" id="L77">        String path = exchange.getRequestURI().getPath();</span>
+        
+        try {
+            // مسیریابی درخواست بر اساس HTTP method
+<span class="nc bnc" id="L81" title="All 5 branches missed.">            switch (method) {</span>
+                case &quot;GET&quot;:
+<span class="nc" id="L83">                    handleGet(exchange, path);</span>
+<span class="nc" id="L84">                    break;</span>
+                case &quot;POST&quot;:
+<span class="nc" id="L86">                    handlePost(exchange, path);</span>
+<span class="nc" id="L87">                    break;</span>
+                case &quot;PUT&quot;:
+<span class="nc" id="L89">                    handlePut(exchange, path);</span>
+<span class="nc" id="L90">                    break;</span>
+                case &quot;DELETE&quot;:
+<span class="nc" id="L92">                    handleDelete(exchange, path);</span>
+<span class="nc" id="L93">                    break;</span>
+                default:
+                    // HTTP method پشتیبانی نشده
+<span class="nc" id="L96">                    sendErrorResponse(exchange, 405, &quot;Method not allowed&quot;);</span>
+            }
+<span class="nc" id="L98">        } catch (IllegalArgumentException e) {</span>
+            // خطای validation ورودی‌ها
+<span class="nc" id="L100">            sendErrorResponse(exchange, 400, e.getMessage());</span>
+<span class="nc" id="L101">        } catch (NotFoundException e) {</span>
+            // خطای عدم وجود رستوران
+<span class="nc" id="L103">            sendErrorResponse(exchange, 404, e.getMessage());</span>
+<span class="nc" id="L104">        } catch (Exception e) {</span>
+            // خطاهای غیرمنتظره سرور
+<span class="nc" id="L106">            sendErrorResponse(exchange, 500, &quot;Internal server error: &quot; + e.getMessage());</span>
+<span class="nc" id="L107">        }</span>
+<span class="nc" id="L108">    }</span>
+    
+    // ==================== GET ENDPOINTS - پردازش درخواست‌های GET ====================
+    
+    /**
+     * پردازش تمام درخواست‌های GET مربوط به رستوران‌ها
+     * 
+     * @param exchange شیء HttpExchange
+     * @param path مسیر درخواست
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handleGet(HttpExchange exchange, String path) throws IOException {
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        if (path.equals(&quot;/api/restaurants&quot;)) {</span>
+            // GET /api/restaurants - دریافت همه رستوران‌های تأیید شده
+<span class="nc" id="L122">            getAllApprovedRestaurants(exchange);</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">        } else if (path.matches(&quot;/api/restaurants/\\d+&quot;)) {</span>
+            // GET /api/restaurants/{id} - دریافت رستوران با شناسه
+<span class="nc" id="L125">            Long id = extractIdFromPath(path);</span>
+<span class="nc" id="L126">            getRestaurantById(exchange, id);</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        } else if (path.matches(&quot;/api/restaurants/owner/\\d+&quot;)) {</span>
+            // GET /api/restaurants/owner/{ownerId} - دریافت رستوران‌های یک مالک
+<span class="nc" id="L129">            Long ownerId = extractIdFromPath(path, &quot;/api/restaurants/owner/&quot;);</span>
+<span class="nc" id="L130">            getRestaurantsByOwner(exchange, ownerId);</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">        } else if (path.matches(&quot;/api/restaurants/status/\\w+&quot;)) {</span>
+            // GET /api/restaurants/status/{status} - دریافت رستوران‌ها بر اساس وضعیت
+<span class="nc" id="L133">            String statusStr = extractStatusFromPath(path);</span>
+<span class="nc" id="L134">            getRestaurantsByStatus(exchange, statusStr);</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">        } else if (path.equals(&quot;/api/restaurants/statistics&quot;)) {</span>
+            // GET /api/restaurants/statistics - دریافت آمار رستوران‌ها
+<span class="nc" id="L137">            getRestaurantStatistics(exchange);</span>
+        } else {
+<span class="nc" id="L139">            sendErrorResponse(exchange, 404, &quot;Endpoint not found&quot;);</span>
+        }
+<span class="nc" id="L141">    }</span>
+    
+    /**
+     * دریافت همه رستوران‌های تأیید شده (برای نمایش عمومی)
+     * فقط رستوران‌هایی که وضعیت APPROVED دارند نمایش داده می‌شوند
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void getAllApprovedRestaurants(HttpExchange exchange) throws IOException {
+<span class="nc" id="L151">        List&lt;Restaurant&gt; restaurants = restaurantService.getApprovedRestaurants();</span>
+<span class="nc" id="L152">        sendJsonResponse(exchange, 200, restaurants);</span>
+<span class="nc" id="L153">    }</span>
+    
+    /**
+     * دریافت اطلاعات رستوران با شناسه مشخص
+     * 
+     * @param exchange شیء HttpExchange
+     * @param id شناسه رستوران
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void getRestaurantById(HttpExchange exchange, Long id) throws IOException {
+<span class="nc" id="L163">        Restaurant restaurant = restaurantService.getRestaurantById(id);</span>
+<span class="nc" id="L164">        sendJsonResponse(exchange, 200, restaurant);</span>
+<span class="nc" id="L165">    }</span>
+    
+    /**
+     * دریافت همه رستوران‌های متعلق به یک مالک
+     * برای نمایش در پنل فروشندگان استفاده می‌شود
+     * 
+     * @param exchange شیء HttpExchange
+     * @param ownerId شناسه مالک رستوران
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void getRestaurantsByOwner(HttpExchange exchange, Long ownerId) throws IOException {
+<span class="nc" id="L176">        List&lt;Restaurant&gt; restaurants = restaurantService.getRestaurantsByOwner(ownerId);</span>
+<span class="nc" id="L177">        sendJsonResponse(exchange, 200, restaurants);</span>
+<span class="nc" id="L178">    }</span>
+    
+    /**
+     * دریافت رستوران‌ها بر اساس وضعیت
+     * برای فیلتر کردن رستوران‌ها در پنل مدیریت استفاده می‌شود
+     * 
+     * @param exchange شیء HttpExchange
+     * @param statusStr رشته وضعیت (PENDING, APPROVED, REJECTED, SUSPENDED)
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void getRestaurantsByStatus(HttpExchange exchange, String statusStr) throws IOException {
+        try {
+            // تبدیل رشته به enum RestaurantStatus
+<span class="nc" id="L191">            RestaurantStatus status = RestaurantStatus.valueOf(statusStr.toUpperCase());</span>
+<span class="nc" id="L192">            List&lt;Restaurant&gt; restaurants = restaurantService.getRestaurantsByStatus(status);</span>
+<span class="nc" id="L193">            sendJsonResponse(exchange, 200, restaurants);</span>
+<span class="nc" id="L194">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L195">            sendErrorResponse(exchange, 400, &quot;Invalid status: &quot; + statusStr);</span>
+<span class="nc" id="L196">        }</span>
+<span class="nc" id="L197">    }</span>
+    
+    /**
+     * دریافت آمار کلی رستوران‌ها
+     * شامل تعداد کل، تأیید شده، در انتظار، رد شده و تعلیق شده
+     * فقط برای مدیران سیستم در دسترس است
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void getRestaurantStatistics(HttpExchange exchange) throws IOException {
+<span class="nc" id="L208">        RestaurantService.RestaurantStatistics stats = restaurantService.getRestaurantStatistics();</span>
+<span class="nc" id="L209">        sendJsonResponse(exchange, 200, stats);</span>
+<span class="nc" id="L210">    }</span>
+    
+    // ==================== POST ENDPOINTS - پردازش درخواست‌های POST ====================
+    
+    /**
+     * پردازش تمام درخواست‌های POST مربوط به رستوران‌ها
+     * 
+     * @param exchange شیء HttpExchange
+     * @param path مسیر درخواست
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handlePost(HttpExchange exchange, String path) throws IOException {
+<span class="nc bnc" id="L222" title="All 2 branches missed.">        if (path.equals(&quot;/api/restaurants&quot;)) {</span>
+            // POST /api/restaurants - ثبت رستوران جدید
+<span class="nc" id="L224">            registerRestaurant(exchange);</span>
+<span class="nc bnc" id="L225" title="All 2 branches missed.">        } else if (path.matches(&quot;/api/restaurants/\\d+/approve&quot;)) {</span>
+            // POST /api/restaurants/{id}/approve - تأیید رستوران
+<span class="nc" id="L227">            Long id = extractIdFromPath(path, &quot;/api/restaurants/&quot;, &quot;/approve&quot;);</span>
+<span class="nc" id="L228">            approveRestaurant(exchange, id);</span>
+<span class="nc bnc" id="L229" title="All 2 branches missed.">        } else if (path.matches(&quot;/api/restaurants/\\d+/reject&quot;)) {</span>
+            // POST /api/restaurants/{id}/reject - رد رستوران
+<span class="nc" id="L231">            Long id = extractIdFromPath(path, &quot;/api/restaurants/&quot;, &quot;/reject&quot;);</span>
+<span class="nc" id="L232">            rejectRestaurant(exchange, id);</span>
+<span class="nc bnc" id="L233" title="All 2 branches missed.">        } else if (path.matches(&quot;/api/restaurants/\\d+/suspend&quot;)) {</span>
+            // POST /api/restaurants/{id}/suspend - تعلیق رستوران
+<span class="nc" id="L235">            Long id = extractIdFromPath(path, &quot;/api/restaurants/&quot;, &quot;/suspend&quot;);</span>
+<span class="nc" id="L236">            suspendRestaurant(exchange, id);</span>
+<span class="nc" id="L237">        } else {</span>
+<span class="nc" id="L238">            sendErrorResponse(exchange, 404, &quot;Endpoint not found&quot;);</span>
+        }
+<span class="nc" id="L240">    }</span>
+    
+    /**
+     * ثبت رستوران جدید در سیستم
+     * رستوران با وضعیت PENDING ثبت می‌شود و منتظر تأیید مدیر است
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void registerRestaurant(HttpExchange exchange) throws IOException {
+<span class="nc" id="L250">        Map&lt;String, Object&gt; requestData = parseJsonRequest(exchange);</span>
+        
+        // استخراج اطلاعات از درخواست
+<span class="nc" id="L253">        Long ownerId = getLongFromMap(requestData, &quot;ownerId&quot;);</span>
+<span class="nc" id="L254">        String name = getStringFromMap(requestData, &quot;name&quot;);</span>
+<span class="nc" id="L255">        String address = getStringFromMap(requestData, &quot;address&quot;);</span>
+<span class="nc" id="L256">        String phone = getStringFromMap(requestData, &quot;phone&quot;);</span>
+        
+        // ثبت رستوران جدید
+<span class="nc" id="L259">        Restaurant restaurant = restaurantService.registerRestaurant(ownerId, name, address, phone);</span>
+<span class="nc" id="L260">        sendJsonResponse(exchange, 201, restaurant);</span>
+<span class="nc" id="L261">    }</span>
+    
+    /**
+     * تأیید رستوران توسط مدیر
+     * وضعیت رستوران از PENDING به APPROVED تغییر می‌کند
+     * 
+     * @param exchange شیء HttpExchange
+     * @param id شناسه رستوران
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void approveRestaurant(HttpExchange exchange, Long id) throws IOException {
+<span class="nc" id="L272">        restaurantService.approveRestaurant(id);</span>
+<span class="nc" id="L273">        sendJsonResponse(exchange, 200, Map.of(&quot;message&quot;, &quot;Restaurant approved successfully&quot;));</span>
+<span class="nc" id="L274">    }</span>
+    
+    /**
+     * رد رستوران توسط مدیر
+     * وضعیت رستوران از PENDING به REJECTED تغییر می‌کند
+     * 
+     * @param exchange شیء HttpExchange
+     * @param id شناسه رستوران
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void rejectRestaurant(HttpExchange exchange, Long id) throws IOException {
+<span class="nc" id="L285">        restaurantService.rejectRestaurant(id);</span>
+<span class="nc" id="L286">        sendJsonResponse(exchange, 200, Map.of(&quot;message&quot;, &quot;Restaurant rejected successfully&quot;));</span>
+<span class="nc" id="L287">    }</span>
+    
+    /**
+     * تعلیق رستوران توسط مدیر
+     * رستوران از دسترس خارج می‌شود اما حذف نمی‌شود
+     * 
+     * @param exchange شیء HttpExchange
+     * @param id شناسه رستوران
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void suspendRestaurant(HttpExchange exchange, Long id) throws IOException {
+<span class="nc" id="L298">        restaurantService.suspendRestaurant(id);</span>
+<span class="nc" id="L299">        sendJsonResponse(exchange, 200, Map.of(&quot;message&quot;, &quot;Restaurant suspended successfully&quot;));</span>
+<span class="nc" id="L300">    }</span>
+    
+    // ==================== PUT ENDPOINTS - پردازش درخواست‌های PUT ====================
+    
+    /**
+     * پردازش تمام درخواست‌های PUT مربوط به رستوران‌ها
+     * 
+     * @param exchange شیء HttpExchange
+     * @param path مسیر درخواست
+     * @throws IOException در صورت خطا در پردازش
+     */
+    private void handlePut(HttpExchange exchange, String path) throws IOException {
+<span class="nc bnc" id="L312" title="All 2 branches missed.">        if (path.matches(&quot;/api/restaurants/\\d+&quot;)) {</span>
+            // PUT /api/restaurants/{id} - به‌روزرسانی اطلاعات رستوران
+<span class="nc" id="L314">            Long id = extractIdFromPath(path);</span>
+<span class="nc" id="L315">            updateRestaurant(exchange, id);</span>
+<span class="nc bnc" id="L316" title="All 2 branches missed.">        } else if (path.matches(&quot;/api/restaurants/\\d+/status&quot;)) {</span>
+            // PUT /api/restaurants/{id}/status - به‌روزرسانی وضعیت رستوران
+<span class="nc" id="L318">            Long id = extractIdFromPath(path, &quot;/api/restaurants/&quot;, &quot;/status&quot;);</span>
+<span class="nc" id="L319">            updateRestaurantStatus(exchange, id);</span>
+<span class="nc" id="L320">        } else {</span>
+<span class="nc" id="L321">            sendErrorResponse(exchange, 404, &quot;Endpoint not found&quot;);</span>
+        }
+<span class="nc" id="L323">    }</span>
+    
+    private void updateRestaurant(HttpExchange exchange, Long id) throws IOException {
+<span class="nc" id="L326">        Map&lt;String, Object&gt; requestData = parseJsonRequest(exchange);</span>
+        
+<span class="nc" id="L328">        String name = getStringFromMap(requestData, &quot;name&quot;);</span>
+<span class="nc" id="L329">        String address = getStringFromMap(requestData, &quot;address&quot;);</span>
+<span class="nc" id="L330">        String phone = getStringFromMap(requestData, &quot;phone&quot;);</span>
+        
+<span class="nc" id="L332">        Restaurant restaurant = restaurantService.updateRestaurant(id, name, address, phone);</span>
+<span class="nc" id="L333">        sendJsonResponse(exchange, 200, restaurant);</span>
+<span class="nc" id="L334">    }</span>
+    
+    private void updateRestaurantStatus(HttpExchange exchange, Long id) throws IOException {
+<span class="nc" id="L337">        Map&lt;String, Object&gt; requestData = parseJsonRequest(exchange);</span>
+<span class="nc" id="L338">        String statusStr = getStringFromMap(requestData, &quot;status&quot;);</span>
+        
+        try {
+<span class="nc" id="L341">            RestaurantStatus status = RestaurantStatus.valueOf(statusStr.toUpperCase());</span>
+<span class="nc" id="L342">            restaurantService.updateRestaurantStatus(id, status);</span>
+<span class="nc" id="L343">            sendJsonResponse(exchange, 200, Map.of(&quot;message&quot;, &quot;Restaurant status updated successfully&quot;));</span>
+<span class="nc" id="L344">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L345">            sendErrorResponse(exchange, 400, &quot;Invalid status: &quot; + statusStr);</span>
+<span class="nc" id="L346">        }</span>
+<span class="nc" id="L347">    }</span>
+    
+    // ==================== DELETE ENDPOINTS ====================
+    
+    private void handleDelete(HttpExchange exchange, String path) throws IOException {
+<span class="nc bnc" id="L352" title="All 2 branches missed.">        if (path.matches(&quot;/api/restaurants/\\d+&quot;)) {</span>
+            // DELETE /api/restaurants/{id} - Delete restaurant
+<span class="nc" id="L354">            Long id = extractIdFromPath(path);</span>
+<span class="nc" id="L355">            deleteRestaurant(exchange, id);</span>
+<span class="nc" id="L356">        } else {</span>
+<span class="nc" id="L357">            sendErrorResponse(exchange, 404, &quot;Endpoint not found&quot;);</span>
+        }
+<span class="nc" id="L359">    }</span>
+    
+    private void deleteRestaurant(HttpExchange exchange, Long id) throws IOException {
+<span class="nc" id="L362">        restaurantService.deleteRestaurant(id);</span>
+<span class="nc" id="L363">        sendJsonResponse(exchange, 200, Map.of(&quot;message&quot;, &quot;Restaurant deleted successfully&quot;));</span>
+<span class="nc" id="L364">    }</span>
+    
+    // ==================== UTILITY METHODS - متدهای کمکی ====================
+    
+    /**
+     * استخراج شناسه از انتهای مسیر
+     * مثال: /api/restaurants/123 -&gt; 123
+     * 
+     * @param path مسیر درخواست
+     * @return شناسه استخراج شده
+     */
+    private Long extractIdFromPath(String path) {
+<span class="nc" id="L376">        String[] parts = path.split(&quot;/&quot;);</span>
+<span class="nc" id="L377">        return Long.parseLong(parts[parts.length - 1]);</span>
+    }
+    
+    private Long extractIdFromPath(String path, String prefix) {
+<span class="nc" id="L381">        String idStr = path.substring(prefix.length());</span>
+<span class="nc" id="L382">        return Long.parseLong(idStr);</span>
+    }
+    
+    private Long extractIdFromPath(String path, String prefix, String suffix) {
+<span class="nc" id="L386">        String withoutPrefix = path.substring(prefix.length());</span>
+<span class="nc" id="L387">        String idStr = withoutPrefix.substring(0, withoutPrefix.indexOf(suffix));</span>
+<span class="nc" id="L388">        return Long.parseLong(idStr);</span>
+    }
+    
+    private String extractStatusFromPath(String path) {
+<span class="nc" id="L392">        String[] parts = path.split(&quot;/&quot;);</span>
+<span class="nc" id="L393">        return parts[parts.length - 1];</span>
+    }
+    
+    private Map&lt;String, Object&gt; parseJsonRequest(HttpExchange exchange) throws IOException {
+        // Simple JSON parsing - in production, use Jackson or Gson
+<span class="nc" id="L398">        String requestBody = new String(exchange.getRequestBody().readAllBytes());</span>
+<span class="nc" id="L399">        Map&lt;String, Object&gt; result = new HashMap&lt;&gt;();</span>
+        
+        // Basic JSON parsing (simplified for this implementation)
+<span class="nc bnc" id="L402" title="All 2 branches missed.">        if (requestBody.trim().isEmpty()) {</span>
+<span class="nc" id="L403">            return result;</span>
+        }
+        
+        // Remove curly braces and split by comma
+<span class="nc" id="L407">        String content = requestBody.trim().replaceAll(&quot;[{}]&quot;, &quot;&quot;);</span>
+<span class="nc" id="L408">        String[] pairs = content.split(&quot;,&quot;);</span>
+        
+<span class="nc bnc" id="L410" title="All 2 branches missed.">        for (String pair : pairs) {</span>
+<span class="nc" id="L411">            String[] keyValue = pair.split(&quot;:&quot;);</span>
+<span class="nc bnc" id="L412" title="All 2 branches missed.">            if (keyValue.length == 2) {</span>
+<span class="nc" id="L413">                String key = keyValue[0].trim().replaceAll(&quot;\&quot;&quot;, &quot;&quot;);</span>
+<span class="nc" id="L414">                String value = keyValue[1].trim().replaceAll(&quot;\&quot;&quot;, &quot;&quot;);</span>
+                
+                // Try to parse as number
+                try {
+<span class="nc bnc" id="L418" title="All 2 branches missed.">                    if (value.contains(&quot;.&quot;)) {</span>
+<span class="nc" id="L419">                        result.put(key, Double.parseDouble(value));</span>
+                    } else {
+<span class="nc" id="L421">                        result.put(key, Long.parseLong(value));</span>
+                    }
+<span class="nc" id="L423">                } catch (NumberFormatException e) {</span>
+<span class="nc" id="L424">                    result.put(key, value);</span>
+<span class="nc" id="L425">                }</span>
+            }
+        }
+        
+<span class="nc" id="L429">        return result;</span>
+    }
+    
+    private String getStringFromMap(Map&lt;String, Object&gt; map, String key) {
+<span class="nc" id="L433">        Object value = map.get(key);</span>
+<span class="nc bnc" id="L434" title="All 2 branches missed.">        return value != null ? value.toString() : null;</span>
+    }
+    
+    private Long getLongFromMap(Map&lt;String, Object&gt; map, String key) {
+<span class="nc" id="L438">        Object value = map.get(key);</span>
+<span class="nc bnc" id="L439" title="All 2 branches missed.">        if (value == null) return null;</span>
+<span class="nc bnc" id="L440" title="All 2 branches missed.">        if (value instanceof Long) return (Long) value;</span>
+<span class="nc bnc" id="L441" title="All 2 branches missed.">        if (value instanceof Number) return ((Number) value).longValue();</span>
+        try {
+<span class="nc" id="L443">            return Long.parseLong(value.toString());</span>
+<span class="nc" id="L444">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L445">            throw new IllegalArgumentException(&quot;Invalid number format for &quot; + key + &quot;: &quot; + value);</span>
+        }
+    }
+    
+    private void sendJsonResponse(HttpExchange exchange, int statusCode, Object data) throws IOException {
+<span class="nc" id="L450">        String jsonResponse = convertToJson(data);</span>
+        
+<span class="nc" id="L452">        exchange.getResponseHeaders().set(&quot;Content-Type&quot;, &quot;application/json&quot;);</span>
+<span class="nc" id="L453">        exchange.sendResponseHeaders(statusCode, jsonResponse.getBytes().length);</span>
+        
+<span class="nc" id="L455">        try (OutputStream os = exchange.getResponseBody()) {</span>
+<span class="nc" id="L456">            os.write(jsonResponse.getBytes());</span>
+        }
+<span class="nc" id="L458">    }</span>
+    
+    private void sendErrorResponse(HttpExchange exchange, int statusCode, String message) throws IOException {
+<span class="nc" id="L461">        Map&lt;String, Object&gt; error = Map.of(</span>
+<span class="nc" id="L462">            &quot;error&quot;, true,</span>
+            &quot;message&quot;, message,
+<span class="nc" id="L464">            &quot;status&quot;, statusCode</span>
+        );
+<span class="nc" id="L466">        sendJsonResponse(exchange, statusCode, error);</span>
+<span class="nc" id="L467">    }</span>
+    
+    private String convertToJson(Object data) {
+        // Simple JSON serialization - in production, use Jackson or Gson
+<span class="nc bnc" id="L471" title="All 2 branches missed.">        if (data == null) {</span>
+<span class="nc" id="L472">            return &quot;null&quot;;</span>
+        }
+        
+<span class="nc bnc" id="L475" title="All 2 branches missed.">        if (data instanceof String) {</span>
+<span class="nc" id="L476">            return &quot;\&quot;&quot; + data + &quot;\&quot;&quot;;</span>
+        }
+        
+<span class="nc bnc" id="L479" title="All 4 branches missed.">        if (data instanceof Number || data instanceof Boolean) {</span>
+<span class="nc" id="L480">            return data.toString();</span>
+        }
+        
+<span class="nc bnc" id="L483" title="All 2 branches missed.">        if (data instanceof Map) {</span>
+<span class="nc" id="L484">            Map&lt;?, ?&gt; map = (Map&lt;?, ?&gt;) data;</span>
+<span class="nc" id="L485">            StringBuilder sb = new StringBuilder(&quot;{&quot;);</span>
+<span class="nc" id="L486">            boolean first = true;</span>
+<span class="nc bnc" id="L487" title="All 2 branches missed.">            for (Map.Entry&lt;?, ?&gt; entry : map.entrySet()) {</span>
+<span class="nc bnc" id="L488" title="All 2 branches missed.">                if (!first) sb.append(&quot;,&quot;);</span>
+<span class="nc" id="L489">                sb.append(&quot;\&quot;&quot;).append(entry.getKey()).append(&quot;\&quot;:&quot;);</span>
+<span class="nc" id="L490">                sb.append(convertToJson(entry.getValue()));</span>
+<span class="nc" id="L491">                first = false;</span>
+<span class="nc" id="L492">            }</span>
+<span class="nc" id="L493">            sb.append(&quot;}&quot;);</span>
+<span class="nc" id="L494">            return sb.toString();</span>
+        }
+        
+<span class="nc bnc" id="L497" title="All 2 branches missed.">        if (data instanceof List) {</span>
+<span class="nc" id="L498">            List&lt;?&gt; list = (List&lt;?&gt;) data;</span>
+<span class="nc" id="L499">            StringBuilder sb = new StringBuilder(&quot;[&quot;);</span>
+<span class="nc" id="L500">            boolean first = true;</span>
+<span class="nc bnc" id="L501" title="All 2 branches missed.">            for (Object item : list) {</span>
+<span class="nc bnc" id="L502" title="All 2 branches missed.">                if (!first) sb.append(&quot;,&quot;);</span>
+<span class="nc" id="L503">                sb.append(convertToJson(item));</span>
+<span class="nc" id="L504">                first = false;</span>
+<span class="nc" id="L505">            }</span>
+<span class="nc" id="L506">            sb.append(&quot;]&quot;);</span>
+<span class="nc" id="L507">            return sb.toString();</span>
+        }
+        
+        // For complex objects like Restaurant, use reflection-based serialization
+<span class="nc" id="L511">        return serializeObject(data);</span>
+    }
+    
+    private String serializeObject(Object obj) {
+        // Simple object serialization for Restaurant and other entities
+<span class="nc bnc" id="L516" title="All 2 branches missed.">        if (obj instanceof Restaurant) {</span>
+<span class="nc" id="L517">            Restaurant r = (Restaurant) obj;</span>
+<span class="nc" id="L518">            return String.format(</span>
+                &quot;{\&quot;id\&quot;:%d,\&quot;ownerId\&quot;:%d,\&quot;name\&quot;:\&quot;%s\&quot;,\&quot;address\&quot;:\&quot;%s\&quot;,\&quot;phone\&quot;:\&quot;%s\&quot;,\&quot;status\&quot;:\&quot;%s\&quot;}&quot;,
+<span class="nc" id="L520">                r.getId(), r.getOwnerId(), r.getName(), r.getAddress(), r.getPhone(), r.getStatus()</span>
+            );
+        }
+        
+<span class="nc bnc" id="L524" title="All 2 branches missed.">        if (obj instanceof RestaurantService.RestaurantStatistics) {</span>
+<span class="nc" id="L525">            RestaurantService.RestaurantStatistics stats = (RestaurantService.RestaurantStatistics) obj;</span>
+<span class="nc" id="L526">            return String.format(</span>
+                &quot;{\&quot;totalCount\&quot;:%d,\&quot;approvedCount\&quot;:%d,\&quot;pendingCount\&quot;:%d,\&quot;rejectedCount\&quot;:%d,\&quot;suspendedCount\&quot;:%d}&quot;,
+<span class="nc" id="L528">                stats.getTotalCount(), stats.getApprovedCount(), stats.getPendingCount(), </span>
+<span class="nc" id="L529">                stats.getRejectedCount(), stats.getSuspendedCount()</span>
+            );
+        }
+        
+        // Fallback to toString
+<span class="nc" id="L534">        return &quot;\&quot;&quot; + obj.toString() + &quot;\&quot;&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

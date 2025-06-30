@@ -1,0 +1,743 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.payment</a> &gt; <span class="el_source">PaymentService.java</span></div><h1>PaymentService.java</h1><pre class="source lang-java linenums">package com.myapp.payment;
+
+import com.myapp.common.exceptions.NotFoundException;
+import com.myapp.common.models.Transaction;
+import com.myapp.common.models.TransactionStatus;
+import com.myapp.common.models.TransactionType;
+import com.myapp.common.models.Order;
+import com.myapp.common.models.User;
+import com.myapp.auth.AuthRepository;
+import com.myapp.order.OrderRepository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+/**
+ * سرویس مدیریت پرداخت و پردازش تراکنش‌های مالی
+ * 
+ * این کلاس مسئول پیاده‌سازی منطق کسب‌وکار مربوط به:
+ * - پردازش انواع مختلف پرداخت (کیف پول، کارت، پرداخت در محل)
+ * - مدیریت استرداد وجه
+ * - اعتبارسنجی تراکنش‌ها
+ * - محاسبه موجودی کیف پول
+ * - تولید گزارش‌های مالی و آمار
+ * - validation و security checks
+ * 
+ * Pattern های استفاده شده:
+ * - Service Layer Pattern: جداسازی منطق کسب‌وکار از controller
+ * - Repository Pattern: دسترسی انتزاعی به لایه داده
+ * - Strategy Pattern: روش‌های مختلف پرداخت
+ * 
+ * @author Food Ordering System Team
+ * @version 1.0
+ * @since 2024
+ */
+public class PaymentService {
+    
+    /** Repository برای مدیریت تراکنش‌ها و پرداخت‌ها */
+    private final PaymentRepository paymentRepository;
+    
+    /** Repository برای اعتبارسنجی کاربران */
+    private final AuthRepository authRepository;
+    
+    /** Repository برای اعتبارسنجی سفارشات */
+    private final OrderRepository orderRepository;
+    
+    /**
+     * سازنده پیش‌فرض - ایجاد instance های جدید از repository ها
+     */
+<span class="nc" id="L51">    public PaymentService() {</span>
+<span class="nc" id="L52">        this.paymentRepository = new PaymentRepository();</span>
+<span class="nc" id="L53">        this.authRepository = new AuthRepository();</span>
+<span class="nc" id="L54">        this.orderRepository = new OrderRepository();</span>
+<span class="nc" id="L55">    }</span>
+    
+    /**
+     * سازنده برای تزریق وابستگی (Dependency Injection)
+     * برای تست‌ها و configuration سفارشی استفاده می‌شود
+     * 
+     * @param paymentRepository repository تراکنش‌ها
+     * @param authRepository repository کاربران
+     * @param orderRepository repository سفارشات
+     */
+<span class="fc" id="L65">    public PaymentService(PaymentRepository paymentRepository, AuthRepository authRepository, OrderRepository orderRepository) {</span>
+<span class="fc" id="L66">        this.paymentRepository = paymentRepository;</span>
+<span class="fc" id="L67">        this.authRepository = authRepository;</span>
+<span class="fc" id="L68">        this.orderRepository = orderRepository;</span>
+<span class="fc" id="L69">    }</span>
+    
+    // ==================== PAYMENT PROCESSING ====================
+    
+    /**
+     * پردازش پرداخت برای سفارش
+     * 
+     * این متد کلیدی‌ترین functionality سیستم پرداخت است که:
+     * 1. تمام ورودی‌ها را validate می‌کند
+     * 2. وجود کاربر و سفارش را بررسی می‌کند
+     * 3. وضعیت سفارش را برای قابلیت پرداخت چک می‌کند
+     * 4. تراکنش پرداخت را ایجاد می‌کند
+     * 5. بر اساس نوع پرداخت، فرآیند مناسب را اجرا می‌کند
+     * 
+     * @param userId شناسه کاربر پرداخت‌کننده
+     * @param orderId شناسه سفارش مورد پرداخت
+     * @param paymentMethod روش پرداخت (WALLET, CARD, CASH_ON_DELIVERY)
+     * @return تراکنش ایجاد شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن ورودی‌ها
+     * @throws NotFoundException در صورت عدم وجود کاربر یا سفارش
+     */
+    public Transaction processPayment(Long userId, Long orderId, String paymentMethod) {
+        // 1. اعتبارسنجی ورودی‌ها
+<span class="pc bpc" id="L92" title="2 of 4 branches missed.">        if (userId == null || userId &lt;= 0) {</span>
+<span class="nc" id="L93">            throw new IllegalArgumentException(&quot;User ID must be positive&quot;);</span>
+        }
+<span class="pc bpc" id="L95" title="2 of 4 branches missed.">        if (orderId == null || orderId &lt;= 0) {</span>
+<span class="nc" id="L96">            throw new IllegalArgumentException(&quot;Order ID must be positive&quot;);</span>
+        }
+<span class="pc bpc" id="L98" title="1 of 4 branches missed.">        if (paymentMethod == null || paymentMethod.trim().isEmpty()) {</span>
+<span class="fc" id="L99">            throw new IllegalArgumentException(&quot;Payment method cannot be empty&quot;);</span>
+        }
+        
+        // 2. اعتبارسنجی وجود کاربر
+<span class="fc" id="L103">        Optional&lt;User&gt; userOpt = authRepository.findById(userId);</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">        if (userOpt.isEmpty()) {</span>
+<span class="nc" id="L105">            throw new NotFoundException(&quot;User&quot;, userId);</span>
+        }
+        
+        // 3. اعتبارسنجی وجود سفارش و تعلق آن به کاربر
+<span class="fc" id="L109">        Optional&lt;Order&gt; orderOpt = orderRepository.findById(orderId);</span>
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">        if (orderOpt.isEmpty()) {</span>
+<span class="fc" id="L111">            throw new NotFoundException(&quot;Order&quot;, orderId);</span>
+        }
+        
+<span class="nc" id="L114">        Order order = orderOpt.get();</span>
+<span class="nc bnc" id="L115" title="All 2 branches missed.">        if (!order.getCustomer().getId().equals(userId)) {</span>
+<span class="nc" id="L116">            throw new IllegalArgumentException(&quot;Order does not belong to the specified user&quot;);</span>
+        }
+        
+        // 4. بررسی وضعیت سفارش برای قابلیت پرداخت
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        if (order.getStatus() != com.myapp.common.models.OrderStatus.PENDING) {</span>
+<span class="nc" id="L121">            throw new IllegalArgumentException(&quot;Order is not in a payable state&quot;);</span>
+        }
+        
+        // 5. بررسی عدم وجود پرداخت قبلی موفق
+<span class="nc" id="L125">        List&lt;Transaction&gt; existingPayments = paymentRepository.findByOrderId(orderId);</span>
+<span class="nc" id="L126">        Optional&lt;Transaction&gt; completedPayment = existingPayments.stream()</span>
+<span class="nc bnc" id="L127" title="All 4 branches missed.">            .filter(t -&gt; t.getStatus() == TransactionStatus.COMPLETED &amp;&amp; t.getType() == TransactionType.PAYMENT)</span>
+<span class="nc" id="L128">            .findFirst();</span>
+        
+<span class="nc bnc" id="L130" title="All 2 branches missed.">        if (completedPayment.isPresent()) {</span>
+<span class="nc" id="L131">            throw new IllegalArgumentException(&quot;Payment already completed for this order&quot;);</span>
+        }
+        
+        // 6. ایجاد تراکنش پرداخت اولیه
+<span class="nc" id="L135">        Transaction payment = Transaction.forPayment(userId, orderId, order.getTotalAmount(), paymentMethod);</span>
+<span class="nc" id="L136">        payment = paymentRepository.save(payment);</span>
+        
+        // 7. پردازش پرداخت بر اساس روش انتخابی
+        try {
+<span class="nc bnc" id="L140" title="All 4 branches missed.">            switch (paymentMethod.toUpperCase()) {</span>
+                case &quot;WALLET&quot;:
+<span class="nc" id="L142">                    processWalletPayment(payment);</span>
+<span class="nc" id="L143">                    break;</span>
+                case &quot;CARD&quot;:
+<span class="nc" id="L145">                    processCardPayment(payment);</span>
+<span class="nc" id="L146">                    break;</span>
+                case &quot;CASH_ON_DELIVERY&quot;:
+<span class="nc" id="L148">                    processCashOnDeliveryPayment(payment);</span>
+<span class="nc" id="L149">                    break;</span>
+                default:
+<span class="nc" id="L151">                    throw new IllegalArgumentException(&quot;Unsupported payment method: &quot; + paymentMethod);</span>
+            }
+<span class="nc" id="L153">        } catch (Exception e) {</span>
+            // در صورت خطا، تراکنش را failed علامت‌گذاری کن
+<span class="nc" id="L155">            payment.markAsFailed(e.getMessage());</span>
+<span class="nc" id="L156">            paymentRepository.update(payment);</span>
+<span class="nc" id="L157">            throw e;</span>
+<span class="nc" id="L158">        }</span>
+        
+<span class="nc" id="L160">        return payment;</span>
+    }
+    
+    /**
+     * پردازش پرداخت از طریق کیف پول
+     * 
+     * مراحل:
+     * 1. بررسی موجودی کافی در کیف پول
+     * 2. ایجاد تراکنش برداشت از کیف پول
+     * 3. تکمیل تراکنش پرداخت
+     * 
+     * @param payment تراکنش پرداخت اولیه
+     * @throws IllegalArgumentException در صورت کمبود موجودی
+     */
+    private void processWalletPayment(Transaction payment) {
+        // 1. محاسبه موجودی فعلی کیف پول
+<span class="nc" id="L176">        Double walletBalance = paymentRepository.calculateWalletBalance(payment.getUserId());</span>
+<span class="nc bnc" id="L177" title="All 2 branches missed.">        if (walletBalance &lt; payment.getAmount()) {</span>
+<span class="nc" id="L178">            throw new IllegalArgumentException(&quot;Insufficient wallet balance. Balance: &quot; + walletBalance + &quot;, Required: &quot; + payment.getAmount());</span>
+        }
+        
+        // 2. ایجاد تراکنش برداشت از کیف پول
+<span class="nc" id="L182">        Transaction withdrawal = Transaction.forWalletWithdrawal(</span>
+<span class="nc" id="L183">            payment.getUserId(), </span>
+<span class="nc" id="L184">            payment.getAmount(), </span>
+<span class="nc" id="L185">            &quot;Payment for order #&quot; + payment.getOrderId()</span>
+        );
+<span class="nc" id="L187">        withdrawal.markAsCompleted(&quot;WALLET_&quot; + UUID.randomUUID().toString().substring(0, 8));</span>
+<span class="nc" id="L188">        paymentRepository.save(withdrawal);</span>
+        
+        // 3. تکمیل موفقیت‌آمیز تراکنش پرداخت
+<span class="nc" id="L191">        payment.markAsCompleted(&quot;WALLET_PAYMENT_&quot; + payment.getId());</span>
+<span class="nc" id="L192">        paymentRepository.update(payment);</span>
+<span class="nc" id="L193">    }</span>
+    
+    /**
+     * پردازش پرداخت از طریق کارت (شبیه‌سازی)
+     * 
+     * در محیط واقعی، این متد با payment gateway های خارجی ارتباط برقرار می‌کند
+     * برای demo، 90% احتمال موفقیت دارد
+     * 
+     * @param payment تراکنش پرداخت اولیه
+     */
+    private void processCardPayment(Transaction payment) {
+        // تولید شناسه مرجع برای تراکنش
+<span class="nc" id="L205">        String referenceId = &quot;CARD_&quot; + UUID.randomUUID().toString().substring(0, 8);</span>
+        
+        // شبیه‌سازی پاسخ payment gateway (90% نرخ موفقیت)
+<span class="nc bnc" id="L208" title="All 2 branches missed.">        if (Math.random() &lt; 0.9) {</span>
+<span class="nc" id="L209">            payment.markAsCompleted(referenceId);</span>
+        } else {
+<span class="nc" id="L211">            payment.markAsFailed(&quot;Card payment declined by bank&quot;);</span>
+        }
+        
+<span class="nc" id="L214">        paymentRepository.update(payment);</span>
+<span class="nc" id="L215">    }</span>
+    
+    /**
+     * پردازش پرداخت در محل تحویل
+     * 
+     * این نوع پرداخت تا زمان تحویل در وضعیت pending باقی می‌ماند
+     * 
+     * @param payment تراکنش پرداخت اولیه
+     */
+    private void processCashOnDeliveryPayment(Transaction payment) {
+        // COD payments تا زمان تحویل pending هستند
+<span class="nc" id="L226">        payment.setDescription(&quot;Cash on delivery - payment pending until delivery&quot;);</span>
+<span class="nc" id="L227">        paymentRepository.update(payment);</span>
+<span class="nc" id="L228">    }</span>
+    
+    // ==================== REFUND PROCESSING ====================
+    
+    /**
+     * پردازش استرداد وجه برای پرداخت قبلی
+     * 
+     * مراحل:
+     * 1. یافتن تراکنش پرداخت اصلی
+     * 2. اعتبارسنجی قابلیت استرداد
+     * 3. ایجاد تراکنش استرداد
+     * 4. پردازش استرداد بر اساس روش پرداخت اصلی
+     * 
+     * @param paymentId شناسه تراکنش پرداخت اصلی
+     * @param reason دلیل استرداد
+     * @return تراکنش استرداد ایجاد شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن ورودی‌ها
+     * @throws NotFoundException در صورت عدم وجود تراکنش
+     */
+    public Transaction processRefund(Long paymentId, String reason) {
+        // 1. اعتبارسنجی ورودی‌ها
+<span class="nc bnc" id="L249" title="All 4 branches missed.">        if (paymentId == null || paymentId &lt;= 0) {</span>
+<span class="nc" id="L250">            throw new IllegalArgumentException(&quot;Payment ID must be positive&quot;);</span>
+        }
+<span class="nc bnc" id="L252" title="All 4 branches missed.">        if (reason == null || reason.trim().isEmpty()) {</span>
+<span class="nc" id="L253">            throw new IllegalArgumentException(&quot;Refund reason cannot be empty&quot;);</span>
+        }
+        
+        // 2. یافتن تراکنش پرداخت اصلی
+<span class="nc" id="L257">        Optional&lt;Transaction&gt; paymentOpt = paymentRepository.findById(paymentId);</span>
+<span class="nc bnc" id="L258" title="All 2 branches missed.">        if (paymentOpt.isEmpty()) {</span>
+<span class="nc" id="L259">            throw new NotFoundException(&quot;Payment transaction&quot;, paymentId);</span>
+        }
+        
+<span class="nc" id="L262">        Transaction originalPayment = paymentOpt.get();</span>
+        
+        // 3. اعتبارسنجی قابلیت استرداد
+<span class="nc bnc" id="L265" title="All 2 branches missed.">        if (originalPayment.getType() != TransactionType.PAYMENT) {</span>
+<span class="nc" id="L266">            throw new IllegalArgumentException(&quot;Only payment transactions can be refunded&quot;);</span>
+        }
+<span class="nc bnc" id="L268" title="All 2 branches missed.">        if (originalPayment.getStatus() != TransactionStatus.COMPLETED) {</span>
+<span class="nc" id="L269">            throw new IllegalArgumentException(&quot;Only completed payments can be refunded&quot;);</span>
+        }
+        
+        // 4. بررسی عدم وجود استرداد قبلی
+<span class="nc" id="L273">        List&lt;Transaction&gt; existingRefunds = paymentRepository.findByOrderId(originalPayment.getOrderId());</span>
+<span class="nc" id="L274">        Optional&lt;Transaction&gt; completedRefund = existingRefunds.stream()</span>
+<span class="nc bnc" id="L275" title="All 4 branches missed.">            .filter(t -&gt; t.getStatus() == TransactionStatus.COMPLETED &amp;&amp; t.getType() == TransactionType.REFUND)</span>
+<span class="nc" id="L276">            .findFirst();</span>
+        
+<span class="nc bnc" id="L278" title="All 2 branches missed.">        if (completedRefund.isPresent()) {</span>
+<span class="nc" id="L279">            throw new IllegalArgumentException(&quot;Payment already refunded&quot;);</span>
+        }
+        
+        // 5. ایجاد تراکنش استرداد
+<span class="nc" id="L283">        Transaction refund = Transaction.forRefund(</span>
+<span class="nc" id="L284">            originalPayment.getUserId(), </span>
+<span class="nc" id="L285">            originalPayment.getOrderId(), </span>
+<span class="nc" id="L286">            originalPayment.getAmount(), </span>
+            reason
+        );
+<span class="nc" id="L289">        refund = paymentRepository.save(refund);</span>
+        
+        // 6. پردازش استرداد بر اساس روش پرداخت اصلی
+        try {
+<span class="nc bnc" id="L293" title="All 4 branches missed.">            switch (originalPayment.getPaymentMethod().toUpperCase()) {</span>
+                case &quot;WALLET&quot;:
+<span class="nc" id="L295">                    processWalletRefund(refund);</span>
+<span class="nc" id="L296">                    break;</span>
+                case &quot;CARD&quot;:
+<span class="nc" id="L298">                    processCardRefund(refund);</span>
+<span class="nc" id="L299">                    break;</span>
+                case &quot;CASH_ON_DELIVERY&quot;:
+<span class="nc" id="L301">                    processCashRefund(refund);</span>
+<span class="nc" id="L302">                    break;</span>
+                default:
+<span class="nc" id="L304">                    throw new IllegalArgumentException(&quot;Cannot process refund for payment method: &quot; + originalPayment.getPaymentMethod());</span>
+            }
+<span class="nc" id="L306">        } catch (Exception e) {</span>
+            // در صورت خطا، استرداد را failed علامت‌گذاری کن
+<span class="nc" id="L308">            refund.markAsFailed(e.getMessage());</span>
+<span class="nc" id="L309">            paymentRepository.update(refund);</span>
+<span class="nc" id="L310">            throw e;</span>
+<span class="nc" id="L311">        }</span>
+        
+<span class="nc" id="L313">        return refund;</span>
+    }
+    
+    /**
+     * پردازش استرداد به کیف پول
+     * 
+     * مبلغ استرداد شده به کیف پول کاربر اضافه می‌شود
+     * 
+     * @param refund تراکنش استرداد
+     */
+    private void processWalletRefund(Transaction refund) {
+        // ایجاد تراکنش شارژ کیف پول برای استرداد
+<span class="nc" id="L325">        Transaction walletCharge = Transaction.forWalletCharge(</span>
+<span class="nc" id="L326">            refund.getUserId(), </span>
+<span class="nc" id="L327">            refund.getAmount(), </span>
+            &quot;REFUND&quot;
+        );
+<span class="nc" id="L330">        walletCharge.setDescription(&quot;Refund for order #&quot; + refund.getOrderId());</span>
+<span class="nc" id="L331">        walletCharge.markAsCompleted(&quot;REFUND_&quot; + UUID.randomUUID().toString().substring(0, 8));</span>
+<span class="nc" id="L332">        paymentRepository.save(walletCharge);</span>
+        
+        // تکمیل تراکنش استرداد
+<span class="nc" id="L335">        refund.markAsCompleted(&quot;WALLET_REFUND_&quot; + refund.getId());</span>
+<span class="nc" id="L336">        paymentRepository.update(refund);</span>
+<span class="nc" id="L337">    }</span>
+    
+    /**
+     * پردازش استرداد به کارت (شبیه‌سازی)
+     * 
+     * در محیط واقعی، با payment gateway برای استرداد به کارت ارتباط برقرار می‌شود
+     * 
+     * @param refund تراکنش استرداد
+     */
+    private void processCardRefund(Transaction refund) {
+        // شبیه‌سازی پردازش استرداد کارت
+<span class="nc" id="L348">        String referenceId = &quot;REFUND_&quot; + UUID.randomUUID().toString().substring(0, 8);</span>
+<span class="nc" id="L349">        refund.markAsCompleted(referenceId);</span>
+<span class="nc" id="L350">        paymentRepository.update(refund);</span>
+<span class="nc" id="L351">    }</span>
+    
+    /**
+     * پردازش استرداد پرداخت نقدی
+     * 
+     * استرداد نقدی نیاز به پردازش دستی دارد
+     * 
+     * @param refund تراکنش استرداد
+     */
+    private void processCashRefund(Transaction refund) {
+        // استرداد نقدی نیاز به پردازش دستی دارد
+<span class="nc" id="L362">        refund.setDescription(refund.getDescription() + &quot; - Manual cash refund required&quot;);</span>
+<span class="nc" id="L363">        refund.markAsCompleted(&quot;CASH_REFUND_MANUAL&quot;);</span>
+<span class="nc" id="L364">        paymentRepository.update(refund);</span>
+<span class="nc" id="L365">    }</span>
+    
+    // ==================== TRANSACTION MANAGEMENT ====================
+    
+    /**
+     * دریافت تراکنش بر اساس شناسه
+     * 
+     * @param transactionId شناسه تراکنش
+     * @return تراکنش مورد نظر
+     * @throws IllegalArgumentException در صورت نامعتبر بودن ID
+     * @throws NotFoundException در صورت عدم وجود تراکنش
+     */
+    public Transaction getTransaction(Long transactionId) {
+<span class="pc bpc" id="L378" title="1 of 4 branches missed.">        if (transactionId == null || transactionId &lt;= 0) {</span>
+<span class="fc" id="L379">            throw new IllegalArgumentException(&quot;Transaction ID must be positive&quot;);</span>
+        }
+        
+<span class="fc" id="L382">        Optional&lt;Transaction&gt; transactionOpt = paymentRepository.findById(transactionId);</span>
+<span class="fc bfc" id="L383" title="All 2 branches covered.">        if (transactionOpt.isEmpty()) {</span>
+<span class="fc" id="L384">            throw new NotFoundException(&quot;Transaction&quot;, transactionId);</span>
+        }
+        
+<span class="fc" id="L387">        return transactionOpt.get();</span>
+    }
+    
+    /**
+     * دریافت تاریخچه کامل تراکنش‌های کاربر
+     * 
+     * شامل تمام انواع تراکنش: پرداخت، استرداد، شارژ و برداشت کیف پول
+     * 
+     * @param userId شناسه کاربر
+     * @return لیست تراکنش‌ها مرتب شده بر اساس تاریخ (جدیدترین ابتدا)
+     * @throws IllegalArgumentException در صورت نامعتبر بودن userId
+     * @throws NotFoundException در صورت عدم وجود کاربر
+     */
+    public List&lt;Transaction&gt; getUserTransactionHistory(Long userId) {
+<span class="pc bpc" id="L401" title="1 of 4 branches missed.">        if (userId == null || userId &lt;= 0) {</span>
+<span class="fc" id="L402">            throw new IllegalArgumentException(&quot;User ID must be positive&quot;);</span>
+        }
+        
+        // بررسی وجود کاربر
+<span class="pc bpc" id="L406" title="1 of 2 branches missed.">        if (!authRepository.existsById(userId)) {</span>
+<span class="nc" id="L407">            throw new NotFoundException(&quot;User&quot;, userId);</span>
+        }
+        
+<span class="fc" id="L410">        return paymentRepository.findByUserId(userId);</span>
+    }
+    
+    /**
+     * دریافت تاریخچه تراکنش‌های سفارش
+     * 
+     * تمام تراکنش‌های مربوط به یک سفارش شامل پرداخت و استرداد
+     * 
+     * @param orderId شناسه سفارش
+     * @return لیست تراکنش‌های مربوط به سفارش
+     * @throws IllegalArgumentException در صورت نامعتبر بودن orderId
+     * @throws NotFoundException در صورت عدم وجود سفارش
+     */
+    public List&lt;Transaction&gt; getOrderTransactionHistory(Long orderId) {
+<span class="nc bnc" id="L424" title="All 4 branches missed.">        if (orderId == null || orderId &lt;= 0) {</span>
+<span class="nc" id="L425">            throw new IllegalArgumentException(&quot;Order ID must be positive&quot;);</span>
+        }
+        
+        // بررسی وجود سفارش
+<span class="nc bnc" id="L429" title="All 2 branches missed.">        if (!orderRepository.existsById(orderId)) {</span>
+<span class="nc" id="L430">            throw new NotFoundException(&quot;Order&quot;, orderId);</span>
+        }
+        
+<span class="nc" id="L433">        return paymentRepository.findByOrderId(orderId);</span>
+    }
+    
+    /**
+     * دریافت تراکنش‌های کیف پول کاربر
+     * 
+     * فقط تراکنش‌های شارژ و برداشت کیف پول
+     * 
+     * @param userId شناسه کاربر
+     * @return لیست تراکنش‌های کیف پول
+     */
+    public List&lt;Transaction&gt; getUserWalletTransactions(Long userId) {
+<span class="nc bnc" id="L445" title="All 4 branches missed.">        if (userId == null || userId &lt;= 0) {</span>
+<span class="nc" id="L446">            throw new IllegalArgumentException(&quot;User ID must be positive&quot;);</span>
+        }
+        
+        // بررسی وجود کاربر
+<span class="nc bnc" id="L450" title="All 2 branches missed.">        if (!authRepository.existsById(userId)) {</span>
+<span class="nc" id="L451">            throw new NotFoundException(&quot;User&quot;, userId);</span>
+        }
+        
+<span class="nc" id="L454">        return paymentRepository.findWalletTransactions(userId);</span>
+    }
+    
+    /**
+     * دریافت تراکنش‌های پرداخت کاربر
+     * 
+     * فقط تراکنش‌های پرداخت و استرداد سفارشات
+     * 
+     * @param userId شناسه کاربر
+     * @return لیست تراکنش‌های پرداخت
+     */
+    public List&lt;Transaction&gt; getUserPaymentTransactions(Long userId) {
+<span class="nc bnc" id="L466" title="All 4 branches missed.">        if (userId == null || userId &lt;= 0) {</span>
+<span class="nc" id="L467">            throw new IllegalArgumentException(&quot;User ID must be positive&quot;);</span>
+        }
+        
+        // بررسی وجود کاربر
+<span class="nc bnc" id="L471" title="All 2 branches missed.">        if (!authRepository.existsById(userId)) {</span>
+<span class="nc" id="L472">            throw new NotFoundException(&quot;User&quot;, userId);</span>
+        }
+        
+<span class="nc" id="L475">        return paymentRepository.findPaymentTransactions(userId);</span>
+    }
+    
+    /**
+     * دریافت تراکنش‌ها بر اساس وضعیت
+     * 
+     * فیلتر کردن تراکنش‌ها بر اساس وضعیت: PENDING, COMPLETED, FAILED, CANCELLED
+     * 
+     * @param status وضعیت مورد نظر
+     * @return لیست تراکنش‌های با وضعیت مشخص
+     * @throws IllegalArgumentException در صورت null بودن status
+     */
+    public List&lt;Transaction&gt; getTransactionsByStatus(TransactionStatus status) {
+<span class="pc bpc" id="L488" title="1 of 2 branches missed.">        if (status == null) {</span>
+<span class="nc" id="L489">            throw new IllegalArgumentException(&quot;Transaction status cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L492">        return paymentRepository.findByStatus(status);</span>
+    }
+    
+    /**
+     * دریافت تراکنش‌ها بر اساس نوع
+     * 
+     * فیلتر کردن تراکنش‌ها بر اساس نوع: PAYMENT, REFUND, WALLET_CHARGE, WALLET_WITHDRAWAL
+     * 
+     * @param type نوع تراکنش مورد نظر
+     * @return لیست تراکنش‌های با نوع مشخص
+     * @throws IllegalArgumentException در صورت null بودن type
+     */
+    public List&lt;Transaction&gt; getTransactionsByType(TransactionType type) {
+<span class="nc bnc" id="L505" title="All 2 branches missed.">        if (type == null) {</span>
+<span class="nc" id="L506">            throw new IllegalArgumentException(&quot;Transaction type cannot be null&quot;);</span>
+        }
+        
+<span class="nc" id="L509">        return paymentRepository.findByType(type);</span>
+    }
+    
+    /**
+     * دریافت تراکنش‌ها در بازه زمانی مشخص
+     * 
+     * @param startDate تاریخ شروع
+     * @param endDate تاریخ پایان
+     * @return لیست تراکنش‌ها در بازه زمانی
+     * @throws IllegalArgumentException در صورت نامعتبر بودن تاریخ‌ها
+     */
+    public List&lt;Transaction&gt; getTransactionsByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+<span class="nc bnc" id="L521" title="All 2 branches missed.">        if (startDate == null) {</span>
+<span class="nc" id="L522">            throw new IllegalArgumentException(&quot;Start date cannot be null&quot;);</span>
+        }
+<span class="nc bnc" id="L524" title="All 2 branches missed.">        if (endDate == null) {</span>
+<span class="nc" id="L525">            throw new IllegalArgumentException(&quot;End date cannot be null&quot;);</span>
+        }
+<span class="nc bnc" id="L527" title="All 2 branches missed.">        if (startDate.isAfter(endDate)) {</span>
+<span class="nc" id="L528">            throw new IllegalArgumentException(&quot;Start date cannot be after end date&quot;);</span>
+        }
+        
+<span class="nc" id="L531">        return paymentRepository.findByDateRange(startDate, endDate);</span>
+    }
+    
+    /**
+     * دریافت تراکنش‌های کاربر در بازه زمانی مشخص
+     * 
+     * @param userId شناسه کاربر
+     * @param startDate تاریخ شروع
+     * @param endDate تاریخ پایان
+     * @return لیست تراکنش‌های کاربر در بازه زمانی
+     * @throws IllegalArgumentException در صورت نامعتبر بودن پارامترها
+     * @throws NotFoundException در صورت عدم وجود کاربر
+     */
+    public List&lt;Transaction&gt; getUserTransactionsByDateRange(Long userId, LocalDateTime startDate, LocalDateTime endDate) {
+<span class="nc bnc" id="L545" title="All 4 branches missed.">        if (userId == null || userId &lt;= 0) {</span>
+<span class="nc" id="L546">            throw new IllegalArgumentException(&quot;User ID must be positive&quot;);</span>
+        }
+<span class="nc bnc" id="L548" title="All 2 branches missed.">        if (startDate == null) {</span>
+<span class="nc" id="L549">            throw new IllegalArgumentException(&quot;Start date cannot be null&quot;);</span>
+        }
+<span class="nc bnc" id="L551" title="All 2 branches missed.">        if (endDate == null) {</span>
+<span class="nc" id="L552">            throw new IllegalArgumentException(&quot;End date cannot be null&quot;);</span>
+        }
+<span class="nc bnc" id="L554" title="All 2 branches missed.">        if (startDate.isAfter(endDate)) {</span>
+<span class="nc" id="L555">            throw new IllegalArgumentException(&quot;Start date cannot be after end date&quot;);</span>
+        }
+        
+        // بررسی وجود کاربر
+<span class="nc bnc" id="L559" title="All 2 branches missed.">        if (!authRepository.existsById(userId)) {</span>
+<span class="nc" id="L560">            throw new NotFoundException(&quot;User&quot;, userId);</span>
+        }
+        
+<span class="nc" id="L563">        return paymentRepository.findByUserIdAndDateRange(userId, startDate, endDate);</span>
+    }
+    
+    // ==================== TRANSACTION STATISTICS ====================
+    
+    /**
+     * دریافت آمار تراکنش‌های کاربر
+     * 
+     * شامل اطلاعات جامعی از فعالیت‌های مالی کاربر:
+     * - تعداد کل تراکنش‌ها
+     * - تعداد تراکنش‌های موفق/ناموفق/در انتظار
+     * - مجموع مبلغ خرج شده
+     * - مجموع مبلغ استرداد شده
+     * - مبلغ خالص خرج شده
+     * - درصد موفقیت تراکنش‌ها
+     * 
+     * @param userId شناسه کاربر
+     * @return آمار کامل تراکنش‌های کاربر
+     * @throws IllegalArgumentException در صورت نامعتبر بودن userId
+     * @throws NotFoundException در صورت عدم وجود کاربر
+     */
+    public PaymentRepository.TransactionStatistics getUserTransactionStatistics(Long userId) {
+<span class="pc bpc" id="L585" title="2 of 4 branches missed.">        if (userId == null || userId &lt;= 0) {</span>
+<span class="nc" id="L586">            throw new IllegalArgumentException(&quot;User ID must be positive&quot;);</span>
+        }
+        
+        // بررسی وجود کاربر
+<span class="pc bpc" id="L590" title="1 of 2 branches missed.">        if (!authRepository.existsById(userId)) {</span>
+<span class="nc" id="L591">            throw new NotFoundException(&quot;User&quot;, userId);</span>
+        }
+        
+<span class="fc" id="L594">        return paymentRepository.getUserTransactionStatistics(userId);</span>
+    }
+    
+    // ==================== PAYMENT VALIDATION ====================
+    
+    /**
+     * اعتبارسنجی روش پرداخت
+     * 
+     * روش‌های پرداخت پشتیبانی شده:
+     * - WALLET: پرداخت از کیف پول
+     * - CARD: پرداخت با کارت
+     * - CASH_ON_DELIVERY: پرداخت در محل تحویل
+     * 
+     * @param paymentMethod روش پرداخت
+     * @return true اگر معتبر باشد، در غیر این صورت false
+     */
+    public boolean isValidPaymentMethod(String paymentMethod) {
+<span class="pc bpc" id="L611" title="1 of 2 branches missed.">        if (paymentMethod == null) {</span>
+<span class="nc" id="L612">            return false;</span>
+        }
+        
+<span class="fc" id="L615">        String method = paymentMethod.toUpperCase();</span>
+<span class="fc bfc" id="L616" title="All 6 branches covered.">        return method.equals(&quot;WALLET&quot;) || method.equals(&quot;CARD&quot;) || method.equals(&quot;CASH_ON_DELIVERY&quot;);</span>
+    }
+    
+    /**
+     * بررسی قابلیت پرداخت کاربر
+     * 
+     * چک می‌کند که آیا کاربر قادر به پرداخت مبلغ مشخص با روش انتخابی است
+     * برای پرداخت کیف پول، موجودی کافی بررسی می‌شود
+     * 
+     * @param userId شناسه کاربر
+     * @param amount مبلغ پرداخت
+     * @param paymentMethod روش پرداخت
+     * @return true اگر قادر به پرداخت باشد، در غیر این صورت false
+     */
+    public boolean canUserMakePayment(Long userId, Double amount, String paymentMethod) {
+<span class="fc bfc" id="L631" title="All 10 branches covered.">        if (userId == null || userId &lt;= 0 || amount == null || amount &lt;= 0 || paymentMethod == null) {</span>
+<span class="fc" id="L632">            return false;</span>
+        }
+        
+        // بررسی وجود کاربر
+<span class="fc bfc" id="L636" title="All 2 branches covered.">        if (!authRepository.existsById(userId)) {</span>
+<span class="fc" id="L637">            return false;</span>
+        }
+        
+        // بررسی معتبر بودن روش پرداخت
+<span class="pc bpc" id="L641" title="1 of 2 branches missed.">        if (!isValidPaymentMethod(paymentMethod)) {</span>
+<span class="fc" id="L642">            return false;</span>
+        }
+        
+        // برای پرداخت کیف پول، بررسی موجودی
+<span class="nc bnc" id="L646" title="All 2 branches missed.">        if (&quot;WALLET&quot;.equalsIgnoreCase(paymentMethod)) {</span>
+<span class="nc" id="L647">            Double walletBalance = paymentRepository.calculateWalletBalance(userId);</span>
+<span class="nc bnc" id="L648" title="All 2 branches missed.">            return walletBalance &gt;= amount;</span>
+        }
+        
+        // برای سایر روش‌های پرداخت، فرض بر قابلیت پردازش است
+<span class="nc" id="L652">        return true;</span>
+    }
+    
+    /**
+     * بررسی قابلیت استرداد تراکنش
+     * 
+     * شرایط استرداد:
+     * 1. تراکنش باید از نوع PAYMENT باشد
+     * 2. وضعیت تراکنش باید COMPLETED باشد
+     * 3. قبلاً استرداد نشده باشد
+     * 
+     * @param transactionId شناسه تراکنش
+     * @return true اگر قابل استرداد باشد، در غیر این صورت false
+     */
+    public boolean canRefundTransaction(Long transactionId) {
+<span class="fc bfc" id="L667" title="All 4 branches covered.">        if (transactionId == null || transactionId &lt;= 0) {</span>
+<span class="fc" id="L668">            return false;</span>
+        }
+        
+<span class="fc" id="L671">        Optional&lt;Transaction&gt; transactionOpt = paymentRepository.findById(transactionId);</span>
+<span class="pc bpc" id="L672" title="1 of 2 branches missed.">        if (transactionOpt.isEmpty()) {</span>
+<span class="fc" id="L673">            return false;</span>
+        }
+        
+<span class="nc" id="L676">        Transaction transaction = transactionOpt.get();</span>
+        
+        // فقط تراکنش‌های پرداخت موفق قابل استرداد هستند
+<span class="nc bnc" id="L679" title="All 4 branches missed.">        if (transaction.getType() != TransactionType.PAYMENT || transaction.getStatus() != TransactionStatus.COMPLETED) {</span>
+<span class="nc" id="L680">            return false;</span>
+        }
+        
+        // بررسی عدم وجود استرداد قبلی
+<span class="nc bnc" id="L684" title="All 2 branches missed.">        if (transaction.getOrderId() != null) {</span>
+<span class="nc" id="L685">            List&lt;Transaction&gt; orderTransactions = paymentRepository.findByOrderId(transaction.getOrderId());</span>
+<span class="nc" id="L686">            return orderTransactions.stream()</span>
+<span class="nc bnc" id="L687" title="All 4 branches missed.">                .noneMatch(t -&gt; t.getType() == TransactionType.REFUND &amp;&amp; t.getStatus() == TransactionStatus.COMPLETED);</span>
+        }
+        
+<span class="nc" id="L690">        return true;</span>
+    }
+    
+    /**
+     * به‌روزرسانی وضعیت تراکنش (برای callback های خارجی)
+     * 
+     * این متد توسط payment gateway ها برای اطلاع‌رسانی نتیجه پرداخت استفاده می‌شود
+     * 
+     * @param transactionId شناسه تراکنش
+     * @param status وضعیت جدید
+     * @param referenceId شناسه مرجع از payment gateway
+     * @param notes یادداشت‌های اضافی
+     * @return تراکنش به‌روزرسانی شده
+     * @throws IllegalArgumentException در صورت نامعتبر بودن ورودی‌ها
+     * @throws NotFoundException در صورت عدم وجود تراکنش
+     */
+    public Transaction updateTransactionStatus(Long transactionId, TransactionStatus status, String referenceId, String notes) {
+<span class="fc bfc" id="L707" title="All 4 branches covered.">        if (transactionId == null || transactionId &lt;= 0) {</span>
+<span class="fc" id="L708">            throw new IllegalArgumentException(&quot;Transaction ID must be positive&quot;);</span>
+        }
+<span class="fc bfc" id="L710" title="All 2 branches covered.">        if (status == null) {</span>
+<span class="fc" id="L711">            throw new IllegalArgumentException(&quot;Transaction status cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L714">        Optional&lt;Transaction&gt; transactionOpt = paymentRepository.findById(transactionId);</span>
+<span class="pc bpc" id="L715" title="1 of 2 branches missed.">        if (transactionOpt.isEmpty()) {</span>
+<span class="fc" id="L716">            throw new NotFoundException(&quot;Transaction&quot;, transactionId);</span>
+        }
+        
+<span class="nc" id="L719">        Transaction transaction = transactionOpt.get();</span>
+        
+        // به‌روزرسانی تراکنش بر اساس وضعیت جدید
+<span class="nc bnc" id="L722" title="All 4 branches missed.">        switch (status) {</span>
+            case COMPLETED:
+<span class="nc" id="L724">                transaction.markAsCompleted(referenceId);</span>
+<span class="nc" id="L725">                break;</span>
+            case FAILED:
+<span class="nc bnc" id="L727" title="All 2 branches missed.">                transaction.markAsFailed(notes != null ? notes : &quot;Payment failed&quot;);</span>
+<span class="nc" id="L728">                break;</span>
+            case CANCELLED:
+<span class="nc bnc" id="L730" title="All 2 branches missed.">                transaction.markAsCancelled(notes != null ? notes : &quot;Payment cancelled&quot;);</span>
+<span class="nc" id="L731">                break;</span>
+            default:
+<span class="nc" id="L733">                transaction.setStatus(status);</span>
+<span class="nc bnc" id="L734" title="All 2 branches missed.">                if (notes != null) {</span>
+<span class="nc" id="L735">                    transaction.setDescription(transaction.getDescription() + &quot;. &quot; + notes);</span>
+                }
+                break;
+        }
+        
+<span class="nc" id="L740">        return paymentRepository.update(transaction);</span>
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

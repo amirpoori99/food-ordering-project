@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Restaurant.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.common.models</a> &gt; <span class="el_source">Restaurant.java</span></div><h1>Restaurant.java</h1><pre class="source lang-java linenums">package com.myapp.common.models;
+
+import jakarta.persistence.*;
+
+/**
+ * مدل رستوران - نماینده یکی از رستوران‌های ثبت شده در سیستم
+ * این کلاس اطلاعات رستوران‌ها شامل نام، آدرس، وضعیت و صاحب رستوران را نگهداری می‌کند
+ * با استفاده از JPA برای ذخیره‌سازی در دیتابیس تنظیم شده است
+ */
+@Entity                              // نشان‌دهنده entity در JPA
+@Table(name = &quot;restaurants&quot;)        // نام جدول در دیتابیس
+public class Restaurant {
+
+    /* ---------- فیلدهای کلاس ---------- */
+    
+    @Id                                                    // کلید اصلی
+    @GeneratedValue(strategy = GenerationType.IDENTITY)   // Auto-increment برای شناسه
+    private Long id;                                       // شناسه یکتای رستوران
+
+    @Column(name = &quot;owner_id&quot;, nullable = false)  // شناسه صاحب رستوران - اجباری
+    private Long ownerId;                         // FK → users.id (کلید خارجی به جدول کاربران)
+
+    @Column(nullable = false)                     // نام رستوران - اجباری
+    private String name;                          // نام رستوران
+
+    private String address;                       // آدرس رستوران (اختیاری)
+    private String phone;                         // شماره تلفن رستوران (اختیاری)
+
+<span class="fc" id="L29">    @Enumerated(EnumType.STRING)                  // ذخیره enum به صورت رشته</span>
+    private RestaurantStatus status = RestaurantStatus.PENDING; // وضعیت رستوران - پیش‌فرض: در انتظار تأیید
+
+    /* ---------- سازنده‌های کلاس ---------- */
+    
+    /**
+     * سازنده پیش‌فرض - برای JPA و فرمورک‌ها
+     * JPA نیاز به سازنده بدون پارامتر دارد
+     */
+<span class="fc" id="L38">    public Restaurant() { }</span>
+
+    /**
+     * سازنده اصلی بدون id - برای ایجاد اشیاء جدید در منطق کسب‌وکار
+     * Hibernate خودش id را تولید می‌کند
+     * 
+     * @param ownerId شناسه صاحب رستوران
+     * @param name نام رستوران
+     * @param address آدرس رستوران
+     * @param phone شماره تلفن رستوران
+     */
+    public Restaurant(Long ownerId,
+                      String name,
+                      String address,
+<span class="fc" id="L52">                      String phone) {</span>
+<span class="fc" id="L53">        this.ownerId = ownerId;   // تنظیم شناسه صاحب رستوران</span>
+<span class="fc" id="L54">        this.name    = name;      // تنظیم نام رستوران</span>
+<span class="fc" id="L55">        this.address = address;   // تنظیم آدرس رستوران</span>
+<span class="fc" id="L56">        this.phone   = phone;     // تنظیم شماره تلفن رستوران</span>
+<span class="fc" id="L57">    }</span>
+
+    /**
+     * سازنده با Long id - برای تست‌هایی که id اولیه را تنظیم می‌کنند
+     * معمولاً در تست‌های واحد استفاده می‌شود
+     * 
+     * @param id شناسه رستوران
+     * @param ownerId شناسه صاحب رستوران
+     * @param name نام رستوران
+     * @param address آدرس رستوران
+     * @param phone شماره تلفن رستوران
+     * @param status وضعیت رستوران
+     */
+    public Restaurant(Long id,
+                      Long ownerId,
+                      String name,
+                      String address,
+                      String phone,
+                      RestaurantStatus status) {
+<span class="fc" id="L76">        this(ownerId, name, address, phone); // فراخوانی سازنده اصلی</span>
+<span class="fc" id="L77">        this.id     = id;                     // تنظیم دستی شناسه</span>
+<span class="fc" id="L78">        this.status = status;                 // تنظیم وضعیت رستوران</span>
+<span class="fc" id="L79">    }</span>
+
+    /**
+     * سازنده سازگاری قدیمی (int id / ownerId) برای حفظ سازگاری با تست‌های قبلی
+     * تبدیل int به Long برای id و ownerId
+     */
+    public Restaurant(int id,
+                      long ownerId,
+                      String name,
+                      String address,
+                      String phone,
+                      RestaurantStatus status) {
+<span class="nc" id="L91">        this((long) id, ownerId, name, address, phone, status); // تبدیل int به Long</span>
+<span class="nc" id="L92">    }</span>
+
+    /* ---------- متدهای Factory Static ---------- */
+    
+    /**
+     * متد Factory برای ثبت رستوران جدید
+     * این متد برای ساده‌سازی فرآیند ثبت رستوران استفاده می‌شود
+     * 
+     * @param ownerId شناسه صاحب رستوران
+     * @param name نام رستوران
+     * @param address آدرس رستوران
+     * @param phone شماره تلفن رستوران
+     * @return شیء Restaurant جدید با وضعیت PENDING
+     */
+    public static Restaurant forRegistration(Long ownerId,
+                                             String name,
+                                             String address,
+                                             String phone) {
+<span class="fc" id="L110">        return new Restaurant(ownerId, name, address, phone);</span>
+    }
+
+    /* ---------- Getter و Setter ها ---------- */
+    
+    // دریافت و تنظیم شناسه رستوران
+<span class="fc" id="L116">    public Long getId() { return id; }</span>
+<span class="fc" id="L117">    public void setId(Long id) { this.id = id; }</span>
+
+    // دریافت و تنظیم شناسه صاحب رستوران
+<span class="fc" id="L120">    public Long getOwnerId() { return ownerId; }</span>
+<span class="fc" id="L121">    public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }</span>
+
+    // دریافت و تنظیم نام رستوران
+<span class="fc" id="L124">    public String getName() { return name; }</span>
+<span class="fc" id="L125">    public void setName(String name) { this.name = name; }</span>
+
+    // دریافت و تنظیم آدرس رستوران
+<span class="fc" id="L128">    public String getAddress() { return address; }</span>
+<span class="fc" id="L129">    public void setAddress(String address) { this.address = address; }</span>
+
+    // دریافت و تنظیم شماره تلفن رستوران
+<span class="fc" id="L132">    public String getPhone() { return phone; }</span>
+<span class="fc" id="L133">    public void setPhone(String phone) { this.phone = phone; }</span>
+
+    // دریافت و تنظیم وضعیت رستوران
+<span class="fc" id="L136">    public RestaurantStatus getStatus() { return status; }</span>
+<span class="fc" id="L137">    public void setStatus(RestaurantStatus status) { this.status = status; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

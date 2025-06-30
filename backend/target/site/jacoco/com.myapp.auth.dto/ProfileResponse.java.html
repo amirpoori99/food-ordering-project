@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProfileResponse.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Food Ordering Backend</a> &gt; <a href="index.source.html" class="el_package">com.myapp.auth.dto</a> &gt; <span class="el_source">ProfileResponse.java</span></div><h1>ProfileResponse.java</h1><pre class="source lang-java linenums">package com.myapp.auth.dto;
+
+// وارد کردن مدل کاربر
+import com.myapp.common.models.User;
+
+/**
+ * کلاس پاسخ پروفایل - DTO برای ارسال اطلاعات پروفایل کاربر
+ * این record شامل اطلاعات عمومی کاربر بدون داده‌های حساس مثل رمز عبور است
+ * از Java Records برای immutability و کد تمیزتر استفاده می‌کند
+ * 
+ * @param id شناسه یکتای کاربر
+ * @param fullName نام و نام خانوادگی کاربر
+ * @param phone شماره تلفن کاربر
+ * @param email آدرس ایمیل کاربر
+ * @param role نقش کاربر در سیستم
+ * @param address آدرس کاربر
+ */
+<span class="fc" id="L18">public record ProfileResponse(long id, String fullName, String phone, String email, User.Role role, String address) {</span>
+    
+    /**
+     * متد Factory برای تبدیل User entity به ProfileResponse
+     * این متد داده‌های حساس مثل رمز عبور را حذف می‌کند
+     * 
+     * @param u شیء User برای تبدیل
+     * @return ProfileResponse حاوی اطلاعات عمومی کاربر
+     */
+    public static ProfileResponse from(User u) {
+<span class="fc" id="L28">        return new ProfileResponse(u.getId(), u.getFullName(), u.getPhone(), u.getEmail(), u.getRole(), u.getAddress());</span>
+    }
+} 
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
