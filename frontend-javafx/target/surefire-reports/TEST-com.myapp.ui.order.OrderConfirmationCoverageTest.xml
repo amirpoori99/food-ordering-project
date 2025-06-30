@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.myapp.ui.order.OrderConfirmationCoverageTest" time="12.746" tests="21" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.myapp.ui.order.OrderConfirmationCoverageTest" time="12.714" tests="21" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="javafx.runtime.version" value="12.0.1+2"/>
@@ -18,7 +18,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Eclipse Adoptium\jdk-17.0.14.7-hotspot\bin"/>
-    <property name="sun.java.command" value="C:\Users\USER\AppData\Local\Temp\surefire13528540414873408228\surefirebooter-20250630203336884_3.jar C:\Users\USER\AppData\Local\Temp\surefire13528540414873408228 2025-06-30T20-33-35_994-jvmRun1 surefire-20250630203336884_1tmp surefire_0-20250630203336884_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\USER\AppData\Local\Temp\surefire16160999568588277428\surefirebooter-20250630222517514_3.jar C:\Users\USER\AppData\Local\Temp\surefire16160999568588277428 2025-06-30T22-25-16_556-jvmRun1 surefire-20250630222517514_1tmp surefire_0-20250630222517514_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\target\test-classes;C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\target\classes;C:\Users\USER\.m2\repository\org\openjfx\javafx-controls\17.0.2\javafx-controls-17.0.2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-controls\17.0.2\javafx-controls-17.0.2-win.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-graphics\17.0.2\javafx-graphics-17.0.2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-graphics\17.0.2\javafx-graphics-17.0.2-win.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-fxml\17.0.2\javafx-fxml-17.0.2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-fxml\17.0.2\javafx-fxml-17.0.2-win.jar;C:\Users\USER\.m2\repository\com\squareup\okhttp3\okhttp\4.11.0\okhttp-4.11.0.jar;C:\Users\USER\.m2\repository\com\squareup\okio\okio\3.2.0\okio-3.2.0.jar;C:\Users\USER\.m2\repository\com\squareup\okio\okio-jvm\3.2.0\okio-jvm-3.2.0.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib\1.6.20\kotlin-stdlib-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-common\1.6.20\kotlin-stdlib-common-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\annotations\13.0\annotations-13.0.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk8\1.6.20\kotlin-stdlib-jdk8-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk7\1.6.20\kotlin-stdlib-jdk7-1.6.20.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.15.2\jackson-databind-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.15.2\jackson-annotations-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.15.2\jackson-core-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.15.2\jackson-datatype-jsr310-2.15.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.9.2\junit-jupiter-api-5.9.2.jar;C:\Users\USER\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-commons\1.9.2\junit-platform-commons-1.9.2.jar;C:\Users\USER\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.9.2\junit-jupiter-engine-5.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-engine\1.9.2\junit-platform-engine-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.9.2\junit-jupiter-params-5.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-suite-api\1.9.2\junit-platform-suite-api-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-suite-engine\1.9.2\junit-platform-suite-engine-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-suite-commons\1.9.2\junit-platform-suite-commons-1.9.2.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-launcher\1.9.2\junit-platform-launcher-1.9.2.jar;C:\Users\USER\.m2\repository\org\testfx\testfx-core\4.0.16-alpha\testfx-core-4.0.16-alpha.jar;C:\Users\USER\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\USER\.m2\repository\org\testfx\testfx-junit5\4.0.16-alpha\testfx-junit5-4.0.16-alpha.jar;C:\Users\USER\.m2\repository\org\assertj\assertj-core\3.24.2\assertj-core-3.24.2.jar;C:\Users\USER\.m2\repository\net\bytebuddy\byte-buddy\1.12.21\byte-buddy-1.12.21.jar;C:\Users\USER\.m2\repository\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\USER\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.12\byte-buddy-agent-1.14.12.jar;C:\Users\USER\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\USER\.m2\repository\org\testfx\openjfx-monocle\jdk-12.0.1+2\openjfx-monocle-jdk-12.0.1+2.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-base\12.0.1\javafx-base-12.0.1.jar;C:\Users\USER\.m2\repository\org\openjfx\javafx-base\12.0.1\javafx-base-12.0.1-win.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -37,7 +37,7 @@
     <property name="testfx.robot" value="glass"/>
     <property name="javafx.verbose" value="false"/>
     <property name="java.awt.headless" value="true"/>
-    <property name="surefire.real.class.path" value="C:\Users\USER\AppData\Local\Temp\surefire13528540414873408228\surefirebooter-20250630203336884_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\USER\AppData\Local\Temp\surefire16160999568588277428\surefirebooter-20250630222517514_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="17.0.14+7"/>
@@ -67,33 +67,33 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="testSendEmailNotification" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.633">
+  <testcase name="testSendEmailNotification" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.635">
     <system-out><![CDATA[📧 ایمیل تکمیل سفارش ارسال شد
 📧 آدرس گیرنده: customer@example.com
 📧 موضوع: تکمیل سفارش شما - شماره ORD-TEST-123
 ]]></system-out>
   </testcase>
-  <testcase name="testSendEmailNotification" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.633">
+  <testcase name="testSendEmailNotification" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.629">
     <system-out><![CDATA[📧 ایمیل تکمیل سفارش ارسال شد
 📧 آدرس گیرنده: customer@example.com
 📧 موضوع: تکمیل سفارش شما - شماره ORD-TEST-123
 ]]></system-out>
   </testcase>
-  <testcase name="testGenerateEmailBody" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.575"/>
-  <testcase name="testGenerateEmailBody" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.574"/>
-  <testcase name="testIsOrderCancelable" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.581"/>
-  <testcase name="testIsOrderCancelable" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.565"/>
-  <testcase name="testSendCompletionNotificationWithNullCheckboxes" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.641"/>
-  <testcase name="testSendCompletionNotificationWithNullCheckboxes" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.62"/>
-  <testcase name="testOpenDetailedTrackingView" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.623"/>
-  <testcase name="testOpenDetailedTrackingView" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.614"/>
-  <testcase name="testProcessCancelOrder" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.63"/>
-  <testcase name="testProcessCancelOrder" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.617"/>
-  <testcase name="testIsOrderCancelableWithEmptySteps" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.575"/>
-  <testcase name="testIsOrderCancelableWithEmptySteps" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.586"/>
-  <testcase name="testUpdateNotificationPreferencesWithNullComponents" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.63"/>
-  <testcase name="testUpdateNotificationPreferencesWithNullComponents" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.629"/>
-  <testcase name="testSendSMSNotification" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.636">
+  <testcase name="testGenerateEmailBody" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.582"/>
+  <testcase name="testGenerateEmailBody" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.572"/>
+  <testcase name="testIsOrderCancelable" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.589"/>
+  <testcase name="testIsOrderCancelable" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.573"/>
+  <testcase name="testSendCompletionNotificationWithNullCheckboxes" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.647"/>
+  <testcase name="testSendCompletionNotificationWithNullCheckboxes" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.644"/>
+  <testcase name="testOpenDetailedTrackingView" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.639"/>
+  <testcase name="testOpenDetailedTrackingView" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.634"/>
+  <testcase name="testProcessCancelOrder" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.626"/>
+  <testcase name="testProcessCancelOrder" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.618"/>
+  <testcase name="testIsOrderCancelableWithEmptySteps" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.577"/>
+  <testcase name="testIsOrderCancelableWithEmptySteps" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.585"/>
+  <testcase name="testUpdateNotificationPreferencesWithNullComponents" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.662"/>
+  <testcase name="testUpdateNotificationPreferencesWithNullComponents" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.627"/>
+  <testcase name="testSendSMSNotification" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.627">
     <system-out><![CDATA[📱 پیامک تکمیل سفارش ارسال شد
 📱 شماره گیرنده: 09123456789
 📱 متن پیام: سفارش ORD-TEST-123 با موفقیت تحویل شد. مبلغ: ۱۰۴٬۰۰۰ تومان. از انتخاب شما متشکریم!
@@ -105,7 +105,7 @@
 🔔 بروزرسانی سفارش: true
 ]]></system-out>
   </testcase>
-  <testcase name="testSendSMSNotification" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.622">
+  <testcase name="testSendSMSNotification" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.628">
     <system-out><![CDATA[📱 پیامک تکمیل سفارش ارسال شد
 📱 شماره گیرنده: 09123456789
 📱 متن پیام: سفارش ORD-TEST-123 با موفقیت تحویل شد. مبلغ: ۱۰۴٬۰۰۰ تومان. از انتخاب شما متشکریم!
@@ -117,39 +117,39 @@
 🔔 بروزرسانی سفارش: true
 ]]></system-out>
   </testcase>
-  <testcase name="testShowTemporaryMessage" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.627"/>
-  <testcase name="testShowTemporaryMessage" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.628"/>
-  <testcase name="testSaveNotificationPreferencesLocally" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.569">
+  <testcase name="testShowTemporaryMessage" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.626"/>
+  <testcase name="testShowTemporaryMessage" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.618"/>
+  <testcase name="testSaveNotificationPreferencesLocally" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.567">
     <system-out><![CDATA[💾 تنظیمات در حافظه محلی ذخیره شد:
 📧 ایمیل: true
 📱 پیامک: false
 🔔 بروزرسانی سفارش: true
 ]]></system-out>
   </testcase>
-  <testcase name="testSaveNotificationPreferencesLocally" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.58">
+  <testcase name="testSaveNotificationPreferencesLocally" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.57">
     <system-out><![CDATA[💾 تنظیمات در حافظه محلی ذخیره شد:
 📧 ایمیل: true
 📱 پیامک: false
 🔔 بروزرسانی سفارش: true
 ]]></system-out>
   </testcase>
-  <testcase name="testNotificationPreferencesClass" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.576"/>
-  <testcase name="testNotificationPreferencesClass" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.555"/>
-  <testcase name="testSendCancellationNotification" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.63">
+  <testcase name="testNotificationPreferencesClass" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.559"/>
+  <testcase name="testNotificationPreferencesClass" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.577"/>
+  <testcase name="testSendCancellationNotification" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.614">
     <system-out><![CDATA[📧 ایمیل لغو سفارش ارسال شد
 📱 پیامک لغو سفارش ارسال شد
 ]]></system-out>
   </testcase>
-  <testcase name="testSendCancellationNotification" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.622">
+  <testcase name="testSendCancellationNotification" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.632">
     <system-out><![CDATA[📧 ایمیل لغو سفارش ارسال شد
 📱 پیامک لغو سفارش ارسال شد
 ]]></system-out>
   </testcase>
-  <testcase name="testGenerateSMSMessage" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.554"/>
-  <testcase name="testGenerateSMSMessage" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.587"/>
-  <testcase name="testOpenDetailedTrackingViewWithNullOrder" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.627"/>
-  <testcase name="testOpenDetailedTrackingViewWithNullOrder" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.642"/>
-  <testcase name="testShowTemporaryMessageWithNullLabel" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.561"/>
+  <testcase name="testGenerateSMSMessage" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.559"/>
+  <testcase name="testGenerateSMSMessage" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.564"/>
+  <testcase name="testOpenDetailedTrackingViewWithNullOrder" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.618"/>
+  <testcase name="testOpenDetailedTrackingViewWithNullOrder" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.635"/>
+  <testcase name="testShowTemporaryMessageWithNullLabel" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.562"/>
   <testcase name="testShowTemporaryMessageWithNullLabel" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.569"/>
   <testcase name="testExceptionHandlingInNotificationMethods" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.612">
     <system-out><![CDATA[📧 ایمیل تکمیل سفارش ارسال شد
@@ -160,7 +160,7 @@
 📱 متن پیام: سفارش null با موفقیت تحویل شد. مبلغ: ۰ تومان. از انتخاب شما متشکریم!
 ]]></system-out>
   </testcase>
-  <testcase name="testExceptionHandlingInNotificationMethods" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.618">
+  <testcase name="testExceptionHandlingInNotificationMethods" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.611">
     <system-out><![CDATA[📧 ایمیل تکمیل سفارش ارسال شد
 📧 آدرس گیرنده: customer@example.com
 📧 موضوع: تکمیل سفارش شما - شماره null
@@ -169,20 +169,20 @@
 📱 متن پیام: سفارش null با موفقیت تحویل شد. مبلغ: ۰ تومان. از انتخاب شما متشکریم!
 ]]></system-out>
   </testcase>
-  <testcase name="testHandleCancelOrderSuccess" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.609">
+  <testcase name="testHandleCancelOrderSuccess" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.628">
     <system-out><![CDATA[📧 ایمیل لغو سفارش ارسال شد
 📱 پیامک لغو سفارش ارسال شد
 ]]></system-out>
   </testcase>
-  <testcase name="testHandleCancelOrderSuccess" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.632">
+  <testcase name="testHandleCancelOrderSuccess" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.628">
     <system-out><![CDATA[📧 ایمیل لغو سفارش ارسال شد
 📱 پیامک لغو سفارش ارسال شد
 ]]></system-out>
   </testcase>
-  <testcase name="testSendCompletionNotificationWithDisabledCheckboxes" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.617"/>
-  <testcase name="testSendCompletionNotificationWithDisabledCheckboxes" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.624"/>
-  <testcase name="testGetCurrentCustomerEmail" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.552"/>
-  <testcase name="testGetCurrentCustomerEmail" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.579"/>
-  <testcase name="testHandleCancelOrderFailure" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.614"/>
-  <testcase name="testHandleCancelOrderFailure" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.643"/>
+  <testcase name="testSendCompletionNotificationWithDisabledCheckboxes" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.647"/>
+  <testcase name="testSendCompletionNotificationWithDisabledCheckboxes" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.62"/>
+  <testcase name="testGetCurrentCustomerEmail" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.558"/>
+  <testcase name="testGetCurrentCustomerEmail" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.56"/>
+  <testcase name="testHandleCancelOrderFailure" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.629"/>
+  <testcase name="testHandleCancelOrderFailure" classname="com.myapp.ui.order.OrderConfirmationCoverageTest" time="0.615"/>
 </testsuite>
