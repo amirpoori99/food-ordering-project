@@ -10,7 +10,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
 import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit5.ApplicationTest;
 import org.testfx.util.WaitForAsyncUtils;
@@ -26,7 +25,6 @@ import static org.mockito.Mockito.*;
 public class LoginFlowIntegrationTest extends ApplicationTest {
 
     private LoginController controller;
-    private NavigationController navigationMock;
 
     @BeforeAll
     static void initHeadless() {
@@ -36,10 +34,12 @@ public class LoginFlowIntegrationTest extends ApplicationTest {
     @Override
     public void start(Stage stage) {
         controller = new LoginController();
-        navigationMock = mock(NavigationController.class);
-        setPrivate(controller, "navigationController", navigationMock);
+        NavigationController.resetInstance();
+        NavigationController realNav = NavigationController.getInstance();
+        Platform.runLater(() -> realNav.initialize(stage));
+        setPrivate(controller, "navigationController", realNav);
 
-        // Mock UI minimal — فقط یک برچسب برای وضعیت جهت جلوگیری از NullPointer
+        // Mock UI minimal
         Label status = new Label();
         setPrivate(controller, "statusLabel", status);
         setPrivate(controller, "phoneField", new javafx.scene.control.TextField());
@@ -60,8 +60,7 @@ public class LoginFlowIntegrationTest extends ApplicationTest {
     }
 
     @Test
-    @Disabled("Flaky in CI; NavigationController singleton requires refactor for proper injection")
-    @DisplayName("(Disabled) ورود موفق و ناوبری")
+    @DisplayName("ورود موفق و ناوبری")
     void shouldNavigateAfterSuccessLogin() {
         Platform.runLater(() -> {
             controller.handleLoginResponse(new com.myapp.ui.common.HttpClientUtil.ApiResponse(true, 200, "", null), "09123456789");

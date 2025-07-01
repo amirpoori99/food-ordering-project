@@ -40,7 +40,7 @@ import java.util.Objects;
 public class Notification {
     /** شناسه یکتای اعلان */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     
     /** شناسه کاربر دریافت‌کننده اعلان */

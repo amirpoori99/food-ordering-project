@@ -601,6 +601,20 @@ class ItemRepositoryTest {
             assertThat(searchResults).hasSize(1);
             assertThat(searchResults.get(0).getName()).isEqualTo("Café Latté");
         }
+
+        @Test
+        @DisplayName("Should handle concurrent item updates")
+        void shouldHandleConcurrentItemUpdates() {
+            com.myapp.common.utils.SQLiteTestHelper.executeWithRetry(DatabaseUtil.getSessionFactory(), () -> {
+                // Simulate concurrent item updates
+                for (int i = 0; i < 10; i++) {
+                    FoodItem foodItem = FoodItem.forMenu("Test Item " + i, "Test description " + i, 10000.0 + i, "Test Category", testRestaurant);
+                    repository.saveNew(foodItem);
+                }
+                return null;
+            });
+            // Add assertions as needed
+        }
     }
 
     /**

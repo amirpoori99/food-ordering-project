@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- ================================================================ -->
 <!-- فایل پیکربندی Maven برای بک‌اند سیستم سفارش غذا -->
-<!-- این فایل شامل تمام وابستگی‌ها، تنظیمات ساخت و پیکربندی پروژه است -->
+<!-- این فایل شامل تمام وابستگی‌ها، تنظیمات ساخت و پیکربندی پروژه Spring Boot است -->
 <!-- نویسنده: تیم توسعه -->
 <!-- تاریخ آخرین ویرایش: تیر ۱۴۰۴ -->
 <!-- نسخه: ۲.۰ - پیکربندی پیشرفته با بهینه‌سازی کامل -->
@@ -25,7 +25,7 @@
     
     <!-- نام و توضیحات پروژه -->
     <name>Food Ordering System Backend</name>
-    <description>بک‌اند سیستم سفارش غذا با Java و Spring Boot</description>
+    <description>بک‌اند سیستم سفارش غذا با Spring Boot</description>
     
     <!-- ================================================================ -->
     <!-- تنظیمات Java -->
@@ -38,33 +38,21 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>  <!-- کدگذاری گزارش‌ها -->
         
         <!-- نسخه‌های وابستگی‌ها -->
-        <spring.boot.version>3.2.0</spring.boot.version>  <!-- نسخه Spring Boot -->
+        <spring-boot.version>3.2.0</spring-boot.version>  <!-- نسخه Spring Boot -->
+        <spring.version>6.1.0</spring.version>  <!-- نسخه Spring Framework -->
         <hibernate.version>6.4.0.Final</hibernate.version>  <!-- نسخه Hibernate -->
-        <sqlite.version>3.44.1.0</sqlite.version>  <!-- نسخه SQLite -->
         <junit.version>5.10.0</junit.version>  <!-- نسخه JUnit -->
         <mockito.version>5.7.0</mockito.version>  <!-- نسخه Mockito -->
         <jacoco.version>0.8.10</jacoco.version>  <!-- نسخه JaCoCo برای پوشش کد -->
+        <jackson.version>2.15.2</jackson.version>  <!-- نسخه Jackson -->
+        <logback.version>1.4.11</logback.version>  <!-- نسخه Logback -->
+        <sqlite.version>3.44.0.0</sqlite.version>  <!-- نسخه SQLite -->
+        <testcontainers.version>1.19.3</testcontainers.version>  <!-- نسخه Testcontainers -->
         
         <!-- تنظیمات اضافی -->
         <skipTests>false</skipTests>  <!-- اجرای تست‌ها (true برای رد کردن) -->
         <maven.test.skip>false</maven.test.skip>  <!-- رد کردن کامپایل تست‌ها -->
     </properties>
-    
-    <!-- ================================================================ -->
-    <!-- مدیریت وابستگی‌ها -->
-    <!-- ================================================================ -->
-    <dependencyManagement>
-        <dependencies>
-            <!-- مدیریت نسخه Spring Boot -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring.boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
     
     <!-- ================================================================ -->
     <!-- وابستگی‌های اصلی پروژه -->
@@ -74,7 +62,7 @@
         <!-- وابستگی‌های Spring Boot -->
         <!-- ================================================================ -->
         
-        <!-- Spring Boot Starter Web - برای ایجاد REST API -->
+        <!-- Spring Boot Starter Web - برای REST API -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -98,66 +86,73 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         
-        <!-- Spring Boot Starter Test - برای تست‌ها -->
+        <!-- Spring Boot Starter Actuator - برای مانیتورینگ -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         
         <!-- ================================================================ -->
         <!-- وابستگی‌های پایگاه داده -->
         <!-- ================================================================ -->
         
-        <!-- SQLite JDBC Driver - درایور پایگاه داده -->
+        <!-- SQLite JDBC Driver - درایور پایگاه داده SQLite -->
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>${sqlite.version}</version>
         </dependency>
         
-        <!-- Hibernate Core - ORM اصلی -->
+        <!-- H2 Database for testing -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- Hibernate SQLite Dialect - گویش SQLite برای Hibernate -->
         <dependency>
             <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>${hibernate.version}</version>
+            <artifactId>hibernate-community-dialects</artifactId>
+            <version>6.2.13.Final</version>
         </dependency>
         
         <!-- ================================================================ -->
-        <!-- وابستگی‌های امنیت و احراز هویت -->
+        <!-- وابستگی‌های JSON -->
         <!-- ================================================================ -->
         
-        <!-- JWT (JSON Web Token) - برای توکن‌های احراز هویت -->
+        <!-- Jackson Core - هسته اصلی Jackson -->
         <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-api</artifactId>
-            <version>0.12.3</version>
-            <description>API برای ایجاد و اعتبارسنجی JWT</description>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
         </dependency>
         
-        <!-- JWT Implementation - پیاده‌سازی JWT -->
+        <!-- Jackson Databind - برای تبدیل JSON به Object -->
         <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-impl</artifactId>
-            <version>0.12.3</version>
-            <scope>runtime</scope>
-            <description>پیاده‌سازی JWT</description>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
         
-        <!-- JWT Jackson - پشتیبانی از JSON -->
+        <!-- Jackson Annotations - برای annotations -->
         <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson</artifactId>
-            <version>0.12.3</version>
-            <scope>runtime</scope>
-            <description>پشتیبانی Jackson برای JWT</description>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
         </dependency>
         
-        <!-- BCrypt - برای رمزنگاری پسوردها -->
+        <!-- ================================================================ -->
+        <!-- وابستگی‌های لاگینگ -->
+        <!-- ================================================================ -->
+        
+        <!-- SLF4J API - API لاگینگ -->
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-crypto</artifactId>
-            <description>ابزارهای رمزنگاری Spring Security</description>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        
+        <!-- Logback Classic - پیاده‌سازی لاگینگ -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
         </dependency>
         
         <!-- ================================================================ -->
@@ -168,88 +163,141 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.12.0</version>
-            <description>ابزارهای کمکی Apache Commons</description>
         </dependency>
         
-        <!-- Jackson - برای پردازش JSON -->
+        <!-- Apache Commons IO - برای کار با فایل‌ها -->
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <description>پردازشگر JSON Jackson</description>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.11.0</version>
         </dependency>
         
-        <!-- SLF4J - برای لاگینگ -->
+        <!-- Apache Commons Codec - برای رمزنگاری -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <description>API لاگینگ SLF4J</description>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
         </dependency>
         
-        <!-- Logback - پیاده‌سازی لاگینگ -->
+        <!-- ================================================================ -->
+        <!-- وابستگی‌های امنیتی -->
+        <!-- ================================================================ -->
+        
+        <!-- JWT - برای توکن‌های احراز هویت -->
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <description>پیاده‌سازی Logback برای لاگینگ</description>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.12.3</version>
+        </dependency>
+        
+        <!-- JWT Implementation - پیاده‌سازی JWT -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.12.3</version>
+            <scope>runtime</scope>
+        </dependency>
+        
+        <!-- JWT Jackson - برای Jackson integration -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.12.3</version>
+            <scope>runtime</scope>
+        </dependency>
+        
+        <!-- BCrypt - برای رمزنگاری پسورد -->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
         </dependency>
         
         <!-- ================================================================ -->
         <!-- وابستگی‌های تست -->
         <!-- ================================================================ -->
         
+        <!-- Spring Boot Starter Test - برای تست‌های Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- Spring Security Test - برای تست‌های امنیت -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
         <!-- JUnit 5 - فریم‌ورک تست -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
-            <description>فریم‌ورک تست JUnit 5</description>
         </dependency>
         
         <!-- Mockito - برای Mock کردن -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>${mockito.version}</version>
             <scope>test</scope>
-            <description>کتابخانه Mockito برای تست‌ها</description>
         </dependency>
         
         <!-- Mockito JUnit Jupiter - ادغام با JUnit 5 -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>${mockito.version}</version>
             <scope>test</scope>
-            <description>ادغام Mockito با JUnit 5</description>
         </dependency>
         
         <!-- AssertJ - برای assertions پیشرفته -->
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.24.2</version>
             <scope>test</scope>
-            <description>کتابخانه AssertJ برای assertions پیشرفته</description>
         </dependency>
         
-        <!-- Spring Boot Test - تست‌های Spring Boot -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-            <description>استارتر تست Spring Boot</description>
-        </dependency>
-        
-        <!-- Testcontainers - برای تست‌های یکپارچه -->
+        <!-- Testcontainers JUnit Jupiter - برای تست‌های integration -->
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>1.19.3</version>
+            <version>${testcontainers.version}</version>
             <scope>test</scope>
-            <description>Testcontainers برای تست‌های یکپارچه</description>
+        </dependency>
+        
+        <!-- Testcontainers Database - برای تست پایگاه داده -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- MockWebServer for HTTP mocking in tests -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>mockwebserver</artifactId>
+            <version>4.11.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
+    
+    <!-- ================================================================ -->
+    <!-- مدیریت وابستگی‌ها -->
+    <!-- ================================================================ -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring Boot BOM - مدیریت نسخه‌های Spring Boot -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     
     <!-- ================================================================ -->
     <!-- تنظیمات ساخت (Build) -->
@@ -262,6 +310,41 @@
         <!-- پلاگین‌های Maven -->
         <!-- ================================================================ -->
         <plugins>
+            <!-- ================================================================ -->
+            <!-- پلاگین Spring Boot -->
+            <!-- ================================================================ -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <configuration>
+                    <!-- کلاس اصلی برنامه -->
+                    <mainClass>com.myapp.ServerApp</mainClass>
+                    <!-- تنظیمات JVM -->
+                    <jvmArguments>
+                        -Xms256m
+                        -Xmx1g
+                        -Dfile.encoding=UTF-8
+                        -Dspring.profiles.active=production
+                    </jvmArguments>
+                    <!-- تنظیمات اضافی -->
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <!-- اجرای repackage در فاز package -->
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
             <!-- ================================================================ -->
             <!-- پلاگین کامپایلر Java -->
             <!-- ================================================================ -->
@@ -278,37 +361,15 @@
                         <arg>-parameters</arg>  <!-- حفظ نام پارامترها -->
                         <arg>-Xlint:unchecked</arg>  <!-- هشدارهای کامپایلر -->
                     </compilerArgs>
+                    <!-- تنظیمات annotation processing -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                            <version>${spring-boot.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
-            </plugin>
-            
-            <!-- ================================================================ -->
-            <!-- پلاگین Spring Boot Maven -->
-            <!-- ================================================================ -->
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring.boot.version}</version>
-                <configuration>
-                    <!-- کلاس اصلی برنامه -->
-                    <mainClass>com.myapp.ServerApp</mainClass>
-                    <!-- نام JAR نهایی -->
-                    <finalName>food-ordering-backend-${project.version}</finalName>
-                    <!-- تنظیمات JVM -->
-                    <jvmArguments>
-                        -Xms512m -Xmx2g -XX:+UseG1GC
-                    </jvmArguments>
-                    <!-- تنظیمات اضافی -->
-                    <addResources>true</addResources>
-                    <layout>JAR</layout>
-                </configuration>
-                <executions>
-                    <!-- اجرای repackage برای ایجاد JAR قابل اجرا -->
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             
             <!-- ================================================================ -->
@@ -332,6 +393,7 @@
                     <systemPropertyVariables>
                         <java.awt.headless>true</java.awt.headless>
                         <file.encoding>UTF-8</file.encoding>
+                        <spring.profiles.active>test</spring.profiles.active>
                     </systemPropertyVariables>
                     <!-- تنظیمات حافظه برای تست‌ها -->
                     <argLine>-Xmx1g -XX:+UseG1GC</argLine>
@@ -404,11 +466,10 @@
                     <filtering>true</filtering>
                     <!-- تنظیمات غیرفعال کردن فیلترینگ برای فایل‌های خاص -->
                     <nonFilteredFileExtensions>
-                        <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>swf</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>gif</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>jpg</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>png</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>sql</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>xml</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>yml</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>yaml</nonFilteredFileExtension>
                     </nonFilteredFileExtensions>
                 </configuration>
             </plugin>
@@ -465,6 +526,35 @@
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- ================================================================ -->
+            <!-- پلاگین Failsafe برای تست‌های یکپارچگی -->
+            <!-- ================================================================ -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <!-- تنظیمات تست‌های یکپارچگی -->
+                    <includes>
+                        <include>**/*IT.java</include>
+                        <include>**/*IntegrationTest.java</include>
+                    </includes>
+                    <!-- تنظیمات سیستم -->
+                    <systemPropertyVariables>
+                        <spring.profiles.active>integration-test</spring.profiles.active>
+                    </systemPropertyVariables>
+                </configuration>
+                <executions>
+                    <!-- اجرای تست‌های یکپارچگی -->
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -535,6 +625,13 @@
                 <artifactId>maven-surefire-report-plugin</artifactId>
                 <version>3.1.2</version>
             </plugin>
+            
+            <!-- پلاگین Failsafe برای گزارش تست‌های یکپارچگی -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-report-plugin</artifactId>
+                <version>3.1.2</version>
+            </plugin>
         </plugins>
     </reporting>
     
@@ -549,8 +646,8 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <spring.profiles.active>dev</spring.profiles.active>
                 <skipTests>false</skipTests>
+                <spring.profiles.active>dev</spring.profiles.active>
             </properties>
         </profile>
         
@@ -558,8 +655,8 @@
         <profile>
             <id>test</id>
             <properties>
-                <spring.profiles.active>test</spring.profiles.active>
                 <skipTests>false</skipTests>
+                <spring.profiles.active>test</spring.profiles.active>
             </properties>
         </profile>
         
@@ -567,8 +664,8 @@
         <profile>
             <id>prod</id>
             <properties>
-                <spring.profiles.active>prod</spring.profiles.active>
                 <skipTests>true</skipTests>
+                <spring.profiles.active>production</spring.profiles.active>
             </properties>
         </profile>
         
@@ -598,5 +695,37 @@
                 </plugins>
             </build>
         </profile>
+        
+        <!-- پروفایل تست‌های یکپارچگی -->
+        <profile>
+            <id>integration-tests</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
+    
+    <repositories>
+        <repository>
+            <id>aliyunmaven</id>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 </project> 

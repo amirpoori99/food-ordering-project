@@ -22,6 +22,9 @@ BACKUP_NAME="food_ordering_backup_${TIMESTAMP}"                # نام فایل
 BACKUP_DIR="${BACKUP_ROOT}/${BACKUP_NAME}"                     # مسیر کامل پشتیبان
 LOG_FILE="${BACKUP_DIR}/backup.log"                            # فایل گزارش
 CONFIG_FILE="${PROJECT_ROOT}/scripts/backup.conf"              # فایل تنظیمات
+RETENTION_DAYS=30                                               # مدت نگهداری پشتیبان‌ها (روز)
+COMPRESSION_LEVEL=9                                             # سطح فشرده‌سازی (۱-۹)
+DATABASE_FILE="food_ordering.db"                                # نام فایل پایگاه داده
 
 # ================================================================
 # رنگ‌ها برای نمایش بهتر پیام‌ها
@@ -67,6 +70,13 @@ check_prerequisites() {
         fi
     done
     
+    # بررسی وجود فایل پایگاه داده
+    if [ ! -f "$PROJECT_ROOT/backend/$DATABASE_FILE" ]; then
+        log_warning "فایل پایگاه داده یافت نشد: $PROJECT_ROOT/backend/$DATABASE_FILE"
+    else
+        log_success "فایل پایگاه داده یافت شد"
+    fi
+    
     log_success "تمام پیش‌نیازها موجود هستند"
 }
 
@@ -98,7 +108,7 @@ create_backup_structure() {
 backup_database() {
     log_info "شروع پشتیبان‌گیری از پایگاه داده..."
     
-    local db_file="${PROJECT_ROOT}/backend/food_ordering.db"
+    local db_file="${PROJECT_ROOT}/backend/$DATABASE_FILE"
     local backup_db="${BACKUP_DIR}/database/food_ordering_backup.sql"
     
     if [ -f "$db_file" ]; then
@@ -106,7 +116,7 @@ backup_database() {
         sqlite3 "$db_file" ".dump" > "$backup_db"
         
         # فشرده‌سازی فایل پشتیبان
-        gzip "$backup_db"
+        gzip -$COMPRESSION_LEVEL "$backup_db"
         
         log_success "پشتیبان‌گیری از پایگاه داده با موفقیت انجام شد"
         log_info "حجم فایل پشتیبان: $(du -h "${backup_db}.gz" | cut -f1)"
@@ -283,8 +293,8 @@ EOF
 cleanup_old_backups() {
     log_info "پاکسازی پشتیبان‌های قدیمی..."
     
-    # حذف پشتیبان‌های قدیمی‌تر از ۳۰ روز
-    find "$BACKUP_ROOT" -name "food_ordering_backup_*" -type d -mtime +30 -exec rm -rf {} \;
+    # حذف پشتیبان‌های قدیمی‌تر از RETENTION_DAYS روز
+    find "$BACKUP_ROOT" -name "food_ordering_backup_*" -type d -mtime +$RETENTION_DAYS -exec rm -rf {} \;
     
     log_success "پشتیبان‌های قدیمی پاکسازی شدند"
 }

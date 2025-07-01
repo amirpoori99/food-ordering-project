@@ -111,26 +111,26 @@ class UserEntityTest {
         }
 
         @Test
-        @DisplayName("User creation with null email succeeds")
-        void user_creation_nullEmail_success() {
+        @DisplayName("User creation with empty email succeeds")
+        void user_creation_emptyEmail_success() {
             // Given & When
-            User user = new User("تست کاربر", "09999999999", null, 
+            User user = new User("تست کاربر", "09999999999", "", 
                                "password", User.Role.BUYER, "آدرس تست");
             
             // Then
-            assertThat(user.getEmail()).isNull();
+            assertThat(user.getEmail()).isEqualTo("");
             assertThat(user.getFullName()).isEqualTo("تست کاربر");
         }
 
         @Test
-        @DisplayName("User creation with null address succeeds")
-        void user_creation_nullAddress_success() {
+        @DisplayName("User creation with empty address succeeds")
+        void user_creation_emptyAddress_success() {
             // Given & When
             User user = new User("تست کاربر", "09888888888", "test@example.com", 
-                               "password", User.Role.ADMIN, null);
+                               "password", User.Role.ADMIN, "");
             
             // Then
-            assertThat(user.getAddress()).isNull();
+            assertThat(user.getAddress()).isEqualTo("");
             assertThat(user.getRole()).isEqualTo(User.Role.ADMIN);
         }
 

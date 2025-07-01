@@ -61,7 +61,7 @@ class ExceptionClassesTest {
 
             // Then
             assertThat(exception).isInstanceOf(RuntimeException.class);
-            assertThat(exception.getMessage()).isEqualTo("User not found with id=123");
+            assertThat(exception.getMessage()).isEqualTo("User not found with ID: 123");
         }
 
         @Test
@@ -69,11 +69,11 @@ class ExceptionClassesTest {
         void shouldHandleDifferentIdTypes() {
             // Test with String ID
             NotFoundException stringIdException = new NotFoundException("Restaurant", "rest_001");
-            assertThat(stringIdException.getMessage()).isEqualTo("Restaurant not found with id=rest_001");
+            assertThat(stringIdException.getMessage()).isEqualTo("Restaurant not found with ID: rest_001");
 
             // Test with Long ID
             NotFoundException longIdException = new NotFoundException("Order", 456L);
-            assertThat(longIdException.getMessage()).isEqualTo("Order not found with id=456");
+            assertThat(longIdException.getMessage()).isEqualTo("Order not found with ID: 456");
 
             // Test with null ID
             NotFoundException nullIdException = new NotFoundException("Item", null);
@@ -86,14 +86,14 @@ class ExceptionClassesTest {
             assertThatThrownBy(() -> {
                 throw new NotFoundException("Payment", 789);
             }).isInstanceOf(NotFoundException.class)
-              .hasMessage("Payment not found with id=789");
+              .hasMessage("Payment not found with ID: 789");
         }
 
         @Test
         @DisplayName("Should handle empty entity name")
         void shouldHandleEmptyEntityName() {
             NotFoundException exception = new NotFoundException("", 123);
-            assertThat(exception.getMessage()).isEqualTo(" not found with id=123");
+            assertThat(exception.getMessage()).isEqualTo(" not found with ID: 123");
         }
     }
 
@@ -309,7 +309,7 @@ class ExceptionClassesTest {
                     throw new NotFoundException("Order", orderId);
                 }
             }).isInstanceOf(NotFoundException.class)
-              .hasMessage("Order not found with id=999");
+              .hasMessage("Order not found with ID: 999");
         }
 
         @Test

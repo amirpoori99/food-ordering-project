@@ -80,7 +80,17 @@ class RestaurantListControllerTest extends TestFXBase {
             searchField = (TextField) root.lookup("#searchField");
             searchButton = (Button) root.lookup("#searchButton");
             refreshButton = (Button) root.lookup("#refreshButton");
-            restaurantListView = (ListView<Restaurant>) root.lookup("#restaurantListView");
+            // رفع هشدار cast: بررسی نوع در زمان اجرا
+            Control node = (Control) root.lookup("#restaurantListView");
+            if (node instanceof ListView<?>) {
+                try {
+                    restaurantListView = (ListView<Restaurant>) node;
+                } catch (ClassCastException e) {
+                    fail("restaurantListView is not of expected generic type ListView<Restaurant>. Actual: " + node.getClass());
+                }
+            } else {
+                fail("restaurantListView node is not a ListView. Actual: " + (node == null ? "null" : node.getClass()));
+            }
             statusLabel = (Label) root.lookup("#statusLabel");
             loadingIndicator = (ProgressIndicator) root.lookup("#loadingIndicator");
             

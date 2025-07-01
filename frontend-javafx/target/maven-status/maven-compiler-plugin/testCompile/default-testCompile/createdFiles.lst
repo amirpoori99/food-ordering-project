@@ -14,7 +14,6 @@ com\myapp\ui\common\NavigationControllerTest$SceneConstantsTests.class
 com\myapp\ui\performance\PerformanceTest$RestaurantData.class
 com\myapp\ui\common\HttpClientUtilTest$AuthenticationStateTests.class
 com\myapp\ui\common\NavigationControllerTest$LogoutTests.class
-com\myapp\ui\comprehensive\ComprehensiveTestSuite$PerformanceMetrics.class
 com\myapp\ui\notification\NotificationControllerTest$DataModelTests.class
 com\myapp\ui\security\SecurityTest.class
 com\myapp\ui\edge\EdgeCaseTest.class
@@ -24,17 +23,13 @@ com\myapp\ui\performance\PerformanceStressTest$NetworkStressTests.class
 com\myapp\ui\common\TestFXBase.class
 com\myapp\ui\admin\AdminDashboardControllerTest.class
 com\myapp\ui\common\HttpClientUtilTest$EdgeCaseTests.class
-com\myapp\ui\comprehensive\ComprehensiveTestSuite.class
 com\myapp\ui\performance\PerformanceStressTest$MemoryStressTests.class
 com\myapp\ui\security\SecurityValidationTest$InputValidationTests.class
 com\myapp\ui\notification\NotificationControllerTest$SettingsTests.class
-com\myapp\ui\comprehensive\ComprehensiveTestSuite$CoverageMetrics.class
 com\myapp\ui\common\NavigationControllerTest$CurrentSceneTests.class
-com\myapp\ui\comprehensive\ComprehensiveTestSuite$QualityMetrics.class
 com\myapp\ui\common\HttpClientUtilTest$AuthenticationTokenTests.class
 com\myapp\ui\common\HttpClientUtilTest.class
 com\myapp\ui\notification\NotificationControllerTest.class
-com\myapp\ui\comprehensive\ComprehensiveTestSuite$TestCategory.class
 com\myapp\ui\security\SecurityValidationTest$DataProtectionTests.class
 com\myapp\ui\security\SecurityValidationTest.class
 com\myapp\ui\common\HttpClientUtilTest$RequestDtoTests.class
@@ -44,7 +39,6 @@ com\myapp\ui\auth\RegisterControllerTest.class
 com\myapp\ui\menu\MenuManagementControllerTest.class
 com\myapp\ui\restaurant\RestaurantListControllerTest$1.class
 com\myapp\ui\common\NavigationControllerTest$CacheManagementTests.class
-com\myapp\ui\comprehensive\ComprehensiveTestSuite$SecurityMetrics.class
 com\myapp\ui\order\OrderConfirmationIntegrationTest.class
 com\myapp\ui\auth\LoginFlowIntegrationTest.class
 com\myapp\ui\auth\ProfileControllerTest.class

@@ -14,7 +14,7 @@ public class User {
     /* ---------- فیلدهای کلاس ---------- */
     
     @Id                                                    // کلید اصلی
-    @GeneratedValue(strategy = GenerationType.IDENTITY)   // Auto-increment برای شناسه
+    @GeneratedValue(strategy = GenerationType.AUTO)       // Auto برای سازگاری با SQLite
     private Long id;                                       // شناسه یکتای کاربر
 
     @Column(name = "full_name", nullable = false)  // نام کامل - اجباری

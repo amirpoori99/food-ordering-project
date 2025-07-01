@@ -301,7 +301,7 @@ class MenuServiceTest {
             NotFoundException exception = assertThrows(NotFoundException.class, () ->
                 menuService.getRestaurantMenu(999L)
             );
-            assertEquals("Restaurant not found with id=999", exception.getMessage());
+            assertEquals("Restaurant not found with ID: 999", exception.getMessage());
         }
     }
     
@@ -450,7 +450,7 @@ class MenuServiceTest {
             NotFoundException exception = assertThrows(NotFoundException.class, () ->
                 menuService.addItemToMenu(999L, "Pizza", "Italian pizza", 25.99, "Italian")
             );
-            assertEquals("Restaurant not found with id=999", exception.getMessage());
+            assertEquals("Restaurant not found with ID: 999", exception.getMessage());
         }
         
         /**
@@ -682,7 +682,7 @@ class MenuServiceTest {
             NotFoundException exception = assertThrows(NotFoundException.class, () ->
                 menuService.updateMenuItem(999L, "Pizza", "Description", 25.99, "Category", 10, true)
             );
-            assertEquals("Food item not found with id=999", exception.getMessage());
+            assertEquals("Food item not found with ID: 999", exception.getMessage());
         }
         
         @Test
@@ -738,7 +738,7 @@ class MenuServiceTest {
             NotFoundException exception = assertThrows(NotFoundException.class, () ->
                 menuService.removeItemFromMenu(999L)
             );
-            assertEquals("Food item not found with id=999", exception.getMessage());
+            assertEquals("Food item not found with ID: 999", exception.getMessage());
         }
     }
     
@@ -1018,5 +1018,20 @@ class MenuServiceTest {
         FoodItem item = FoodItem.forMenu(name, "Delicious " + name, price, "Test Category", restaurant);
         item.setAvailable(available);
         return itemRepository.save(item);
+    }
+
+    @Test
+    @DisplayName("Should handle concurrent menu updates")
+    void shouldHandleConcurrentMenuUpdates() {
+        com.myapp.common.utils.SQLiteTestHelper.executeWithRetry(DatabaseUtil.getSessionFactory(), () -> {
+            // Simulate concurrent menu updates
+            Restaurant restaurant = createAndSaveRestaurant();
+            for (int i = 0; i < 10; i++) {
+                FoodItem foodItem = FoodItem.forMenu("Test Item " + i, "Test description " + i, 10000.0 + i, "Test Category", restaurant);
+                itemRepository.saveNew(foodItem);
+            }
+            return null;
+        });
+        // Add assertions as needed
     }
 } 

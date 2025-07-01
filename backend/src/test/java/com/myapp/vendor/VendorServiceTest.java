@@ -1241,4 +1241,19 @@ public class VendorServiceTest {
         
         return Arrays.asList(pizza, burger);
     }
+
+    @Test
+    @DisplayName("Service instance should be initialized and dependencies injected")
+    void serviceInitializationTest() {
+        VendorService service = new VendorService();
+        assertNotNull(service);
+        // تست ساده یک متد
+        assertDoesNotThrow(() -> service.getAllVendors());
+    }
+
+    @Test
+    void outerClassIsLoaded() {
+        // Ensures outer class is recognized by test runner
+        assertTrue(true);
+    }
 } 

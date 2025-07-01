@@ -12,7 +12,7 @@ import jakarta.persistence.*;
 public class FoodItem {
     
     @Id                                                    // کلید اصلی
-    @GeneratedValue(strategy = GenerationType.IDENTITY)   // Auto-increment برای شناسه
+    @GeneratedValue(strategy = GenerationType.AUTO)   // Auto-increment برای شناسه
     private Long id;                                       // شناسه یکتای آیتم غذایی
     
     @Column(nullable = false, length = 100)  // نام آیتم - اجباری، حداکثر 100 کاراکتر

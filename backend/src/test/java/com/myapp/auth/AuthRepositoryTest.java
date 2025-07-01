@@ -583,4 +583,13 @@ class AuthRepositoryTest {
             }
         }
     }
+
+    @Test
+    @DisplayName("Repository instance should be initialized and database accessible")
+    void repositoryInitializationTest() {
+        AuthRepository repo = new AuthRepository();
+        Assertions.assertNotNull(repo);
+        // تست ساده یک کوئری واقعی
+        Assertions.assertDoesNotThrow(() -> repo.findByPhone(""));
+    }
 }

@@ -1,46 +1,59 @@
 package com.myapp;
 
-import com.myapp.auth.AuthRepository;
-import com.myapp.auth.AuthService;
-import com.myapp.auth.AuthResult;
-import com.myapp.auth.AuthMiddleware;
-import com.myapp.restaurant.RestaurantRepository;
-import com.myapp.restaurant.RestaurantController;
-import com.myapp.admin.AdminRepository;
-import com.myapp.admin.AdminService;
-import com.myapp.admin.AdminController;
-import com.myapp.order.OrderRepository;
-import com.myapp.order.OrderController;
-import com.myapp.payment.PaymentRepository;
-import com.myapp.payment.PaymentController;
-import com.myapp.payment.WalletController;
-import com.myapp.payment.WalletService;
-import com.myapp.payment.TransactionController;
-import com.myapp.courier.DeliveryRepository;
-import com.myapp.courier.DeliveryController;
-import com.myapp.item.ItemController;
-import com.myapp.menu.MenuController;
-import com.myapp.vendor.VendorController;
-import com.myapp.favorites.FavoritesRepository;
-import com.myapp.favorites.FavoritesService;
-import com.myapp.favorites.FavoritesController;
-import com.myapp.notification.NotificationRepository;
-import com.myapp.notification.NotificationService;
-import com.myapp.notification.NotificationController;
-import com.myapp.common.utils.DatabaseUtil;
-import com.myapp.common.utils.PasswordUtil;
-import com.myapp.common.models.User;
-import com.myapp.common.constants.ApplicationConstants;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpExchange;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.util.concurrent.Executors;
+// --- ایمپورت‌های مربوط به ماژول احراز هویت ---
+import com.myapp.auth.AuthRepository; // ریپازیتوری احراز هویت (دسترسی به داده‌های کاربر)
+import com.myapp.auth.AuthService;    // سرویس منطق احراز هویت
+import com.myapp.auth.AuthResult;     // مدل نتیجه عملیات احراز هویت
+import com.myapp.auth.AuthMiddleware; // میدلور امنیتی برای بررسی توکن
+// --- ایمپورت‌های مربوط به رستوران ---
+import com.myapp.restaurant.RestaurantRepository; // ریپازیتوری رستوران
+import com.myapp.restaurant.RestaurantController; // کنترلر رستوران
+// --- ایمپورت‌های مربوط به ادمین ---
+import com.myapp.admin.AdminRepository; // ریپازیتوری ادمین
+import com.myapp.admin.AdminService;    // سرویس ادمین
+import com.myapp.admin.AdminController; // کنترلر ادمین
+// --- ایمپورت‌های مربوط به سفارش ---
+import com.myapp.order.OrderRepository; // ریپازیتوری سفارش
+import com.myapp.order.OrderController; // کنترلر سفارش
+// --- ایمپورت‌های مربوط به پرداخت ---
+import com.myapp.payment.PaymentRepository; // ریپازیتوری پرداخت
+import com.myapp.payment.PaymentController; // کنترلر پرداخت
+import com.myapp.payment.WalletController;  // کنترلر کیف پول
+import com.myapp.payment.WalletService;     // سرویس کیف پول
+import com.myapp.payment.TransactionController; // کنترلر تراکنش
+// --- ایمپورت‌های مربوط به پیک ---
+import com.myapp.courier.DeliveryRepository; // ریپازیتوری پیک
+import com.myapp.courier.DeliveryController; // کنترلر پیک
+// --- ایمپورت‌های مربوط به آیتم و منو ---
+import com.myapp.item.ItemController; // کنترلر آیتم
+import com.myapp.menu.MenuController; // کنترلر منو
+// --- ایمپورت‌های مربوط به فروشنده ---
+import com.myapp.vendor.VendorController; // کنترلر فروشنده
+// --- ایمپورت‌های مربوط به علاقه‌مندی ---
+import com.myapp.favorites.FavoritesRepository; // ریپازیتوری علاقه‌مندی
+import com.myapp.favorites.FavoritesService;    // سرویس علاقه‌مندی
+import com.myapp.favorites.FavoritesController; // کنترلر علاقه‌مندی
+// --- ایمپورت‌های مربوط به اعلان ---
+import com.myapp.notification.NotificationRepository; // ریپازیتوری اعلان
+import com.myapp.notification.NotificationService;    // سرویس اعلان
+import com.myapp.notification.NotificationController; // کنترلر اعلان
+// --- ابزارهای کمکی و مدل‌ها ---
+import com.myapp.common.utils.DatabaseUtil; // ابزار اتصال به دیتابیس
+import com.myapp.common.utils.PasswordUtil; // ابزار رمزنگاری
+import com.myapp.common.models.User;        // مدل کاربر
+import com.myapp.common.constants.ApplicationConstants; // ثابت‌های برنامه
+// --- ابزارهای جکسون برای JSON ---
+import com.fasterxml.jackson.databind.ObjectMapper; // مبدل JSON
+import com.fasterxml.jackson.databind.JsonNode;     // نود جکسون
+// --- سرور HTTP جاوا ---
+import com.sun.net.httpserver.HttpServer;   // سرور HTTP
+import com.sun.net.httpserver.HttpHandler;  // هندلر درخواست
+import com.sun.net.httpserver.HttpExchange; // تبادل HTTP
+// --- ابزارهای جاوا ---
+import java.io.IOException;                 // مدیریت خطاهای IO
+import java.io.OutputStream;                // خروجی داده
+import java.net.InetSocketAddress;          // آدرس شبکه
+import java.util.concurrent.Executors;      // مدیریت Thread Pool
 
 /**
  * کلاس اصلی سرور پروژه سیستم سفارش غذا
@@ -48,7 +61,6 @@ import java.util.concurrent.Executors;
  * شامل تمام endpoint های REST API و مدیریت درخواست‌ها
  */
 public class ServerApp {
-    
     // تعریف متغیرهای static برای سرویس‌ها و کنترلرهای مختلف
     private static AuthService authService;                    // سرویس احراز هویت
     private static AdminController adminController;            // کنترلر پنل مدیریت
@@ -246,19 +258,19 @@ public class ServerApp {
     }
     
     /**
-     * کلاس Handler برای endpoint بررسی سلامت سرور (/health)
-     * این endpoint برای monitoring، health check و load balancer استفاده می‌شود
+     * کلاس Handler برای بررسی سلامت سرور (/health)
+     * این endpoint برای monitoring و health check سرور استفاده می‌شود
      * 
      * عملکرد این Handler:
-     * - بازگشت وضعیت سرور (UP/DOWN)
-     * - اطلاعات نام سرویس
+     * - بررسی وضعیت کلی سرور
+     * - بازگشت وضعیت UP در صورت عملکرد صحیح
      * - بدون نیاز به احراز هویت
      * 
-     * این endpoint معمولاً توسط:
-     * - Load balancers برای تشخیص سرورهای سالم
-     * - Monitoring systems برای نظارت بر سرور
-     * - CI/CD pipelines برای تست deployment
-     * استفاده می‌شود
+     * این endpoint مفید است برای:
+     * - Load balancer ها برای بررسی سلامت سرور
+     * - Monitoring tools برای نظارت بر سرور
+     * - DevOps برای بررسی وضعیت سرویس
+     * - تست اولیه اتصال به سرور
      * 
      * فرمت پاسخ:
      * <pre>

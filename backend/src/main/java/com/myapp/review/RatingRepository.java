@@ -76,7 +76,9 @@ public class RatingRepository {
      */
     public Rating save(Rating rating) {
         Transaction transaction = null;
-        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = DatabaseUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
             
             if (rating.getId() == null) {
@@ -93,11 +95,23 @@ public class RatingRepository {
             return rating;
             
         } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
+            if (transaction != null && transaction.isActive()) {
+                try {
+                    transaction.rollback();
+                } catch (Exception rollbackEx) {
+                    logger.error("Error during rollback: {}", rollbackEx.getMessage(), rollbackEx);
+                }
             }
             logger.error("Error saving rating: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to save rating", e);
+        } finally {
+            if (session != null && session.isOpen()) {
+                try {
+                    session.close();
+                } catch (Exception closeEx) {
+                    logger.error("Error closing session: {}", closeEx.getMessage(), closeEx);
+                }
+            }
         }
     }
     

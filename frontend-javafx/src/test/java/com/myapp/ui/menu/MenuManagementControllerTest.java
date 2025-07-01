@@ -102,6 +102,10 @@ class MenuManagementControllerTest extends TestFXBase {
     private Button exportMenuButton;
     private Button publishMenuButton;
 
+    /** کامپوننت‌های UI - ComboBoxes */
+    private ComboBox<String> categoryComboBox;
+    private ComboBox<String> itemComboBox;
+
     /**
      * راه‌اندازی اولیه Stage برای تست
      * تلاش برای بارگذاری FXML یا ایجاد UI ساختگی
@@ -181,6 +185,28 @@ class MenuManagementControllerTest extends TestFXBase {
         previewMenuButton = (Button) root.lookup("#previewMenuButton");
         exportMenuButton = (Button) root.lookup("#exportMenuButton");
         publishMenuButton = (Button) root.lookup("#publishMenuButton");
+
+        // رفع هشدار cast: بررسی نوع در زمان اجرا
+        Control node = (Control) root.lookup("#categoryComboBox");
+        if (node instanceof ComboBox<?>) {
+            try {
+                categoryComboBox = (ComboBox<String>) node;
+            } catch (ClassCastException e) {
+                fail("categoryComboBox is not of expected generic type ComboBox<String>. Actual: " + node.getClass());
+            }
+        } else {
+            fail("categoryComboBox node is not a ComboBox. Actual: " + (node == null ? "null" : node.getClass()));
+        }
+        node = (Control) root.lookup("#itemComboBox");
+        if (node instanceof ComboBox<?>) {
+            try {
+                itemComboBox = (ComboBox<String>) node;
+            } catch (ClassCastException e) {
+                fail("itemComboBox is not of expected generic type ComboBox<String>. Actual: " + node.getClass());
+            }
+        } else {
+            fail("itemComboBox node is not a ComboBox. Actual: " + (node == null ? "null" : node.getClass()));
+        }
     }
     
     /**
@@ -252,6 +278,12 @@ class MenuManagementControllerTest extends TestFXBase {
         previewMenuButton = new Button("👁️ پیش‌نمایش منو");
         exportMenuButton = new Button("📄 خروجی PDF");
         publishMenuButton = new Button("🚀 انتشار منو");
+        
+        // ComboBoxes
+        categoryComboBox = new ComboBox<>();
+        categoryComboBox.getItems().addAll("دسته ۱", "دسته ۲", "دسته ۳");
+        itemComboBox = new ComboBox<>();
+        itemComboBox.getItems().addAll("آیتم ۱", "آیتم ۲", "آیتم ۳");
         
         // ایجاد scene با کامپوننت‌های ساختگی
         VBox root = new VBox(10);

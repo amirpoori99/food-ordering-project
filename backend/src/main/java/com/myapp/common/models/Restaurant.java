@@ -14,7 +14,7 @@ public class Restaurant {
     /* ---------- فیلدهای کلاس ---------- */
     
     @Id                                                    // کلید اصلی
-    @GeneratedValue(strategy = GenerationType.IDENTITY)   // Auto-increment برای شناسه
+    @GeneratedValue(strategy = GenerationType.AUTO)   // Auto-increment برای شناسه
     private Long id;                                       // شناسه یکتای رستوران
 
     @Column(name = "owner_id", nullable = false)  // شناسه صاحب رستوران - اجباری

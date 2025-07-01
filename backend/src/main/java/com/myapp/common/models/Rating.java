@@ -39,7 +39,7 @@ public class Rating {
     
     /** شناسه یکتای رتبه‌بندی */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     
     /** کاربر ثبت‌کننده نظر (رابطه چند‌به‌یک) */

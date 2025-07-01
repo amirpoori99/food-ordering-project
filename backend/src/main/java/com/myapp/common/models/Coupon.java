@@ -42,7 +42,7 @@ public class Coupon {
     
     /** شناسه یکتای کوپن */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     
     /** کد یکتای کوپن برای استفاده توسط کاربر */

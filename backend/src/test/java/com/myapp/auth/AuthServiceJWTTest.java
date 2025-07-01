@@ -380,7 +380,7 @@ class AuthServiceJWTTest {
             RegisterRequest registerRequest = new RegisterRequest(
                 "امیر حسینی", "09888999000", "amir@example.com", "password456", User.Role.BUYER, "قم"
             );
-            authService.register(registerRequest);
+            User user = authService.register(registerRequest);
             
             // When - دو بار ورود
             LoginRequest loginRequest = new LoginRequest("09888999000", "password456");
@@ -397,9 +397,27 @@ class AuthServiceJWTTest {
             assertThat(firstLogin.getAccessToken()).isNotNull();
             assertThat(secondLogin.getAccessToken()).isNotNull();
             
+            // Debug: بررسی token ها
+            System.out.println("🔍 Debug Token Validation:");
+            System.out.println("First login token: " + firstLogin.getAccessToken());
+            System.out.println("Second login token: " + secondLogin.getAccessToken());
+            
             // بررسی معتبر بودن هر دو token
-            assertThat(authService.validateToken(firstLogin.getAccessToken()).isAuthenticated()).isTrue();
-            assertThat(authService.validateToken(secondLogin.getAccessToken()).isAuthenticated()).isTrue();
+            AuthResult firstValidation = authService.validateToken(firstLogin.getAccessToken());
+            AuthResult secondValidation = authService.validateToken(secondLogin.getAccessToken());
+            
+            System.out.println("First validation result: " + firstValidation.isAuthenticated());
+            System.out.println("Second validation result: " + secondValidation.isAuthenticated());
+            
+            if (!firstValidation.isAuthenticated()) {
+                System.out.println("First validation error: " + firstValidation.getErrorMessage());
+            }
+            if (!secondValidation.isAuthenticated()) {
+                System.out.println("Second validation error: " + secondValidation.getErrorMessage());
+            }
+            
+            assertThat(firstValidation.isAuthenticated()).isTrue();
+            assertThat(secondValidation.isAuthenticated()).isTrue();
             
             // بررسی اینکه هر دو token حاوی اطلاعات صحیح کاربر باشند
             assertThat(JWTUtil.getPhoneFromToken(firstLogin.getAccessToken())).isEqualTo("09888999000");

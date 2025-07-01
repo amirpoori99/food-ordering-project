@@ -42,7 +42,7 @@ public class Favorite {
     
     /** شناسه یکتای علاقه‌مندی */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     
     /** کاربر صاحب علاقه‌مندی (رابطه چند‌به‌یک) */

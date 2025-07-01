@@ -301,7 +301,7 @@ class AdminServiceTest {
             NotFoundException exception = assertThrows(NotFoundException.class, 
                 () -> adminService.getUserById(999L));
             
-            assertEquals("User not found with id=999", exception.getMessage());
+            assertEquals("User not found with ID: 999", exception.getMessage());
         }
         
         /**

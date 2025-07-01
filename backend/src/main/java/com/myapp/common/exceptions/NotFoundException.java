@@ -42,7 +42,7 @@ public class NotFoundException extends RuntimeException {
     private static String buildMessage(String entity, Object id) {
         String entityName = (entity != null) ? entity : "Entity";
         String idValue = (id != null) ? id.toString() : "null";
-        return entityName + " not found with id=" + idValue;
+        return entityName + " not found with ID: " + idValue;
     }
     
     /**

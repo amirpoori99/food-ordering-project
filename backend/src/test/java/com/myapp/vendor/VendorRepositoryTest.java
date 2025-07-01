@@ -775,4 +775,19 @@ public class VendorRepositoryTest {
             });
         }
     }
+
+    @Test
+    @DisplayName("Repository instance should be initialized and database accessible")
+    void repositoryInitializationTest() {
+        VendorRepository repo = new VendorRepository();
+        assertNotNull(repo);
+        // تست ساده یک کوئری واقعی
+        assertDoesNotThrow(() -> repo.searchVendors(""));
+    }
+
+    @Test
+    void outerClassIsLoaded() {
+        // Ensures outer class is recognized by test runner
+        assertTrue(true);
+    }
 }

@@ -138,7 +138,7 @@ public class RestaurantService {
                 System.out.println("🏪 " + result.toString());
                 return result.getResult();
             },
-            List.class,
+            (Class<List<Restaurant>>) (Class<?>) List.class,
             15 // Cache برای 15 دقیقه
         );
     }

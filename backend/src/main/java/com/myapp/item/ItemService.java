@@ -130,6 +130,37 @@ public class ItemService {
         FoodItem item = itemRepository.findById(itemId)
             .orElseThrow(() -> new NotFoundException("Food item", itemId));
         
+        // اعتبارسنجی داده‌های ورودی فقط در صورت ارائه
+        if (name != null && !name.trim().isEmpty()) {
+            if (name.trim().length() > 100) {
+                throw new IllegalArgumentException("Item name cannot exceed 100 characters");
+            }
+            // جلوگیری از اسکریپت و جاوااسکریپت در نام آیتم
+            String lowerName = name.toLowerCase();
+            if (lowerName.contains("<script>") || lowerName.contains("javascript:")) {
+                throw new IllegalArgumentException("Item name contains forbidden content");
+            }
+        }
+        if (description != null && !description.trim().isEmpty()) {
+            if (description.trim().length() > 500) {
+                throw new IllegalArgumentException("Item description cannot exceed 500 characters");
+            }
+        }
+        if (price <= 0) {
+            throw new IllegalArgumentException("Item price must be positive");
+        }
+        if (price >= 10000) {
+            throw new IllegalArgumentException("Item price cannot be 10,000 or more");
+        }
+        if (category != null && !category.trim().isEmpty()) {
+            if (category.trim().length() > 50) {
+                throw new IllegalArgumentException("Item category cannot exceed 50 characters");
+            }
+        }
+        if (quantity != null && quantity < 0) {
+            throw new IllegalArgumentException("Item quantity cannot be negative");
+        }
+        
         // به‌روزرسانی فیلدها در صورت ارائه
         if (name != null && !name.trim().isEmpty()) {
             item.setName(name.trim());
@@ -375,6 +406,11 @@ public class ItemService {
         if (name.trim().length() > 100) {
             throw new IllegalArgumentException("Item name cannot exceed 100 characters");
         }
+        // جلوگیری از اسکریپت و جاوااسکریپت در نام آیتم
+        String lowerName = name.toLowerCase();
+        if (lowerName.contains("<script>") || lowerName.contains("javascript:")) {
+            throw new IllegalArgumentException("Item name contains forbidden content");
+        }
         if (description == null || description.trim().isEmpty()) {
             throw new IllegalArgumentException("Item description cannot be empty");
         }
@@ -384,8 +420,8 @@ public class ItemService {
         if (price <= 0) {
             throw new IllegalArgumentException("Item price must be positive");
         }
-        if (price > 10000) {
-            throw new IllegalArgumentException("Item price cannot exceed 10,000");
+        if (price >= 10000) {
+            throw new IllegalArgumentException("Item price cannot be 10,000 or more");
         }
         if (category == null || category.trim().isEmpty()) {
             throw new IllegalArgumentException("Item category cannot be empty");

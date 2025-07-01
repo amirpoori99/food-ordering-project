@@ -276,7 +276,7 @@ class MenuControllerTest {
             NotFoundException exception = assertThrows(NotFoundException.class, () ->
                 menuService.getRestaurantMenu(999L)
             );
-            assertEquals("Restaurant not found with id=999", exception.getMessage());
+            assertEquals("Restaurant not found with ID: 999", exception.getMessage());
         }
     }
     
@@ -373,7 +373,7 @@ class MenuControllerTest {
             NotFoundException exception = assertThrows(NotFoundException.class, () ->
                 menuService.addItemToMenu(999L, "Pizza", "Italian pizza", 25.99, "Italian")
             );
-            assertEquals("Restaurant not found with id=999", exception.getMessage());
+            assertEquals("Restaurant not found with ID: 999", exception.getMessage());
         }
         
         @ParameterizedTest
@@ -559,7 +559,7 @@ class MenuControllerTest {
             NotFoundException exception = assertThrows(NotFoundException.class, () ->
                 menuService.updateMenuItem(999L, "Pizza", "Description", 25.99, "Category", 10, true)
             );
-            assertEquals("Food item not found with id=999", exception.getMessage());
+            assertEquals("Food item not found with ID: 999", exception.getMessage());
         }
         
         @Test
@@ -615,7 +615,7 @@ class MenuControllerTest {
             NotFoundException exception = assertThrows(NotFoundException.class, () ->
                 menuService.removeItemFromMenu(999L)
             );
-            assertEquals("Food item not found with id=999", exception.getMessage());
+            assertEquals("Food item not found with ID: 999", exception.getMessage());
         }
     }
     

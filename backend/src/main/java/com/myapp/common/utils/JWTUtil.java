@@ -180,6 +180,9 @@ public class JWTUtil {
      */
     public static boolean isTokenExpired(String token) {
         try {
+            if (token == null || token.trim().isEmpty()) {
+                return true; // token های null یا خالی را منقضی در نظر می‌گیریم
+            }
             Claims claims = getClaimsFromToken(token);
             return claims.getExpiration().before(new Date()); // مقایسه با زمان فعلی
         } catch (JwtException e) {

@@ -1,160 +1,390 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- فایل پیکربندی Logback برای سیستم لاگ -->
+<!-- این فایل شامل تمام تنظیمات مربوط به لاگ کردن در سیستم است -->
+<!-- Logback یک کتابخانه قدرتمند برای لاگ کردن در Java است -->
+<!-- نسخه XML: 1.0 با کدگذاری UTF-8 برای پشتیبانی از کاراکترهای فارسی -->
+
 <configuration>
+    <!-- تگ اصلی پیکربندی Logback -->
+    <!-- تمام تنظیمات لاگ در این تگ قرار می‌گیرد -->
     
-    <!-- Define log file location -->
+    <!-- تعریف مسیر فایل لاگ -->
+    <!-- متغیرهای محیطی برای مسیرهای لاگ -->
     <property name="LOG_HOME" value="logs"/>
+    <!-- پوشه اصلی ذخیره فایل‌های لاگ -->
+    <!-- تمام فایل‌های لاگ در این پوشه ذخیره می‌شوند -->
+    
     <property name="LOG_FILE" value="${LOG_HOME}/food-ordering-app"/>
+    <!-- نام پایه فایل لاگ -->
+    <!-- فایل‌های لاگ با این نام و پسوندهای مختلف ایجاد می‌شوند -->
     
-    <!-- Console Appender -->
+    <!-- Console Appender - نمایش لاگ در کنسول -->
+    <!-- این appender لاگ‌ها را در کنسول نمایش می‌دهد -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- نام appender: CONSOLE -->
+        <!-- کلاس: ConsoleAppender برای نمایش در کنسول -->
+        
         <encoder>
+            <!-- encoder برای تبدیل لاگ به متن -->
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <!-- الگوی نمایش لاگ: -->
+            <!-- %d{yyyy-MM-dd HH:mm:ss.SSS}: تاریخ و زمان با دقت میلی‌ثانیه -->
+            <!-- [%thread]: نام thread که لاگ را تولید کرده -->
+            <!-- %-5level: سطح لاگ (ERROR, WARN, INFO, DEBUG) با عرض 5 کاراکتر -->
+            <!-- %logger{36}: نام logger با حداکثر 36 کاراکتر -->
+            <!-- %msg: پیام لاگ -->
+            <!-- %n: خط جدید -->
         </encoder>
     </appender>
     
-    <!-- File Appender for All Logs -->
+    <!-- File Appender برای تمام لاگ‌ها -->
+    <!-- این appender لاگ‌ها را در فایل ذخیره می‌کند -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- نام appender: FILE -->
+        <!-- کلاس: RollingFileAppender برای فایل‌های چرخشی -->
+        
         <file>${LOG_FILE}.log</file>
+        <!-- مسیر فایل لاگ اصلی -->
+        <!-- لاگ‌ها در این فایل ذخیره می‌شوند -->
+        
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- سیاست چرخش فایل بر اساس زمان -->
+            <!-- فایل‌ها بر اساس تاریخ چرخش می‌شوند -->
+            
             <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- الگوی نام فایل‌های چرخشی -->
+            <!-- %d{yyyy-MM-dd}: تاریخ در نام فایل -->
+            <!-- %i: شماره فایل در همان روز -->
+            
             <maxFileSize>10MB</maxFileSize>
+            <!-- حداکثر اندازه هر فایل لاگ -->
+            <!-- پس از رسیدن به این اندازه، فایل جدید ایجاد می‌شود -->
+            
             <maxHistory>30</maxHistory>
+            <!-- حداکثر تعداد فایل‌های نگهداری شده -->
+            <!-- فایل‌های قدیمی‌تر از 30 روز حذف می‌شوند -->
+            
             <totalSizeCap>300MB</totalSizeCap>
+            <!-- حداکثر اندازه کل فایل‌های لاگ -->
+            <!-- پس از رسیدن به این اندازه، قدیمی‌ترین فایل‌ها حذف می‌شوند -->
         </rollingPolicy>
+        
         <encoder>
+            <!-- encoder برای تبدیل لاگ به متن -->
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <!-- همان الگوی کنسول برای یکپارچگی -->
         </encoder>
     </appender>
     
-    <!-- Error File Appender -->
+    <!-- Error File Appender - فایل جداگانه برای خطاها -->
+    <!-- این appender فقط خطاها را در فایل جداگانه ذخیره می‌کند -->
     <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- نام appender: ERROR_FILE -->
+        <!-- کلاس: RollingFileAppender برای فایل‌های چرخشی -->
+        
         <file>${LOG_FILE}-error.log</file>
+        <!-- مسیر فایل لاگ خطاها -->
+        <!-- فقط خطاها در این فایل ذخیره می‌شوند -->
+        
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- فیلتر بر اساس سطح لاگ -->
+            <!-- فقط لاگ‌های با سطح مشخص شده پذیرفته می‌شوند -->
+            
             <level>ERROR</level>
+            <!-- فقط لاگ‌های ERROR -->
+            
             <onMatch>ACCEPT</onMatch>
+            <!-- اگر سطح لاگ ERROR باشد، پذیرفته می‌شود -->
+            
             <onMismatch>DENY</onMismatch>
+            <!-- اگر سطح لاگ ERROR نباشد، رد می‌شود -->
         </filter>
+        
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- سیاست چرخش فایل بر اساس زمان -->
             <fileNamePattern>${LOG_FILE}-error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- الگوی نام فایل‌های چرخشی برای خطاها -->
+            
             <maxFileSize>10MB</maxFileSize>
+            <!-- حداکثر اندازه هر فایل لاگ خطا -->
+            
             <maxHistory>30</maxHistory>
+            <!-- حداکثر تعداد فایل‌های نگهداری شده -->
         </rollingPolicy>
+        
         <encoder>
+            <!-- encoder برای تبدیل لاگ به متن -->
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
     
-    <!-- Test Appender -->
+    <!-- Test Appender - فایل جداگانه برای تست‌ها -->
+    <!-- این appender لاگ‌های تست را در فایل جداگانه ذخیره می‌کند -->
     <appender name="TEST_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- نام appender: TEST_FILE -->
+        
         <file>${LOG_HOME}/tests.log</file>
+        <!-- مسیر فایل لاگ تست‌ها -->
+        
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- سیاست چرخش فایل بر اساس زمان -->
             <fileNamePattern>${LOG_HOME}/tests.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- الگوی نام فایل‌های چرخشی برای تست‌ها -->
+            
             <maxHistory>7</maxHistory>
+            <!-- حداکثر تعداد فایل‌های نگهداری شده (7 روز) -->
+            <!-- فایل‌های تست کمتر نگهداری می‌شوند -->
         </rollingPolicy>
+        
         <encoder>
+            <!-- encoder برای تبدیل لاگ به متن -->
             <pattern>%d{HH:mm:ss.SSS} %-5level %logger{20} - %msg%n</pattern>
+            <!-- الگوی ساده‌تر برای تست‌ها -->
+            <!-- فقط ساعت:دقیقه:ثانیه بدون تاریخ -->
         </encoder>
     </appender>
     
-    <!-- Performance Monitoring Appender -->
+    <!-- Performance Monitoring Appender - فایل جداگانه برای نظارت عملکرد -->
+    <!-- این appender لاگ‌های مربوط به عملکرد را ذخیره می‌کند -->
     <appender name="PERFORMANCE_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- نام appender: PERFORMANCE_FILE -->
+        
         <file>${LOG_HOME}/performance.log</file>
+        <!-- مسیر فایل لاگ عملکرد -->
+        
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- سیاست چرخش فایل بر اساس زمان -->
             <fileNamePattern>${LOG_HOME}/performance.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- الگوی نام فایل‌های چرخشی برای عملکرد -->
+            
             <maxHistory>14</maxHistory>
+            <!-- حداکثر تعداد فایل‌های نگهداری شده (14 روز) -->
         </rollingPolicy>
+        
         <encoder>
+            <!-- encoder برای تبدیل لاگ به متن -->
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} - %msg%n</pattern>
+            <!-- الگوی ساده برای لاگ‌های عملکرد -->
+            <!-- فقط تاریخ و زمان و پیام -->
         </encoder>
     </appender>
     
-    <!-- Security Events Appender -->
+    <!-- Security Events Appender - فایل جداگانه برای رویدادهای امنیتی -->
+    <!-- این appender لاگ‌های مربوط به امنیت را ذخیره می‌کند -->
     <appender name="SECURITY_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- نام appender: SECURITY_FILE -->
+        
         <file>${LOG_HOME}/security.log</file>
+        <!-- مسیر فایل لاگ امنیت -->
+        
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- سیاست چرخش فایل بر اساس زمان -->
             <fileNamePattern>${LOG_HOME}/security.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- الگوی نام فایل‌های چرخشی برای امنیت -->
+            
             <maxHistory>90</maxHistory>
+            <!-- حداکثر تعداد فایل‌های نگهداری شده (90 روز) -->
+            <!-- فایل‌های امنیتی بیشتر نگهداری می‌شوند -->
         </rollingPolicy>
+        
         <encoder>
+            <!-- encoder برای تبدیل لاگ به متن -->
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
     
-    <!-- Async Appender for better performance -->
+    <!-- Async Appender برای عملکرد بهتر -->
+    <!-- این appender لاگ‌ها را به صورت async پردازش می‌کند -->
     <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- نام appender: ASYNC_FILE -->
+        <!-- کلاس: AsyncAppender برای پردازش async -->
+        
         <appender-ref ref="FILE"/>
+        <!-- ارجاع به appender FILE -->
+        <!-- لاگ‌ها ابتدا در صف قرار می‌گیرند سپس به FILE ارسال می‌شوند -->
+        
         <queueSize>512</queueSize>
+        <!-- اندازه صف async -->
+        <!-- حداکثر 512 لاگ در صف قرار می‌گیرند -->
+        
         <discardingThreshold>0</discardingThreshold>
+        <!-- آستانه حذف لاگ‌ها -->
+        <!-- 0 یعنی هیچ لاگی حذف نمی‌شود -->
     </appender>
     
-    <!-- Logger configurations -->
+    <!-- پیکربندی Logger ها -->
+    <!-- تعریف logger های مختلف برای بخش‌های مختلف سیستم -->
     
-    <!-- Root logger -->
+    <!-- Root logger - logger اصلی سیستم -->
+    <!-- تمام لاگ‌ها از این logger ارث‌بری می‌کنند -->
     <root level="INFO">
+        <!-- سطح لاگ: INFO -->
+        <!-- لاگ‌های با سطح INFO و بالاتر نمایش داده می‌شوند -->
+        
         <appender-ref ref="CONSOLE"/>
+        <!-- ارجاع به appender CONSOLE -->
+        <!-- لاگ‌ها در کنسول نمایش داده می‌شوند -->
+        
         <appender-ref ref="ASYNC_FILE"/>
+        <!-- ارجاع به appender ASYNC_FILE -->
+        <!-- لاگ‌ها در فایل ذخیره می‌شوند -->
+        
         <appender-ref ref="ERROR_FILE"/>
+        <!-- ارجاع به appender ERROR_FILE -->
+        <!-- خطاها در فایل جداگانه ذخیره می‌شوند -->
     </root>
     
-    <!-- Application specific loggers -->
+    <!-- Logger های اختصاصی برنامه -->
+    <!-- logger برای پکیج اصلی برنامه -->
     <logger name="com.myapp" level="DEBUG" additivity="false">
+        <!-- نام logger: com.myapp -->
+        <!-- سطح لاگ: DEBUG (جزئیات بیشتر) -->
+        <!-- additivity=false: لاگ‌ها به logger والد ارسال نمی‌شوند -->
+        
         <appender-ref ref="CONSOLE"/>
+        <!-- ارجاع به appender CONSOLE -->
+        
         <appender-ref ref="ASYNC_FILE"/>
+        <!-- ارجاع به appender ASYNC_FILE -->
+        
         <appender-ref ref="ERROR_FILE"/>
+        <!-- ارجاع به appender ERROR_FILE -->
     </logger>
     
-    <!-- Test loggers -->
+    <!-- Logger های تست -->
+    <!-- logger برای تست‌های JWT -->
     <logger name="com.myapp.auth.JWTEndToEndTest" level="INFO" additivity="false">
+        <!-- نام logger: تست end-to-end JWT -->
+        <!-- سطح لاگ: INFO -->
+        
         <appender-ref ref="TEST_FILE"/>
+        <!-- ارجاع به appender TEST_FILE -->
+        <!-- لاگ‌های تست در فایل جداگانه ذخیره می‌شوند -->
+        
         <appender-ref ref="CONSOLE"/>
+        <!-- ارجاع به appender CONSOLE -->
     </logger>
     
     <logger name="com.myapp.auth.JWTMissingScenarios" level="INFO" additivity="false">
+        <!-- نام logger: تست سناریوهای ناقص JWT -->
+        <!-- سطح لاگ: INFO -->
+        
         <appender-ref ref="TEST_FILE"/>
+        <!-- ارجاع به appender TEST_FILE -->
+        
         <appender-ref ref="CONSOLE"/>
+        <!-- ارجاع به appender CONSOLE -->
     </logger>
     
     <logger name="com.myapp.auth.JWTComprehensiveTest" level="INFO" additivity="false">
+        <!-- نام logger: تست جامع JWT -->
+        <!-- سطح لاگ: INFO -->
+        
         <appender-ref ref="TEST_FILE"/>
+        <!-- ارجاع به appender TEST_FILE -->
+        
         <appender-ref ref="CONSOLE"/>
+        <!-- ارجاع به appender CONSOLE -->
     </logger>
     
-    <!-- Performance logger -->
+    <!-- Logger عملکرد -->
+    <!-- logger برای نظارت عملکرد -->
     <logger name="performance" level="INFO" additivity="false">
+        <!-- نام logger: performance -->
+        <!-- سطح لاگ: INFO -->
+        
         <appender-ref ref="PERFORMANCE_FILE"/>
+        <!-- ارجاع به appender PERFORMANCE_FILE -->
+        <!-- لاگ‌های عملکرد در فایل جداگانه ذخیره می‌شوند -->
     </logger>
     
-    <!-- Security logger -->
+    <!-- Logger امنیت -->
+    <!-- logger برای رویدادهای امنیتی -->
     <logger name="security" level="INFO" additivity="false">
+        <!-- نام logger: security -->
+        <!-- سطح لاگ: INFO -->
+        
         <appender-ref ref="SECURITY_FILE"/>
+        <!-- ارجاع به appender SECURITY_FILE -->
+        <!-- لاگ‌های امنیتی در فایل جداگانه ذخیره می‌شوند -->
+        
         <appender-ref ref="CONSOLE"/>
+        <!-- ارجاع به appender CONSOLE -->
     </logger>
     
-    <!-- Database operation logger -->
+    <!-- Logger عملیات پایگاه داده -->
+    <!-- logger برای عملیات پایگاه داده -->
     <logger name="com.myapp.common.utils.DatabaseUtil" level="DEBUG" additivity="false">
+        <!-- نام logger: ابزار پایگاه داده -->
+        <!-- سطح لاگ: DEBUG (جزئیات بیشتر) -->
+        
         <appender-ref ref="CONSOLE"/>
+        <!-- ارجاع به appender CONSOLE -->
+        
         <appender-ref ref="ASYNC_FILE"/>
+        <!-- ارجاع به appender ASYNC_FILE -->
     </logger>
     
-    <!-- HTTP Server logger -->
+    <!-- Logger سرور HTTP -->
+    <!-- logger برای سرور HTTP -->
     <logger name="com.sun.net.httpserver" level="WARN"/>
+    <!-- نام logger: سرور HTTP -->
+    <!-- سطح لاگ: WARN (فقط هشدارها) -->
+    <!-- لاگ‌های اضافی سرور HTTP کاهش یافته‌اند -->
     
-    <!-- Hibernate logger -->
+    <!-- Logger های Hibernate -->
+    <!-- logger برای Hibernate -->
     <logger name="org.hibernate" level="WARN"/>
+    <!-- نام logger: Hibernate -->
+    <!-- سطح لاگ: WARN (فقط هشدارها) -->
+    <!-- لاگ‌های اضافی Hibernate کاهش یافته‌اند -->
+    
     <logger name="org.hibernate.SQL" level="DEBUG"/>
+    <!-- نام logger: کوئری‌های SQL -->
+    <!-- سطح لاگ: DEBUG -->
+    <!-- کوئری‌های SQL نمایش داده می‌شوند -->
+    
     <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+    <!-- نام logger: پارامترهای SQL -->
+    <!-- سطح لاگ: TRACE -->
+    <!-- پارامترهای کوئری‌های SQL نمایش داده می‌شوند -->
     
-    <!-- SQLite logger -->
+    <!-- Logger SQLite -->
+    <!-- logger برای SQLite -->
     <logger name="org.sqlite" level="WARN"/>
+    <!-- نام logger: SQLite -->
+    <!-- سطح لاگ: WARN (فقط هشدارها) -->
+    <!-- لاگ‌های اضافی SQLite کاهش یافته‌اند -->
     
-    <!-- Jackson logger -->
+    <!-- Logger Jackson -->
+    <!-- logger برای Jackson (JSON) -->
     <logger name="com.fasterxml.jackson" level="WARN"/>
+    <!-- نام logger: Jackson -->
+    <!-- سطح لاگ: WARN (فقط هشدارها) -->
+    <!-- لاگ‌های اضافی Jackson کاهش یافته‌اند -->
     
-    <!-- TestFX logger -->
+    <!-- Logger TestFX -->
+    <!-- logger برای TestFX (تست UI) -->
     <logger name="org.testfx" level="WARN"/>
+    <!-- نام logger: TestFX -->
+    <!-- سطح لاگ: WARN (فقط هشدارها) -->
+    <!-- لاگ‌های اضافی TestFX کاهش یافته‌اند -->
     
-    <!-- Suppress verbose third-party logs -->
+    <!-- کاهش لاگ‌های verbose کتابخانه‌های شخص ثالث -->
+    <!-- logger برای Spring -->
     <logger name="org.springframework" level="WARN"/>
-    <logger name="io.netty" level="WARN"/>
+    <!-- نام logger: Spring -->
+    <!-- سطح لاگ: WARN (فقط هشدارها) -->
+    <!-- لاگ‌های اضافی Spring کاهش یافته‌اند -->
     
-</configuration> 
+    <!-- logger برای Netty -->
+    <logger name="io.netty" level="WARN"/>
+    <!-- نام logger: Netty -->
+    <!-- سطح لاگ: WARN (فقط هشدارها) -->
+    <!-- لاگ‌های اضافی Netty کاهش یافته‌اند -->
+    
+</configuration>
+<!-- پایان فایل پیکربندی Logback -->
+<!-- این فایل سیستم لاگ کامل و بهینه‌سازی شده را تعریف می‌کند -->
+<!-- شامل لاگ‌های مختلف برای بخش‌های مختلف سیستم است -->
+<!-- و عملکرد بهتری نسبت به لاگ‌های پیش‌فرض دارد --> 

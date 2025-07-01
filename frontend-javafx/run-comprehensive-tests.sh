@@ -9,6 +9,8 @@
 # نسخه: ۲.۰ - سیستم تست جامع پیشرفته
 # ================================================================
 
+# نمایش هدر و اطلاعات اولیه
+# ----------------------------------------------------------------
 echo "================================================================================"
 echo "🎯 FOOD ORDERING SYSTEM - COMPREHENSIVE TEST EXECUTION"
 echo "📅 Date: $(date)"
@@ -24,6 +26,7 @@ if ! command -v mvn &> /dev/null; then
     echo "💡 Or download from: https://maven.apache.org/download.cgi"
     exit 1
 fi
+# اگر Maven نصب باشد پیام موفقیت نمایش داده می‌شود
 echo "✅ Maven found"
 
 # بررسی نصب بودن Java - محیط اجرایی مورد نیاز
@@ -32,6 +35,7 @@ if ! command -v java &> /dev/null; then
     echo "💡 Install with: sudo apt-get install openjdk-17-jdk"
     exit 1
 fi
+# اگر Java نصب باشد پیام موفقیت نمایش داده می‌شود
 echo "✅ Java found"
 
 # بررسی وجود پروژه backend - برای تست‌های یکپارچگی
@@ -40,14 +44,15 @@ if [ ! -f "../backend/pom.xml" ]; then
     echo "💡 Make sure backend folder exists in parent directory"
     exit 1
 fi
+# اگر پروژه بک‌اند وجود داشته باشد پیام موفقیت نمایش داده می‌شود
 echo "✅ Backend project found"
 
 echo ""
 echo "🚀 Starting Backend Server..."  # راه‌اندازی سرور بک‌اند برای تست‌های یکپارچگی
-cd ../backend
+cd ../backend  # ورود به پوشه بک‌اند
 mvn spring-boot:run &   # اجرای سرور بک‌اند در پس‌زمینه
 BACKEND_PID=$!          # ذخیره شناسه فرآیند سرور
-cd ../frontend-javafx
+cd ../frontend-javafx   # بازگشت به پوشه فرانت‌اند
 
 echo "⏳ Waiting for backend to start (30 seconds)..."  # صبر برای راه‌اندازی کامل سرور
 sleep 30

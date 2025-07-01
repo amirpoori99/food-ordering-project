@@ -89,7 +89,20 @@ class NotificationIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        testDatabaseManager.clearNotifications();
+        // Clear only notification data, not users
+        testDatabaseManager.clearNotificationData();
+        
+        // Verify test users still exist
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            User user1 = session.get(User.class, testUser1.getId());
+            User user2 = session.get(User.class, testUser2.getId());
+            User user3 = session.get(User.class, testUser3.getId());
+            
+            if (user1 == null || user2 == null || user3 == null) {
+                System.out.println("⚠️ Test users were deleted, recreating...");
+                createTestUsers();
+            }
+        }
     }
 
     private static void createTestUsers() {

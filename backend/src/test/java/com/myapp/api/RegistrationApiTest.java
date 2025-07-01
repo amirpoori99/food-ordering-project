@@ -3,14 +3,18 @@ package com.myapp.api;
 import com.myapp.auth.AuthRepository;
 import com.myapp.auth.AuthService;
 import com.myapp.common.models.User;
+import com.myapp.common.utils.SQLiteTestHelper;
+import com.myapp.common.utils.DatabaseUtil;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.api.Nested;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -70,11 +74,22 @@ import static org.assertj.core.api.Assertions.*;
 @DisplayName("Registration API Comprehensive Tests")
 class RegistrationApiTest {
 
+    /** Factory برای ایجاد session های دیتابیس */
+    private static SessionFactory sessionFactory;
+    
     /** Repository برای دسترسی به پایگاه داده کاربران */
     private AuthRepository repo;
     
     /** Service برای منطق کسب‌وکار احراز هویت */
     private AuthService authService;
+
+    /**
+     * راه‌اندازی کلاس تست - فقط یک بار اجرا می‌شود
+     */
+    @BeforeAll
+    static void setUpClass() {
+        sessionFactory = DatabaseUtil.getSessionFactory();
+    }
 
     /**
      * راه‌اندازی اولیه قبل از هر تست
@@ -670,19 +685,22 @@ class RegistrationApiTest {
             // Act - ثبت نام کاربر
             User saved = authService.registerUser(user);
             
-            // Assert - تأیید persistence
-            assertThat(repo.findById(saved.getId())).isPresent();
-            assertThat(repo.findByPhone(phone)).isPresent();
-            
-            // بررسی یکپارچگی داده‌ها
-            User retrieved = repo.findByPhone(phone).get();
-            assertThat(retrieved.getId()).isEqualTo(saved.getId());
-            assertThat(retrieved.getFullName()).isEqualTo(saved.getFullName());
-            assertThat(retrieved.getPhone()).isEqualTo(saved.getPhone());
-            assertThat(retrieved.getEmail()).isEqualTo(saved.getEmail());
-            assertThat(retrieved.getPasswordHash()).isEqualTo(saved.getPasswordHash());
-            assertThat(retrieved.getAddress()).isEqualTo(saved.getAddress());
-            assertThat(retrieved.getRole()).isEqualTo(saved.getRole());
+            // Assert - تأیید persistence با retry logic برای SQLite
+            com.myapp.common.utils.SQLiteTestHelper.executeWithRetry(DatabaseUtil.getSessionFactory(), () -> {
+                assertThat(repo.findById(saved.getId())).isPresent();
+                assertThat(repo.findByPhone(phone)).isPresent();
+                
+                // بررسی یکپارچگی داده‌ها
+                User retrieved = repo.findByPhone(phone).get();
+                assertThat(retrieved.getId()).isEqualTo(saved.getId());
+                assertThat(retrieved.getFullName()).isEqualTo(saved.getFullName());
+                assertThat(retrieved.getPhone()).isEqualTo(saved.getPhone());
+                assertThat(retrieved.getEmail()).isEqualTo(saved.getEmail());
+                assertThat(retrieved.getPasswordHash()).isEqualTo(saved.getPasswordHash());
+                assertThat(retrieved.getAddress()).isEqualTo(saved.getAddress());
+                assertThat(retrieved.getRole()).isEqualTo(saved.getRole());
+                return null;
+            });
         }
 
         /**
@@ -839,7 +857,8 @@ class RegistrationApiTest {
             User user = User.forRegistration(whitespaceName, phone, whitespaceEmail, "hashed_pass", whitespaceAddress);
             
             // Act
-            User saved = authService.registerUser(user);
+            User saved = com.myapp.common.utils.SQLiteTestHelper.executeWithRetry(DatabaseUtil.getSessionFactory(), () -> 
+                authService.registerUser(user));
             
             // Assert - حفظ whitespace ها
             assertThat(saved.getFullName()).isEqualTo(whitespaceName);
@@ -863,7 +882,8 @@ class RegistrationApiTest {
             User user = User.forRegistration(numericName, phone, "numeric@example.com", "hashed_pass", "Tehran");
             
             // Act
-            User saved = authService.registerUser(user);
+            User saved = com.myapp.common.utils.SQLiteTestHelper.executeWithRetry(DatabaseUtil.getSessionFactory(), () -> 
+                authService.registerUser(user));
             
             // Assert - پذیرش نام عددی
             assertThat(saved.getFullName()).isEqualTo(numericName);

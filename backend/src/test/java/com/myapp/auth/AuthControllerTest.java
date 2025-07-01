@@ -402,8 +402,8 @@ class AuthControllerTest {
     @Test
     void register_delegatesToService() {
         // Arrange
-        RegisterRequest req = new RegisterRequest("Test", "09120000001", null, "hash", User.Role.BUYER, "Addr");
-        User expected = new User(1, "Test", "09120000001", null, "hash", User.Role.BUYER, "Addr");
+        RegisterRequest req = new RegisterRequest("Test", "09120000001", "", "hash", User.Role.BUYER, "Addr");
+        User expected = new User(1, "Test", "09120000001", "", "hash", User.Role.BUYER, "Addr");
         when(service.register(req)).thenReturn(expected);
 
         // Act
@@ -422,7 +422,7 @@ class AuthControllerTest {
     @Test
     void login_delegatesToService() {
         // Arrange
-        User expected = new User(2, "Ali", "09120000002", null, "hash2", User.Role.BUYER, "A");
+        User expected = new User(2, "Ali", "09120000002", "", "hash2", User.Role.BUYER, "A");
         when(service.login("09120000002", "hash2")).thenReturn(expected);
 
         // Act

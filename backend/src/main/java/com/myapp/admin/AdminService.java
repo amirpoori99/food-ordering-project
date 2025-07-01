@@ -635,9 +635,15 @@ public class AdminService {
      * شامل تمام معیارهای کلیدی عملکرد سیستم
      * 
      * @return آمار کلی سیستم
+     * @throws RuntimeException در صورت خطای دیتابیس
      */
     public AdminRepository.SystemStatistics getSystemStatistics() {
-        return adminRepository.getSystemStatistics();
+        try {
+            return adminRepository.getSystemStatistics();
+        } catch (Exception e) {
+            // در صورت خطا، RuntimeException برمی‌گردانیم
+            throw new RuntimeException("Database error", e);
+        }
     }
     
     /**

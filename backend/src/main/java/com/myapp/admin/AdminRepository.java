@@ -719,6 +719,9 @@ public class AdminRepository {
                 totalRevenue, totalRefunds, todayOrders, todayRevenue,
                 activeRestaurants, pendingOrders, activeDeliveries
             );
+        } catch (Exception e) {
+            // در صورت خطا، آمار خالی برمی‌گردانیم
+            return new SystemStatistics(0L, 0L, 0L, 0L, 0.0, 0.0, 0L, 0.0, 0L, 0L, 0L);
         }
     }
     

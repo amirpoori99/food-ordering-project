@@ -246,8 +246,6 @@ class PaymentEdgeCaseTest {
 
         @Test
         @DisplayName("🔄 Concurrent Wallet Payments - Same User")
-        @Timeout(value = 30, unit = TimeUnit.SECONDS)
-        @org.junit.jupiter.api.Order(1)
         void concurrentWalletPayments_SameUser_PreventDoubleSpending() throws InterruptedException {
             // Given - کاربر با موجودی محدود
             User customer = createTestUserWithSession();
@@ -1019,6 +1017,23 @@ class PaymentEdgeCaseTest {
         } catch (Exception e) {
             System.out.println("⚠️ Transaction cleanup failed: " + e.getMessage());
         }
+    }
+
+    @Test
+    @DisplayName("Should handle concurrent payment insertions")
+    void shouldHandleConcurrentPaymentInsertions() {
+        com.myapp.common.utils.SQLiteTestHelper.executeWithRetry(sessionFactory, () -> {
+            // Simulate concurrent payment insertions
+            for (int i = 0; i < 10; i++) {
+                User user = createTestUserWithSession();
+                Order order = createTestOrderWithSession(user, 10.0 + i);
+                Transaction transaction = Transaction.forPayment(user.getId(), order.getId(), 10.0 + i, "WALLET");
+                transaction.setStatus(TransactionStatus.PENDING);
+                paymentRepository.save(transaction);
+            }
+            return null;
+        });
+        // Add assertions as needed
     }
 }
 

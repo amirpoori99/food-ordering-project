@@ -116,6 +116,18 @@ public class TestDatabaseManager {
     }
     
     /**
+     * پاک‌سازی فقط داده‌های notification بدون حذف کاربران
+     * 
+     * Scenario: پاک‌سازی انتخابی notifications برای تست‌های که نیاز به حفظ کاربران دارند
+     * 
+     * این متد فقط notification ها را حذف می‌کند و کاربران را دست‌نخورده نگه می‌دارد
+     * مناسب برای تست‌هایی که کاربران ثابت نیاز دارند
+     */
+    public void clearNotificationData() {
+        clearNotifications();
+    }
+    
+    /**
      * پاک‌سازی تمام داده‌های rating از پایگاه داده
      * 
      * Scenario: پاک‌سازی انتخابی فقط رتبه‌بندی‌ها
@@ -199,6 +211,15 @@ public class TestDatabaseManager {
             }
             logger.error("Error cleaning test data: {}", e.getMessage(), e);
         }
+    }
+    
+    /**
+     * پاک‌سازی تمام داده‌های تست (alias برای cleanAllTestData)
+     * 
+     * این متد wrapper برای cleanAllTestData است تا با نام‌گذاری تست‌ها سازگار باشد
+     */
+    public void clearAllData() {
+        cleanAllTestData();
     }
     
     /**

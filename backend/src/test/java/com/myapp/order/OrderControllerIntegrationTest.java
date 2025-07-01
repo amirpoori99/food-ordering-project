@@ -142,7 +142,8 @@ class OrderControllerIntegrationTest {
                 try {
             orderService.updateItemQuantity(order.getId(), item1.getId(), 3);
                     Order updatedOrder = orderService.getOrder(order.getId());
-                    assertEquals(77.97 + 18.99, updatedOrder.getTotalAmount(), 0.01, "مبلغ کل پس از تغییر تعداد اشتباه است");
+                    // محاسبه صحیح: (25.99 * 3) + 18.99 = 77.97 + 18.99 = 96.96
+                    assertEquals(96.96, updatedOrder.getTotalAmount(), 0.01, "مبلغ کل پس از تغییر تعداد اشتباه است");
                     System.out.println("✅ تعداد آیتم با موفقیت به‌روزرسانی شد");
                 } catch (Exception e) {
                     System.out.println("⚠️  مشکل در به‌روزرسانی تعداد آیتم");

@@ -1003,13 +1003,11 @@ public class RatingRepositoryTest {
         @Test
         @DisplayName("Should handle very long review text")
         void shouldHandleVeryLongReviewText() {
-            String longReview = "A".repeat(999); // Just under 1000 char limit
-            testRating.setReviewText(longReview);
-
-            assertDoesNotThrow(() -> {
-                Rating savedRating = ratingRepository.save(testRating);
-                assertEquals(longReview, savedRating.getReviewText());
-            });
+            String longReview = "a".repeat(10000);
+            Rating rating = new Rating(testUser, testRestaurant, 5, longReview);
+            Rating saved = com.myapp.common.utils.SQLiteTestHelper.executeWithRetry(DatabaseUtil.getSessionFactory(), () -> ratingRepository.save(rating));
+            assertNotNull(saved);
+            assertEquals(longReview, saved.getReviewText());
         }
 
         @Test

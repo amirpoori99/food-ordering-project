@@ -23,6 +23,7 @@ com\myapp\menu\MenuController.class
 com\myapp\common\models\Rating.class
 com\myapp\menu\MenuService$MenuStatistics.class
 com\myapp\common\utils\JsonUtil.class
+com\myapp\common\utils\SQLiteTransactionManager.class
 com\myapp\common\constants\ApplicationConstants$DATABASE.class
 com\myapp\notification\NotificationRepository.class
 com\myapp\payment\PaymentRepository.class

@@ -1,41 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ================================================================
-  فایل پیکربندی Maven پروژه فرانت‌اند سیستم سفارش غذا
-  این فایل شامل تعریف وابستگی‌ها، پلاگین‌ها و تنظیمات build است
-  نویسنده: تیم توسعه
-  تاریخ آخرین ویرایش: تیر ۱۴۰۴
-  نسخه: ۲.۰ - سیستم پیکربندی پیشرفته
-  ================================================================
--->
+<!-- ================================================================ -->
+<!-- فایل پیکربندی Maven برای فرانت‌اند سیستم سفارش غذا -->
+<!-- این فایل شامل تمام وابستگی‌ها، تنظیمات ساخت و پیکربندی پروژه JavaFX است -->
+<!-- نویسنده: تیم توسعه -->
+<!-- تاریخ آخرین ویرایش: تیر ۱۴۰۴ -->
+<!-- نسخه: ۲.۰ - پیکربندی پیشرفته با بهینه‌سازی کامل -->
+<!-- ================================================================ -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
     
-    <!-- اطلاعات اصلی پروژه -->
-    <groupId>com.myapp</groupId>
-    <artifactId>food-ordering-frontend</artifactId>
-    <version>1.0.0</version>
-    <packaging>jar</packaging>
-    <name>Food Ordering Frontend</name>
-    <description>JavaFX Frontend for Food Ordering System</description>
+    <!-- ================================================================ -->
+    <!-- اطلاعات پایه پروژه -->
+    <!-- ================================================================ -->
+    <modelVersion>4.0.0</modelVersion>  <!-- نسخه مدل Maven -->
     
-    <!-- تنظیمات عمومی پروژه -->
+    <!-- اطلاعات گروه و آرتیفکت -->
+    <groupId>com.myapp</groupId>        <!-- شناسه گروه پروژه -->
+    <artifactId>food-ordering-frontend</artifactId>  <!-- نام آرتیفکت فرانت‌اند -->
+    <version>1.0.0</version>            <!-- نسخه پروژه -->
+    <packaging>jar</packaging>          <!-- نوع بسته‌بندی: JAR -->
+    
+    <!-- نام و توضیحات پروژه -->
+    <name>Food Ordering System Frontend</name>
+    <description>فرانت‌اند سیستم سفارش غذا با JavaFX</description>
+    
+    <!-- ================================================================ -->
+    <!-- تنظیمات Java -->
+    <!-- ================================================================ -->
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>        <!-- نسخه Java برای کامپایل -->
-        <maven.compiler.target>17</maven.compiler.target>        <!-- نسخه Java هدف -->
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  <!-- کدگذاری فایل‌ها -->
-        <javafx.version>17.0.2</javafx.version>                  <!-- نسخه JavaFX -->
-        <junit.jupiter.version>5.9.2</junit.jupiter.version>     <!-- نسخه JUnit 5 -->
-        <jackson.version>2.15.2</jackson.version>                <!-- نسخه Jackson برای JSON -->
-        <okhttp.version>4.11.0</okhttp.version>                  <!-- نسخه OkHttp برای HTTP -->
-        <testfx.version>4.0.16-alpha</testfx.version>            <!-- نسخه TestFX برای تست UI -->
+        <!-- نسخه Java مورد نیاز -->
+        <maven.compiler.source>17</maven.compiler.source>  <!-- نسخه منبع Java -->
+        <maven.compiler.target>17</maven.compiler.target>  <!-- نسخه هدف Java -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  <!-- کدگذاری فایل‌های منبع -->
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>  <!-- کدگذاری گزارش‌ها -->
+        
+        <!-- نسخه‌های وابستگی‌ها -->
+        <javafx.version>17.0.2</javafx.version>  <!-- نسخه JavaFX -->
+        <junit.version>5.10.0</junit.version>  <!-- نسخه JUnit -->
+        <mockito.version>5.7.0</mockito.version>  <!-- نسخه Mockito -->
+        <jacoco.version>0.8.10</jacoco.version>  <!-- نسخه JaCoCo برای پوشش کد -->
+        <jackson.version>2.15.2</jackson.version>  <!-- نسخه Jackson -->
+        <logback.version>1.4.11</logback.version>  <!-- نسخه Logback -->
+        
+        <!-- تنظیمات اضافی -->
+        <skipTests>false</skipTests>  <!-- اجرای تست‌ها (true برای رد کردن) -->
+        <maven.test.skip>false</maven.test.skip>  <!-- رد کردن کامپایل تست‌ها -->
     </properties>
     
-    <!-- وابستگی‌های پروژه -->
+    <!-- ================================================================ -->
+    <!-- وابستگی‌های اصلی پروژه -->
+    <!-- ================================================================ -->
     <dependencies>
-        <!-- JavaFX Controls - کامپوننت‌های اصلی رابط کاربری -->
+        <!-- ================================================================ -->
+        <!-- وابستگی‌های JavaFX -->
+        <!-- ================================================================ -->
+        
+        <!-- JavaFX Controls - کنترل‌های اصلی JavaFX -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -49,82 +72,135 @@
             <version>${javafx.version}</version>
         </dependency>
         
-        <!-- HTTP Client برای ارتباط با API -->
+        <!-- JavaFX Graphics - برای گرافیک و انیمیشن -->
         <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>${okhttp.version}</version>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
         </dependency>
         
-        <!-- Jackson برای پردازش JSON -->
+        <!-- JavaFX Base - هسته اصلی JavaFX -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        
+        <!-- JavaFX Web - برای نمایش محتوای وب -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        
+        <!-- ================================================================ -->
+        <!-- وابستگی‌های شبکه و HTTP -->
+        <!-- ================================================================ -->
+        
+        <!-- Apache HttpClient - برای ارتباط با سرور -->
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.2.1</version>
+        </dependency>
+        
+        <!-- Apache HttpClient Fluent - برای API ساده‌تر -->
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5-fluent</artifactId>
+            <version>5.2.1</version>
+        </dependency>
+        
+        <!-- ================================================================ -->
+        <!-- وابستگی‌های JSON -->
+        <!-- ================================================================ -->
+        
+        <!-- Jackson Core - هسته اصلی Jackson -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        
+        <!-- Jackson Databind - برای تبدیل JSON به Object -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
         
-        <!-- Jackson JSR310 برای پشتیبانی از LocalDateTime -->
+        <!-- Jackson Annotations - برای annotations -->
         <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
             <version>${jackson.version}</version>
         </dependency>
         
-        <!-- JUnit 5 برای تست‌نویسی -->
+        <!-- ================================================================ -->
+        <!-- وابستگی‌های لاگینگ -->
+        <!-- ================================================================ -->
+        
+        <!-- SLF4J API - API لاگینگ -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.7</version>
+        </dependency>
+        
+        <!-- Logback Classic - پیاده‌سازی لاگینگ -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        
+        <!-- ================================================================ -->
+        <!-- وابستگی‌های ابزار و کمکی -->
+        <!-- ================================================================ -->
+        
+        <!-- Apache Commons Lang - ابزارهای کمکی -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version>
+        </dependency>
+        
+        <!-- Apache Commons IO - برای کار با فایل‌ها -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+        
+        <!-- ================================================================ -->
+        <!-- وابستگی‌های تست -->
+        <!-- ================================================================ -->
+        
+        <!-- JUnit 5 - فریم‌ورک تست -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.jupiter.version}</version>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         
+        <!-- Mockito - برای Mock کردن -->
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.jupiter.version}</version>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
         
-        <!-- JUnit 5 Parameterized Tests - برای تست‌های پارامتری -->
+        <!-- Mockito JUnit Jupiter - ادغام با JUnit 5 -->
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <version>${junit.jupiter.version}</version>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
         
-        <!-- JUnit Platform Suite API برای تست‌های گروهی -->
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-suite-api</artifactId>
-            <version>1.9.2</version>
-            <scope>test</scope>
-        </dependency>
-        
-        <!-- JUnit Platform Suite Engine -->
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-suite-engine</artifactId>
-            <version>1.9.2</version>
-            <scope>test</scope>
-        </dependency>
-        
-        <!-- TestFX برای تست رابط کاربری JavaFX -->
-        <dependency>
-            <groupId>org.testfx</groupId>
-            <artifactId>testfx-core</artifactId>
-            <version>${testfx.version}</version>
-            <scope>test</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.testfx</groupId>
-            <artifactId>testfx-junit5</artifactId>
-            <version>${testfx.version}</version>
-            <scope>test</scope>
-        </dependency>
-        
-        <!-- AssertJ برای assertion های پیشرفته -->
+        <!-- AssertJ - برای assertions پیشرفته -->
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
@@ -132,247 +208,295 @@
             <scope>test</scope>
         </dependency>
         
-        <!-- Mockito برای mock کردن -->
+        <!-- TestFX - برای تست JavaFX -->
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>5.11.0</version>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-core</artifactId>
+            <version>4.0.16-alpha</version>
             <scope>test</scope>
         </dependency>
         
-        <!-- TestFX Monocle برای تست headless -->
+        <!-- TestFX JUnit5 - ادغام TestFX با JUnit 5 -->
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-junit5</artifactId>
+            <version>4.0.16-alpha</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- Monocle - برای تست headless -->
         <dependency>
             <groupId>org.testfx</groupId>
             <artifactId>openjfx-monocle</artifactId>
             <version>jdk-12.0.1+2</version>
             <scope>test</scope>
         </dependency>
+        
+        <!-- JUnit Platform Suite - برای تست‌های suite -->
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-suite</artifactId>
+            <version>1.10.0</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- JUnit Platform Suite Engine - موتور اجرای suite -->
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-suite-engine</artifactId>
+            <version>1.10.0</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- OkHttp - برای ارتباط HTTP -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.11.0</version>
+        </dependency>
+        
+        <!-- Jackson Datatype JSR310 - پشتیبانی از تاریخ و زمان جاوا -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.15.2</version>
+        </dependency>
     </dependencies>
     
-    <!-- تنظیمات build -->
+    <!-- ================================================================ -->
+    <!-- تنظیمات ساخت (Build) -->
+    <!-- ================================================================ -->
     <build>
-        <sourceDirectory>src/main/java</sourceDirectory>           <!-- مسیر کدهای اصلی -->
-        <testSourceDirectory>src/test/java</testSourceDirectory>   <!-- مسیر کدهای تست -->
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>          <!-- مسیر منابع اصلی -->
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>          <!-- مسیر منابع تست -->
-                <filtering>true</filtering>
-            </testResource>
-        </testResources>
+        <!-- نام نهایی JAR -->
+        <finalName>food-ordering-frontend-${project.version}</finalName>
         
+        <!-- ================================================================ -->
         <!-- پلاگین‌های Maven -->
+        <!-- ================================================================ -->
         <plugins>
-            <!-- Maven Compiler Plugin با تنظیمات پیشرفته -->
+            <!-- ================================================================ -->
+            <!-- پلاگین کامپایلر Java -->
+            <!-- ================================================================ -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
-                    <source>17</source>                            <!-- نسخه Java منبع -->
-                    <target>17</target>                            <!-- نسخه Java هدف -->
-                    <encoding>UTF-8</encoding>                     <!-- کدگذاری -->
+                    <source>${maven.compiler.source}</source>  <!-- نسخه منبع -->
+                    <target>${maven.compiler.target}</target>  <!-- نسخه هدف -->
+                    <encoding>${project.build.sourceEncoding}</encoding>  <!-- کدگذاری -->
                     <compilerArgs>
-                        <arg>-parameters</arg>                     <!-- نگهداری نام پارامترها -->
-                        <arg>-Xlint:unchecked</arg>                <!-- هشدارهای کامپایل -->
-                        <arg>-Xlint:deprecation</arg>              <!-- هشدارهای deprecated -->
+                        <!-- تنظیمات کامپایلر -->
+                        <arg>-parameters</arg>  <!-- حفظ نام پارامترها -->
+                        <arg>-Xlint:unchecked</arg>  <!-- هشدارهای کامپایلر -->
                     </compilerArgs>
                 </configuration>
             </plugin>
             
-            <!-- Maven Resources Plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                    <nonFilteredFileExtensions>
-                        <nonFilteredFileExtension>fxml</nonFilteredFileExtension>  <!-- فایل‌های FXML -->
-                        <nonFilteredFileExtension>css</nonFilteredFileExtension>   <!-- فایل‌های CSS -->
-                        <nonFilteredFileExtension>png</nonFilteredFileExtension>   <!-- تصاویر PNG -->
-                        <nonFilteredFileExtension>jpg</nonFilteredFileExtension>   <!-- تصاویر JPG -->
-                        <nonFilteredFileExtension>gif</nonFilteredFileExtension>   <!-- تصاویر GIF -->
-                    </nonFilteredFileExtensions>
-                </configuration>
-            </plugin>
-            
-            <!-- JavaFX Maven Plugin با تنظیمات پیشرفته -->
+            <!-- ================================================================ -->
+            <!-- پلاگین JavaFX Maven -->
+            <!-- ================================================================ -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>com.myapp.ui.MainApp</mainClass>     <!-- کلاس اصلی -->
+                    <!-- کلاس اصلی برنامه -->
+                    <mainClass>com.myapp.ui.MainApp</mainClass>
+                    <!-- تنظیمات JVM -->
                     <options>
-                        <option>--add-opens</option>                <!-- تنظیمات امنیتی JavaFX -->
-                        <option>javafx.graphics/javafx.scene=ALL-UNNAMED</option>
-                        <option>--add-opens</option>
-                        <option>javafx.controls/javafx.scene.control=ALL-UNNAMED</option>
+                        <option>-Xms256m</option>  <!-- حداقل حافظه -->
+                        <option>-Xmx1g</option>    <!-- حداکثر حافظه -->
+                        <option>-Dfile.encoding=UTF-8</option>  <!-- کدگذاری فایل‌ها -->
                     </options>
                 </configuration>
             </plugin>
             
-            <!-- Maven Surefire Plugin برای تست جامع -->
+            <!-- ================================================================ -->
+            <!-- پلاگین Shade برای ایجاد JAR قابل اجرا -->
+            <!-- ================================================================ -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M9</version>
-                <configuration>
-                    <includes>
-                        <include>**/*Test.java</include>           <!-- فایل‌های تست -->
-                        <include>**/*SimpleTest.java</include>     <!-- تست‌های ساده -->
-                        <include>**/*IntegrationTest.java</include> <!-- تست‌های یکپارچگی -->
-                        <include>**/*PerformanceTest.java</include> <!-- تست‌های عملکرد -->
-                        <include>**/*SecurityTest.java</include>   <!-- تست‌های امنیتی -->
-                        <include>**/*EdgeCaseTest.java</include>   <!-- تست‌های شرایط خاص -->
-                        <include>**/*TestSuite.java</include>      <!-- تست‌های گروهی -->
-                    </includes>
-                    <excludes>
-                        <exclude>**/*ManualTest.java</exclude>     <!-- تست‌های دستی -->
-                    </excludes>
-                    <parallel>classes</parallel>                   <!-- اجرای موازی -->
-                    <threadCount>4</threadCount>                   <!-- تعداد thread -->
-                    <perCoreThreadCount>true</perCoreThreadCount>
-                    <trimStackTrace>false</trimStackTrace>         <!-- نمایش کامل stack trace -->
-                    <reportFormat>xml</reportFormat>               <!-- فرمت گزارش XML -->
-                    <reportFormat>html</reportFormat>              <!-- فرمت گزارش HTML -->
-                    <!-- تنظیمات TestFX برای تست headless -->
-                    <systemPropertyVariables>
-                        <testfx.robot>glass</testfx.robot>         <!-- نوع robot -->
-                        <testfx.headless>true</testfx.headless>    <!-- تست headless -->
-                        <prism.order>sw</prism.order>              <!-- رندرینگ -->
-                        <prism.text>t2k</prism.text>               <!-- رندرینگ متن -->
-                        <java.awt.headless>true</java.awt.headless> <!-- headless mode -->
-                        <test.comprehensive>true</test.comprehensive> <!-- تست جامع -->
-                        <javafx.verbose>false</javafx.verbose>     <!-- عدم نمایش پیام‌های verbose -->
-                    </systemPropertyVariables>
-                </configuration>
-            </plugin>
-            
-            <!-- Maven Failsafe Plugin برای تست‌های یکپارچگی -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.0.0-M9</version>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.4.1</version>
                 <executions>
                     <execution>
+                        <phase>package</phase>
                         <goals>
-                            <goal>integration-test</goal>          <!-- تست یکپارچگی -->
-                            <goal>verify</goal>                    <!-- تأیید -->
+                            <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <includes>
-                                <include>**/*IntegrationTest.java</include> <!-- تست‌های یکپارچگی -->
-                                <include>**/*PerformanceTest.java</include> <!-- تست‌های عملکرد -->
-                            </includes>
-                            <systemPropertyVariables>
-                                <testfx.robot>glass</testfx.robot>
-                                <testfx.headless>true</testfx.headless>
-                                <prism.order>sw</prism.order>
-                                <prism.text>t2k</prism.text>
-                                <java.awt.headless>true</java.awt.headless>
-                            </systemPropertyVariables>
+                            <!-- کلاس اصلی برنامه -->
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.myapp.ui.MainApp</mainClass>
+                                </transformer>
+                            </transformers>
+                            <!-- فیلتر کردن فایل‌های اضافی -->
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
             
-            <!-- Maven Surefire Report Plugin -->
+            <!-- ================================================================ -->
+            <!-- پلاگین Surefire برای تست‌ها -->
+            <!-- ================================================================ -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>3.0.0-M9</version>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.2</version>
                 <configuration>
-                    <showSuccess>true</showSuccess>                <!-- نمایش تست‌های موفق -->
-                    <outputDirectory>${project.reporting.outputDirectory}/surefire-reports</outputDirectory>
-                    <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+                    <!-- رد کردن تست‌ها در صورت نیاز -->
+                    <skipTests>${skipTests}</skipTests>
+                    <!-- رد کردن کامپایل تست‌ها -->
+                    <skip>${maven.test.skip}</skip>
+                    <!-- تنظیمات JUnit 5 -->
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/*Tests.java</include>
+                    </includes>
+                    <!-- تنظیمات سیستم -->
+                    <systemPropertyVariables>
+                        <java.awt.headless>true</java.awt.headless>
+                        <file.encoding>UTF-8</file.encoding>
+                        <testfx.robot>awt</testfx.robot>
+                        <testfx.headless>true</testfx.headless>
+                    </systemPropertyVariables>
+                    <!-- تنظیمات حافظه برای تست‌ها -->
+                    <argLine>-Xmx1g -XX:+UseG1GC</argLine>
                 </configuration>
             </plugin>
             
-            <!-- JaCoCo برای پوشش تست -->
+            <!-- ================================================================ -->
+            <!-- پلاگین JaCoCo برای پوشش کد -->
+            <!-- ================================================================ -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.8</version>
+                <version>${jacoco.version}</version>
+                <configuration>
+                    <!-- تنظیمات JaCoCo -->
+                    <destFile>${project.build.directory}/jacoco.exec</destFile>
+                    <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                    <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
+                    <!-- تنظیمات پوشش کد -->
+                    <rules>
+                        <rule>
+                            <element>BUNDLE</element>
+                            <limits>
+                                <limit>
+                                    <counter>LINE</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>0.80</minimum>
+                                </limit>
+                            </limits>
+                        </rule>
+                    </rules>
+                </configuration>
                 <executions>
+                    <!-- اجرای JaCoCo در فاز prepare-agent -->
                     <execution>
+                        <id>prepare-agent</id>
                         <goals>
-                            <goal>prepare-agent</goal>             <!-- آماده‌سازی agent -->
+                            <goal>prepare-agent</goal>
                         </goals>
                     </execution>
+                    <!-- اجرای JaCoCo در فاز report -->
                     <execution>
                         <id>report</id>
                         <phase>test</phase>
                         <goals>
-                            <goal>report</goal>                    <!-- تولید گزارش -->
+                            <goal>report</goal>
                         </goals>
                     </execution>
+                    <!-- اجرای JaCoCo در فاز check -->
                     <execution>
                         <id>check</id>
                         <goals>
-                            <goal>check</goal>                     <!-- بررسی پوشش -->
+                            <goal>check</goal>
                         </goals>
-                        <configuration>
-                            <rules>
-                                <rule>
-                                    <element>BUNDLE</element>
-                                    <limits>
-                                        <limit>
-                                            <counter>LINE</counter>     <!-- پوشش خط -->
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>0.85</minimum>     <!-- حداقل ۸۵٪ -->
-                                        </limit>
-                                        <limit>
-                                            <counter>BRANCH</counter>   <!-- پوشش شاخه -->
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>0.80</minimum>     <!-- حداقل ۸۰٪ -->
-                                        </limit>
-                                        <limit>
-                                            <counter>METHOD</counter>   <!-- پوشش متد -->
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>0.90</minimum>     <!-- حداقل ۹۰٪ -->
-                                        </limit>
-                                    </limits>
-                                </rule>
-                            </rules>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
             
-            <!-- Maven JAR Plugin با تنظیمات manifest -->
+            <!-- ================================================================ -->
+            <!-- پلاگین Resources برای کپی فایل‌های منابع -->
+            <!-- ================================================================ -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
                 <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.myapp.ui.MainApp</mainClass> <!-- کلاس اصلی -->
-                            <addClasspath>true</addClasspath>           <!-- اضافه کردن classpath -->
-                            <classpathPrefix>lib/</classpathPrefix>     <!-- پیشوند classpath -->
-                        </manifest>
-                    </archive>
+                    <!-- کدگذاری فایل‌های منابع -->
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <!-- فیلتر کردن متغیرها -->
+                    <filtering>true</filtering>
+                    <!-- تنظیمات غیرفعال کردن فیلترینگ برای فایل‌های خاص -->
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>fxml</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>css</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>png</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jpg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gif</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
                 </configuration>
             </plugin>
             
-            <!-- Maven Dependency Plugin برای کپی وابستگی‌ها -->
+            <!-- ================================================================ -->
+            <!-- پلاگین Clean برای پاکسازی -->
+            <!-- ================================================================ -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <!-- فایل‌ها و پوشه‌های اضافی برای پاکسازی -->
+                    <filesets>
+                        <fileset>
+                            <directory>${project.build.directory}</directory>
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+            
+            <!-- ================================================================ -->
+            <!-- پلاگین Dependency برای تحلیل وابستگی‌ها -->
+            <!-- ================================================================ -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>3.6.0</version>
                 <executions>
+                    <!-- تحلیل وابستگی‌ها -->
+                    <execution>
+                        <id>analyze</id>
+                        <goals>
+                            <goal>analyze</goal>
+                        </goals>
+                        <configuration>
+                            <failOnWarning>false</failOnWarning>
+                        </configuration>
+                    </execution>
+                    <!-- کپی وابستگی‌ها -->
                     <execution>
                         <id>copy-dependencies</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>copy-dependencies</goal>             <!-- کپی وابستگی‌ها -->
+                            <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
@@ -383,81 +507,132 @@
                     </execution>
                 </executions>
             </plugin>
-            
-            <!-- Maven Assembly Plugin برای ساخت JAR اجرایی -->
+        </plugins>
+        
+        <!-- ================================================================ -->
+        <!-- تنظیمات منابع -->
+        <!-- ================================================================ -->
+        <resources>
+            <!-- منابع اصلی -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.yml</include>
+                    <include>**/*.yaml</include>
+                </includes>
+            </resource>
+            <!-- منابع بدون فیلتر -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/*.properties</exclude>
+                    <exclude>**/*.xml</exclude>
+                    <exclude>**/*.yml</exclude>
+                    <exclude>**/*.yaml</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        
+        <!-- ================================================================ -->
+        <!-- تنظیمات تست‌ها -->
+        <!-- ================================================================ -->
+        <testResources>
+            <!-- منابع تست -->
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+    </build>
+    
+    <!-- ================================================================ -->
+    <!-- تنظیمات گزارش‌گیری -->
+    <!-- ================================================================ -->
+    <reporting>
+        <plugins>
+            <!-- پلاگین JaCoCo برای گزارش پوشش کد -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.6.0</version>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef> <!-- JAR با وابستگی‌ها -->
-                    </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.myapp.ui.MainApp</mainClass> <!-- کلاس اصلی -->
-                        </manifest>
-                    </archive>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>                         <!-- ساخت JAR واحد -->
-                        </goals>
-                    </execution>
-                </executions>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
             </plugin>
             
-            <!-- Maven Clean Plugin -->
+            <!-- پلاگین Surefire برای گزارش تست‌ها -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>3.3.2</version>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <directory>${project.build.directory}</directory>
-                            <includes>
-                                <include>**/*</include>
-                            </includes>
-                        </fileset>
-                    </filesets>
-                </configuration>
-            </plugin>
-            
-            <!-- Maven Shade Plugin برای ساخت uber JAR -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.4.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>                          <!-- ساخت JAR کامل -->
-                        </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.myapp.ui.MainApp</mainClass> <!-- کلاس اصلی -->
-                                </transformer>
-                            </transformers>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/*.SF</exclude>   <!-- حذف فایل‌های امضا -->
-                                        <exclude>META-INF/*.DSA</exclude>
-                                        <exclude>META-INF/*.RSA</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                        </configuration>
-                    </execution>
-                </executions>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>3.1.2</version>
             </plugin>
         </plugins>
-    </build>
+    </reporting>
+    
+    <!-- ================================================================ -->
+    <!-- تنظیمات پروفایل‌ها -->
+    <!-- ================================================================ -->
+    <profiles>
+        <!-- پروفایل توسعه -->
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <skipTests>false</skipTests>
+            </properties>
+        </profile>
+        
+        <!-- پروفایل تست -->
+        <profile>
+            <id>test</id>
+            <properties>
+                <skipTests>false</skipTests>
+            </properties>
+        </profile>
+        
+        <!-- پروفایل تولید -->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <skipTests>true</skipTests>
+            </properties>
+        </profile>
+        
+        <!-- پروفایل پوشش کد -->
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

@@ -98,12 +98,12 @@ public class OrderService {
         // بررسی وجود و در دسترس بودن رستوران
         Optional<Restaurant> restaurantOpt = restaurantRepository.findById(restaurantId);
         if (restaurantOpt.isEmpty()) {
-            throw new NotFoundException("Restaurant", restaurantId);
+            throw new NotFoundException("Restaurant not found with ID: " + restaurantId);
         }
         
         Restaurant restaurant = restaurantOpt.get();
         if (restaurant.getStatus() != RestaurantStatus.APPROVED) {
-            throw new IllegalArgumentException("Restaurant is not available for orders. Status: " + restaurant.getStatus());
+            throw new IllegalArgumentException("Restaurant is not approved for orders");
         }
         
         // ایجاد شیء کاربر (در برنامه واقعی از UserRepository دریافت می‌شود)

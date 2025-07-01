@@ -34,7 +34,7 @@ public class OrderItem {
     
     /** شناسه یکتای آیتم سفارش */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     
     /** سفارش مربوطه (رابطه چند‌به‌یک) */

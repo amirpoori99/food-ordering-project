@@ -551,7 +551,7 @@ class PaymentControllerTest {
             // Then
             Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
             assertFalse((Boolean) responseMap.get("success"));
-            assertEquals("User not found with id=999", responseMap.get("error"));
+            assertEquals("User not found with ID: 999", responseMap.get("error"));
         }
     }
 
@@ -608,7 +608,7 @@ class PaymentControllerTest {
             // Then
             Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
             assertFalse((Boolean) responseMap.get("success"));
-            assertEquals("Transaction not found with id=999", responseMap.get("error"));
+            assertEquals("Transaction not found with ID: 999", responseMap.get("error"));
         }
     }
 

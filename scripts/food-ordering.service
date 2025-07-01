@@ -1,56 +1,88 @@
+# ================================================================
+# فایل سرویس سیستم برای سیستم سفارش غذا
+# این فایل برای راه‌اندازی خودکار سیستم به عنوان سرویس سیستم‌عامل استفاده می‌شود
+# نویسنده: تیم توسعه
+# تاریخ آخرین ویرایش: تیر ۱۴۰۴
+# نسخه: ۲.۰ - سرویس پیشرفته با مدیریت کامل
+# ================================================================
+
 [Unit]
 # ================================================================
-# سیستم سفارش غذا - فایل سرویس systemd
-# این فایل سرویس backend را به عنوان سرویس سیستمی تعریف می‌کند
+# بخش تنظیمات واحد سرویس
 # ================================================================
-Description=Food Ordering System Backend Service  # توضیحات سرویس
-Documentation=https://github.com/yourcompany/food-ordering-system  # مستندات پروژه
-After=network.target postgresql.service  # وابستگی‌ها: شبکه و دیتابیس
-Wants=postgresql.service  # سرویس مورد نیاز
-Requires=network.target  # سرویس اجباری
+Description=Food Ordering System Service                    # توضیحات سرویس
+Documentation=https://github.com/food-ordering-system      # مستندات پروژه
+After=network.target                                       # اجرا پس از راه‌اندازی شبکه
+Wants=network.target                                       # نیاز به شبکه
+Requires=network.target                                    # اجباری بودن شبکه
 
+# ================================================================
+# بخش تنظیمات سرویس
+# ================================================================
 [Service]
-Type=simple  # نوع سرویس: ساده
-User=food-ordering  # کاربر اجراکننده سرویس
-Group=food-ordering  # گروه کاربری
-WorkingDirectory=/opt/food-ordering  # دایرکتوری کاری
-ExecStart=/usr/bin/java -jar /opt/food-ordering/food-ordering-backend.jar --spring.profiles.active=production  # دستور شروع
-ExecReload=/bin/kill -HUP $MAINPID  # دستور reload
-ExecStop=/bin/kill -TERM $MAINPID  # دستور توقف
+# نوع سرویس: ساده (simple) برای برنامه‌های ساده
+Type=simple
 
-# متغیرهای محیطی
-Environment=JAVA_OPTS="-Xmx2g -Xms1g -XX:+UseG1GC -XX:+UseStringDeduplication"  # تنظیمات JVM
-Environment=SERVER_HOST=0.0.0.0  # آدرس سرور
-Environment=SERVER_PORT=8081  # پورت سرور
-Environment=SPRING_PROFILES_ACTIVE=production  # پروفایل Spring
+# کاربر و گروه اجراکننده سرویس
+User=food-ordering                                         # نام کاربر
+Group=food-ordering                                        # نام گروه
+
+# مسیر کاری سرویس
+WorkingDirectory=/opt/food-ordering-system                 # مسیر کاری
+
+# دستور اجرای سرویس
+ExecStart=/usr/bin/java -jar /opt/food-ordering-system/backend/target/food-ordering-backend.jar  # دستور شروع
+
+# دستور توقف سرویس
+ExecStop=/bin/kill -TERM $MAINPID                         # دستور توقف
+
+# دستور بارگذاری مجدد سرویس
+ExecReload=/bin/kill -HUP $MAINPID                        # دستور بارگذاری مجدد
+
+# تنظیمات محیطی
+Environment=JAVA_HOME=/usr/lib/jvm/java-17-openjdk        # مسیر Java
+Environment=SPRING_PROFILES_ACTIVE=production             # پروفایل فعال Spring
+Environment=DB_PATH=/opt/food-ordering-system/backend/food_ordering.db  # مسیر پایگاه داده
 
 # تنظیمات امنیتی
-NoNewPrivileges=true  # عدم افزایش امتیازات
-PrivateTmp=true  # دایرکتوری موقت خصوصی
-ProtectSystem=strict  # محافظت شدید از سیستم
-ProtectHome=true  # محافظت از home directory
-ReadWritePaths=/opt/food-ordering/logs /opt/food-ordering/uploads /tmp  # مسیرهای قابل نوشتن
+NoNewPrivileges=true                                       # عدم دسترسی به امتیازات جدید
+PrivateTmp=true                                            # استفاده از /tmp خصوصی
+ProtectSystem=strict                                        # محافظت شدید از سیستم
+ProtectHome=true                                           # محافظت از پوشه home
+ReadWritePaths=/opt/food-ordering-system                   # مسیرهای قابل نوشتن
 
-# محدودیت‌های منابع
-LimitNOFILE=65536  # حداکثر تعداد فایل‌های باز
-LimitNPROC=4096  # حداکثر تعداد process
+# تنظیمات منابع
+LimitNOFILE=65536                                          # حداکثر تعداد فایل‌های باز
+LimitNPROC=4096                                            # حداکثر تعداد پردازش‌ها
+MemoryMax=2G                                               # حداکثر حافظه استفاده شده
 
-# سیاست restart
-Restart=always  # همیشه restart شود
-RestartSec=30  # فاصله زمانی restart
-StartLimitInterval=350  # بازه زمانی محدودیت شروع
-StartLimitBurst=10  # حداکثر تعداد restart
+# تنظیمات راه‌اندازی مجدد
+Restart=always                                             # همیشه راه‌اندازی مجدد
+RestartSec=10                                              # فاصله زمانی راه‌اندازی مجدد (ثانیه)
+StartLimitInterval=60                                      # فاصله زمانی محدودیت شروع (ثانیه)
+StartLimitBurst=3                                          # حداکثر تعداد شروع در فاصله زمانی
 
-# لاگ‌گیری
-StandardOutput=journal  # خروجی استاندارد به journal
-StandardError=journal  # خطاها به journal
-SyslogIdentifier=food-ordering  # شناسه syslog
+# تنظیمات تایم‌اوت
+TimeoutStartSec=300                                        # تایم‌اوت شروع (ثانیه)
+TimeoutStopSec=60                                          # تایم‌اوت توقف (ثانیه)
 
-# مدیریت process
-KillMode=mixed  # حالت kill
-KillSignal=SIGTERM  # سیگنال kill
-TimeoutStartSec=60  # زمان timeout شروع
-TimeoutStopSec=30  # زمان timeout توقف
+# تنظیمات لاگینگ
+StandardOutput=journal                                     # خروجی استاندارد به journal
+StandardError=journal                                      # خروجی خطا به journal
+SyslogIdentifier=food-ordering                             # شناسه syslog
 
+# ================================================================
+# بخش تنظیمات نصب
+# ================================================================
 [Install]
-WantedBy=multi-user.target  # نصب در سطح multi-user 
+# سرویس‌های مورد نیاز برای نصب
+WantedBy=multi-user.target                                 # نصب در حالت چندکاربره
+
+# ================================================================
+# بخش تنظیمات اضافی (اختیاری)
+# ================================================================
+# تنظیمات اضافی برای بهینه‌سازی عملکرد
+# KillMode=mixed                                           # حالت توقف پردازش‌ها
+# KillSignal=SIGTERM                                       # سیگنال توقف
+# SendSIGKILL=yes                                          # ارسال SIGKILL در صورت عدم توقف
+# SendSIGHUP=no                                            # عدم ارسال SIGHUP 
