@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.myapp.auth.AuthServiceJWTTest$JWTIntegrationSecurityTests
--------------------------------------------------------------------------------
-Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.052 s -- in com.myapp.auth.AuthServiceJWTTest$JWTIntegrationSecurityTests

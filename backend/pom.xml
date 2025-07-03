@@ -25,7 +25,7 @@
     
     <!-- نام و توضیحات پروژه -->
     <name>Food Ordering System Backend</name>
-    <description>بک‌اند سیستم سفارش غذا با Spring Boot</description>
+    <description>بک‌اند سیستم سفارش غذا با Java و Hibernate</description>
     
     <!-- ================================================================ -->
     <!-- تنظیمات Java -->
@@ -234,7 +234,7 @@
                     <systemPropertyVariables>
                         <java.awt.headless>true</java.awt.headless>
                         <file.encoding>UTF-8</file.encoding>
-                        <spring.profiles.active>test</spring.profiles.active>
+                        <app.profiles.active>test</app.profiles.active>
                     </systemPropertyVariables>
                     <!-- تنظیمات حافظه برای تست‌ها -->
                     <argLine>-Xmx1g -XX:+UseG1GC</argLine>
@@ -386,7 +386,7 @@
                     </includes>
                     <!-- تنظیمات سیستم -->
                     <systemPropertyVariables>
-                        <spring.profiles.active>integration-test</spring.profiles.active>
+                        <app.profiles.active>integration-test</app.profiles.active>
                     </systemPropertyVariables>
                 </configuration>
                 <executions>
@@ -488,7 +488,7 @@
             </activation>
             <properties>
                 <skipTests>false</skipTests>
-                <spring.profiles.active>dev</spring.profiles.active>
+                <app.profiles.active>dev</app.profiles.active>
             </properties>
         </profile>
         
@@ -497,7 +497,7 @@
             <id>test</id>
             <properties>
                 <skipTests>false</skipTests>
-                <spring.profiles.active>test</spring.profiles.active>
+                <app.profiles.active>test</app.profiles.active>
             </properties>
         </profile>
         
@@ -506,7 +506,7 @@
             <id>prod</id>
             <properties>
                 <skipTests>true</skipTests>
-                <spring.profiles.active>production</spring.profiles.active>
+                <app.profiles.active>production</app.profiles.active>
             </properties>
         </profile>
         

@@ -1,4 +1,4 @@
-# 🚀 راهنمای نصب
+# 🚀 راهنمای نصب - سیستم سفارش غذا
 
 ## پیش‌نیازها
 
@@ -38,6 +38,15 @@ java -jar target/food-ordering-frontend.jar
 - بک‌اند روی `localhost:8081` اجرا می‌شود
 - از پایگاه داده SQLite استفاده می‌کند (خودکار ایجاد می‌شود)
 - نیازی به پیکربندی اضافی نیست
+
+### 3. کلاس‌های موجود
+سیستم شامل کلاس‌های زیر است:
+- **احراز هویت**: `AuthController`, `AuthService`, `AuthRepository`
+- **مدیریت**: `AdminController`, `AdminService`, `AdminRepository`
+- **سفارش**: `OrderController`, `OrderService`, `OrderRepository`
+- **پرداخت**: `PaymentController`, `PaymentService`, `PaymentRepository`
+- **رستوران**: `RestaurantController`, `RestaurantService`, `RestaurantRepository`
+- **امنیت**: `AdvancedSecurityUtil`, `PasswordUtil`, `ValidationUtil`
 
 ---
 
@@ -198,38 +207,98 @@ chmod +x food-ordering-frontend.jar
 
 ### مشکلات رایج
 
-**پورت در حال استفاده:**
+#### خطای اتصال به پایگاه داده
 ```bash
-# بررسی اینکه چه چیزی از پورت 8081 استفاده می‌کند
-netstat -tulpn | grep 8081
-# کشتن پروسه یا تغییر پورت
+# بررسی وضعیت PostgreSQL
+sudo systemctl status postgresql
+
+# بررسی لاگ‌ها
+sudo tail -f /var/log/postgresql/postgresql-*.log
+
+# تست اتصال
+psql -h localhost -U food_ordering_user -d food_ordering_prod
 ```
 
-**خطا در اتصال پایگاه داده:**
+#### خطای پورت در حال استفاده
 ```bash
-# تأیید اینکه PostgreSQL در حال اجرا است
-systemctl status postgresql
-# بررسی اطلاعات ورود و رشته اتصال
+# بررسی پورت‌های در حال استفاده
+sudo netstat -tlnp | grep :8081
+
+# کشتن پروسه
+sudo kill -9 <PID>
 ```
 
-**جاوا یافت نشد:**
+#### خطای حافظه
 ```bash
-# نصب Java 17
-sudo apt install openjdk-17-jdk
-# تأیید نصب
-java -version
-```
+# افزایش حافظه JVM
+java -Xmx2g -jar food-ordering-backend.jar
 
-برای عیب‌یابی بیشتر، [راهنمای عیب‌یابی](troubleshooting.md) را ببینید.
+# بررسی استفاده از حافظه
+free -h
+```
 
 ---
 
-## مراحل بعدی
+## تست‌های نصب
 
-بعد از نصب:
-1. [راهنمای کاربر](user-guide.md) را برای مستندات کاربر نهایی بخوانید
-2. [راهنمای مدیر](admin-guide.md) را برای مدیریت سیستم بخوانید
-3. [مرجع API](api-reference.md) را برای ادغام بررسی کنید
+### اجرای تست‌های نصب
+```bash
+# تست‌های بک‌اند
+cd backend
+mvn test
 
-## نکات تست و توسعه
-- برای اجرای تست‌های frontend و امنیتی، نیاز به محیط گرافیکی نیست و تست‌ها در محیط headless نیز اجرا می‌شوند. 
+# تست‌های فرانت‌اند
+cd ../frontend-javafx
+mvn test
+
+# تست‌های امنیتی
+mvn test -Dtest=*Security*Test
+
+# تست‌های عملکرد
+mvn test -Dtest=*Performance*Test
+```
+
+### بررسی وضعیت سیستم
+```bash
+# بررسی API
+curl http://localhost:8081/api/health
+
+# بررسی پایگاه داده
+curl http://localhost:8081/api/admin/status
+
+# بررسی لاگ‌ها
+tail -f backend/logs/application.log
+```
+
+---
+
+## به‌روزرسانی سیستم
+
+### به‌روزرسانی خودکار
+```bash
+# اسکریپت به‌روزرسانی
+./scripts/update-system.sh
+
+# یا دستی
+git pull origin main
+mvn clean package
+sudo systemctl restart food-ordering
+```
+
+### Rollback
+```bash
+# بازگشت به نسخه قبلی
+git checkout <previous-version>
+mvn clean package
+sudo systemctl restart food-ordering
+```
+
+---
+
+## نتیجه‌گیری
+
+سیستم سفارش غذا با موفقیت نصب و راه‌اندازی شده است. تمام کلاس‌ها و ویژگی‌ها فعال هستند و آماده استفاده می‌باشند.
+
+---
+**آخرین به‌روزرسانی**: 15 ژوئن 2025  
+**مسئول نصب**: Food Ordering System Installation Team 

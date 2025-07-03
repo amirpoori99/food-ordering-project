@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.myapp.ui.security.SecurityValidationTest
--------------------------------------------------------------------------------
-Tests run: 0, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 151.1 s -- in com.myapp.ui.security.SecurityValidationTest

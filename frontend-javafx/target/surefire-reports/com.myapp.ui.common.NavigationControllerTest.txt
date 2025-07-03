@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.myapp.ui.common.NavigationControllerTest
--------------------------------------------------------------------------------
-Tests run: 0, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.617 s -- in com.myapp.ui.common.NavigationControllerTest

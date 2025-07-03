@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.myapp.ui.order.OrderHistoryControllerSimpleTest
--------------------------------------------------------------------------------
-Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.619 s -- in com.myapp.ui.order.OrderHistoryControllerSimpleTest

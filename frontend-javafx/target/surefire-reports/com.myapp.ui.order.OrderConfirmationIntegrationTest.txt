@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.myapp.ui.order.OrderConfirmationIntegrationTest
--------------------------------------------------------------------------------
-Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.600 s -- in com.myapp.ui.order.OrderConfirmationIntegrationTest
