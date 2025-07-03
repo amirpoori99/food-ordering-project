@@ -1,0 +1,47 @@
+-------------------------------------------------------------------------------
+Test set: com.myapp.ui.admin.AdminDashboardControllerTest
+-------------------------------------------------------------------------------
+Tests run: 22, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 13.51 s <<< FAILURE! -- in com.myapp.ui.admin.AdminDashboardControllerTest
+com.myapp.ui.admin.AdminDashboardControllerTest.testFilterOrders -- Time elapsed: 0.401 s <<< ERROR!
+java.lang.RuntimeException: java.lang.ArrayIndexOutOfBoundsException: Index 0 out of bounds for length 0
+	at org.testfx.util.WaitForAsyncUtils.---- Delayed Exception: (See Trace Below) ----(WaitForAsyncUtils.java:0)
+Caused by: java.lang.ArrayIndexOutOfBoundsException: Index 0 out of bounds for length 0
+	at com.sun.javafx.text.PrismTextLayout.getCaretShape(PrismTextLayout.java:365)
+	at javafx.scene.text.Text$TextAttribute$11.computeValue(Text.java:1824)
+	at javafx.scene.text.Text$TextAttribute$11.computeValue(Text.java:1814)
+	at javafx.beans.binding.ObjectBinding.get(ObjectBinding.java:157)
+	at javafx.beans.binding.ObjectExpression.getValue(ObjectExpression.java:49)
+	at javafx.beans.property.ObjectPropertyBase.get(ObjectPropertyBase.java:133)
+	at javafx.scene.control.skin.TextFieldSkin.lambda$new$4(TextFieldSkin.java:252)
+	at com.sun.javafx.binding.ExpressionHelper$SingleInvalidation.fireValueChangedEvent(ExpressionHelper.java:136)
+	at com.sun.javafx.binding.ExpressionHelper.fireValueChangedEvent(ExpressionHelper.java:80)
+	at javafx.beans.property.ObjectPropertyBase.fireValueChangedEvent(ObjectPropertyBase.java:106)
+	at javafx.beans.property.ObjectPropertyBase.markInvalid(ObjectPropertyBase.java:113)
+	at javafx.beans.property.ObjectPropertyBase$Listener.invalidated(ObjectPropertyBase.java:234)
+	at com.sun.javafx.binding.ExpressionHelper$SingleInvalidation.fireValueChangedEvent(ExpressionHelper.java:136)
+	at com.sun.javafx.binding.ExpressionHelper.fireValueChangedEvent(ExpressionHelper.java:80)
+	at javafx.beans.binding.ObjectBinding.invalidate(ObjectBinding.java:176)
+	at javafx.scene.text.Text.doGeomChanged(Text.java:842)
+	at javafx.scene.text.Text$1.doGeomChanged(Text.java:159)
+	at com.sun.javafx.scene.shape.TextHelper.geomChangedImpl(TextHelper.java:106)
+	at com.sun.javafx.scene.NodeHelper.geomChanged(NodeHelper.java:138)
+	at javafx.scene.text.Text.needsTextLayout(Text.java:267)
+	at javafx.scene.text.Text.needsFullTextLayout(Text.java:262)
+	at javafx.scene.text.Text$3.invalidated(Text.java:463)
+	at javafx.beans.property.StringPropertyBase.markInvalid(StringPropertyBase.java:110)
+	at javafx.beans.property.StringPropertyBase$Listener.invalidated(StringPropertyBase.java:231)
+	at com.sun.javafx.binding.ExpressionHelper$SingleInvalidation.fireValueChangedEvent(ExpressionHelper.java:136)
+	at com.sun.javafx.binding.ExpressionHelper.fireValueChangedEvent(ExpressionHelper.java:80)
+	at javafx.beans.binding.StringBinding.invalidate(StringBinding.java:175)
+	at com.sun.javafx.binding.BindingHelperObserver.invalidated(BindingHelperObserver.java:52)
+	at com.sun.javafx.binding.ExpressionHelper$Generic.fireValueChangedEvent(ExpressionHelper.java:348)
+	at com.sun.javafx.binding.ExpressionHelper.fireValueChangedEvent(ExpressionHelper.java:80)
+	at javafx.scene.control.TextInputControl$TextProperty.fireValueChangedEvent(TextInputControl.java:1459)
+	at javafx.scene.control.TextInputControl$TextProperty.markInvalid(TextInputControl.java:1463)
+	at javafx.scene.control.TextInputControl$TextProperty.set(TextInputControl.java:1394)
+	at javafx.scene.control.TextInputControl.setText(TextInputControl.java:361)
+	at com.myapp.ui.admin.AdminDashboardControllerTest.testFilterOrders(AdminDashboardControllerTest.java:170)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+

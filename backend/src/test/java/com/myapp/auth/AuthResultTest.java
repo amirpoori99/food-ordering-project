@@ -36,6 +36,9 @@ class AuthResultTest {
     /** شماره تلفن تستی */
     private final String testPhone = "09123456789";
     
+    /** نام کامل تستی */
+    private final String testFullName = "Test User";
+    
     /** نقش کاربری تستی */
     private final String testRole = "BUYER";
     
@@ -62,7 +65,7 @@ class AuthResultTest {
     @DisplayName("Should create authenticated result")
     void testAuthenticatedResult() {
         // Act - ایجاد نتیجه احراز هویت موفق
-        AuthResult result = AuthResult.authenticated(testUserId, testPhone, testRole, testAccessToken);
+        AuthResult result = AuthResult.authenticated(testUserId, testPhone, testFullName, testRole, testAccessToken);
         
         // Assert - بررسی تمام فیلدها
         assertTrue(result.isAuthenticated());
@@ -116,7 +119,7 @@ class AuthResultTest {
     @DisplayName("Should create refreshed result")
     void testRefreshedResult() {
         // Act - ایجاد نتیجه refresh شده
-        AuthResult result = AuthResult.refreshed(testUserId, testPhone, testRole, testAccessToken, testRefreshToken);
+        AuthResult result = AuthResult.refreshed(testUserId, testPhone, testFullName, testRole, testAccessToken, testRefreshToken);
         
         // Assert - بررسی وضعیت refresh
         assertTrue(result.isAuthenticated());
@@ -141,7 +144,7 @@ class AuthResultTest {
     @DisplayName("Should check specific role")
     void testHasRole() {
         // Arrange
-        AuthResult result = AuthResult.authenticated(testUserId, testPhone, testRole, testAccessToken);
+        AuthResult result = AuthResult.authenticated(testUserId, testPhone, testFullName, testRole, testAccessToken);
         
         // Act & Assert - تست نقش‌های مختلف
         assertTrue(result.hasRole(testRole)); // نقش اصلی کاربر
@@ -161,8 +164,8 @@ class AuthResultTest {
     @DisplayName("Should identify customer role")
     void testIsCustomer() {
         // Arrange - ایجاد کاربران با نقش‌های مختلف
-        AuthResult customerResult = AuthResult.authenticated(testUserId, testPhone, "BUYER", testAccessToken);
-        AuthResult sellerResult = AuthResult.authenticated(testUserId, testPhone, "SELLER", testAccessToken);
+        AuthResult customerResult = AuthResult.authenticated(testUserId, testPhone, testFullName, "BUYER", testAccessToken);
+        AuthResult sellerResult = AuthResult.authenticated(testUserId, testPhone, testFullName, "SELLER", testAccessToken);
         
         // Act & Assert
         assertTrue(customerResult.isCustomer());
@@ -202,10 +205,10 @@ class AuthResultTest {
     @DisplayName("Should identify all user roles correctly")
     void testAllUserRoles() {
         // Arrange - ایجاد AuthResult برای هر نقش
-        AuthResult buyerResult = AuthResult.authenticated(testUserId, testPhone, "BUYER", testAccessToken);
-        AuthResult sellerResult = AuthResult.authenticated(testUserId, testPhone, "SELLER", testAccessToken);
-        AuthResult courierResult = AuthResult.authenticated(testUserId, testPhone, "COURIER", testAccessToken);
-        AuthResult adminResult = AuthResult.authenticated(testUserId, testPhone, "ADMIN", testAccessToken);
+        AuthResult buyerResult = AuthResult.authenticated(testUserId, testPhone, testFullName, "BUYER", testAccessToken);
+        AuthResult sellerResult = AuthResult.authenticated(testUserId, testPhone, testFullName, "SELLER", testAccessToken);
+        AuthResult courierResult = AuthResult.authenticated(testUserId, testPhone, testFullName, "COURIER", testAccessToken);
+        AuthResult adminResult = AuthResult.authenticated(testUserId, testPhone, testFullName, "ADMIN", testAccessToken);
         
         // Test BUYER role
         assertTrue(buyerResult.isCustomer());
@@ -242,7 +245,7 @@ class AuthResultTest {
     @DisplayName("Should check hasAnyRole correctly")
     void testHasAnyRole() {
         // Arrange
-        AuthResult buyerResult = AuthResult.authenticated(testUserId, testPhone, "BUYER", testAccessToken);
+        AuthResult buyerResult = AuthResult.authenticated(testUserId, testPhone, testFullName, "BUYER", testAccessToken);
         AuthResult unauthenticatedResult = AuthResult.unauthenticated("Error");
         
         // Act & Assert - BUYER role
@@ -264,9 +267,9 @@ class AuthResultTest {
     @DisplayName("Should format toString correctly")
     void testToString() {
         // Arrange & Act
-        AuthResult authenticatedResult = AuthResult.authenticated(testUserId, testPhone, testRole, testAccessToken);
+        AuthResult authenticatedResult = AuthResult.authenticated(testUserId, testPhone, testFullName, testRole, testAccessToken);
         AuthResult unauthenticatedResult = AuthResult.unauthenticated(testErrorMessage);
-        AuthResult refreshedResult = AuthResult.refreshed(testUserId, testPhone, testRole, testAccessToken, testRefreshToken);
+        AuthResult refreshedResult = AuthResult.refreshed(testUserId, testPhone, testFullName, testRole, testAccessToken, testRefreshToken);
         
         // Assert - بررسی شامل بودن اطلاعات کلیدی
         String authString = authenticatedResult.toString();

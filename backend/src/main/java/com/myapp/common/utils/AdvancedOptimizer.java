@@ -1,407 +1,235 @@
 package com.myapp.common.utils;
 
-import java.util.concurrent.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.function.Supplier;
-import java.util.function.Consumer;
-import java.time.LocalDateTime;
-import java.time.Duration;
+import java.util.logging.Logger;
 
 /**
- * کلاس بهینه‌سازی پیشرفته برای سیستم سفارش غذا
- * Version: 1.0 - Phase 33 Implementation
- * 
- * این کلاس تکنیک‌های پیشرفته بهینه‌سازی عملکرد را فراهم می‌کند:
- * - Connection Pooling پیشرفته
- * - Query Optimization
- * - Resource Management
- * - Adaptive Performance Tuning
- * - Load Balancing
- * - Circuit Breaker Pattern
- * - Rate Limiting
- * 
- * @author Food Ordering System Team
- * @version 1.0
- * @since 2024
+ * Advanced optimization utilities for performance, reliability, and resource management
  */
 public class AdvancedOptimizer {
+    private static final Logger logger = Logger.getLogger(AdvancedOptimizer.class.getName());
     
-    // ==================== تنظیمات پیشرفته ====================
+    // Connection pool
+    private static final ConcurrentHashMap<String, Connection> connectionPool = new ConcurrentHashMap<>();
+    private static final int MAX_POOL_SIZE = 10;
     
-    private static final int DEFAULT_MAX_CONNECTIONS = 50;
-    private static final int DEFAULT_MIN_CONNECTIONS = 5;
-    private static final long CONNECTION_TIMEOUT_MS = 30000;
-    private static final long IDLE_TIMEOUT_MS = 600000; // 10 minutes
+    // Circuit breaker state
+    private static final ConcurrentHashMap<String, CircuitBreakerState> circuitBreakers = new ConcurrentHashMap<>();
     
-    // ==================== Connection Pool پیشرفته ====================
+    // Rate limiting
+    private static final ConcurrentHashMap<String, RateLimiter> rateLimiters = new ConcurrentHashMap<>();
     
-    private static final AtomicInteger activeConnections = new AtomicInteger(0);
-    private static final AtomicInteger totalConnections = new AtomicInteger(0);
-    private static final AtomicLong connectionWaitTime = new AtomicLong(0);
-    private static final AtomicLong connectionErrors = new AtomicLong(0);
+    // Performance metrics
+    private static final ConcurrentHashMap<String, AtomicLong> executionTimes = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, AtomicInteger> successCount = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, AtomicInteger> failureCount = new ConcurrentHashMap<>();
     
     /**
-     * کلاس مدیریت اتصالات با قابلیت‌های پیشرفته
+     * Circuit Breaker Pattern Implementation
      */
-    private static class ConnectionManager {
-        private final Semaphore connectionSemaphore;
-        private final AtomicInteger currentConnections;
-        private final int maxConnections;
+    public static class CircuitBreakerState {
+        private volatile State state = State.CLOSED;
+        private final AtomicInteger failureCount = new AtomicInteger(0);
+        private final AtomicLong lastFailureTime = new AtomicLong(0);
+        private final int failureThreshold;
         private final long timeoutMs;
         
-        public ConnectionManager(int maxConnections, long timeoutMs) {
-            this.maxConnections = maxConnections;
+        public CircuitBreakerState(int failureThreshold, long timeoutMs) {
+            this.failureThreshold = failureThreshold;
             this.timeoutMs = timeoutMs;
-            this.connectionSemaphore = new Semaphore(maxConnections);
-            this.currentConnections = new AtomicInteger(0);
         }
         
-        public <T> T executeWithConnection(Supplier<T> operation) throws Exception {
-            long startTime = System.currentTimeMillis();
-            boolean acquired = false;
-            
-            try {
-                // تلاش برای دریافت اتصال
-                acquired = connectionSemaphore.tryAcquire(timeoutMs, TimeUnit.MILLISECONDS);
-                if (!acquired) {
-                    connectionWaitTime.addAndGet(System.currentTimeMillis() - startTime);
-                    connectionErrors.incrementAndGet();
-                    throw new TimeoutException("Connection timeout after " + timeoutMs + "ms");
-                }
-                
-                currentConnections.incrementAndGet();
-                activeConnections.incrementAndGet();
-                
-                // اجرای عملیات
-                T result = operation.get();
-                
-                return result;
-                
-            } finally {
-                if (acquired) {
-                    connectionSemaphore.release();
-                    currentConnections.decrementAndGet();
-                    activeConnections.decrementAndGet();
-                }
-                connectionWaitTime.addAndGet(System.currentTimeMillis() - startTime);
+        public boolean canExecute() {
+            switch (state) {
+                case CLOSED:
+                    return true;
+                case OPEN:
+                    if (System.currentTimeMillis() - lastFailureTime.get() > timeoutMs) {
+                        state = State.HALF_OPEN;
+                        return true;
+                    }
+                    return false;
+                case HALF_OPEN:
+                    return true;
+                default:
+                    return false;
             }
         }
         
-        public int getCurrentConnections() {
-            return currentConnections.get();
-        }
-        
-        public int getAvailableConnections() {
-            return connectionSemaphore.availablePermits();
-        }
-        
-        public double getConnectionUtilization() {
-            return (double) currentConnections.get() / maxConnections;
-        }
-    }
-    
-    private static final ConnectionManager connectionManager = 
-        new ConnectionManager(DEFAULT_MAX_CONNECTIONS, CONNECTION_TIMEOUT_MS);
-    
-    // ==================== Circuit Breaker Pattern ====================
-    
-    /**
-     * کلاس Circuit Breaker برای مدیریت خطاها و جلوگیری از cascade failures
-     */
-    private static class CircuitBreaker {
-        private final String name;
-        private final AtomicInteger failureCount = new AtomicInteger(0);
-        private final AtomicInteger successCount = new AtomicInteger(0);
-        private final AtomicLong lastFailureTime = new AtomicLong(0);
-        private volatile CircuitState state = CircuitState.CLOSED;
-        
-        private static final int FAILURE_THRESHOLD = 5;
-        private static final long TIMEOUT_MS = 60000; // 1 minute
-        private static final int SUCCESS_THRESHOLD = 3;
-        
-        public enum CircuitState {
-            CLOSED,     // عملیات عادی
-            OPEN,       // عملیات متوقف شده
-            HALF_OPEN   // تست بازیابی
-        }
-        
-        public CircuitBreaker(String name) {
-            this.name = name;
-        }
-        
-        public <T> T execute(Supplier<T> operation) throws Exception {
-            if (state == CircuitState.OPEN) {
-                if (System.currentTimeMillis() - lastFailureTime.get() > TIMEOUT_MS) {
-                    state = CircuitState.HALF_OPEN;
-                } else {
-                    throw new CircuitBreakerOpenException("Circuit breaker is OPEN for " + name);
-                }
-            }
-            
-            try {
-                T result = operation.get();
-                onSuccess();
-                return result;
-            } catch (Exception e) {
-                onFailure();
-                throw e;
-            }
-        }
-        
-        private void onSuccess() {
-            successCount.incrementAndGet();
+        public void recordSuccess() {
             failureCount.set(0);
-            
-            if (state == CircuitState.HALF_OPEN && successCount.get() >= SUCCESS_THRESHOLD) {
-                state = CircuitState.CLOSED;
-                successCount.set(0);
-            }
+            state = State.CLOSED;
         }
         
-        private void onFailure() {
+        public void recordFailure() {
             failureCount.incrementAndGet();
             lastFailureTime.set(System.currentTimeMillis());
-            successCount.set(0);
             
-            if (failureCount.get() >= FAILURE_THRESHOLD) {
-                state = CircuitState.OPEN;
+            if (failureCount.get() >= failureThreshold) {
+                state = State.OPEN;
             }
         }
         
-        public CircuitState getState() {
-            return state;
-        }
-        
-        public Map<String, Object> getStats() {
-            Map<String, Object> stats = new ConcurrentHashMap<>();
-            stats.put("name", name);
-            stats.put("state", state.toString());
-            stats.put("failureCount", failureCount.get());
-            stats.put("successCount", successCount.get());
-            stats.put("lastFailureTime", lastFailureTime.get());
-            return stats;
-        }
+        private enum State { CLOSED, OPEN, HALF_OPEN }
     }
     
-    private static final Map<String, CircuitBreaker> circuitBreakers = new ConcurrentHashMap<>();
-    
-    // ==================== Rate Limiting ====================
-    
     /**
-     * کلاس Rate Limiter برای کنترل تعداد درخواست‌ها
+     * Rate Limiter Implementation
      */
-    private static class RateLimiter {
-        private final String name;
+    public static class RateLimiter {
         private final int maxRequests;
-        private final long timeWindowMs;
+        private final long windowMs;
         private final AtomicInteger currentRequests = new AtomicInteger(0);
-        private final AtomicLong windowStartTime = new AtomicLong(System.currentTimeMillis());
+        private final AtomicLong windowStart = new AtomicLong(System.currentTimeMillis());
         
-        public RateLimiter(String name, int maxRequests, long timeWindowMs) {
-            this.name = name;
+        public RateLimiter(int maxRequests, long windowMs) {
             this.maxRequests = maxRequests;
-            this.timeWindowMs = timeWindowMs;
+            this.windowMs = windowMs;
         }
         
-        public boolean tryAcquire() {
-            long currentTime = System.currentTimeMillis();
-            long windowStart = windowStartTime.get();
+        public boolean allowRequest() {
+            long now = System.currentTimeMillis();
+            long windowStartTime = windowStart.get();
             
-            // بررسی انقضای window
-            if (currentTime - windowStart > timeWindowMs) {
+            if (now - windowStartTime > windowMs) {
                 currentRequests.set(0);
-                windowStartTime.set(currentTime);
+                windowStart.set(now);
             }
             
-            // تلاش برای افزایش تعداد درخواست‌ها
-            int current = currentRequests.get();
-            while (current < maxRequests) {
-                if (currentRequests.compareAndSet(current, current + 1)) {
-                    return true;
-                }
-                current = currentRequests.get();
-            }
-            
-            return false;
-        }
-        
-        public Map<String, Object> getStats() {
-            Map<String, Object> stats = new ConcurrentHashMap<>();
-            stats.put("name", name);
-            stats.put("maxRequests", maxRequests);
-            stats.put("currentRequests", currentRequests.get());
-            stats.put("windowStartTime", windowStartTime.get());
-            stats.put("timeWindowMs", timeWindowMs);
-            return stats;
+            return currentRequests.incrementAndGet() <= maxRequests;
         }
     }
     
-    private static final Map<String, RateLimiter> rateLimiters = new ConcurrentHashMap<>();
-    
-    // ==================== متدهای عمومی ====================
-    
     /**
-     * اجرای عملیات با Connection Pool
+     * Execute operation with circuit breaker protection
      */
-    public static <T> T executeWithConnection(Supplier<T> operation) throws Exception {
-        return connectionManager.executeWithConnection(operation);
-    }
-    
-    /**
-     * اجرای عملیات با Circuit Breaker
-     */
-    public static <T> T executeWithCircuitBreaker(String name, Supplier<T> operation) throws Exception {
-        CircuitBreaker circuitBreaker = circuitBreakers.computeIfAbsent(name, CircuitBreaker::new);
-        return circuitBreaker.execute(operation);
-    }
-    
-    /**
-     * اجرای عملیات با Rate Limiting
-     */
-    public static <T> T executeWithRateLimit(String name, int maxRequests, long timeWindowMs, Supplier<T> operation) throws Exception {
-        RateLimiter rateLimiter = rateLimiters.computeIfAbsent(name, 
-            k -> new RateLimiter(name, maxRequests, timeWindowMs));
+    public static <T> T executeWithCircuitBreaker(String operationName, Supplier<T> operation) {
+        CircuitBreakerState circuitBreaker = circuitBreakers.computeIfAbsent(
+            operationName, 
+            k -> new CircuitBreakerState(5, 30000) // 5 failures, 30s timeout
+        );
         
-        if (!rateLimiter.tryAcquire()) {
-            throw new RateLimitExceededException("Rate limit exceeded for " + name);
+        if (!circuitBreaker.canExecute()) {
+            logger.warning("Circuit breaker OPEN for operation: " + operationName);
+            throw new RuntimeException("Service temporarily unavailable");
+        }
+        
+        try {
+            long startTime = System.currentTimeMillis();
+            T result = operation.get();
+            long executionTime = System.currentTimeMillis() - startTime;
+            
+            circuitBreaker.recordSuccess();
+            recordMetrics(operationName, executionTime, true);
+            
+            return result;
+        } catch (Exception e) {
+            circuitBreaker.recordFailure();
+            recordMetrics(operationName, 0, false);
+            throw e;
+        }
+    }
+    
+    /**
+     * Execute operation with rate limiting
+     */
+    public static <T> T executeWithRateLimit(String operationName, Supplier<T> operation) {
+        RateLimiter rateLimiter = rateLimiters.computeIfAbsent(
+            operationName,
+            k -> new RateLimiter(100, 60000) // 100 requests per minute
+        );
+        
+        if (!rateLimiter.allowRequest()) {
+            logger.warning("Rate limit exceeded for operation: " + operationName);
+            throw new RuntimeException("Rate limit exceeded");
         }
         
         return operation.get();
     }
     
     /**
-     * اجرای عملیات با تمام بهینه‌سازی‌ها
+     * Execute operation with Hibernate session
      */
-    public static <T> T executeOptimized(String name, Supplier<T> operation) throws Exception {
-        return executeWithRateLimit(name, 100, 60000, () -> {
-            try {
-                return executeWithCircuitBreaker(name, () -> {
-                    try {
-                        return executeWithConnection(operation);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+    public static <T> T executeWithSession(Supplier<T> operation) {
+        try {
+            return operation.get();
+        } catch (Exception e) {
+            logger.severe("Error executing operation with session: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+    
+    /**
+     * Record performance metrics
+     */
+    private static void recordMetrics(String operationName, long executionTime, boolean success) {
+        executionTimes.computeIfAbsent(operationName, k -> new AtomicLong(0))
+                     .addAndGet(executionTime);
+        
+        if (success) {
+            successCount.computeIfAbsent(operationName, k -> new AtomicInteger(0))
+                       .incrementAndGet();
+        } else {
+            failureCount.computeIfAbsent(operationName, k -> new AtomicInteger(0))
+                       .incrementAndGet();
+        }
+    }
+    
+    /**
+     * Get performance statistics
+     */
+    public static String getPerformanceStats() {
+        StringBuilder stats = new StringBuilder();
+        stats.append("=== Performance Statistics ===\n");
+        
+        for (String operation : executionTimes.keySet()) {
+            long totalTime = executionTimes.get(operation).get();
+            int successes = successCount.getOrDefault(operation, new AtomicInteger(0)).get();
+            int failures = failureCount.getOrDefault(operation, new AtomicInteger(0)).get();
+            int total = successes + failures;
+            
+            if (total > 0) {
+                double avgTime = (double) totalTime / total;
+                double successRate = (double) successes / total * 100;
+                
+                stats.append(String.format("%s: Avg=%.2fms, Success=%.1f%%, Total=%d\n", 
+                    operation, avgTime, successRate, total));
             }
-        });
-    }
-    
-    // ==================== آمار و مانیتورینگ ====================
-    
-    /**
-     * دریافت آمار Connection Pool
-     */
-    public static Map<String, Object> getConnectionPoolStats() {
-        Map<String, Object> stats = new ConcurrentHashMap<>();
-        stats.put("activeConnections", activeConnections.get());
-        stats.put("totalConnections", totalConnections.get());
-        stats.put("currentConnections", connectionManager.getCurrentConnections());
-        stats.put("availableConnections", connectionManager.getAvailableConnections());
-        stats.put("connectionUtilization", connectionManager.getConnectionUtilization());
-        stats.put("connectionWaitTime", connectionWaitTime.get());
-        stats.put("connectionErrors", connectionErrors.get());
-        return stats;
-    }
-    
-    /**
-     * دریافت آمار Circuit Breakers
-     */
-    public static Map<String, Object> getCircuitBreakerStats() {
-        Map<String, Object> stats = new ConcurrentHashMap<>();
-        stats.put("totalCircuitBreakers", circuitBreakers.size());
+        }
         
-        Map<String, Object> breakerStats = new ConcurrentHashMap<>();
-        for (Map.Entry<String, CircuitBreaker> entry : circuitBreakers.entrySet()) {
-            breakerStats.put(entry.getKey(), entry.getValue().getStats());
-        }
-        stats.put("circuitBreakers", breakerStats);
-        
-        return stats;
+        return stats.toString();
     }
     
     /**
-     * دریافت آمار Rate Limiters
+     * Adaptive performance tuning based on metrics
      */
-    public static Map<String, Object> getRateLimiterStats() {
-        Map<String, Object> stats = new ConcurrentHashMap<>();
-        stats.put("totalRateLimiters", rateLimiters.size());
-        
-        Map<String, Object> limiterStats = new ConcurrentHashMap<>();
-        for (Map.Entry<String, RateLimiter> entry : rateLimiters.entrySet()) {
-            limiterStats.put(entry.getKey(), entry.getValue().getStats());
-        }
-        stats.put("rateLimiters", limiterStats);
-        
-        return stats;
-    }
-    
-    /**
-     * دریافت گزارش کامل بهینه‌سازی
-     */
-    public static Map<String, Object> getCompleteOptimizationReport() {
-        Map<String, Object> report = new ConcurrentHashMap<>();
-        report.put("timestamp", LocalDateTime.now().toString());
-        report.put("connectionPool", getConnectionPoolStats());
-        report.put("circuitBreakers", getCircuitBreakerStats());
-        report.put("rateLimiters", getRateLimiterStats());
-        return report;
-    }
-    
-    // ==================== تنظیمات پویا ====================
-    
-    /**
-     * تنظیم اندازه Connection Pool
-     */
-    public static void setConnectionPoolSize(int maxConnections) {
-        // این متد برای تنظیم پویای اندازه connection pool استفاده می‌شود
-        // در پیاده‌سازی واقعی، باید connection manager جدیدی ایجاد شود
-        System.out.println("Setting connection pool size to: " + maxConnections);
-    }
-    
-    /**
-     * تنظیم آستانه Circuit Breaker
-     */
-    public static void setCircuitBreakerThreshold(String name, int failureThreshold) {
-        CircuitBreaker circuitBreaker = circuitBreakers.get(name);
-        if (circuitBreaker != null) {
-            System.out.println("Setting circuit breaker threshold for " + name + " to: " + failureThreshold);
-        }
-    }
-    
-    /**
-     * تنظیم Rate Limiter
-     */
-    public static void setRateLimit(String name, int maxRequests, long timeWindowMs) {
-        RateLimiter rateLimiter = rateLimiters.get(name);
-        if (rateLimiter != null) {
-            System.out.println("Setting rate limit for " + name + " to: " + maxRequests + " requests per " + timeWindowMs + "ms");
-        }
-    }
-    
-    // ==================== Exception Classes ====================
-    
-    public static class CircuitBreakerOpenException extends RuntimeException {
-        public CircuitBreakerOpenException(String message) {
-            super(message);
-        }
-    }
-    
-    public static class RateLimitExceededException extends RuntimeException {
-        public RateLimitExceededException(String message) {
-            super(message);
-        }
-    }
-    
-    public static class ConnectionTimeoutException extends RuntimeException {
-        public ConnectionTimeoutException(String message) {
-            super(message);
+    public static void adaptiveTuning() {
+        for (String operation : executionTimes.keySet()) {
+            long avgTime = executionTimes.get(operation).get();
+            int failures = failureCount.getOrDefault(operation, new AtomicInteger(0)).get();
+            
+            // Adjust circuit breaker settings based on failure rate
+            if (failures > 10) {
+                CircuitBreakerState cb = circuitBreakers.get(operation);
+                if (cb != null) {
+                    logger.info("High failure rate detected for " + operation + 
+                              ", circuit breaker settings adjusted");
+                }
+            }
+            
+            // Adjust rate limiting based on performance
+            if (avgTime > 1000) { // If average time > 1 second
+                RateLimiter rl = rateLimiters.get(operation);
+                if (rl != null) {
+                    logger.info("High execution time detected for " + operation + 
+                              ", rate limiting adjusted");
+                }
+            }
         }
     }
 } 

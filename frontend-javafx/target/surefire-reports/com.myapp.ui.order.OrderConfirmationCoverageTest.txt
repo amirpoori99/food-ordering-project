@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.myapp.ui.order.OrderConfirmationCoverageTest
+-------------------------------------------------------------------------------
+Tests run: 21, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 12.79 s -- in com.myapp.ui.order.OrderConfirmationCoverageTest

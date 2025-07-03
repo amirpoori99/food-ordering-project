@@ -1,0 +1,17 @@
+-------------------------------------------------------------------------------
+Test set: com.myapp.ui.performance.PerformanceStressTest$NetworkStressTests
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 30.60 s <<< FAILURE! -- in com.myapp.ui.performance.PerformanceStressTest$NetworkStressTests
+com.myapp.ui.performance.PerformanceStressTest$NetworkStressTests.networkDisconnectionTest -- Time elapsed: 30.30 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: All disconnection tests should complete ==> expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:63)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:36)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:210)
+	at com.myapp.ui.performance.PerformanceStressTest$NetworkStressTests.networkDisconnectionTest(PerformanceStressTest.java:540)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+

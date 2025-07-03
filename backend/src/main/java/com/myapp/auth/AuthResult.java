@@ -10,6 +10,7 @@ public class AuthResult {
     private final String errorMessage;      // پیام خطا در صورت عدم موفقیت
     private final Long userId;              // شناسه کاربر (در صورت موفقیت)
     private final String phone;             // شماره تلفن کاربر (در صورت موفقیت)
+    private final String fullName;          // نام کامل کاربر (در صورت موفقیت)
     private final String role;              // نقش کاربر (در صورت موفقیت)
     private final String accessToken;       // Access Token برای دسترسی به API
     private final String refreshToken;      // Refresh Token برای تجدید Access Token
@@ -19,12 +20,13 @@ public class AuthResult {
      * سازنده خصوصی - فقط از طریق متدهای static قابل دسترسی
      * این الگو Type Safety و کنترل بهتری فراهم می‌کند
      */
-    private AuthResult(boolean authenticated, String errorMessage, Long userId, String phone, String role, 
+    private AuthResult(boolean authenticated, String errorMessage, Long userId, String phone, String fullName, String role, 
                       String accessToken, String refreshToken, boolean isRefresh) {
         this.authenticated = authenticated;   // تنظیم وضعیت احراز هویت
         this.errorMessage = errorMessage;     // تنظیم پیام خطا
         this.userId = userId;                 // تنظیم شناسه کاربر
         this.phone = phone;                   // تنظیم شماره تلفن
+        this.fullName = fullName;             // تنظیم نام کامل
         this.role = role;                     // تنظیم نقش کاربر
         this.accessToken = accessToken;       // تنظیم Access Token
         this.refreshToken = refreshToken;     // تنظیم Refresh Token
@@ -40,8 +42,8 @@ public class AuthResult {
      * @param accessToken Access Token
      * @return نتیجه احراز هویت موفق
      */
-    public static AuthResult authenticated(Long userId, String phone, String role, String accessToken) {
-        return new AuthResult(true, null, userId, phone, role, accessToken, null, false);
+    public static AuthResult authenticated(Long userId, String phone, String fullName, String role, String accessToken) {
+        return new AuthResult(true, null, userId, phone, fullName, role, accessToken, null, false);
     }
     
     /**
@@ -51,7 +53,7 @@ public class AuthResult {
      * @return نتیجه احراز هویت ناموفق
      */
     public static AuthResult unauthenticated(String errorMessage) {
-        return new AuthResult(false, errorMessage, null, null, null, null, null, false);
+        return new AuthResult(false, errorMessage, null, null, null, null, null, null, false);
     }
     
     /**
@@ -64,8 +66,8 @@ public class AuthResult {
      * @param newRefreshToken Refresh Token جدید
      * @return نتیجه تجدید token موفق
      */
-    public static AuthResult refreshed(Long userId, String phone, String role, String newAccessToken, String newRefreshToken) {
-        return new AuthResult(true, null, userId, phone, role, newAccessToken, newRefreshToken, true);
+    public static AuthResult refreshed(Long userId, String phone, String fullName, String role, String newAccessToken, String newRefreshToken) {
+        return new AuthResult(true, null, userId, phone, fullName, role, newAccessToken, newRefreshToken, true);
     }
     
     /**
@@ -102,6 +104,15 @@ public class AuthResult {
      */
     public String getPhone() {
         return phone;
+    }
+    
+    /**
+     * دریافت نام کامل کاربر احراز هویت شده
+     * 
+     * @return نام کامل کاربر یا null در صورت عدم احراز هویت
+     */
+    public String getFullName() {
+        return fullName;
     }
     
     /**

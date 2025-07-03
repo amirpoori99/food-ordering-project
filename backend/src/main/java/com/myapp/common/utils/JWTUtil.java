@@ -98,14 +98,15 @@ public class JWTUtil {
      * @param token JWT token برای اعتبارسنجی
      * @return true اگر token معتبر باشد، در غیر اینصورت false
      */
+    @SuppressWarnings("deprecation")
     public static boolean validateToken(String token) {
         try {
             // پردازش و اعتبارسنجی token
             Jwts.parser()
-                .verifyWith(getSigningKey())        // بررسی امضا
+                .setSigningKey(getSigningKey())     // بررسی امضا
                 .requireIssuer(ISSUER)              // بررسی صادرکننده
                 .build()
-                .parseSignedClaims(token);          // پردازش claims
+                .parseClaimsJws(token);             // پردازش claims
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false; // token نامعتبر
@@ -299,6 +300,7 @@ public class JWTUtil {
      * @return شیء Claims
      * @throws JwtException در صورت نامعتبر بودن token
      */
+    @SuppressWarnings("deprecation")
     private static Claims getClaimsFromToken(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())        // بررسی امضا

@@ -1,0 +1,876 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.myapp.stress.AdvancedStressTest" time="8.089" tests="5" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="17"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="Cp1252"/>
+    <property name="java.class.path" value="C:\Users\USER\Desktop\work space\food-ordering-project\backend\target\test-classes;C:\Users\USER\Desktop\work space\food-ordering-project\backend\target\classes;C:\Users\USER\.m2\repository\org\hibernate\orm\hibernate-core\6.4.0.Final\hibernate-core-6.4.0.Final.jar;C:\Users\USER\.m2\repository\jakarta\persistence\jakarta.persistence-api\3.1.0\jakarta.persistence-api-3.1.0.jar;C:\Users\USER\.m2\repository\jakarta\transaction\jakarta.transaction-api\2.0.1\jakarta.transaction-api-2.0.1.jar;C:\Users\USER\.m2\repository\org\jboss\logging\jboss-logging\3.5.0.Final\jboss-logging-3.5.0.Final.jar;C:\Users\USER\.m2\repository\org\hibernate\common\hibernate-commons-annotations\6.0.6.Final\hibernate-commons-annotations-6.0.6.Final.jar;C:\Users\USER\.m2\repository\io\smallrye\jandex\3.1.2\jandex-3.1.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\classmate\1.5.1\classmate-1.5.1.jar;C:\Users\USER\.m2\repository\net\bytebuddy\byte-buddy\1.14.7\byte-buddy-1.14.7.jar;C:\Users\USER\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.0\jakarta.xml.bind-api-4.0.0.jar;C:\Users\USER\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.0\jakarta.activation-api-2.1.0.jar;C:\Users\USER\.m2\repository\org\glassfish\jaxb\jaxb-runtime\4.0.2\jaxb-runtime-4.0.2.jar;C:\Users\USER\.m2\repository\org\glassfish\jaxb\jaxb-core\4.0.2\jaxb-core-4.0.2.jar;C:\Users\USER\.m2\repository\org\eclipse\angus\angus-activation\2.0.0\angus-activation-2.0.0.jar;C:\Users\USER\.m2\repository\org\glassfish\jaxb\txw2\4.0.2\txw2-4.0.2.jar;C:\Users\USER\.m2\repository\com\sun\istack\istack-commons-runtime\4.1.1\istack-commons-runtime-4.1.1.jar;C:\Users\USER\.m2\repository\jakarta\inject\jakarta.inject-api\2.0.1\jakarta.inject-api-2.0.1.jar;C:\Users\USER\.m2\repository\org\antlr\antlr4-runtime\4.13.0\antlr4-runtime-4.13.0.jar;C:\Users\USER\.m2\repository\org\hibernate\orm\hibernate-community-dialects\6.2.13.Final\hibernate-community-dialects-6.2.13.Final.jar;C:\Users\USER\.m2\repository\org\xerial\sqlite-jdbc\3.44.0.0\sqlite-jdbc-3.44.0.0.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.15.2\jackson-core-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.15.2\jackson-databind-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.15.2\jackson-annotations-2.15.2.jar;C:\Users\USER\.m2\repository\org\slf4j\slf4j-api\2.0.9\slf4j-api-2.0.9.jar;C:\Users\USER\.m2\repository\ch\qos\logback\logback-classic\1.4.11\logback-classic-1.4.11.jar;C:\Users\USER\.m2\repository\ch\qos\logback\logback-core\1.4.11\logback-core-1.4.11.jar;C:\Users\USER\.m2\repository\org\mindrot\jbcrypt\0.4\jbcrypt-0.4.jar;C:\Users\USER\.m2\repository\io\jsonwebtoken\jjwt-api\0.12.3\jjwt-api-0.12.3.jar;C:\Users\USER\.m2\repository\io\jsonwebtoken\jjwt-impl\0.12.3\jjwt-impl-0.12.3.jar;C:\Users\USER\.m2\repository\io\jsonwebtoken\jjwt-jackson\0.12.3\jjwt-jackson-0.12.3.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.0\junit-jupiter-5.10.0.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.0\junit-jupiter-api-5.10.0.jar;C:\Users\USER\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-commons\1.10.0\junit-platform-commons-1.10.0.jar;C:\Users\USER\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.0\junit-jupiter-params-5.10.0.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.0\junit-jupiter-engine-5.10.0.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-engine\1.10.0\junit-platform-engine-1.10.0.jar;C:\Users\USER\.m2\repository\org\mockito\mockito-core\5.7.0\mockito-core-5.7.0.jar;C:\Users\USER\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.9\byte-buddy-agent-1.14.9.jar;C:\Users\USER\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\USER\.m2\repository\org\assertj\assertj-core\3.24.2\assertj-core-3.24.2.jar;C:\Users\USER\.m2\repository\com\h2database\h2\2.2.224\h2-2.2.224.jar;C:\Users\USER\.m2\repository\org\testcontainers\junit-jupiter\1.19.3\junit-jupiter-1.19.3.jar;C:\Users\USER\.m2\repository\org\testcontainers\testcontainers\1.19.3\testcontainers-1.19.3.jar;C:\Users\USER\.m2\repository\junit\junit\4.13.2\junit-4.13.2.jar;C:\Users\USER\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\USER\.m2\repository\org\apache\commons\commons-compress\1.24.0\commons-compress-1.24.0.jar;C:\Users\USER\.m2\repository\org\rnorth\duct-tape\duct-tape\1.0.8\duct-tape-1.0.8.jar;C:\Users\USER\.m2\repository\org\jetbrains\annotations\17.0.0\annotations-17.0.0.jar;C:\Users\USER\.m2\repository\com\github\docker-java\docker-java-api\3.3.4\docker-java-api-3.3.4.jar;C:\Users\USER\.m2\repository\com\github\docker-java\docker-java-transport-zerodep\3.3.4\docker-java-transport-zerodep-3.3.4.jar;C:\Users\USER\.m2\repository\com\github\docker-java\docker-java-transport\3.3.4\docker-java-transport-3.3.4.jar;C:\Users\USER\.m2\repository\net\java\dev\jna\jna\5.13.0\jna-5.13.0.jar;C:\Users\USER\.m2\repository\com\squareup\okhttp3\mockwebserver\4.11.0\mockwebserver-4.11.0.jar;C:\Users\USER\.m2\repository\com\squareup\okhttp3\okhttp\4.11.0\okhttp-4.11.0.jar;C:\Users\USER\.m2\repository\com\squareup\okio\okio\3.2.0\okio-3.2.0.jar;C:\Users\USER\.m2\repository\com\squareup\okio\okio-jvm\3.2.0\okio-jvm-3.2.0.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib\1.6.20\kotlin-stdlib-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-common\1.6.20\kotlin-stdlib-common-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk8\1.6.10\kotlin-stdlib-jdk8-1.6.10.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk7\1.6.10\kotlin-stdlib-jdk7-1.6.10.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.15.2\jackson-datatype-jsr310-2.15.2.jar;"/>
+    <property name="java.vm.vendor" value="Eclipse Adoptium"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://adoptium.net/"/>
+    <property name="user.timezone" value="Asia/Tehran"/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="java.vm.specification.version" value="17"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.boot.library.path" value="C:\Program Files\Eclipse Adoptium\jdk-17.0.14.7-hotspot\bin"/>
+    <property name="sun.java.command" value="C:\Users\USER\AppData\Local\Temp\surefire8236851155724109824\surefirebooter-20250703070855672_3.jar C:\Users\USER\AppData\Local\Temp\surefire8236851155724109824 2025-07-03T07-08-55_112-jvmRun1 surefire-20250703070855672_1tmp surefire_0-20250703070855672_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="C:\Users\USER\Desktop\work space\food-ordering-project\backend\target\test-classes;C:\Users\USER\Desktop\work space\food-ordering-project\backend\target\classes;C:\Users\USER\.m2\repository\org\hibernate\orm\hibernate-core\6.4.0.Final\hibernate-core-6.4.0.Final.jar;C:\Users\USER\.m2\repository\jakarta\persistence\jakarta.persistence-api\3.1.0\jakarta.persistence-api-3.1.0.jar;C:\Users\USER\.m2\repository\jakarta\transaction\jakarta.transaction-api\2.0.1\jakarta.transaction-api-2.0.1.jar;C:\Users\USER\.m2\repository\org\jboss\logging\jboss-logging\3.5.0.Final\jboss-logging-3.5.0.Final.jar;C:\Users\USER\.m2\repository\org\hibernate\common\hibernate-commons-annotations\6.0.6.Final\hibernate-commons-annotations-6.0.6.Final.jar;C:\Users\USER\.m2\repository\io\smallrye\jandex\3.1.2\jandex-3.1.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\classmate\1.5.1\classmate-1.5.1.jar;C:\Users\USER\.m2\repository\net\bytebuddy\byte-buddy\1.14.7\byte-buddy-1.14.7.jar;C:\Users\USER\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.0\jakarta.xml.bind-api-4.0.0.jar;C:\Users\USER\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.0\jakarta.activation-api-2.1.0.jar;C:\Users\USER\.m2\repository\org\glassfish\jaxb\jaxb-runtime\4.0.2\jaxb-runtime-4.0.2.jar;C:\Users\USER\.m2\repository\org\glassfish\jaxb\jaxb-core\4.0.2\jaxb-core-4.0.2.jar;C:\Users\USER\.m2\repository\org\eclipse\angus\angus-activation\2.0.0\angus-activation-2.0.0.jar;C:\Users\USER\.m2\repository\org\glassfish\jaxb\txw2\4.0.2\txw2-4.0.2.jar;C:\Users\USER\.m2\repository\com\sun\istack\istack-commons-runtime\4.1.1\istack-commons-runtime-4.1.1.jar;C:\Users\USER\.m2\repository\jakarta\inject\jakarta.inject-api\2.0.1\jakarta.inject-api-2.0.1.jar;C:\Users\USER\.m2\repository\org\antlr\antlr4-runtime\4.13.0\antlr4-runtime-4.13.0.jar;C:\Users\USER\.m2\repository\org\hibernate\orm\hibernate-community-dialects\6.2.13.Final\hibernate-community-dialects-6.2.13.Final.jar;C:\Users\USER\.m2\repository\org\xerial\sqlite-jdbc\3.44.0.0\sqlite-jdbc-3.44.0.0.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.15.2\jackson-core-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.15.2\jackson-databind-2.15.2.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.15.2\jackson-annotations-2.15.2.jar;C:\Users\USER\.m2\repository\org\slf4j\slf4j-api\2.0.9\slf4j-api-2.0.9.jar;C:\Users\USER\.m2\repository\ch\qos\logback\logback-classic\1.4.11\logback-classic-1.4.11.jar;C:\Users\USER\.m2\repository\ch\qos\logback\logback-core\1.4.11\logback-core-1.4.11.jar;C:\Users\USER\.m2\repository\org\mindrot\jbcrypt\0.4\jbcrypt-0.4.jar;C:\Users\USER\.m2\repository\io\jsonwebtoken\jjwt-api\0.12.3\jjwt-api-0.12.3.jar;C:\Users\USER\.m2\repository\io\jsonwebtoken\jjwt-impl\0.12.3\jjwt-impl-0.12.3.jar;C:\Users\USER\.m2\repository\io\jsonwebtoken\jjwt-jackson\0.12.3\jjwt-jackson-0.12.3.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.0\junit-jupiter-5.10.0.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.0\junit-jupiter-api-5.10.0.jar;C:\Users\USER\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-commons\1.10.0\junit-platform-commons-1.10.0.jar;C:\Users\USER\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.0\junit-jupiter-params-5.10.0.jar;C:\Users\USER\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.0\junit-jupiter-engine-5.10.0.jar;C:\Users\USER\.m2\repository\org\junit\platform\junit-platform-engine\1.10.0\junit-platform-engine-1.10.0.jar;C:\Users\USER\.m2\repository\org\mockito\mockito-core\5.7.0\mockito-core-5.7.0.jar;C:\Users\USER\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.9\byte-buddy-agent-1.14.9.jar;C:\Users\USER\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\USER\.m2\repository\org\assertj\assertj-core\3.24.2\assertj-core-3.24.2.jar;C:\Users\USER\.m2\repository\com\h2database\h2\2.2.224\h2-2.2.224.jar;C:\Users\USER\.m2\repository\org\testcontainers\junit-jupiter\1.19.3\junit-jupiter-1.19.3.jar;C:\Users\USER\.m2\repository\org\testcontainers\testcontainers\1.19.3\testcontainers-1.19.3.jar;C:\Users\USER\.m2\repository\junit\junit\4.13.2\junit-4.13.2.jar;C:\Users\USER\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\USER\.m2\repository\org\apache\commons\commons-compress\1.24.0\commons-compress-1.24.0.jar;C:\Users\USER\.m2\repository\org\rnorth\duct-tape\duct-tape\1.0.8\duct-tape-1.0.8.jar;C:\Users\USER\.m2\repository\org\jetbrains\annotations\17.0.0\annotations-17.0.0.jar;C:\Users\USER\.m2\repository\com\github\docker-java\docker-java-api\3.3.4\docker-java-api-3.3.4.jar;C:\Users\USER\.m2\repository\com\github\docker-java\docker-java-transport-zerodep\3.3.4\docker-java-transport-zerodep-3.3.4.jar;C:\Users\USER\.m2\repository\com\github\docker-java\docker-java-transport\3.3.4\docker-java-transport-3.3.4.jar;C:\Users\USER\.m2\repository\net\java\dev\jna\jna\5.13.0\jna-5.13.0.jar;C:\Users\USER\.m2\repository\com\squareup\okhttp3\mockwebserver\4.11.0\mockwebserver-4.11.0.jar;C:\Users\USER\.m2\repository\com\squareup\okhttp3\okhttp\4.11.0\okhttp-4.11.0.jar;C:\Users\USER\.m2\repository\com\squareup\okio\okio\3.2.0\okio-3.2.0.jar;C:\Users\USER\.m2\repository\com\squareup\okio\okio-jvm\3.2.0\okio-jvm-3.2.0.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib\1.6.20\kotlin-stdlib-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-common\1.6.20\kotlin-stdlib-common-1.6.20.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk8\1.6.10\kotlin-stdlib-jdk8-1.6.10.jar;C:\Users\USER\.m2\repository\org\jetbrains\kotlin\kotlin-stdlib-jdk7\1.6.10\kotlin-stdlib-jdk7-1.6.10.jar;C:\Users\USER\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.15.2\jackson-datatype-jsr310-2.15.2.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\USER"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2025-01-21"/>
+    <property name="java.home" value="C:\Program Files\Eclipse Adoptium\jdk-17.0.14.7-hotspot"/>
+    <property name="spring.profiles.active" value="test"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="C:\Users\USER\Desktop\work space\food-ordering-project\backend"/>
+    <property name="java.vm.compressedOopsMode" value="32-bit"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="surefire.real.class.path" value="C:\Users\USER\AppData\Local\Temp\surefire8236851155724109824\surefirebooter-20250703070855672_3.jar"/>
+    <property name="user.script" value=""/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="17.0.14+7"/>
+    <property name="user.name" value="USER"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Temurin-17.0.14+7"/>
+    <property name="localRepository" value="C:\Users\USER\.m2\repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/adoptium/adoptium-support/issues"/>
+    <property name="java.io.tmpdir" value="C:\Users\USER\AppData\Local\Temp\"/>
+    <property name="java.version" value="17.0.14"/>
+    <property name="user.dir" value="C:\Users\USER\Desktop\work space\food-ordering-project\backend"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="native.encoding" value="Cp1252"/>
+    <property name="java.library.path" value="C:\Program Files\Eclipse Adoptium\jdk-17.0.14.7-hotspot\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\mingw64\mingw64\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files\Eclipse Adoptium\jdk-17.0.14.7-hotspot\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\dotnet\;C:\Program Files (x86)\AOMEI;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Microsoft VS Code\bin;C:\mingw64\mingw64\bin;C:\raylib-master\src;C:\Program Files\Git\cmd;C:\Program Files\Redis\;C:\Users\USER\AppData\Local\Programs\Python\Python313\Scripts\;C:\Users\USER\AppData\Local\Programs\Python\Python313\;C:\Users\USER\AppData\Local\Programs\Python\Launcher\;C:\Users\USER\AppData\Local\Programs\Python\Python312\Scripts\;C:\Users\USER\AppData\Local\Programs\Python\Python312\;C:\Users\USER\AppData\Local\Microsoft\WindowsApps;C:\mingw64\mingw64\bin;C:\raylib-master\src;C:\Program Files\Java\jdk-23\bin;C:\modeltech64_2020.4\win64;C:\apache-maven\apache-maven-3.9.9\bin;C:\Program Files\JetBrains\IntelliJ IDEA 2025.1.1.1\bin;;C:\Users\USER\AppData\Local\Programs\cursor\resources\app\bin;;."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="java.vendor" value="Eclipse Adoptium"/>
+    <property name="java.vm.version" value="17.0.14+7"/>
+    <property name="java.specification.maintenance.version" value="1"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="61.0"/>
+  </properties>
+  <testcase name="testSecurityPenetration" classname="com.myapp.stress.AdvancedStressTest" time="0.154">
+    <system-out><![CDATA[2025-07-03 07:10:26.850 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 07:10:26.850 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 07:10:26.850 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 07:10:26.850 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 07:10:26.850 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 07:10:26.850 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 07:10:26.851 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 07:10:26.852 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 07:10:26.852 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 07:10:26.852 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database setup completed
+🔒 Testing Security Penetration...
+✅ Security Penetration Testing Completed
+2025-07-03 07:10:26.999 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 07:10:26.999 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 07:10:26.999 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 07:10:27.000 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 07:10:27.000 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 07:10:27.000 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 07:10:27.000 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 07:10:27.001 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 07:10:27.001 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+]]></system-out>
+  </testcase>
+  <testcase name="testHighConcurrentLoad" classname="com.myapp.stress.AdvancedStressTest" time="3.39">
+    <system-out><![CDATA[2025-07-03 07:10:27.004 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 07:10:27.004 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 07:10:27.005 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 07:10:27.005 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 07:10:27.005 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 07:10:27.005 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 07:10:27.005 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 07:10:27.006 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 07:10:27.006 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 07:10:27.006 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database setup completed
+🔥 شروع تست فشار بالا با 1000 درخواست همزمان
+📊 تنظیمات تست:
+  - تعداد Thread ها: 50
+  - درخواست هر Thread: 20
+  - کل درخواست‌ها: 1000
+🚀 شروع ارسال درخواست‌های همزمان
+🧵 Thread 0 شروع به کار کرد
+🧵 Thread 1 شروع به کار کرد
+🧵 Thread 2 شروع به کار کرد
+🧵 Thread 3 شروع به کار کرد
+🧵 Thread 4 شروع به کار کرد
+🧵 Thread 5 شروع به کار کرد
+🧵 Thread 6 شروع به کار کرد
+🧵 Thread 7 شروع به کار کرد
+🧵 Thread 8 شروع به کار کرد
+🧵 Thread 9 شروع به کار کرد
+🧵 Thread 12 شروع به کار کرد
+🧵 Thread 11 شروع به کار کرد
+🧵 Thread 16 شروع به کار کرد
+🧵 Thread 13 شروع به کار کرد
+🧵 Thread 14 شروع به کار کرد
+🧵 Thread 15 شروع به کار کرد
+🧵 Thread 10 شروع به کار کرد
+🧵 Thread 17 شروع به کار کرد
+🧵 Thread 19 شروع به کار کرد
+🧵 Thread 18 شروع به کار کرد
+🧵 Thread 20 شروع به کار کرد
+🧵 Thread 21 شروع به کار کرد
+🧵 Thread 22 شروع به کار کرد
+🧵 Thread 24 شروع به کار کرد
+🧵 Thread 23 شروع به کار کرد
+🧵 Thread 25 شروع به کار کرد
+🧵 Thread 27 شروع به کار کرد
+🧵 Thread 26 شروع به کار کرد
+🧵 Thread 29 شروع به کار کرد
+🧵 Thread 28 شروع به کار کرد
+🧵 Thread 30 شروع به کار کرد
+🧵 Thread 31 شروع به کار کرد
+🧵 Thread 32 شروع به کار کرد
+🧵 Thread 33 شروع به کار کرد
+🧵 Thread 34 شروع به کار کرد
+🧵 Thread 35 شروع به کار کرد
+🧵 Thread 36 شروع به کار کرد
+🧵 Thread 37 شروع به کار کرد
+🧵 Thread 39 شروع به کار کرد
+🧵 Thread 38 شروع به کار کرد
+🧵 Thread 40 شروع به کار کرد
+🧵 Thread 41 شروع به کار کرد
+🧵 Thread 45 شروع به کار کرد
+⏳ انتظار برای تکمیل همه Thread ها
+🧵 Thread 44 شروع به کار کرد
+🧵 Thread 46 شروع به کار کرد
+🧵 Thread 42 شروع به کار کرد
+🧵 Thread 43 شروع به کار کرد
+🧵 Thread 48 شروع به کار کرد
+🧵 Thread 47 شروع به کار کرد
+🧵 Thread 49 شروع به کار کرد
+✅ Thread 10 کار خود را تکمیل کرد
+✅ Thread 3 کار خود را تکمیل کرد
+✅ Thread 2 کار خود را تکمیل کرد
+✅ Thread 6 کار خود را تکمیل کرد
+✅ Thread 18 کار خود را تکمیل کرد
+✅ Thread 4 کار خود را تکمیل کرد
+✅ Thread 14 کار خود را تکمیل کرد
+✅ Thread 12 کار خود را تکمیل کرد
+✅ Thread 5 کار خود را تکمیل کرد
+✅ Thread 49 کار خود را تکمیل کرد
+✅ Thread 0 کار خود را تکمیل کرد
+✅ Thread 33 کار خود را تکمیل کرد
+✅ Thread 30 کار خود را تکمیل کرد
+✅ Thread 19 کار خود را تکمیل کرد
+✅ Thread 16 کار خود را تکمیل کرد
+✅ Thread 7 کار خود را تکمیل کرد
+✅ Thread 28 کار خود را تکمیل کرد
+✅ Thread 15 کار خود را تکمیل کرد
+✅ Thread 23 کار خود را تکمیل کرد
+✅ Thread 11 کار خود را تکمیل کرد
+✅ Thread 25 کار خود را تکمیل کرد
+✅ Thread 48 کار خود را تکمیل کرد
+✅ Thread 45 کار خود را تکمیل کرد
+✅ Thread 37 کار خود را تکمیل کرد
+✅ Thread 20 کار خود را تکمیل کرد
+✅ Thread 27 کار خود را تکمیل کرد
+✅ Thread 9 کار خود را تکمیل کرد
+✅ Thread 8 کار خود را تکمیل کرد
+✅ Thread 13 کار خود را تکمیل کرد
+✅ Thread 39 کار خود را تکمیل کرد
+✅ Thread 24 کار خود را تکمیل کرد
+✅ Thread 42 کار خود را تکمیل کرد
+✅ Thread 31 کار خود را تکمیل کرد
+✅ Thread 17 کار خود را تکمیل کرد
+✅ Thread 29 کار خود را تکمیل کرد
+✅ Thread 43 کار خود را تکمیل کرد
+✅ Thread 1 کار خود را تکمیل کرد
+✅ Thread 32 کار خود را تکمیل کرد
+✅ Thread 44 کار خود را تکمیل کرد
+✅ Thread 40 کار خود را تکمیل کرد
+✅ Thread 21 کار خود را تکمیل کرد
+✅ Thread 46 کار خود را تکمیل کرد
+✅ Thread 26 کار خود را تکمیل کرد
+✅ Thread 35 کار خود را تکمیل کرد
+✅ Thread 22 کار خود را تکمیل کرد
+✅ Thread 41 کار خود را تکمیل کرد
+✅ Thread 38 کار خود را تکمیل کرد
+✅ Thread 36 کار خود را تکمیل کرد
+✅ Thread 34 کار خود را تکمیل کرد
+📊 تحلیل نتایج تست فشار بالا:
+   📈 کل درخواست‌ها: 1000
+   ✅ موفق: 988 (98.80%)
+   ❌ ناموفق: 0
+   ⏱️ میانگین زمان پاسخ: 41.88 میلی‌ثانیه
+🎯 بررسی معیارهای موفقیت:
+✅ تست اجرا شد - نرخ موفقیت: 98.8%
+✅ زمان پاسخ قابل قبول: 41.9 ms
+🎉 تست فشار بالا با موفقیت تکمیل شد
+2025-07-03 07:10:30.386 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 07:10:30.387 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 07:10:30.387 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 07:10:30.387 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 07:10:30.387 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 07:10:30.387 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 07:10:30.387 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 07:10:30.390 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 07:10:30.390 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+]]></system-out>
+  </testcase>
+  <testcase name="testMemoryLeakage" classname="com.myapp.stress.AdvancedStressTest" time="4.202">
+    <system-out><![CDATA[2025-07-03 07:10:30.395 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 07:10:30.396 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 07:10:30.396 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 07:10:30.396 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 07:10:30.396 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 07:10:30.396 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 07:10:30.396 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 07:10:30.398 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 07:10:30.398 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 07:10:30.398 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database setup completed
+🧠 Testing Memory Leakage...
+Initial Memory Usage: 56 MB
+Iteration 0 - Memory: 37 MB (Increase: -19 MB)
+Iteration 30 - Memory: 37 MB (Increase: -19 MB)
+Iteration 60 - Memory: 37 MB (Increase: -19 MB)
+Iteration 90 - Memory: 37 MB (Increase: -19 MB)
+Iteration 120 - Memory: 37 MB (Increase: -19 MB)
+Iteration 150 - Memory: 37 MB (Increase: -19 MB)
+Iteration 180 - Memory: 37 MB (Increase: -19 MB)
+Iteration 210 - Memory: 39 MB (Increase: -16 MB)
+Iteration 240 - Memory: 36 MB (Increase: -20 MB)
+Iteration 270 - Memory: 36 MB (Increase: -20 MB)
+✅ Memory Leakage Testing Completed
+2025-07-03 07:10:34.590 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 07:10:34.590 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 07:10:34.590 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 07:10:34.590 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 07:10:34.590 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 07:10:34.590 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 07:10:34.590 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 07:10:34.593 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 07:10:34.593 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+]]></system-out>
+  </testcase>
+  <testcase name="testDataCorruption" classname="com.myapp.stress.AdvancedStressTest" time="0.173">
+    <system-out><![CDATA[2025-07-03 07:10:34.598 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 07:10:34.598 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 07:10:34.598 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 07:10:34.598 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 07:10:34.598 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 07:10:34.598 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 07:10:34.599 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 07:10:34.611 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 07:10:34.611 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 07:10:34.611 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database setup completed
+💥 Testing Data Corruption Scenarios...
+✅ Data Corruption Testing Completed
+2025-07-03 07:10:34.765 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 07:10:34.766 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 07:10:34.766 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 07:10:34.766 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 07:10:34.766 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 07:10:34.766 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 07:10:34.766 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 07:10:34.767 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 07:10:34.767 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+]]></system-out>
+  </testcase>
+  <testcase name="testEdgeCasesAndBoundaryValues" classname="com.myapp.stress.AdvancedStressTest" time="0.168">
+    <system-out><![CDATA[2025-07-03 07:10:34.771 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 07:10:34.771 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 07:10:34.771 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 07:10:34.771 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 07:10:34.771 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 07:10:34.772 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 07:10:34.772 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 07:10:34.773 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 07:10:34.773 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 07:10:34.773 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database setup completed
+🎯 Testing Edge Cases and Boundary Values...
+🔍 شروع تست داده‌های خالی و null
+📋 تعداد test case ها: 15
+🧪 تست 1/15: ''
+  ✅ موفق - Status: 400
+🧪 تست 2/15: '{}'
+  ✅ موفق - Status: 400
+🧪 تست 3/15: '{"fullName":""}'
+  ✅ موفق - Status: 400
+🧪 تست 4/15: '{"phone":""}'
+  ✅ موفق - Status: 400
+🧪 تست 5/15: '{"password":""}'
+  ✅ موفق - Status: 400
+🧪 تست 6/15: '{"fullName":null}'
+  ✅ موفق - Status: 400
+🧪 تست 7/15: '{"phone":null,"passw...'
+  ✅ موفق - Status: 400
+🧪 تست 8/15: '{"fullName":"   "}'
+  ✅ موفق - Status: 400
+🧪 تست 9/15: '{"fullName":"\t\n\r"...'
+  ✅ موفق - Status: 400
+🧪 تست 10/15: 'null'
+  ✅ موفق - Status: 400
+🧪 تست 11/15: '{"fullName":"\u0000"...'
+  ✅ موفق - Status: 400
+🧪 تست 12/15: '{"data":undefined}'
+  ✅ موفق - Status: 500
+🧪 تست 13/15: '     '
+  ✅ موفق - Status: 400
+🧪 تست 14/15: '	
+'
+  ✅ موفق - Status: 400
+🧪 تست 15/15: '{"test":""}'
+  ✅ موفق - Status: 400
+📊 نتیجه تست داده‌های خالی: 15/15 موفق (100.0%)
+✅ تست داده‌های خالی موفق - سیستم crash نکرد
+🔢 شروع تست اعداد مرزی
+📋 تعداد اعداد تست: 8
+🧪 تست عدد 1/8: 9223372036854775807
+  ✅ پاسخ دریافت شد - Status: 404
+🧪 تست عدد 2/8: -9223372036854775808
+  ✅ پاسخ دریافت شد - Status: 404
+🧪 تست عدد 3/8: 0
+  ✅ پاسخ دریافت شد - Status: 404
+🧪 تست عدد 4/8: -1
+  ✅ پاسخ دریافت شد - Status: 404
+🧪 تست عدد 5/8: 2147483647
+  ✅ پاسخ دریافت شد - Status: 404
+🧪 تست عدد 6/8: -2147483648
+  ✅ پاسخ دریافت شد - Status: 404
+🧪 تست عدد 7/8: 999999999999
+  ✅ پاسخ دریافت شد - Status: 404
+🧪 تست عدد 8/8: -999999999999
+  ✅ پاسخ دریافت شد - Status: 404
+✅ تست اعداد مرزی تکمیل شد
+📄 شروع تست فرمت‌های نامعتبر JSON
+📋 تعداد JSON نامعتبر: 11
+🧪 تست JSON 1/11: '{invalid json'
+  ✅ خطای مناسب - Status: 500
+🧪 تست JSON 2/11: '{'single': 'quotes'}'
+  ✅ خطای مناسب - Status: 500
+🧪 تست JSON 3/11: '{"trailing": "comma",}'
+  ✅ خطای مناسب - Status: 500
+🧪 تست JSON 4/11: '{"duplicate":1,"duplicate":2}'
+  ✅ خطای مناسب - Status: 400
+🧪 تست JSON 5/11: 'not json at all'
+  ✅ خطای مناسب - Status: 500
+🧪 تست JSON 6/11: '[1,2,3]'
+  ✅ خطای مناسب - Status: 400
+🧪 تست JSON 7/11: '123'
+  ✅ خطای مناسب - Status: 400
+🧪 تست JSON 8/11: '"string"'
+  ✅ خطای مناسب - Status: 400
+🧪 تست JSON 9/11: '{"nested":{"deeply":{"very":{"...'
+  ✅ خطای مناسب - Status: 400
+🧪 تست JSON 10/11: '{"\u0000":"null byte"}'
+  ✅ خطای مناسب - Status: 400
+🧪 تست JSON 11/11: '{"key":undefined}'
+  ✅ خطای مناسب - Status: 500
+✅ تست فرمت‌های نامعتبر JSON تکمیل شد
+✅ Edge Cases Testing Completed
+2025-07-03 07:10:34.934 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 07:10:34.934 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 07:10:34.934 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 07:10:34.935 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 07:10:34.935 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 07:10:34.935 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 07:10:34.935 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 07:10:34.936 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 07:10:34.936 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+]]></system-out>
+  </testcase>
+</testsuite>

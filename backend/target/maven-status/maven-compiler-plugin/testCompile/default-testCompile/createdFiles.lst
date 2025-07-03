@@ -110,7 +110,6 @@ com\myapp\item\ItemServiceTest$MenuStatisticsTests.class
 com\myapp\stress\DatabasePerformanceTest$LargeDatasetTests.class
 com\myapp\review\RatingControllerTest$ErrorHandlingTests.class
 com\myapp\review\RatingServiceTest$RatingStatsTests.class
-com\myapp\common\utils\AdvancedOptimizerTest$IntegrationTests.class
 com\myapp\coupon\CouponCompleteTest.class
 com\myapp\item\ItemServiceEdgeCaseTest$ConcurrentOperationsTests.class
 com\myapp\courier\DeliveryControllerTest.class
@@ -169,8 +168,6 @@ com\myapp\auth\UserEntityTest$RoleEnumTests.class
 com\myapp\item\FoodItemEntityTest$EdgeCasesAndErrorHandling.class
 com\myapp\courier\DeliveryEntityTest$GettersSettersTests.class
 com\myapp\review\RatingServiceTest$DeleteRatingTests.class
-com\myapp\common\utils\AdvancedOptimizerTest$ConnectionPoolTests.class
-com\myapp\common\utils\AdvancedOptimizerTest$EdgeCasesTests.class
 com\myapp\favorites\FavoritesServiceTest$FavoriteStatsTests.class
 com\myapp\common\utils\JWTUtilTest$TokenGenerationTests.class
 com\myapp\payment\TransactionControllerTest$WalletWithdrawalsTests.class
@@ -196,11 +193,9 @@ com\myapp\common\utils\JWTUtilTest$EdgeCasesTests.class
 com\myapp\favorites\FavoritesRepositoryTest$DataIntegrityTests.class
 com\myapp\vendor\VendorRepositoryTest$PerformanceTests.class
 com\myapp\courier\DeliveryEntityTest$TimeEstimationTests.class
-com\myapp\common\utils\AdvancedOptimizerTest.class
 com\myapp\review\RatingRepositoryTest$FindByScoreRangeTests.class
 com\myapp\menu\MenuServiceTest$ItemAvailabilityTests.class
 com\myapp\payment\PaymentEdgeCaseTest$PaymentMethodValidationTests.class
-com\myapp\common\utils\SecurityUtilTest.class
 com\myapp\review\RatingRepositoryTest$FindRecentRatingsTests.class
 com\myapp\auth\AuthServiceIntegrationTest$PerformanceIntegrationTests.class
 com\myapp\courier\DeliveryEntityTest$DeliveryCompletionTests.class
@@ -221,6 +216,7 @@ com\myapp\vendor\VendorRepositoryTest$FindByFiltersTests.class
 com\myapp\favorites\FavoritesServiceTest$CheckFavoriteTests.class
 com\myapp\api\RegistrationApiTest$MultipleUserTests.class
 com\myapp\restaurant\RestaurantRepositoryTest$RestaurantQueryPerformanceTests.class
+com\myapp\payment\PaymentControllerTest$1.class
 com\myapp\item\ItemServiceTest$InputValidationTests.class
 com\myapp\favorites\FavoritesRepositoryTest$CountOperationsTests.class
 com\myapp\courier\DeliveryServiceTest$GetDeliveryTests.class
@@ -232,7 +228,6 @@ com\myapp\courier\DeliveryServiceTest$CreateDeliveryTests.class
 com\myapp\menu\MenuServiceTest$RemoveItemFromMenuTests.class
 com\myapp\common\utils\SQLiteTestHelper.class
 com\myapp\restaurant\RestaurantServiceTest$PendingRestaurantsTests.class
-com\myapp\common\utils\AdvancedOptimizerTest$PerformanceTests.class
 com\myapp\payment\TransactionControllerTest$ErrorHandlingTests.class
 com\myapp\favorites\FavoritesServiceTest$GetUserFavoriteForRestaurantTests.class
 com\myapp\auth\AuthServiceTest$LoginTests.class
@@ -247,7 +242,6 @@ com\myapp\auth\UserEntityTest$PersistenceTests.class
 com\myapp\coupon\CouponServiceTest$CouponUsageTests.class
 com\myapp\review\RatingRepositoryTest$DataIntegrityTests.class
 com\myapp\auth\SecurityComprehensiveTest$EdgeCasesSecurityTests.class
-com\myapp\common\utils\AdvancedOptimizerTest$DynamicConfigurationTests.class
 com\myapp\notification\NotificationControllerTest$PutEndpointsTest.class
 com\myapp\auth\UserEntityTest$EntityCreationTests.class
 com\myapp\menu\MenuServiceTest$UpdateMenuItemTests.class
@@ -276,7 +270,6 @@ com\myapp\favorites\FavoritesRepositoryTest$RecentFavoritesTests.class
 com\myapp\order\OrderControllerIntegrationTest$PerformanceTests.class
 com\myapp\common\ApplicationConstantsTest$SecurityConstantsTests.class
 com\myapp\restaurant\RestaurantServiceTest$RestaurantStatisticsTests.class
-com\myapp\common\utils\AdvancedOptimizerTest$CircuitBreakerTests.class
 com\myapp\vendor\VendorControllerTest$GetVendorDetailsTests.class
 com\myapp\order\OrderControllerIntegrationTest$ConcurrentAccessTests.class
 com\myapp\vendor\VendorServiceTest$GetFeaturedVendorsTests.class
@@ -317,7 +310,6 @@ com\myapp\payment\PaymentControllerTest$PaymentHistoryTests.class
 com\myapp\payment\WalletServiceTest$WalletChargingTests.class
 com\myapp\favorites\FavoritesServiceTest$AddFavoriteTests.class
 com\myapp\common\ApplicationConstantsTest$HttpStatusConstantsTests.class
-com\myapp\common\utils\AdvancedOptimizerTest$RateLimitingTests.class
 com\myapp\notification\NotificationControllerTest.class
 com\myapp\order\OrderEntityTest$ErrorConditionsTests.class
 com\myapp\courier\DeliveryServiceTest$MissingMethodsTests.class
@@ -341,12 +333,11 @@ com\myapp\menu\MenuServiceTest.class
 com\myapp\auth\JWTEndToEndTest.class
 com\myapp\review\RatingControllerTest$EdgeCasesTests.class
 com\myapp\auth\AuthControllerTest$RegistrationControllerTests.class
+com\myapp\common\DatabaseTest.class
 com\myapp\coupon\CouponCompleteTest$AdditionalCoverageTests.class
 com\myapp\item\FoodItemEntityTest$BusinessLogicTests.class
 com\myapp\vendor\VendorRepositoryTest$FindByLocationTests.class
 com\myapp\favorites\FavoritesRepositoryTest$FindOperationTests.class
-com\myapp\common\utils\AdvancedOptimizerTest$ErrorHandlingTests.class
-com\myapp\common\utils\ValidationUtilTest.class
 com\myapp\item\ItemRepositoryTest.class
 com\myapp\vendor\VendorControllerTest$GetVendorsByLocationTests.class
 com\myapp\common\ApplicationConstantsTest$DatabaseConstantsTests.class
@@ -382,7 +373,6 @@ com\myapp\item\ItemServiceTest$BusinessLogicTests.class
 com\myapp\restaurant\RestaurantServiceTest$EdgeCaseTests.class
 com\myapp\courier\DeliveryControllerTest$PutEndpointsTests.class
 com\myapp\favorites\FavoritesControllerTest$ConstructorTests.class
-com\myapp\common\utils\LoggerUtilTest.class
 com\myapp\payment\WalletControllerTest$TransactionHistoryTests.class
 com\myapp\api\RegistrationApiTest$BasicRegistrationTests.class
 com\myapp\vendor\VendorServiceTest$GetVendorsByLocationTests.class
@@ -410,7 +400,6 @@ com\myapp\vendor\VendorServiceTest$GetAllVendorsTests.class
 com\myapp\vendor\VendorControllerTest.class
 com\myapp\common\utils\JWTUtilTest$TokenValidationTests.class
 com\myapp\order\OrderServiceTest.class
-com\myapp\common\utils\AdvancedSecurityUtilTest.class
 com\myapp\review\RatingServiceTest$PerformanceTests.class
 com\myapp\item\ItemServiceTest$AddItemTests.class
 com\myapp\review\RatingRepositoryTest$FindByRestaurantTests.class

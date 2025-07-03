@@ -151,13 +151,13 @@ public class ServerApp {
         
         // مرحله 10: اضافه کردن endpoint های کنترلرها (Business Logic)
         server.createContext("/api/admin/", adminController);              // endpoint های پنل مدیریت
-        server.createContext("/api/restaurants/", restaurantController);   // endpoint های رستوران‌ها
+        server.createContext("/api/restaurants", restaurantController);   // endpoint های رستوران‌ها
         server.createContext("/api/orders/", orderController);             // endpoint های سفارشات
         server.createContext("/api/payments/", paymentController);         // endpoint های پرداخت
         server.createContext("/api/wallet/", walletController);            // endpoint های کیف پول
         server.createContext("/api/transactions/", transactionController); // endpoint های تراکنش‌ها
         server.createContext("/api/deliveries/", deliveryController);      // endpoint های تحویل
-        server.createContext("/api/items/", itemController);               // endpoint های آیتم‌ها
+        server.createContext("/api/items", itemController);               // endpoint های آیتم‌ها
         server.createContext("/api/menu/", menuController);                // endpoint های منو
         server.createContext("/api/vendors/", vendorController);           // endpoint های فروشندگان
         server.createContext("/api/favorites/", favoritesController);      // endpoint های علاقه‌مندی‌ها
@@ -516,9 +516,6 @@ public class ServerApp {
                         return;
                     }
                     
-                    // هش کردن رمز عبور برای مقایسه (در واقع باید از verify استفاده شود)
-                    // String passwordHash = "hashed_" + password;
-                    
                     // احراز هویت کاربر و دریافت JWT token
                     AuthResult authResult = authService.loginWithTokens(phone, password);
                     
@@ -535,7 +532,7 @@ public class ServerApp {
                         "\"accessToken\":\"%s\",\"refreshToken\":\"%s\"," +
                         "\"tokenType\":\"Bearer\",\"expiresIn\":%d}",
                         authResult.getUserId(),                         // شناسه کاربر
-                        authResult.getPhone().replace("\"", "\\\""),    // نام کاربر (با escape کردن ")
+                        authResult.getFullName().replace("\"", "\\\""),    // نام کاربر (با escape کردن ")
                         authResult.getPhone(),                          // شماره تلفن
                         authResult.getRole(),                           // نقش کاربر
                         authResult.getAccessToken(),                    // Access Token

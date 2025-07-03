@@ -4,6 +4,8 @@ import com.myapp.common.exceptions.NotFoundException;
 import com.myapp.common.models.Restaurant;
 import com.myapp.common.models.RestaurantStatus;
 import com.myapp.common.utils.PerformanceUtil;
+import com.myapp.common.utils.AdvancedOptimizer;
+import com.myapp.common.utils.ValidationUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -69,7 +71,14 @@ public class RestaurantService {
             throw new IllegalArgumentException("Restaurant cannot be null");
         }
         
-        // اعتبارسنجی اطلاعات رستوران
+        // اعتبارسنجی اطلاعات رستوران با ValidationUtil
+        if (!ValidationUtil.isValidRestaurantName(restaurant.getName())) {
+            throw new IllegalArgumentException("Invalid restaurant name");
+        }
+        if (!ValidationUtil.isValidAddress(restaurant.getAddress())) {
+            throw new IllegalArgumentException("Invalid address");
+        }
+        
         validateRegistrationInput(restaurant.getOwnerId(), restaurant.getName(), 
                                 restaurant.getAddress(), restaurant.getPhone());
         
@@ -78,7 +87,9 @@ public class RestaurantService {
             restaurant.setStatus(RestaurantStatus.PENDING);
         }
         
-        return restaurantRepository.saveNew(restaurant);
+        return AdvancedOptimizer.executeWithCircuitBreaker("create_restaurant", () ->
+            restaurantRepository.saveNew(restaurant)
+        );
     }
     
     /**
@@ -123,24 +134,27 @@ public class RestaurantService {
      * 
      * @return لیست رستوران‌های تأیید شده
      */
+    @SuppressWarnings("unchecked")
     public List<Restaurant> getApprovedRestaurants() {
-        String cacheKey = PerformanceUtil.createQueryCacheKey("approved_restaurants");
-        
-        return PerformanceUtil.executeWithCache(
-            cacheKey,
-            () -> {
-                // اندازه‌گیری عملکرد عملیات دیتابیس
-                PerformanceUtil.PerformanceResult<List<Restaurant>> result = 
-                    PerformanceUtil.measurePerformance("getApprovedRestaurants", 
-                        () -> restaurantRepository.listApproved());
-                
-                // نمایش نتیجه عملکرد با emoji
-                System.out.println("🏪 " + result.toString());
-                return result.getResult();
-            },
-            (Class<List<Restaurant>>) (Class<?>) List.class,
-            15 // Cache برای 15 دقیقه
-        );
+        return AdvancedOptimizer.executeWithCircuitBreaker("get_approved_restaurants", () -> {
+            String cacheKey = PerformanceUtil.createQueryCacheKey("approved_restaurants");
+            
+            return PerformanceUtil.executeWithCache(
+                cacheKey,
+                () -> {
+                    // اندازه‌گیری عملکرد عملیات دیتابیس
+                    PerformanceUtil.PerformanceResult<List<Restaurant>> result = 
+                        PerformanceUtil.measurePerformance("getApprovedRestaurants", 
+                            () -> restaurantRepository.listApproved());
+                    
+                    // نمایش نتیجه عملکرد با emoji
+                    System.out.println("🏪 " + result.toString());
+                    return result.getResult();
+                },
+                List.class,
+                15 // Cache برای 15 دقیقه
+            );
+        });
     }
     
     /**

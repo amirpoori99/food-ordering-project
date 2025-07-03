@@ -95,7 +95,7 @@ class JWTEndToEndTest {
         
         // 9. Test AuthResult creation
         System.out.println("🔄 Testing AuthResult creation...");
-        AuthResult authResult = AuthResult.authenticated(userId, phone, role, accessToken);
+        AuthResult authResult = AuthResult.authenticated(userId, phone, "Test User", role, accessToken);
         assertTrue(authResult.isAuthenticated(), "AuthResult should be authenticated");
         assertEquals(userId, authResult.getUserId(), "User ID should match");
         assertEquals(phone, authResult.getPhone(), "Phone should match");

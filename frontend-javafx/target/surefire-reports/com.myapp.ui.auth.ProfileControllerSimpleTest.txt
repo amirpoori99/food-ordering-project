@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.myapp.ui.auth.ProfileControllerSimpleTest
+-------------------------------------------------------------------------------
+Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.114 s -- in com.myapp.ui.auth.ProfileControllerSimpleTest

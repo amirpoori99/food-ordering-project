@@ -8,6 +8,8 @@ import com.myapp.common.models.User;
 import com.myapp.common.exceptions.NotFoundException;
 import com.myapp.common.exceptions.DuplicatePhoneException;
 import com.myapp.common.utils.JWTUtil;
+import com.myapp.common.utils.AdvancedSecurityUtil;
+import com.myapp.common.utils.ValidationUtil;
 
 import java.util.Objects;
 
@@ -39,9 +41,21 @@ public class AuthService {
     public User register(RegisterRequest req) {
         Objects.requireNonNull(req, "request must not be null");  // اعتبارسنجی ورودی
         
+        // hash کردن رمز عبور اگر به صورت متنی ارسال شده باشد
+        String passwordHash = req.getPasswordHash();
+        if (passwordHash == null) {
+            throw new IllegalArgumentException("Password cannot be null");
+        } else if (passwordHash.isEmpty()) {
+            // اگر رمز عبور خالی باشد، یک رمز عبور پیش‌فرض تولید کنیم
+            passwordHash = com.myapp.common.utils.PasswordUtil.hashPassword("defaultPassword123");
+        } else if (!passwordHash.contains(":")) {
+            // اگر رمز عبور hash نشده باشد، آن را hash کنیم
+            passwordHash = com.myapp.common.utils.PasswordUtil.hashPassword(passwordHash);
+        }
+        
         // ایجاد شیء کاربر از اطلاعات درخواست - بدون ID تا Hibernate خودش تولید کند
         User user = new User(req.getFullName(), req.getPhone(), req.getEmail(),
-                req.getPasswordHash(), req.getRole(), req.getAddress());
+                passwordHash, req.getRole(), req.getAddress());
         
         return repository.saveNew(user);  // ذخیره کاربر در دیتابیس
     }
@@ -51,13 +65,21 @@ public class AuthService {
      * در صورت مطابقت، کاربر را برمی‌گرداند، در غیر اینصورت استثنا پرتاب می‌کند
      * 
      * @param phone شماره تلفن کاربر
-     * @param passwordHash رمز عبور hash شده
+     * @param passwordHash رمز عبور hash شده یا متنی
      * @return کاربر وارد شده
      * @throws InvalidCredentialsException در صورت نامعتبر بودن اعتبارات
      */
     public User login(String phone, String passwordHash) {
         return repository.findByPhone(phone)                            // یافتن کاربر با شماره تلفن
-                .filter(u -> u.getPasswordHash().equals(passwordHash))  // فیلتر بر اساس رمز عبور
+                .filter(u -> {
+                    // اگر رمز عبور hash شده باشد، مستقیماً مقایسه کنیم
+                    if (passwordHash != null && passwordHash.contains(":")) {
+                        return u.getPasswordHash().equals(passwordHash);
+                    } else {
+                        // اگر رمز عبور متنی باشد، با verifyPassword بررسی کنیم
+                        return com.myapp.common.utils.PasswordUtil.verifyPassword(passwordHash, u.getPasswordHash());
+                    }
+                })
                 .orElseThrow(InvalidCredentialsException::new);         // پرتاب استثنا در صورت عدم مطابقت
     }
 
@@ -72,14 +94,8 @@ public class AuthService {
         Objects.requireNonNull(req, "login request must not be null");  // اعتبارسنجی ورودی
         
         try {
-            // تلاش برای ورود کاربر
-            User user = login(req.getPhone(), req.getPasswordHash());
-            
-            // تولید جفت token (Access + Refresh)
-            String[] tokens = JWTUtil.generateTokenPair(user.getId(), user.getPhone(), user.getRole().toString());
-            
-            // بازگشت AuthResult با هر دو token
-            return AuthResult.refreshed(user.getId(), user.getPhone(), user.getRole().toString(), tokens[0], tokens[1]);
+            // استفاده از loginWithTokens که رمز عبور متنی را مدیریت می‌کند
+            return loginWithTokens(req.getPhone(), req.getPasswordHash());
             
         } catch (InvalidCredentialsException e) {
             return AuthResult.unauthenticated("Invalid phone or password");
@@ -93,19 +109,35 @@ public class AuthService {
      * این متد ورود کاربر را بررسی کرده و token های دسترسی و تجدید تولید می‌کند
      * 
      * @param phone شماره تلفن کاربر
-     * @param passwordHash رمز عبور hash شده
+     * @param password رمز عبور متنی
      * @return AuthResult حاوی JWT token ها
      */
-    public AuthResult loginWithTokens(String phone, String passwordHash) {
+    public AuthResult loginWithTokens(String phone, String password) {
         try {
-            // تلاش برای ورود کاربر
-            User user = login(phone, passwordHash);
+            // Security and validation
+            if (AdvancedSecurityUtil.detectThreats(phone, "")) {
+                throw new SecurityException("Threat detected in phone");
+            }
+            if (!ValidationUtil.isValidPhone(phone)) {
+                throw new IllegalArgumentException("Invalid phone");
+            }
+            // Note: Password validation is skipped for login to allow existing users
+            // with simple passwords to still login
+            
+            // یافتن کاربر با شماره تلفن
+            User user = repository.findByPhone(phone)
+                    .orElseThrow(InvalidCredentialsException::new);
+            
+            // تأیید رمز عبور
+            if (!com.myapp.common.utils.PasswordUtil.verifyPassword(password, user.getPasswordHash())) {
+                throw new InvalidCredentialsException();
+            }
             
             // تولید جفت token (Access + Refresh)
             String[] tokens = JWTUtil.generateTokenPair(user.getId(), user.getPhone(), user.getRole().toString());
             
             // بازگشت AuthResult با هر دو token
-            return AuthResult.refreshed(user.getId(), user.getPhone(), user.getRole().toString(), tokens[0], tokens[1]);
+            return AuthResult.refreshed(user.getId(), user.getPhone(), user.getFullName(), user.getRole().toString(), tokens[0], tokens[1]);
             
         } catch (InvalidCredentialsException e) {
             return AuthResult.unauthenticated("Invalid phone or password");
@@ -208,4 +240,6 @@ public class AuthService {
     public User registerUser(User user) {
         return repository.saveNew(user);
     }
+
+
 }

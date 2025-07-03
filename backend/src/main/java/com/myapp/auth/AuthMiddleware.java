@@ -62,7 +62,7 @@ public class AuthMiddleware {
             String phone = JWTUtil.getPhoneFromToken(token);
             String role = JWTUtil.getRoleFromToken(token);
             
-            return AuthResult.authenticated(userId, phone, role, token);
+            return AuthResult.authenticated(userId, phone, null, role, token);
             
         } catch (JwtException e) {
             return AuthResult.unauthenticated("Token validation failed: " + e.getMessage());
@@ -162,7 +162,7 @@ public class AuthMiddleware {
             var user = userOpt.get();
             String[] tokens = JWTUtil.generateTokenPair(user.getId(), user.getPhone(), user.getRole().toString());
             
-            return AuthResult.refreshed(user.getId(), user.getPhone(), user.getRole().toString(), tokens[0], tokens[1]);
+            return AuthResult.refreshed(user.getId(), user.getPhone(), user.getFullName(), user.getRole().toString(), tokens[0], tokens[1]);
             
         } catch (JwtException e) {
             return AuthResult.unauthenticated("Token refresh failed: " + e.getMessage());

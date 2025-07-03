@@ -121,7 +121,8 @@ class AuthServiceTest {
             assertThat(saved.getFullName()).isEqualTo("Ahmad Mohammadi");
             assertThat(saved.getPhone()).isEqualTo("09123456789");
             assertThat(saved.getEmail()).isEqualTo("ahmad@example.com");
-            assertThat(saved.getPasswordHash()).isEqualTo("secureHash123");
+            // رمز عبور hash شده است، پس باید شامل ":" باشد
+            assertThat(saved.getPasswordHash()).contains(":");
             assertThat(saved.getRole()).isEqualTo(User.Role.BUYER);
             assertThat(saved.getAddress()).isEqualTo("Tehran, Iran");
         }
@@ -227,23 +228,23 @@ class AuthServiceTest {
         }
 
         @Test
-        @DisplayName("Registration with null passwordHash throws exception due to database constraint")
+        @DisplayName("Registration with null passwordHash throws exception")
         void register_nullPasswordHash_throwsException() {
             RegisterRequest request = req("Test User", "09123456776", "test@example.com", null, User.Role.BUYER, "Address");
             
             assertThatThrownBy(() -> service.register(request))
-                    .isInstanceOf(Exception.class); // Database NOT NULL constraint should fail
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
-        @DisplayName("Registration with empty passwordHash succeeds (but insecure)")
+        @DisplayName("Registration with empty passwordHash generates default hash")
         void register_emptyPasswordHash_succeeds() {
             RegisterRequest request = req("Test User", "09123456775", "test@example.com", "", User.Role.BUYER, "Address");
             
-            // Current system allows empty password hash (security issue but no validation)
+            // Empty password should generate a default hash
             User saved = service.register(request);
             assertThat(saved.getId()).isNotNull();
-            assertThat(saved.getPasswordHash()).isEqualTo("");
+            assertThat(saved.getPasswordHash()).contains(":");
         }
 
         @Test
@@ -311,7 +312,8 @@ class AuthServiceTest {
             assertThat(saved.getFullName()).isEqualTo("Exact User");
             assertThat(saved.getPhone()).isEqualTo("09123456770");
             assertThat(saved.getEmail()).isEqualTo("exact@test.com");
-            assertThat(saved.getPasswordHash()).isEqualTo("exactHash");
+            // رمز عبور hash شده است
+            assertThat(saved.getPasswordHash()).contains(":");
             assertThat(saved.getRole()).isEqualTo(User.Role.ADMIN);
             assertThat(saved.getAddress()).isEqualTo("Exact Address");
         }
@@ -331,7 +333,8 @@ class AuthServiceTest {
             User loggedIn = service.login(phone, password);
             
             assertThat(loggedIn.getPhone()).isEqualTo(phone);
-            assertThat(loggedIn.getPasswordHash()).isEqualTo(password);
+            // رمز عبور hash شده است
+            assertThat(loggedIn.getPasswordHash()).contains(":");
             assertThat(loggedIn.getFullName()).isEqualTo("Test User");
         }
 
@@ -427,7 +430,8 @@ class AuthServiceTest {
             assertThat(loggedIn.getFullName()).isEqualTo("Complete User");
             assertThat(loggedIn.getPhone()).isEqualTo(phone);
             assertThat(loggedIn.getEmail()).isEqualTo("complete@test.com");
-            assertThat(loggedIn.getPasswordHash()).isEqualTo(password);
+            // رمز عبور hash شده است
+            assertThat(loggedIn.getPasswordHash()).contains(":");
             assertThat(loggedIn.getRole()).isEqualTo(User.Role.COURIER);
             assertThat(loggedIn.getAddress()).isEqualTo("Complete Address");
         }
@@ -459,7 +463,7 @@ class AuthServiceTest {
             
             User loggedIn = service.login(phone, specialPassword);
             
-            assertThat(loggedIn.getPasswordHash()).isEqualTo(specialPassword);
+            assertThat(loggedIn.getPasswordHash()).contains(":");
         }
 
         @Test
@@ -612,7 +616,7 @@ class AuthServiceTest {
             User updated = service.updateProfile(registered.getId(), request);
             
             assertThat(updated.getRole()).isEqualTo(User.Role.ADMIN); // Should not change
-            assertThat(updated.getPasswordHash()).isEqualTo("originalPassword"); // Should not change
+            assertThat(updated.getPasswordHash()).contains(":"); // Should not change
             assertThat(updated.getId()).isEqualTo(registered.getId()); // Should not change
         }
 

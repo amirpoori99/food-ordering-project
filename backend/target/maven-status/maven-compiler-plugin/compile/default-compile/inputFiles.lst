@@ -3,8 +3,6 @@ C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\common\utils\DatabaseUtil.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\item\ItemService.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\common\models\FoodItem.java
-C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\common\utils\SecurityUtil.java
-C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\common\utils\SQLiteTransactionManager.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\review\RatingService.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\restaurant\RestaurantService.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\payment\WalletController.java
@@ -12,10 +10,12 @@ C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\common\models\Favorite.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\courier\DeliveryRepository.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\common\models\Coupon.java
+C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\DatabaseChecker.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\item\ItemRepository.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\payment\TransactionController.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\payment\WalletService.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\restaurant\RestaurantController.java
+C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\DatabasePopulator.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\admin\AdminController.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\auth\AuthRepository.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\auth\AuthService.java
@@ -53,7 +53,6 @@ C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\notification\NotificationService.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\vendor\VendorRepository.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\common\models\Rating.java
-C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\common\utils\LoggerUtil.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\favorites\FavoritesController.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\common\models\CouponUsage.java
 C:\Users\USER\Desktop\work space\food-ordering-project\backend\src\main\java\com\myapp\notification\NotificationController.java

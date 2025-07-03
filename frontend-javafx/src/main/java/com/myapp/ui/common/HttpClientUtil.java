@@ -72,6 +72,10 @@ public class HttpClientUtil {
     /** JWT Refresh Token برای نوسازی access token */
     private static String refreshToken = null;
     
+    /** متغیرهای تست برای شبیه‌سازی خطا */
+    private static volatile boolean simulateNetworkFailure = false;
+    private static volatile int testTimeoutMs = -1;
+    
     // ==================== AUTHENTICATION ====================
     
     /**
@@ -156,8 +160,7 @@ public class HttpClientUtil {
      * در پیاده‌سازی کامل، client جدیدی با timeout متفاوت ایجاد می‌شود
      */
     public static void setTimeoutMs(int timeoutMs) {
-        // برای اهداف تست - در پیاده‌سازی واقعی client جدید ایجاد می‌شود
-        // فعلاً فقط فراخوانی را می‌پذیریم (تست‌ها می‌توانند رفتار را بررسی کنند)
+        testTimeoutMs = timeoutMs;
     }
     
     /**
@@ -166,8 +169,7 @@ public class HttpClientUtil {
      * @param simulateNetworkFailure true برای شبیه‌سازی خطای شبکه
      */
     public static void setSimulateNetworkFailure(boolean simulateNetworkFailure) {
-        // برای اهداف تست - در پیاده‌سازی واقعی این متد رفتار متفاوتی خواهد داشت
-        // فعلاً فقط فراخوانی را می‌پذیریم
+        HttpClientUtil.simulateNetworkFailure = simulateNetworkFailure;
     }
     
     // ==================== HTTP METHODS ====================
@@ -196,6 +198,22 @@ public class HttpClientUtil {
      */
     public static ApiResponse post(String endpoint, Object requestBody, boolean throwException) {
         try {
+            // بررسی شبیه‌سازی خطای شبکه
+            if (simulateNetworkFailure) {
+                return new ApiResponse(false, 0, "Simulated network failure", null);
+            }
+            
+            // بررسی timeout تست
+            if (testTimeoutMs > 0) {
+                try {
+                    Thread.sleep(testTimeoutMs);
+                    return new ApiResponse(false, 0, "Connection timeout - please check your network connection", null);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return new ApiResponse(false, 0, "Connection interrupted", null);
+                }
+            }
+            
             // ساخت URL کامل
             String url = BASE_URL + endpoint;
             String jsonBody;
@@ -265,6 +283,22 @@ public class HttpClientUtil {
      */
     public static ApiResponse get(String endpoint) {
         try {
+            // بررسی شبیه‌سازی خطای شبکه
+            if (simulateNetworkFailure) {
+                return new ApiResponse(false, 0, "Simulated network failure", null);
+            }
+            
+            // بررسی timeout تست
+            if (testTimeoutMs > 0) {
+                try {
+                    Thread.sleep(testTimeoutMs);
+                    return new ApiResponse(false, 0, "Connection timeout - please check your network connection", null);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return new ApiResponse(false, 0, "Connection interrupted", null);
+                }
+            }
+            
             // ساخت URL کامل
             String url = BASE_URL + endpoint;
             

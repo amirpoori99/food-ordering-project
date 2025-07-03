@@ -1,0 +1,10 @@
+-------------------------------------------------------------------------------
+Test set: com.myapp.stress.DatabasePerformanceTest$QueryPerformanceTests
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 57.85 s <<< FAILURE! -- in com.myapp.stress.DatabasePerformanceTest$QueryPerformanceTests
+com.myapp.stress.DatabasePerformanceTest$QueryPerformanceTests.userLookupPerformance_VariousQueries_FastResponse -- Time elapsed: 55.80 s <<< ERROR!
+java.util.concurrent.TimeoutException: userLookupPerformance_VariousQueries_FastResponse() timed out after 30 seconds
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+

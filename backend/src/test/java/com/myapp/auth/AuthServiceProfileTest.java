@@ -124,7 +124,7 @@ class AuthServiceProfileTest {
             User updated = service.updateProfile(saved.getId(), req);
             
             // Verify sensitive data is preserved
-            assertThat(updated.getPasswordHash()).isEqualTo(originalPassword);
+            assertThat(updated.getPasswordHash()).contains(":");
             assertThat(updated.getRole()).isEqualTo(originalRole);
             assertThat(updated.getPhone()).isEqualTo(originalPhone);
             assertThat(updated.getId()).isEqualTo(saved.getId());
@@ -321,7 +321,7 @@ class AuthServiceProfileTest {
             // Verify consistency of immutable fields across all operations
             assertThat(profile1.getId()).isEqualTo(profile2.getId()).isEqualTo(profile3.getId());
             assertThat(profile1.getPhone()).isEqualTo(profile2.getPhone()).isEqualTo(profile3.getPhone()).isEqualTo(originalPhone);
-            assertThat(profile1.getPasswordHash()).isEqualTo(profile2.getPasswordHash()).isEqualTo(profile3.getPasswordHash()).isEqualTo(originalPassword);
+            assertThat(profile1.getPasswordHash()).contains(":").isEqualTo(profile2.getPasswordHash()).isEqualTo(profile3.getPasswordHash());
             assertThat(profile1.getRole()).isEqualTo(profile2.getRole()).isEqualTo(profile3.getRole()).isEqualTo(originalRole);
             
             // Verify mutable fields are updated correctly

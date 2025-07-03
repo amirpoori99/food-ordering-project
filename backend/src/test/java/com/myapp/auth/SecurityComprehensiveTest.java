@@ -250,7 +250,7 @@ class SecurityComprehensiveTest {
         @DisplayName("User should have access to own profile")
         void userShouldHaveAccessToOwnProfile() {
             // Given - کاربر با ID مشخص
-            AuthResult authResult = AuthResult.authenticated(123L, "09123456789", "buyer", "token");
+            AuthResult authResult = AuthResult.authenticated(123L, "09123456789", "Test User", "buyer", "token");
             
             // When & Then
             assertThat(AuthMiddleware.isSameUserOrAdmin(authResult, 123L)).isTrue();
@@ -260,7 +260,7 @@ class SecurityComprehensiveTest {
         @DisplayName("User should not have access to other user profile")
         void userShouldNotHaveAccessToOtherUserProfile() {
             // Given - کاربر تلاش برای دسترسی به پروفایل دیگری
-            AuthResult authResult = AuthResult.authenticated(123L, "09123456789", "buyer", "token");
+            AuthResult authResult = AuthResult.authenticated(123L, "09123456789", "Test User", "buyer", "token");
             
             // When & Then
             assertThat(AuthMiddleware.isSameUserOrAdmin(authResult, 456L)).isFalse();
@@ -270,7 +270,7 @@ class SecurityComprehensiveTest {
         @DisplayName("Admin should have access to all profiles")
         void adminShouldHaveAccessToAllProfiles() {
             // Given - کاربر مدیر
-            AuthResult authResult = AuthResult.authenticated(1L, "09111111111", "admin", "token");
+            AuthResult authResult = AuthResult.authenticated(1L, "09111111111", "Admin User", "admin", "token");
             
             // When & Then
             assertThat(AuthMiddleware.isSameUserOrAdmin(authResult, 999L)).isTrue();
@@ -280,10 +280,10 @@ class SecurityComprehensiveTest {
         @DisplayName("Role-based access should work correctly")
         void roleBasedAccess_shouldWorkCorrectly() {
             // Given - کاربران با نقش‌های مختلف
-            AuthResult buyer = AuthResult.authenticated(1L, "09111111111", "buyer", "token");
-            AuthResult seller = AuthResult.authenticated(2L, "09222222222", "seller", "token");
-            AuthResult courier = AuthResult.authenticated(3L, "09333333333", "delivery", "token");
-            AuthResult admin = AuthResult.authenticated(4L, "09444444444", "admin", "token");
+            AuthResult buyer = AuthResult.authenticated(1L, "09111111111", "Buyer User", "buyer", "token");
+            AuthResult seller = AuthResult.authenticated(2L, "09222222222", "Seller User", "seller", "token");
+            AuthResult courier = AuthResult.authenticated(3L, "09333333333", "Courier User", "delivery", "token");
+            AuthResult admin = AuthResult.authenticated(4L, "09444444444", "Admin User", "admin", "token");
             
             // When & Then - تست نقش‌های مختلف
             assertThat(AuthMiddleware.hasRole(buyer, "buyer")).isTrue();
@@ -302,7 +302,7 @@ class SecurityComprehensiveTest {
         @DisplayName("hasAnyRole should work correctly")
         void hasAnyRole_shouldWorkCorrectly() {
             // Given
-            AuthResult seller = AuthResult.authenticated(1L, "09111111111", "seller", "token");
+            AuthResult seller = AuthResult.authenticated(1L, "09111111111", "Seller User", "seller", "token");
             
             // When & Then
             assertThat(AuthMiddleware.hasAnyRole(seller, "buyer", "seller", "admin")).isTrue();

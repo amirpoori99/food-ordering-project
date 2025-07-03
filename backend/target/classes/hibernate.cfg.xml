@@ -1,199 +1,39 @@
-<?xml version='1.0' encoding='utf-8'?>
-<!-- فایل پیکربندی Hibernate ORM -->
-<!-- این فایل شامل تمام تنظیمات مربوط به Hibernate برای اتصال به پایگاه داده و مدیریت entity ها است -->
-<!-- نسخه XML: 1.0 با کدگذاری UTF-8 برای پشتیبانی از کاراکترهای فارسی -->
-
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE hibernate-configuration PUBLIC
-        "-//Hibernate/Hibernate Configuration DTD 5.4//EN"
-        "http://hibernate.org/dtd/hibernate-configuration-5.4.dtd">
-<!-- تعریف DTD برای Hibernate Configuration -->
-<!-- این DTD تعریف می‌کند که چه عناصری در فایل پیکربندی مجاز هستند -->
-
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
-    <!-- تگ اصلی پیکربندی Hibernate -->
-    <!-- تمام تنظیمات Hibernate در این تگ قرار می‌گیرد -->
-    
     <session-factory>
-        <!-- تگ session-factory که تعریف می‌کند چگونه session های Hibernate ایجاد شوند -->
-        <!-- هر session یک اتصال به پایگاه داده و context برای عملیات ORM است -->
-        
-        <!-- تنظیمات اتصال پایگاه داده (SQLite بهینه‌سازی شده برای تست) -->
-        <!-- درایور JDBC برای SQLite -->
+        <!-- Database connection properties -->
         <property name="hibernate.connection.driver_class">org.sqlite.JDBC</property>
-        <!-- این درایور برای اتصال به پایگاه داده SQLite استفاده می‌شود -->
-        <!-- SQLite برای محیط توسعه و تست انتخاب شده است -->
-        
-        <!-- URL اتصال به پایگاه داده SQLite با تنظیمات بهینه -->
-        <property name="hibernate.connection.url">jdbc:sqlite:food_ordering.db?journal_mode=WAL&amp;synchronous=NORMAL&amp;busy_timeout=60000&amp;cache_size=10000&amp;temp_store=memory</property>
-        <!-- journal_mode=WAL: Write-Ahead Logging برای بهبود عملکرد و قابلیت اطمینان -->
-        <!-- synchronous=NORMAL: تعادل بین عملکرد و امنیت داده -->
-        <!-- busy_timeout=60000: زمان انتظار برای قفل پایگاه داده (60 ثانیه) -->
-        <!-- cache_size=10000: اندازه کش SQLite (10MB) -->
-        <!-- temp_store=memory: ذخیره موقت در حافظه برای بهبود عملکرد -->
-        
-        <!-- نام کاربری پایگاه داده (برای SQLite خالی است) -->
+        <property name="hibernate.connection.url">jdbc:sqlite:food_ordering.db</property>
         <property name="hibernate.connection.username"></property>
-        <!-- SQLite از احراز هویت کاربری استفاده نمی‌کند -->
-        
-        <!-- رمز عبور پایگاه داده (برای SQLite خالی است) -->
         <property name="hibernate.connection.password"></property>
-        <!-- SQLite از رمز عبور استفاده نمی‌کند -->
-
-        <!-- Connection Pool JDBC (افزایش یافته برای تست همزمان) -->
-        <!-- اندازه pool اتصالات -->
-        <property name="connection.pool_size">20</property>
-        <!-- برای تست‌های همزمان، تعداد بیشتری اتصال نیاز است -->
-        <!-- در محیط تولید، این مقدار بر اساس بار کاری تنظیم می‌شود -->
         
-        <!-- کلاس ارائه‌دهنده اتصال -->
-        <property name="hibernate.connection.provider_class">org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl</property>
-        <!-- این کلاس مسئول مدیریت اتصالات JDBC است -->
-        <!-- از DriverManager استاندارد Java استفاده می‌کند -->
-        
-        <!-- تنظیمات مدیریت اتصال -->
-        <!-- غیرفعال‌سازی autocommit -->
-        <property name="hibernate.connection.autocommit">false</property>
-        <!-- Hibernate خودش تراکنش‌ها را مدیریت می‌کند -->
-        <!-- این تنظیم برای کنترل بهتر تراکنش‌ها ضروری است -->
-        
-        <!-- حالت آزادسازی اتصال -->
-        <property name="hibernate.connection.release_mode">auto</property>
-        <!-- اتصال به صورت خودکار پس از پایان تراکنش آزاد می‌شود -->
-        
-        <!-- بهینه‌سازی‌های اضافی SQLite برای چند نخی -->
-        <!-- سطح isolation تراکنش -->
-        <property name="hibernate.connection.isolation">2</property>
-        <!-- READ_COMMITTED: خواندن داده‌های commit شده -->
-        <!-- این سطح تعادل خوبی بین عملکرد و قابلیت اطمینان دارد -->
-        
-        <!-- اندازه batch برای عملیات JDBC -->
-        <property name="hibernate.jdbc.batch_size">20</property>
-        <!-- عملیات‌های مشابه در batch های 20 تایی انجام می‌شوند -->
-        <!-- این کار عملکرد را بهبود می‌دهد -->
-        
-        <!-- مرتب‌سازی عملیات insert -->
-        <property name="hibernate.order_inserts">true</property>
-        <!-- عملیات‌های insert مرتب می‌شوند تا batch بهتر کار کند -->
-        
-        <!-- مرتب‌سازی عملیات update -->
-        <property name="hibernate.order_updates">true</property>
-        <!-- عملیات‌های update مرتب می‌شوند تا batch بهتر کار کند -->
-        
-        <!-- فعال‌سازی batch برای داده‌های versioned -->
-        <property name="hibernate.jdbc.batch_versioned_data">true</property>
-        <!-- batch برای entity هایی که version دارند فعال است -->
-        
-        <!-- بهبودهای عملکرد -->
-        <!-- غیرفعال‌سازی کش سطح دوم -->
-        <property name="hibernate.cache.use_second_level_cache">false</property>
-        <!-- در محیط توسعه، کش سطح دوم غیرفعال است -->
-        <!-- در محیط تولید، معمولاً فعال می‌شود -->
-        
-        <!-- غیرفعال‌سازی کش کوئری -->
-        <property name="hibernate.cache.use_query_cache">false</property>
-        <!-- در محیط توسعه، کش کوئری غیرفعال است -->
-        <!-- در محیط تولید، برای کوئری‌های پرتکرار فعال می‌شود -->
-
-        <!-- SQL dialect -->
-        <!-- تعریف dialect برای SQLite -->
+        <!-- Hibernate properties -->
         <property name="hibernate.dialect">org.hibernate.community.dialect.SQLiteDialect</property>
-        <!-- این dialect به Hibernate می‌گوید چگونه با SQLite کار کند -->
-        <!-- شامل تبدیل نوع داده‌ها و تولید SQL مناسب است -->
-        
-        <!-- تنظیمات ID Generation برای SQLite -->
-        <!-- غیرفعال‌سازی getGeneratedKeys برای SQLite -->
-        <property name="hibernate.jdbc.use_get_generated_keys">false</property>
-        <!-- SQLite از getGeneratedKeys پشتیبانی نمی‌کند -->
-        <!-- این تنظیم از خطای "not implemented by SQLite JDBC driver" جلوگیری می‌کند -->
-        
-        <!-- استفاده از استراتژی ID مناسب برای SQLite -->
-        <property name="hibernate.id.new_generator_mappings">true</property>
-        <!-- استفاده از استراتژی‌های جدید ID generation -->
-        <!-- برای SQLite بهتر از استراتژی‌های قدیمی کار می‌کند -->
-        
-        <!-- پیکربندی Context Session برای تست -->
-        <!-- کلاس context session -->
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.format_sql">true</property>
+        <property name="hibernate.hbm2ddl.auto">validate</property>
+        <property name="hibernate.connection.pool_size">10</property>
         <property name="hibernate.current_session_context_class">thread</property>
-        <!-- هر thread یک session جداگانه دارد -->
-        <!-- این تنظیم برای تست‌های همزمان مناسب است -->
+        <property name="hibernate.jdbc.batch_size">20</property>
+        <property name="hibernate.jdbc.fetch_size">20</property>
+        <property name="hibernate.cache.use_second_level_cache">false</property>
+        <property name="hibernate.cache.use_query_cache">false</property>
         
-        <!-- حالت مدیریت اتصال -->
-        <property name="hibernate.connection.handling_mode">DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION</property>
-        <!-- اتصال تا زمان نیاز به تعویق می‌افتد -->
-        <!-- پس از پایان تراکنش آزاد می‌شود -->
-        <!-- این کار بهینه‌سازی منابع را بهبود می‌دهد -->
-
-        <!-- نمایش SQL -->
-        <!-- فعال‌سازی نمایش کوئری‌های SQL -->
-        <property name="show_sql">true</property>
-        <!-- کوئری‌های SQL در لاگ نمایش داده می‌شوند -->
-        <!-- برای debug و بهینه‌سازی مفید است -->
-        <!-- در محیط تولید، معمولاً غیرفعال می‌شود -->
-
-        <!-- حذف و ایجاد مجدد schema پایگاه داده در startup -->
-        <!-- تنظیمات DDL -->
-        <property name="hbm2ddl.auto">update</property>
-        <!-- update: schema را بر اساس entity ها به‌روزرسانی می‌کند -->
-        <!-- جدول‌های جدید ایجاد می‌شوند -->
-        <!-- ستون‌های جدید اضافه می‌شوند -->
-        <!-- در محیط تولید، معمولاً validate یا none تنظیم می‌شود -->
-
-        <!-- Entity ها -->
-        <!-- تعریف تمام entity های سیستم -->
-        <!-- هر entity یک جدول در پایگاه داده است -->
-        
-        <!-- Entity رستوران -->
-        <mapping class="com.myapp.common.models.Restaurant"/>
-        <!-- جدول رستوران‌ها با اطلاعات نام، آدرس، تلفن و غیره -->
-        
-        <!-- Entity کاربر -->
+        <!-- Entity mappings -->
         <mapping class="com.myapp.common.models.User"/>
-        <!-- جدول کاربران با اطلاعات شخصی، نقش و احراز هویت -->
-        
-        <!-- Entity آیتم غذا -->
+        <mapping class="com.myapp.common.models.Restaurant"/>
         <mapping class="com.myapp.common.models.FoodItem"/>
-        <!-- جدول آیتم‌های غذا با اطلاعات نام، قیمت، توضیحات و غیره -->
-        
-        <!-- Entity سفارش -->
         <mapping class="com.myapp.common.models.Order"/>
-        <!-- جدول سفارش‌ها با اطلاعات مشتری، رستوران، وضعیت و غیره -->
-        
-        <!-- Entity آیتم سفارش -->
         <mapping class="com.myapp.common.models.OrderItem"/>
-        <!-- جدول آیتم‌های سفارش با اطلاعات آیتم، تعداد و قیمت -->
-        
-        <!-- Entity تراکنش -->
         <mapping class="com.myapp.common.models.Transaction"/>
-        <!-- جدول تراکنش‌های مالی با اطلاعات پرداخت، روش و وضعیت -->
-        
-        <!-- Entity تحویل -->
-        <mapping class="com.myapp.common.models.Delivery"/>
-        <!-- جدول تحویل‌ها با اطلاعات پیک، زمان و وضعیت -->
-        
-        <!-- Entity امتیازدهی -->
         <mapping class="com.myapp.common.models.Rating"/>
-        <!-- جدول امتیازها و نظرات با اطلاعات امتیاز، نظر و تصاویر -->
-        
-        <!-- Entity کوپن -->
         <mapping class="com.myapp.common.models.Coupon"/>
-        <!-- جدول کوپن‌های تخفیف با اطلاعات کد، نوع، مقدار و تاریخ -->
-        
-        <!-- Entity استفاده از کوپن -->
         <mapping class="com.myapp.common.models.CouponUsage"/>
-        <!-- جدول استفاده از کوپن‌ها با اطلاعات کاربر و تاریخ استفاده -->
-        
-        <!-- Entity علاقه‌مندی -->
-        <mapping class="com.myapp.common.models.Favorite"/>
-        <!-- جدول رستوران‌های مورد علاقه کاربران -->
-        
-        <!-- Entity اعلان -->
         <mapping class="com.myapp.common.models.Notification"/>
-        <!-- جدول اعلان‌های سیستم با اطلاعات نوع، پیام و وضعیت -->
-        
+        <mapping class="com.myapp.common.models.Favorite"/>
+        <mapping class="com.myapp.common.models.Delivery"/>
     </session-factory>
-    <!-- پایان session-factory -->
-    
-</hibernate-configuration>
-<!-- پایان فایل پیکربندی Hibernate -->
-<!-- این فایل به Hibernate می‌گوید چگونه با پایگاه داده کار کند -->
-<!-- و کدام entity ها را مدیریت کند --> 
+</hibernate-configuration> 

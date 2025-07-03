@@ -55,6 +55,23 @@ public class JsonUtil {
     }
     
     /**
+     * تبدیل رشته JSON به شیء با استفاده از TypeReference
+     * 
+     * @param json رشته JSON
+     * @param typeRef نوع مقصد با استفاده از TypeReference
+     * @param <T> نوع شیء مقصد
+     * @return شیء deserialize شده
+     * @throws RuntimeException در صورت خطا در deserialize
+     */
+    public static <T> T fromJson(String json, com.fasterxml.jackson.core.type.TypeReference<T> typeRef) {
+        try {
+            return objectMapper.readValue(json, typeRef);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to deserialize JSON to object", e);
+        }
+    }
+    
+    /**
      * دریافت نمونه ObjectMapper برای استفاده‌های پیشرفته
      * در صورت نیاز به تنظیمات خاص JSON
      * 

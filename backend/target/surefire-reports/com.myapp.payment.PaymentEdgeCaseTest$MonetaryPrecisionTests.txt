@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.myapp.payment.PaymentEdgeCaseTest$MonetaryPrecisionTests
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.715 s -- in com.myapp.payment.PaymentEdgeCaseTest$MonetaryPrecisionTests

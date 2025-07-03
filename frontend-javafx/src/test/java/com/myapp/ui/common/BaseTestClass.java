@@ -196,7 +196,11 @@ public abstract class BaseTestClass {
                 HttpClientUtil.ApiResponse response = HttpClientUtil.get(endpoint);
                 assertNotNull(response, "Should get response for: " + endpoint);
                 
-                if (!response.isSuccess()) {
+                // For very short timeouts (simulating disconnection), expect failure
+                if (timeoutMs <= 10) {
+                    assertFalse(response.isSuccess(), "Short timeout should cause failure for: " + endpoint);
+                    assertNetworkErrorMessage(response.getMessage(), endpoint);
+                } else if (!response.isSuccess()) {
                     assertNetworkErrorMessage(response.getMessage(), endpoint);
                 }
             }

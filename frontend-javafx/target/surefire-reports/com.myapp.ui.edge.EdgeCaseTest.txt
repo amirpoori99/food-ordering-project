@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.myapp.ui.edge.EdgeCaseTest
+-------------------------------------------------------------------------------
+Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 334.4 s -- in com.myapp.ui.edge.EdgeCaseTest

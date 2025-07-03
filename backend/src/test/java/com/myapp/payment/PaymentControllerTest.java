@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -402,7 +403,7 @@ class PaymentControllerTest {
             String response = controller.processPayment(requestData);
 
             // Then - بررسی خطا
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertFalse((Boolean) responseMap.get("success"), "درخواست باید ناموفق باشد");
             assertTrue(responseMap.get("error").toString().contains("User ID is required"), 
                 "پیام خطای مناسب برای userId");
@@ -430,7 +431,7 @@ class PaymentControllerTest {
             String response = controller.processPayment(requestData);
 
             // Then - بررسی خطا
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertFalse((Boolean) responseMap.get("success"));
             assertTrue(responseMap.get("error").toString().contains("Order ID is required"));
             
@@ -457,7 +458,7 @@ class PaymentControllerTest {
             String response = controller.processPayment(requestData);
 
             // Then - بررسی خطا
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertFalse((Boolean) responseMap.get("success"));
             assertTrue(responseMap.get("error").toString().contains("Invalid payment method"));
             
@@ -489,7 +490,7 @@ class PaymentControllerTest {
             String response = controller.processPayment(requestData);
 
             // Then - بررسی مدیریت خطا
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertFalse((Boolean) responseMap.get("success"));
             assertEquals("Payment processing failed", responseMap.get("error"));
         }
@@ -516,7 +517,7 @@ class PaymentControllerTest {
 
             // Then
             assertNotNull(response);
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertTrue((Boolean) responseMap.get("success"));
             assertNotNull(responseMap.get("transactions"));
             
@@ -530,7 +531,7 @@ class PaymentControllerTest {
             String response = controller.getPaymentHistory(null);
 
             // Then
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertFalse((Boolean) responseMap.get("success"));
             assertTrue(responseMap.get("error").toString().contains("User ID is required"));
             
@@ -549,7 +550,7 @@ class PaymentControllerTest {
             String response = controller.getPaymentHistory(userId);
 
             // Then
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertFalse((Boolean) responseMap.get("success"));
             assertEquals("User not found with ID: 999", responseMap.get("error"));
         }
@@ -573,7 +574,7 @@ class PaymentControllerTest {
 
             // Then
             assertNotNull(response);
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertTrue((Boolean) responseMap.get("success"));
             assertNotNull(responseMap.get("transaction"));
             
@@ -587,7 +588,7 @@ class PaymentControllerTest {
             String response = controller.getPaymentDetails(null);
 
             // Then
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertFalse((Boolean) responseMap.get("success"));
             assertTrue(responseMap.get("error").toString().contains("Transaction ID is required"));
             
@@ -606,7 +607,7 @@ class PaymentControllerTest {
             String response = controller.getPaymentDetails(transactionId);
 
             // Then
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertFalse((Boolean) responseMap.get("success"));
             assertEquals("Transaction not found with ID: 999", responseMap.get("error"));
         }
@@ -633,7 +634,7 @@ class PaymentControllerTest {
 
             // Then
             assertNotNull(response);
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertTrue((Boolean) responseMap.get("success"));
             assertEquals("Refund processed successfully", responseMap.get("message"));
             
@@ -652,7 +653,7 @@ class PaymentControllerTest {
             String response = controller.processRefund(requestData);
 
             // Then
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertFalse((Boolean) responseMap.get("success"));
             assertTrue(responseMap.get("error").toString().contains("Transaction ID is required"));
             
@@ -675,7 +676,7 @@ class PaymentControllerTest {
             String response = controller.processRefund(requestData);
 
             // Then
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertFalse((Boolean) responseMap.get("success"));
             assertEquals("Refund not allowed", responseMap.get("error"));
         }
@@ -700,7 +701,7 @@ class PaymentControllerTest {
             String response = controller.processPayment(requestData);
 
             // Then
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertFalse((Boolean) responseMap.get("success"));
             assertTrue(responseMap.get("error").toString().contains("Card details are required"));
             
@@ -726,7 +727,7 @@ class PaymentControllerTest {
             String response = controller.processPayment(requestData);
 
             // Then
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertFalse((Boolean) responseMap.get("success"));
             assertTrue(responseMap.get("error").toString().contains("Invalid card number"));
             
@@ -753,7 +754,7 @@ class PaymentControllerTest {
             String response = controller.processPayment(requestData);
 
             // Then
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertFalse((Boolean) responseMap.get("success"));
             assertTrue(responseMap.get("error").toString().contains("Invalid expiry month"));
             
@@ -779,7 +780,7 @@ class PaymentControllerTest {
             String response = controller.processPayment(requestData);
 
             // Then
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertFalse((Boolean) responseMap.get("success"));
             assertTrue(responseMap.get("error").toString().contains("Card has expired"));
             
@@ -805,7 +806,7 @@ class PaymentControllerTest {
             String response = controller.processPayment(requestData);
 
             // Then
-            Map<String, Object> responseMap = JsonUtil.fromJson(response, Map.class);
+            Map<String, Object> responseMap = parseJsonToMap(response);
             assertFalse((Boolean) responseMap.get("success"));
             assertTrue(responseMap.get("error").toString().contains("User ID is required"));
             
@@ -817,7 +818,7 @@ class PaymentControllerTest {
 
     @SuppressWarnings("unchecked")
     private Map<String, Object> parseJsonToMap(String json) {
-        return JsonUtil.fromJson(json, Map.class);
+        return JsonUtil.fromJson(json, new TypeReference<Map<String, Object>>() {});
     }
 
     private Transaction createSampleTransaction(Long id, Double amount, TransactionType type) {
