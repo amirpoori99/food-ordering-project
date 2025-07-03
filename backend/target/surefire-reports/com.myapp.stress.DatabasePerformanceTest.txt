@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.myapp.stress.DatabasePerformanceTest
+-------------------------------------------------------------------------------
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 71.82 s -- in com.myapp.stress.DatabasePerformanceTest

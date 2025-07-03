@@ -1,0 +1,6070 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.myapp.order.OrderControllerIntegrationTest$EdgeCaseTests" time="1.205" tests="5" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/workspace/backend/target/test-classes:/workspace/backend/target/classes:/home/ubuntu/.m2/repository/org/hibernate/orm/hibernate-core/6.4.0.Final/hibernate-core-6.4.0.Final.jar:/home/ubuntu/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.1.0/jakarta.persistence-api-3.1.0.jar:/home/ubuntu/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/jboss/logging/jboss-logging/3.5.0.Final/jboss-logging-3.5.0.Final.jar:/home/ubuntu/.m2/repository/org/hibernate/common/hibernate-commons-annotations/6.0.6.Final/hibernate-commons-annotations-6.0.6.Final.jar:/home/ubuntu/.m2/repository/io/smallrye/jandex/3.1.2/jandex-3.1.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/classmate/1.5.1/classmate-1.5.1.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy/1.14.7/byte-buddy-1.14.7.jar:/home/ubuntu/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.0/jakarta.xml.bind-api-4.0.0.jar:/home/ubuntu/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.0/jakarta.activation-api-2.1.0.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.2/jaxb-runtime-4.0.2.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.2/jaxb-core-4.0.2.jar:/home/ubuntu/.m2/repository/org/eclipse/angus/angus-activation/2.0.0/angus-activation-2.0.0.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/txw2/4.0.2/txw2-4.0.2.jar:/home/ubuntu/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.1/istack-commons-runtime-4.1.1.jar:/home/ubuntu/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/antlr/antlr4-runtime/4.13.0/antlr4-runtime-4.13.0.jar:/home/ubuntu/.m2/repository/org/hibernate/orm/hibernate-community-dialects/6.2.13.Final/hibernate-community-dialects-6.2.13.Final.jar:/home/ubuntu/.m2/repository/org/xerial/sqlite-jdbc/3.44.0.0/sqlite-jdbc-3.44.0.0.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar:/home/ubuntu/.m2/repository/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-classic/1.4.11/logback-classic-1.4.11.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-core/1.4.11/logback-core-1.4.11.jar:/home/ubuntu/.m2/repository/org/mindrot/jbcrypt/0.4/jbcrypt-0.4.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-api/0.12.3/jjwt-api-0.12.3.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-impl/0.12.3/jjwt-impl-0.12.3.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-jackson/0.12.3/jjwt-jackson-0.12.3.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.0/junit-jupiter-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.0/junit-jupiter-api-5.10.0.jar:/home/ubuntu/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-commons/1.10.0/junit-platform-commons-1.10.0.jar:/home/ubuntu/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.0/junit-jupiter-params-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.0/junit-jupiter-engine-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-engine/1.10.0/junit-platform-engine-1.10.0.jar:/home/ubuntu/.m2/repository/org/mockito/mockito-core/5.7.0/mockito-core-5.7.0.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.9/byte-buddy-agent-1.14.9.jar:/home/ubuntu/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/ubuntu/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:/home/ubuntu/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar:/home/ubuntu/.m2/repository/org/testcontainers/junit-jupiter/1.19.3/junit-jupiter-1.19.3.jar:/home/ubuntu/.m2/repository/org/testcontainers/testcontainers/1.19.3/testcontainers-1.19.3.jar:/home/ubuntu/.m2/repository/junit/junit/4.13.2/junit-4.13.2.jar:/home/ubuntu/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/ubuntu/.m2/repository/org/apache/commons/commons-compress/1.24.0/commons-compress-1.24.0.jar:/home/ubuntu/.m2/repository/org/rnorth/duct-tape/duct-tape/1.0.8/duct-tape-1.0.8.jar:/home/ubuntu/.m2/repository/org/jetbrains/annotations/17.0.0/annotations-17.0.0.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-api/3.3.4/docker-java-api-3.3.4.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-transport-zerodep/3.3.4/docker-java-transport-zerodep-3.3.4.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-transport/3.3.4/docker-java-transport-3.3.4.jar:/home/ubuntu/.m2/repository/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar:/home/ubuntu/.m2/repository/com/squareup/okhttp3/mockwebserver/4.11.0/mockwebserver-4.11.0.jar:/home/ubuntu/.m2/repository/com/squareup/okhttp3/okhttp/4.11.0/okhttp-4.11.0.jar:/home/ubuntu/.m2/repository/com/squareup/okio/okio/3.2.0/okio-3.2.0.jar:/home/ubuntu/.m2/repository/com/squareup/okio/okio-jvm/3.2.0/okio-jvm-3.2.0.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib/1.6.20/kotlin-stdlib-1.6.20.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-common/1.6.20/kotlin-stdlib-common-1.6.20.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.6.10/kotlin-stdlib-jdk8-1.6.10.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.6.10/kotlin-stdlib-jdk7-1.6.10.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.15.2/jackson-datatype-jsr310-2.15.2.jar:"/>
+    <property name="java.vm.vendor" value="Ubuntu"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://ubuntu.com/"/>
+    <property name="user.timezone" value="UTC"/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-21-openjdk-amd64/lib"/>
+    <property name="sun.java.command" value="/workspace/backend/target/surefire/surefirebooter-20250703234215266_3.jar /workspace/backend/target/surefire 2025-07-03T23-42-09_523-jvmRun1 surefire-20250703234215266_1tmp surefire_0-20250703234215266_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/workspace/backend/target/test-classes:/workspace/backend/target/classes:/home/ubuntu/.m2/repository/org/hibernate/orm/hibernate-core/6.4.0.Final/hibernate-core-6.4.0.Final.jar:/home/ubuntu/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.1.0/jakarta.persistence-api-3.1.0.jar:/home/ubuntu/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/jboss/logging/jboss-logging/3.5.0.Final/jboss-logging-3.5.0.Final.jar:/home/ubuntu/.m2/repository/org/hibernate/common/hibernate-commons-annotations/6.0.6.Final/hibernate-commons-annotations-6.0.6.Final.jar:/home/ubuntu/.m2/repository/io/smallrye/jandex/3.1.2/jandex-3.1.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/classmate/1.5.1/classmate-1.5.1.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy/1.14.7/byte-buddy-1.14.7.jar:/home/ubuntu/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.0/jakarta.xml.bind-api-4.0.0.jar:/home/ubuntu/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.0/jakarta.activation-api-2.1.0.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.2/jaxb-runtime-4.0.2.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.2/jaxb-core-4.0.2.jar:/home/ubuntu/.m2/repository/org/eclipse/angus/angus-activation/2.0.0/angus-activation-2.0.0.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/txw2/4.0.2/txw2-4.0.2.jar:/home/ubuntu/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.1/istack-commons-runtime-4.1.1.jar:/home/ubuntu/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/antlr/antlr4-runtime/4.13.0/antlr4-runtime-4.13.0.jar:/home/ubuntu/.m2/repository/org/hibernate/orm/hibernate-community-dialects/6.2.13.Final/hibernate-community-dialects-6.2.13.Final.jar:/home/ubuntu/.m2/repository/org/xerial/sqlite-jdbc/3.44.0.0/sqlite-jdbc-3.44.0.0.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar:/home/ubuntu/.m2/repository/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-classic/1.4.11/logback-classic-1.4.11.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-core/1.4.11/logback-core-1.4.11.jar:/home/ubuntu/.m2/repository/org/mindrot/jbcrypt/0.4/jbcrypt-0.4.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-api/0.12.3/jjwt-api-0.12.3.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-impl/0.12.3/jjwt-impl-0.12.3.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-jackson/0.12.3/jjwt-jackson-0.12.3.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.0/junit-jupiter-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.0/junit-jupiter-api-5.10.0.jar:/home/ubuntu/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-commons/1.10.0/junit-platform-commons-1.10.0.jar:/home/ubuntu/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.0/junit-jupiter-params-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.0/junit-jupiter-engine-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-engine/1.10.0/junit-platform-engine-1.10.0.jar:/home/ubuntu/.m2/repository/org/mockito/mockito-core/5.7.0/mockito-core-5.7.0.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.9/byte-buddy-agent-1.14.9.jar:/home/ubuntu/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/ubuntu/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:/home/ubuntu/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar:/home/ubuntu/.m2/repository/org/testcontainers/junit-jupiter/1.19.3/junit-jupiter-1.19.3.jar:/home/ubuntu/.m2/repository/org/testcontainers/testcontainers/1.19.3/testcontainers-1.19.3.jar:/home/ubuntu/.m2/repository/junit/junit/4.13.2/junit-4.13.2.jar:/home/ubuntu/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/ubuntu/.m2/repository/org/apache/commons/commons-compress/1.24.0/commons-compress-1.24.0.jar:/home/ubuntu/.m2/repository/org/rnorth/duct-tape/duct-tape/1.0.8/duct-tape-1.0.8.jar:/home/ubuntu/.m2/repository/org/jetbrains/annotations/17.0.0/annotations-17.0.0.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-api/3.3.4/docker-java-api-3.3.4.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-transport-zerodep/3.3.4/docker-java-transport-zerodep-3.3.4.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-transport/3.3.4/docker-java-transport-3.3.4.jar:/home/ubuntu/.m2/repository/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar:/home/ubuntu/.m2/repository/com/squareup/okhttp3/mockwebserver/4.11.0/mockwebserver-4.11.0.jar:/home/ubuntu/.m2/repository/com/squareup/okhttp3/okhttp/4.11.0/okhttp-4.11.0.jar:/home/ubuntu/.m2/repository/com/squareup/okio/okio/3.2.0/okio-3.2.0.jar:/home/ubuntu/.m2/repository/com/squareup/okio/okio-jvm/3.2.0/okio-jvm-3.2.0.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib/1.6.20/kotlin-stdlib-1.6.20.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-common/1.6.20/kotlin-stdlib-common-1.6.20.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.6.10/kotlin-stdlib-jdk8-1.6.10.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.6.10/kotlin-stdlib-jdk7-1.6.10.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.15.2/jackson-datatype-jsr310-2.15.2.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/ubuntu"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2025-04-15"/>
+    <property name="java.home" value="/usr/lib/jvm/java-21-openjdk-amd64"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/workspace/backend"/>
+    <property name="java.vm.compressedOopsMode" value="32-bit"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="surefire.real.class.path" value="/workspace/backend/target/surefire/surefirebooter-20250703234215266_3.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.7+6-Ubuntu-0ubuntu125.04"/>
+    <property name="user.name" value="ubuntu"/>
+    <property name="stdout.encoding" value="UTF-8"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="6.8.0-1024-aws"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="localRepository" value="/home/ubuntu/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://bugs.launchpad.net/ubuntu/+source/openjdk-21"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="java.version" value="21.0.7"/>
+    <property name="user.dir" value="/workspace/backend"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="UTF-8"/>
+    <property name="java.vendor" value="Ubuntu"/>
+    <property name="java.vm.version" value="21.0.7+6-Ubuntu-0ubuntu125.04"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+    <property name="app.profiles.active" value="test"/>
+  </properties>
+  <testcase name="largeOrder_MaximumItemsAndQuantities_HandledCorrectly" classname="com.myapp.order.OrderControllerIntegrationTest$EdgeCaseTests" time="0.31">
+    <system-out><![CDATA[2025-07-03 23:42:41.338 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:41.338 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:41.338 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:41.338 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:41.338 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:41.338 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:41.338 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:41.341 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:41.341 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+🚀 شروع تست سفارش بزرگ
+🔨 شروع ایجاد کاربر تست با ایمیل: customer.large@test.com
+🔄 تلاش شماره 1 از 3 برای ذخیره کاربر
+2025-07-03 23:42:41.441 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:41.442 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+✅ کاربر تست با موفقیت ذخیره شد - ID: 23894, ایمیل: customer.large@test.com
+🏪 شروع ایجاد رستوران تست با نام: رستوران بزرگ
+🔨 شروع ایجاد کاربر تست با ایمیل: restaurant.owner.1751586161444@test.com
+🔄 تلاش شماره 1 از 3 برای ذخیره کاربر
+2025-07-03 23:42:41.444 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:41.444 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+✅ کاربر تست با موفقیت ذخیره شد - ID: 23895, ایمیل: restaurant.owner.1751586161444@test.com
+👤 مالک رستوران ایجاد شد - ID: 23895
+💾 تلاش برای ذخیره رستوران در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره رستوران
+2025-07-03 23:42:41.446 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+✅ رستوران با موفقیت ذخیره شد - ID: 3276
+2025-07-03 23:42:41.448 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ تأیید: رستوران قابل بازیابی است
+2025-07-03 23:42:41.449 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:41.449 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+🍽️ ایجاد آیتم‌های غذا مختلف
+🍕 شروع ایجاد آیتم غذا تست: آیتم 0 - قیمت: 10.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.451 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5857
+2025-07-03 23:42:41.454 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 1 - قیمت: 11.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.454 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5858
+2025-07-03 23:42:41.456 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 2 - قیمت: 12.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.456 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5859
+2025-07-03 23:42:41.458 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 3 - قیمت: 13.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.458 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5860
+2025-07-03 23:42:41.461 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 4 - قیمت: 14.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.461 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5861
+2025-07-03 23:42:41.465 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 5 - قیمت: 15.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.465 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5862
+2025-07-03 23:42:41.467 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 6 - قیمت: 16.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.467 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5863
+2025-07-03 23:42:41.469 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 7 - قیمت: 17.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.470 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5864
+2025-07-03 23:42:41.472 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 8 - قیمت: 18.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.472 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5865
+2025-07-03 23:42:41.474 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 9 - قیمت: 19.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.474 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5866
+2025-07-03 23:42:41.476 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 10 - قیمت: 20.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.476 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5867
+2025-07-03 23:42:41.478 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 11 - قیمت: 21.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.478 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5868
+2025-07-03 23:42:41.480 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 12 - قیمت: 22.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.481 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5869
+2025-07-03 23:42:41.483 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 13 - قیمت: 23.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.483 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5870
+2025-07-03 23:42:41.485 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 14 - قیمت: 24.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.485 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5871
+2025-07-03 23:42:41.487 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 15 - قیمت: 25.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.487 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5872
+2025-07-03 23:42:41.489 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 16 - قیمت: 26.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.489 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5873
+2025-07-03 23:42:41.495 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 17 - قیمت: 27.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.495 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5874
+2025-07-03 23:42:41.497 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 18 - قیمت: 28.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.497 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5875
+2025-07-03 23:42:41.499 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: آیتم 19 - قیمت: 29.0
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.499 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5876
+2025-07-03 23:42:41.501 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+✅ 20 آیتم غذا آماده شد
+📦 اضافه کردن آیتم‌ها به سفارش
+2025-07-03 23:42:41.502 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.502 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+2025-07-03 23:42:41.502 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.503 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+2025-07-03 23:42:41.503 [main] DEBUG org.hibernate.SQL - 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+Hibernate: 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+📊 1 آیتم اضافه شده
+2025-07-03 23:42:41.505 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.506 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+2025-07-03 23:42:41.506 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.506 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+2025-07-03 23:42:41.506 [main] DEBUG org.hibernate.SQL - 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+Hibernate: 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+2025-07-03 23:42:41.508 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.509 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+2025-07-03 23:42:41.509 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.509 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+2025-07-03 23:42:41.509 [main] DEBUG org.hibernate.SQL - 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+Hibernate: 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+2025-07-03 23:42:41.511 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.512 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+2025-07-03 23:42:41.512 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.513 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+2025-07-03 23:42:41.513 [main] DEBUG org.hibernate.SQL - 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+Hibernate: 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+2025-07-03 23:42:41.517 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.517 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+2025-07-03 23:42:41.517 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.518 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+2025-07-03 23:42:41.518 [main] DEBUG org.hibernate.SQL - 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+Hibernate: 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+2025-07-03 23:42:41.522 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.522 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+2025-07-03 23:42:41.523 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.523 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+2025-07-03 23:42:41.523 [main] DEBUG org.hibernate.SQL - 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+Hibernate: 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+📊 6 آیتم اضافه شده
+2025-07-03 23:42:41.527 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.527 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+2025-07-03 23:42:41.527 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.528 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+2025-07-03 23:42:41.528 [main] DEBUG org.hibernate.SQL - 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+Hibernate: 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+2025-07-03 23:42:41.532 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.532 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+2025-07-03 23:42:41.533 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.533 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+2025-07-03 23:42:41.533 [main] DEBUG org.hibernate.SQL - 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+Hibernate: 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+2025-07-03 23:42:41.537 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.537 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+2025-07-03 23:42:41.537 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.538 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+2025-07-03 23:42:41.538 [main] DEBUG org.hibernate.SQL - 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+Hibernate: 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+2025-07-03 23:42:41.540 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.541 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+2025-07-03 23:42:41.541 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.541 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+2025-07-03 23:42:41.542 [main] DEBUG org.hibernate.SQL - 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+Hibernate: 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+✅ در مجموع 10 آیتم اضافه شد
+2025-07-03 23:42:41.544 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+📋 تعداد نهایی آیتم‌ها: 10
+💰 مبلغ کل سفارش: 455.0
+🎉 تست سفارش بزرگ با موفقیت تکمیل شد
+2025-07-03 23:42:41.545 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:41.545 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:41.545 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:41.545 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:41.545 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:41.545 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:41.545 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:41.548 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:41.548 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+]]></system-out>
+  </testcase>
+  <testcase name="emptyCartOperations_AllScenarios_HandledGracefully" classname="com.myapp.order.OrderControllerIntegrationTest$EdgeCaseTests" time="0.219">
+    <system-out><![CDATA[2025-07-03 23:42:41.649 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:41.649 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:41.649 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:41.649 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:41.649 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:41.649 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:41.649 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:41.652 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:41.652 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+🚀 شروع تست عملیات سبد خرید خالی
+🔨 شروع ایجاد کاربر تست با ایمیل: customer.empty@test.com
+🔄 تلاش شماره 1 از 3 برای ذخیره کاربر
+2025-07-03 23:42:41.752 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:41.753 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+✅ کاربر تست با موفقیت ذخیره شد - ID: 23896, ایمیل: customer.empty@test.com
+🏪 شروع ایجاد رستوران تست با نام: رستوران خالی
+🔨 شروع ایجاد کاربر تست با ایمیل: restaurant.owner.1751586161755@test.com
+🔄 تلاش شماره 1 از 3 برای ذخیره کاربر
+2025-07-03 23:42:41.755 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:41.756 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+✅ کاربر تست با موفقیت ذخیره شد - ID: 23897, ایمیل: restaurant.owner.1751586161755@test.com
+👤 مالک رستوران ایجاد شد - ID: 23897
+💾 تلاش برای ذخیره رستوران در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره رستوران
+2025-07-03 23:42:41.758 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+✅ رستوران با موفقیت ذخیره شد - ID: 3277
+2025-07-03 23:42:41.760 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ تأیید: رستوران قابل بازیابی است
+2025-07-03 23:42:41.760 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:41.760 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+📦 بررسی سفارش خالی
+2025-07-03 23:42:41.763 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+✅ سفارش خالی به درستی شناسایی شد
+❌ تلاش برای ثبت سفارش خالی
+2025-07-03 23:42:41.763 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+✅ خطای مناسب برای سفارش خالی: IllegalArgumentException
+❌ تلاش برای حذف آیتم غیرموجود
+2025-07-03 23:42:41.763 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.764 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ خطای مناسب برای آیتم غیرموجود: NotFoundException
+❌ تلاش برای به‌روزرسانی آیتم غیرموجود
+2025-07-03 23:42:41.764 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.764 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ خطای مناسب برای به‌روزرسانی غیرموجود: NotFoundException
+🎉 تست عملیات سبد خرید خالی با موفقیت تکمیل شد
+2025-07-03 23:42:41.764 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:41.764 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:41.764 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:41.764 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:41.764 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:41.764 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:41.764 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:41.767 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:41.767 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+]]></system-out>
+  </testcase>
+  <testcase name="extremeQuantities_BoundaryValues_HandledCorrectly(int)[1]" classname="com.myapp.order.OrderControllerIntegrationTest$EdgeCaseTests" time="0.225">
+    <system-out><![CDATA[2025-07-03 23:42:41.869 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:41.869 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:41.869 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:41.869 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:41.869 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:41.869 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:41.869 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:41.872 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:41.872 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+🚀 شروع تست تعداد افراطی: 1
+🔨 شروع ایجاد کاربر تست با ایمیل: customer.extreme1@test.com
+🔄 تلاش شماره 1 از 3 برای ذخیره کاربر
+2025-07-03 23:42:41.973 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:41.973 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+✅ کاربر تست با موفقیت ذخیره شد - ID: 23898, ایمیل: customer.extreme1@test.com
+🏪 شروع ایجاد رستوران تست با نام: رستوران مرزی 1
+🔨 شروع ایجاد کاربر تست با ایمیل: restaurant.owner.1751586161975@test.com
+🔄 تلاش شماره 1 از 3 برای ذخیره کاربر
+2025-07-03 23:42:41.976 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:41.976 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+✅ کاربر تست با موفقیت ذخیره شد - ID: 23899, ایمیل: restaurant.owner.1751586161975@test.com
+👤 مالک رستوران ایجاد شد - ID: 23899
+💾 تلاش برای ذخیره رستوران در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره رستوران
+2025-07-03 23:42:41.978 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+✅ رستوران با موفقیت ذخیره شد - ID: 3278
+2025-07-03 23:42:41.980 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ تأیید: رستوران قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: پیتزا مرزی - قیمت: 25.99
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:41.980 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5877
+2025-07-03 23:42:41.983 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+2025-07-03 23:42:41.983 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:41.983 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+🧪 تست اضافه کردن آیتم با تعداد: 1
+2025-07-03 23:42:41.985 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.986 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+2025-07-03 23:42:41.986 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:41.986 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+2025-07-03 23:42:41.986 [main] DEBUG org.hibernate.SQL - 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+Hibernate: 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+2025-07-03 23:42:41.989 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+💰 مبلغ محاسبه شده: 25.99 (انتظار: 25.99)
+✅ تعداد 1 با موفقیت پردازش شد
+🎉 تست تعداد 1 تکمیل شد
+2025-07-03 23:42:41.990 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:41.990 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:41.990 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:41.990 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:41.990 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:41.990 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:41.990 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:41.993 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:41.993 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+]]></system-out>
+  </testcase>
+  <testcase name="extremeQuantities_BoundaryValues_HandledCorrectly(int)[2]" classname="com.myapp.order.OrderControllerIntegrationTest$EdgeCaseTests" time="0.223">
+    <system-out><![CDATA[2025-07-03 23:42:42.094 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:42.094 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:42.094 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:42.094 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:42.094 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:42.094 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:42.094 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:42.097 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:42.097 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+🚀 شروع تست تعداد افراطی: 100
+🔨 شروع ایجاد کاربر تست با ایمیل: customer.extreme100@test.com
+🔄 تلاش شماره 1 از 3 برای ذخیره کاربر
+2025-07-03 23:42:42.197 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:42.198 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+✅ کاربر تست با موفقیت ذخیره شد - ID: 23900, ایمیل: customer.extreme100@test.com
+🏪 شروع ایجاد رستوران تست با نام: رستوران مرزی 100
+🔨 شروع ایجاد کاربر تست با ایمیل: restaurant.owner.1751586162200@test.com
+🔄 تلاش شماره 1 از 3 برای ذخیره کاربر
+2025-07-03 23:42:42.200 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:42.200 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+✅ کاربر تست با موفقیت ذخیره شد - ID: 23901, ایمیل: restaurant.owner.1751586162200@test.com
+👤 مالک رستوران ایجاد شد - ID: 23901
+💾 تلاش برای ذخیره رستوران در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره رستوران
+2025-07-03 23:42:42.202 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+✅ رستوران با موفقیت ذخیره شد - ID: 3279
+2025-07-03 23:42:42.204 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ تأیید: رستوران قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: پیتزا مرزی - قیمت: 25.99
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:42.205 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5878
+2025-07-03 23:42:42.207 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+2025-07-03 23:42:42.207 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:42.207 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+🧪 تست اضافه کردن آیتم با تعداد: 100
+2025-07-03 23:42:42.210 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:42.210 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+2025-07-03 23:42:42.210 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:42.210 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+2025-07-03 23:42:42.211 [main] DEBUG org.hibernate.SQL - 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+Hibernate: 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+2025-07-03 23:42:42.213 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+💰 مبلغ محاسبه شده: 2599.0 (انتظار: 2599.0)
+✅ تعداد 100 با موفقیت پردازش شد
+🎉 تست تعداد 100 تکمیل شد
+2025-07-03 23:42:42.213 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:42.213 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:42.213 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:42.213 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:42.213 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:42.213 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:42.213 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:42.216 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:42.216 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+]]></system-out>
+  </testcase>
+  <testcase name="extremeQuantities_BoundaryValues_HandledCorrectly(int)[3]" classname="com.myapp.order.OrderControllerIntegrationTest$EdgeCaseTests" time="0.224">
+    <system-out><![CDATA[2025-07-03 23:42:42.317 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:42.317 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:42.317 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:42.317 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:42.317 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:42.317 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:42.317 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:42.320 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:42.320 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+🚀 شروع تست تعداد افراطی: 1000
+🔨 شروع ایجاد کاربر تست با ایمیل: customer.extreme1000@test.com
+🔄 تلاش شماره 1 از 3 برای ذخیره کاربر
+2025-07-03 23:42:42.421 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:42.421 [main] DEBUG org.hibernate.SQL - 
+    select
+        next_val as id_val 
+    from
+        users_SEQ
+Hibernate: 
+    select
+        next_val as id_val 
+    from
+        users_SEQ
+2025-07-03 23:42:42.421 [main] DEBUG org.hibernate.SQL - 
+    update
+        users_SEQ 
+    set
+        next_val= ? 
+    where
+        next_val=?
+Hibernate: 
+    update
+        users_SEQ 
+    set
+        next_val= ? 
+    where
+        next_val=?
+2025-07-03 23:42:42.423 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+✅ کاربر تست با موفقیت ذخیره شد - ID: 23902, ایمیل: customer.extreme1000@test.com
+🏪 شروع ایجاد رستوران تست با نام: رستوران مرزی 1000
+🔨 شروع ایجاد کاربر تست با ایمیل: restaurant.owner.1751586162425@test.com
+🔄 تلاش شماره 1 از 3 برای ذخیره کاربر
+2025-07-03 23:42:42.426 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:42.426 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+✅ کاربر تست با موفقیت ذخیره شد - ID: 23903, ایمیل: restaurant.owner.1751586162425@test.com
+👤 مالک رستوران ایجاد شد - ID: 23903
+💾 تلاش برای ذخیره رستوران در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره رستوران
+2025-07-03 23:42:42.428 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+✅ رستوران با موفقیت ذخیره شد - ID: 3280
+2025-07-03 23:42:42.430 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ تأیید: رستوران قابل بازیابی است
+🍕 شروع ایجاد آیتم غذا تست: پیتزا مرزی - قیمت: 25.99
+💾 تلاش برای ذخیره آیتم غذا در پایگاه داده...
+🔄 تلاش شماره 1 از 3 برای ذخیره آیتم غذا
+2025-07-03 23:42:42.430 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ آیتم غذا با موفقیت ذخیره شد - ID: 5879
+2025-07-03 23:42:42.432 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+✅ تأیید: آیتم غذا قابل بازیابی است
+2025-07-03 23:42:42.432 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:42.433 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+🧪 تست اضافه کردن آیتم با تعداد: 1000
+2025-07-03 23:42:42.435 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:42.435 [main] DEBUG org.hibernate.SQL - 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+Hibernate: 
+    select
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id 
+    from
+        food_items fi1_0 
+    where
+        fi1_0.id=?
+2025-07-03 23:42:42.435 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:42.436 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        order_items
+        (food_item_id, order_id, price, quantity, id) 
+    values
+        (?, ?, ?, ?, ?)
+2025-07-03 23:42:42.436 [main] DEBUG org.hibernate.SQL - 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+Hibernate: 
+    update
+        orders 
+    set
+        actual_delivery_time=?,
+        customer_id=?,
+        delivery_address=?,
+        estimated_delivery_time=?,
+        notes=?,
+        order_date=?,
+        phone=?,
+        restaurant_id=?,
+        status=?,
+        total_amount=? 
+    where
+        id=?
+2025-07-03 23:42:42.438 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+💰 مبلغ محاسبه شده: 25990.0 (انتظار: 25990.0)
+✅ تعداد 1000 با موفقیت پردازش شد
+🎉 تست تعداد 1000 تکمیل شد
+2025-07-03 23:42:42.439 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:42.439 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:42.439 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:42.439 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:42.439 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:42.439 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:42.439 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:42.441 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:42.441 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+]]></system-out>
+  </testcase>
+</testsuite>

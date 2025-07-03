@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.myapp.auth.AuthServiceTest$RegistrationTests
+-------------------------------------------------------------------------------
+Tests run: 25, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.148 s -- in com.myapp.auth.AuthServiceTest$RegistrationTests

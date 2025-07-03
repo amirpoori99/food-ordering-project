@@ -1,0 +1,2999 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.myapp.item.ItemServiceEdgeCaseTest$SpecialCharactersTests" time="0.166" tests="17" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/workspace/backend/target/test-classes:/workspace/backend/target/classes:/home/ubuntu/.m2/repository/org/hibernate/orm/hibernate-core/6.4.0.Final/hibernate-core-6.4.0.Final.jar:/home/ubuntu/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.1.0/jakarta.persistence-api-3.1.0.jar:/home/ubuntu/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/jboss/logging/jboss-logging/3.5.0.Final/jboss-logging-3.5.0.Final.jar:/home/ubuntu/.m2/repository/org/hibernate/common/hibernate-commons-annotations/6.0.6.Final/hibernate-commons-annotations-6.0.6.Final.jar:/home/ubuntu/.m2/repository/io/smallrye/jandex/3.1.2/jandex-3.1.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/classmate/1.5.1/classmate-1.5.1.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy/1.14.7/byte-buddy-1.14.7.jar:/home/ubuntu/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.0/jakarta.xml.bind-api-4.0.0.jar:/home/ubuntu/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.0/jakarta.activation-api-2.1.0.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.2/jaxb-runtime-4.0.2.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.2/jaxb-core-4.0.2.jar:/home/ubuntu/.m2/repository/org/eclipse/angus/angus-activation/2.0.0/angus-activation-2.0.0.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/txw2/4.0.2/txw2-4.0.2.jar:/home/ubuntu/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.1/istack-commons-runtime-4.1.1.jar:/home/ubuntu/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/antlr/antlr4-runtime/4.13.0/antlr4-runtime-4.13.0.jar:/home/ubuntu/.m2/repository/org/hibernate/orm/hibernate-community-dialects/6.2.13.Final/hibernate-community-dialects-6.2.13.Final.jar:/home/ubuntu/.m2/repository/org/xerial/sqlite-jdbc/3.44.0.0/sqlite-jdbc-3.44.0.0.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar:/home/ubuntu/.m2/repository/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-classic/1.4.11/logback-classic-1.4.11.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-core/1.4.11/logback-core-1.4.11.jar:/home/ubuntu/.m2/repository/org/mindrot/jbcrypt/0.4/jbcrypt-0.4.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-api/0.12.3/jjwt-api-0.12.3.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-impl/0.12.3/jjwt-impl-0.12.3.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-jackson/0.12.3/jjwt-jackson-0.12.3.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.0/junit-jupiter-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.0/junit-jupiter-api-5.10.0.jar:/home/ubuntu/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-commons/1.10.0/junit-platform-commons-1.10.0.jar:/home/ubuntu/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.0/junit-jupiter-params-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.0/junit-jupiter-engine-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-engine/1.10.0/junit-platform-engine-1.10.0.jar:/home/ubuntu/.m2/repository/org/mockito/mockito-core/5.7.0/mockito-core-5.7.0.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.9/byte-buddy-agent-1.14.9.jar:/home/ubuntu/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/ubuntu/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:/home/ubuntu/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar:/home/ubuntu/.m2/repository/org/testcontainers/junit-jupiter/1.19.3/junit-jupiter-1.19.3.jar:/home/ubuntu/.m2/repository/org/testcontainers/testcontainers/1.19.3/testcontainers-1.19.3.jar:/home/ubuntu/.m2/repository/junit/junit/4.13.2/junit-4.13.2.jar:/home/ubuntu/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/ubuntu/.m2/repository/org/apache/commons/commons-compress/1.24.0/commons-compress-1.24.0.jar:/home/ubuntu/.m2/repository/org/rnorth/duct-tape/duct-tape/1.0.8/duct-tape-1.0.8.jar:/home/ubuntu/.m2/repository/org/jetbrains/annotations/17.0.0/annotations-17.0.0.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-api/3.3.4/docker-java-api-3.3.4.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-transport-zerodep/3.3.4/docker-java-transport-zerodep-3.3.4.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-transport/3.3.4/docker-java-transport-3.3.4.jar:/home/ubuntu/.m2/repository/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar:/home/ubuntu/.m2/repository/com/squareup/okhttp3/mockwebserver/4.11.0/mockwebserver-4.11.0.jar:/home/ubuntu/.m2/repository/com/squareup/okhttp3/okhttp/4.11.0/okhttp-4.11.0.jar:/home/ubuntu/.m2/repository/com/squareup/okio/okio/3.2.0/okio-3.2.0.jar:/home/ubuntu/.m2/repository/com/squareup/okio/okio-jvm/3.2.0/okio-jvm-3.2.0.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib/1.6.20/kotlin-stdlib-1.6.20.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-common/1.6.20/kotlin-stdlib-common-1.6.20.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.6.10/kotlin-stdlib-jdk8-1.6.10.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.6.10/kotlin-stdlib-jdk7-1.6.10.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.15.2/jackson-datatype-jsr310-2.15.2.jar:"/>
+    <property name="java.vm.vendor" value="Ubuntu"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://ubuntu.com/"/>
+    <property name="user.timezone" value="UTC"/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-21-openjdk-amd64/lib"/>
+    <property name="sun.java.command" value="/workspace/backend/target/surefire/surefirebooter-20250703234215266_3.jar /workspace/backend/target/surefire 2025-07-03T23-42-09_523-jvmRun1 surefire-20250703234215266_1tmp surefire_0-20250703234215266_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/workspace/backend/target/test-classes:/workspace/backend/target/classes:/home/ubuntu/.m2/repository/org/hibernate/orm/hibernate-core/6.4.0.Final/hibernate-core-6.4.0.Final.jar:/home/ubuntu/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.1.0/jakarta.persistence-api-3.1.0.jar:/home/ubuntu/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/jboss/logging/jboss-logging/3.5.0.Final/jboss-logging-3.5.0.Final.jar:/home/ubuntu/.m2/repository/org/hibernate/common/hibernate-commons-annotations/6.0.6.Final/hibernate-commons-annotations-6.0.6.Final.jar:/home/ubuntu/.m2/repository/io/smallrye/jandex/3.1.2/jandex-3.1.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/classmate/1.5.1/classmate-1.5.1.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy/1.14.7/byte-buddy-1.14.7.jar:/home/ubuntu/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.0/jakarta.xml.bind-api-4.0.0.jar:/home/ubuntu/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.0/jakarta.activation-api-2.1.0.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.2/jaxb-runtime-4.0.2.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.2/jaxb-core-4.0.2.jar:/home/ubuntu/.m2/repository/org/eclipse/angus/angus-activation/2.0.0/angus-activation-2.0.0.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/txw2/4.0.2/txw2-4.0.2.jar:/home/ubuntu/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.1/istack-commons-runtime-4.1.1.jar:/home/ubuntu/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/antlr/antlr4-runtime/4.13.0/antlr4-runtime-4.13.0.jar:/home/ubuntu/.m2/repository/org/hibernate/orm/hibernate-community-dialects/6.2.13.Final/hibernate-community-dialects-6.2.13.Final.jar:/home/ubuntu/.m2/repository/org/xerial/sqlite-jdbc/3.44.0.0/sqlite-jdbc-3.44.0.0.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar:/home/ubuntu/.m2/repository/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-classic/1.4.11/logback-classic-1.4.11.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-core/1.4.11/logback-core-1.4.11.jar:/home/ubuntu/.m2/repository/org/mindrot/jbcrypt/0.4/jbcrypt-0.4.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-api/0.12.3/jjwt-api-0.12.3.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-impl/0.12.3/jjwt-impl-0.12.3.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-jackson/0.12.3/jjwt-jackson-0.12.3.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.0/junit-jupiter-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.0/junit-jupiter-api-5.10.0.jar:/home/ubuntu/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-commons/1.10.0/junit-platform-commons-1.10.0.jar:/home/ubuntu/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.0/junit-jupiter-params-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.0/junit-jupiter-engine-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-engine/1.10.0/junit-platform-engine-1.10.0.jar:/home/ubuntu/.m2/repository/org/mockito/mockito-core/5.7.0/mockito-core-5.7.0.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.9/byte-buddy-agent-1.14.9.jar:/home/ubuntu/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/ubuntu/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:/home/ubuntu/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar:/home/ubuntu/.m2/repository/org/testcontainers/junit-jupiter/1.19.3/junit-jupiter-1.19.3.jar:/home/ubuntu/.m2/repository/org/testcontainers/testcontainers/1.19.3/testcontainers-1.19.3.jar:/home/ubuntu/.m2/repository/junit/junit/4.13.2/junit-4.13.2.jar:/home/ubuntu/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/ubuntu/.m2/repository/org/apache/commons/commons-compress/1.24.0/commons-compress-1.24.0.jar:/home/ubuntu/.m2/repository/org/rnorth/duct-tape/duct-tape/1.0.8/duct-tape-1.0.8.jar:/home/ubuntu/.m2/repository/org/jetbrains/annotations/17.0.0/annotations-17.0.0.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-api/3.3.4/docker-java-api-3.3.4.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-transport-zerodep/3.3.4/docker-java-transport-zerodep-3.3.4.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-transport/3.3.4/docker-java-transport-3.3.4.jar:/home/ubuntu/.m2/repository/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar:/home/ubuntu/.m2/repository/com/squareup/okhttp3/mockwebserver/4.11.0/mockwebserver-4.11.0.jar:/home/ubuntu/.m2/repository/com/squareup/okhttp3/okhttp/4.11.0/okhttp-4.11.0.jar:/home/ubuntu/.m2/repository/com/squareup/okio/okio/3.2.0/okio-3.2.0.jar:/home/ubuntu/.m2/repository/com/squareup/okio/okio-jvm/3.2.0/okio-jvm-3.2.0.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib/1.6.20/kotlin-stdlib-1.6.20.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-common/1.6.20/kotlin-stdlib-common-1.6.20.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.6.10/kotlin-stdlib-jdk8-1.6.10.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.6.10/kotlin-stdlib-jdk7-1.6.10.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.15.2/jackson-datatype-jsr310-2.15.2.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/ubuntu"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2025-04-15"/>
+    <property name="java.home" value="/usr/lib/jvm/java-21-openjdk-amd64"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/workspace/backend"/>
+    <property name="java.vm.compressedOopsMode" value="32-bit"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="surefire.real.class.path" value="/workspace/backend/target/surefire/surefirebooter-20250703234215266_3.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.7+6-Ubuntu-0ubuntu125.04"/>
+    <property name="user.name" value="ubuntu"/>
+    <property name="stdout.encoding" value="UTF-8"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="6.8.0-1024-aws"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="localRepository" value="/home/ubuntu/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://bugs.launchpad.net/ubuntu/+source/openjdk-21"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="java.version" value="21.0.7"/>
+    <property name="user.dir" value="/workspace/backend"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="UTF-8"/>
+    <property name="java.vendor" value="Ubuntu"/>
+    <property name="java.vm.version" value="21.0.7+6-Ubuntu-0ubuntu125.04"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+    <property name="app.profiles.active" value="test"/>
+  </properties>
+  <testcase name="specialASCIICharacters_VariousSpecialChars_SanitizedOrAccepted(String)[1]" classname="com.myapp.item.ItemServiceEdgeCaseTest$SpecialCharactersTests" time="0.009">
+    <system-out><![CDATA[2025-07-03 23:42:35.427 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:35.427 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:35.428 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:35.428 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:35.428 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:35.428 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:35.428 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:35.430 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:35.430 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:35.431 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.431 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+📝 Global restaurant saved to repository for tests
+2025-07-03 23:42:35.433 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Global restaurant saved successfully - ID: 3123
+2025-07-03 23:42:35.434 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.434 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Successfully handled special characters: Item with\nnewline
+]]></system-out>
+  </testcase>
+  <testcase name="specialASCIICharacters_VariousSpecialChars_SanitizedOrAccepted(String)[2]" classname="com.myapp.item.ItemServiceEdgeCaseTest$SpecialCharactersTests" time="0.008">
+    <system-out><![CDATA[2025-07-03 23:42:35.437 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:35.437 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:35.437 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:35.437 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:35.437 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:35.437 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:35.437 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:35.440 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:35.440 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:35.440 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.440 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+📝 Global restaurant saved to repository for tests
+2025-07-03 23:42:35.442 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Global restaurant saved successfully - ID: 3124
+2025-07-03 23:42:35.442 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.443 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Successfully handled special characters: Item with\ttab
+]]></system-out>
+  </testcase>
+  <testcase name="specialASCIICharacters_VariousSpecialChars_SanitizedOrAccepted(String)[3]" classname="com.myapp.item.ItemServiceEdgeCaseTest$SpecialCharactersTests" time="0.009">
+    <system-out><![CDATA[2025-07-03 23:42:35.446 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:35.446 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:35.446 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:35.446 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:35.446 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:35.446 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:35.446 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:35.448 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:35.448 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:35.448 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.449 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+📝 Global restaurant saved to repository for tests
+2025-07-03 23:42:35.451 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Global restaurant saved successfully - ID: 3125
+2025-07-03 23:42:35.451 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.452 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Successfully handled special characters: Item with\rcarriage return
+]]></system-out>
+  </testcase>
+  <testcase name="specialASCIICharacters_VariousSpecialChars_SanitizedOrAccepted(String)[4]" classname="com.myapp.item.ItemServiceEdgeCaseTest$SpecialCharactersTests" time="0.017">
+    <system-out><![CDATA[2025-07-03 23:42:35.454 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:35.454 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:35.454 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:35.454 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:35.454 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:35.455 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:35.455 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:35.461 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:35.461 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:35.461 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.462 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+📝 Global restaurant saved to repository for tests
+2025-07-03 23:42:35.466 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Global restaurant saved successfully - ID: 3126
+2025-07-03 23:42:35.466 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.466 [main] DEBUG org.hibernate.SQL - 
+    select
+        next_val as id_val 
+    from
+        food_items_SEQ
+Hibernate: 
+    select
+        next_val as id_val 
+    from
+        food_items_SEQ
+2025-07-03 23:42:35.466 [main] DEBUG org.hibernate.SQL - 
+    update
+        food_items_SEQ 
+    set
+        next_val= ? 
+    where
+        next_val=?
+Hibernate: 
+    update
+        food_items_SEQ 
+    set
+        next_val= ? 
+    where
+        next_val=?
+2025-07-03 23:42:35.469 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Successfully handled special characters: Item with "quotes"
+]]></system-out>
+  </testcase>
+  <testcase name="specialASCIICharacters_VariousSpecialChars_SanitizedOrAccepted(String)[5]" classname="com.myapp.item.ItemServiceEdgeCaseTest$SpecialCharactersTests" time="0.009">
+    <system-out><![CDATA[2025-07-03 23:42:35.471 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:35.471 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:35.471 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:35.472 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:35.472 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:35.472 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:35.472 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:35.474 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:35.474 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:35.474 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.475 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+📝 Global restaurant saved to repository for tests
+2025-07-03 23:42:35.477 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Global restaurant saved successfully - ID: 3127
+2025-07-03 23:42:35.477 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.478 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Successfully handled special characters: Item with 'apostrophe'
+]]></system-out>
+  </testcase>
+  <testcase name="specialASCIICharacters_VariousSpecialChars_SanitizedOrAccepted(String)[6]" classname="com.myapp.item.ItemServiceEdgeCaseTest$SpecialCharactersTests" time="0.008">
+    <system-out><![CDATA[2025-07-03 23:42:35.480 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:35.480 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:35.480 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:35.480 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:35.480 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:35.480 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:35.480 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:35.483 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:35.483 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:35.483 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.483 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+📝 Global restaurant saved to repository for tests
+2025-07-03 23:42:35.485 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Global restaurant saved successfully - ID: 3128
+2025-07-03 23:42:35.486 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.486 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Successfully handled special characters: Item & with & ampersands
+]]></system-out>
+  </testcase>
+  <testcase name="specialASCIICharacters_VariousSpecialChars_SanitizedOrAccepted(String)[7]" classname="com.myapp.item.ItemServiceEdgeCaseTest$SpecialCharactersTests" time="0.009">
+    <system-out><![CDATA[2025-07-03 23:42:35.489 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:35.489 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:35.489 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:35.489 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:35.489 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:35.489 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:35.489 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:35.492 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:35.492 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:35.492 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.492 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+📝 Global restaurant saved to repository for tests
+2025-07-03 23:42:35.494 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Global restaurant saved successfully - ID: 3129
+2025-07-03 23:42:35.494 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.495 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Successfully handled special characters: Item < with > brackets
+]]></system-out>
+  </testcase>
+  <testcase name="specialASCIICharacters_VariousSpecialChars_SanitizedOrAccepted(String)[8]" classname="com.myapp.item.ItemServiceEdgeCaseTest$SpecialCharactersTests" time="0.009">
+    <system-out><![CDATA[2025-07-03 23:42:35.497 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:35.498 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:35.498 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:35.498 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:35.498 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:35.498 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:35.498 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:35.500 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:35.500 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:35.501 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.501 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+📝 Global restaurant saved to repository for tests
+2025-07-03 23:42:35.504 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Global restaurant saved successfully - ID: 3130
+2025-07-03 23:42:35.504 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.504 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Successfully handled special characters: Item/with/slashes\backslashes
+]]></system-out>
+  </testcase>
+  <testcase name="htmlXmlInjectionPrevention_MaliciousInput_SanitizedOrRejected" classname="com.myapp.item.ItemServiceEdgeCaseTest$SpecialCharactersTests" time="0.014">
+    <system-out><![CDATA[2025-07-03 23:42:35.507 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:35.507 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:35.507 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:35.507 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:35.507 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:35.507 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:35.507 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:35.510 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:35.510 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:35.510 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.510 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+📝 Global restaurant saved to repository for tests
+2025-07-03 23:42:35.512 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Global restaurant saved successfully - ID: 3131
+2025-07-03 23:42:35.513 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Malicious input correctly rejected: <script>alert('XSS')</script>
+2025-07-03 23:42:35.513 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.513 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Malicious input sanitized: <img src=x onerror=alert('XSS')>
+2025-07-03 23:42:35.516 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.516 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Malicious input sanitized: <?xml version="1.0"?><!DOCTYPE test [<!ENTITY test "malicious">]>
+2025-07-03 23:42:35.518 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.519 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Malicious input sanitized: <svg onload=alert('XSS')>
+2025-07-03 23:42:35.521 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Malicious input correctly rejected: javascript:alert('XSS')
+]]></system-out>
+  </testcase>
+  <testcase name="unicodeAndEmojiSupport_InternationalCharacters_HandledCorrectly(String)[1]" classname="com.myapp.item.ItemServiceEdgeCaseTest$SpecialCharactersTests" time="0.009">
+    <system-out><![CDATA[2025-07-03 23:42:35.522 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:35.522 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:35.522 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:35.522 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:35.522 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:35.522 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:35.522 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:35.525 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:35.525 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:35.525 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.525 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+📝 Global restaurant saved to repository for tests
+2025-07-03 23:42:35.527 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Global restaurant saved successfully - ID: 3132
+2025-07-03 23:42:35.527 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.529 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Successfully handled international name: Pizza 🍕 Margherita
+]]></system-out>
+  </testcase>
+  <testcase name="unicodeAndEmojiSupport_InternationalCharacters_HandledCorrectly(String)[2]" classname="com.myapp.item.ItemServiceEdgeCaseTest$SpecialCharactersTests" time="0.008">
+    <system-out><![CDATA[2025-07-03 23:42:35.531 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:35.531 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:35.531 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:35.531 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:35.531 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:35.531 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:35.532 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:35.534 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:35.534 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:35.534 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.535 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+📝 Global restaurant saved to repository for tests
+2025-07-03 23:42:35.537 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Global restaurant saved successfully - ID: 3133
+2025-07-03 23:42:35.537 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.537 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Successfully handled international name: Café Latté ☕
+]]></system-out>
+  </testcase>
+  <testcase name="unicodeAndEmojiSupport_InternationalCharacters_HandledCorrectly(String)[3]" classname="com.myapp.item.ItemServiceEdgeCaseTest$SpecialCharactersTests" time="0.009">
+    <system-out><![CDATA[2025-07-03 23:42:35.540 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:35.540 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:35.540 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:35.540 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:35.540 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:35.540 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:35.540 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:35.543 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:35.543 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:35.543 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.543 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+📝 Global restaurant saved to repository for tests
+2025-07-03 23:42:35.545 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Global restaurant saved successfully - ID: 3134
+2025-07-03 23:42:35.546 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.546 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Successfully handled international name: Spicy 🌶️ Jalapeño
+]]></system-out>
+  </testcase>
+  <testcase name="unicodeAndEmojiSupport_InternationalCharacters_HandledCorrectly(String)[4]" classname="com.myapp.item.ItemServiceEdgeCaseTest$SpecialCharactersTests" time="0.008">
+    <system-out><![CDATA[2025-07-03 23:42:35.548 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:35.549 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:35.549 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:35.549 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:35.549 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:35.549 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:35.549 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:35.551 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:35.551 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:35.551 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.551 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+📝 Global restaurant saved to repository for tests
+2025-07-03 23:42:35.554 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Global restaurant saved successfully - ID: 3135
+2025-07-03 23:42:35.554 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.554 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Successfully handled international name: Crème Brûlée 🍮
+]]></system-out>
+  </testcase>
+  <testcase name="unicodeAndEmojiSupport_InternationalCharacters_HandledCorrectly(String)[5]" classname="com.myapp.item.ItemServiceEdgeCaseTest$SpecialCharactersTests" time="0.01">
+    <system-out><![CDATA[2025-07-03 23:42:35.557 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:35.557 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:35.557 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:35.557 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:35.557 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:35.557 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:35.557 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:35.560 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:35.560 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:35.560 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.560 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+📝 Global restaurant saved to repository for tests
+2025-07-03 23:42:35.562 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Global restaurant saved successfully - ID: 3136
+2025-07-03 23:42:35.562 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.562 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Successfully handled international name: Piña Colada 🍹
+]]></system-out>
+  </testcase>
+  <testcase name="unicodeAndEmojiSupport_InternationalCharacters_HandledCorrectly(String)[6]" classname="com.myapp.item.ItemServiceEdgeCaseTest$SpecialCharactersTests" time="0.009">
+    <system-out><![CDATA[2025-07-03 23:42:35.567 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:35.567 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:35.567 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:35.567 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:35.567 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:35.567 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:35.567 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:35.570 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:35.570 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:35.570 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.570 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+📝 Global restaurant saved to repository for tests
+2025-07-03 23:42:35.573 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Global restaurant saved successfully - ID: 3137
+2025-07-03 23:42:35.573 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.573 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Successfully handled international name: Navroz کباب
+]]></system-out>
+  </testcase>
+  <testcase name="unicodeAndEmojiSupport_InternationalCharacters_HandledCorrectly(String)[7]" classname="com.myapp.item.ItemServiceEdgeCaseTest$SpecialCharactersTests" time="0.008">
+    <system-out><![CDATA[2025-07-03 23:42:35.576 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:35.576 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:35.576 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:35.576 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:35.576 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:35.576 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:35.576 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:35.579 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:35.579 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:35.579 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.579 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+📝 Global restaurant saved to repository for tests
+2025-07-03 23:42:35.581 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Global restaurant saved successfully - ID: 3138
+2025-07-03 23:42:35.581 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.582 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Successfully handled international name: 北京烤鸭
+]]></system-out>
+  </testcase>
+  <testcase name="unicodeAndEmojiSupport_InternationalCharacters_HandledCorrectly(String)[8]" classname="com.myapp.item.ItemServiceEdgeCaseTest$SpecialCharactersTests" time="0.008">
+    <system-out><![CDATA[2025-07-03 23:42:35.584 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:35.584 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:35.584 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:35.584 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:35.584 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:35.584 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:35.584 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:35.587 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:35.587 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:35.587 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.587 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+📝 Global restaurant saved to repository for tests
+2025-07-03 23:42:35.589 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+✅ Global restaurant saved successfully - ID: 3139
+2025-07-03 23:42:35.590 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:35.590 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        food_items
+        (available, category, description, image_url, keywords, name, price, quantity, restaurant_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+✅ Successfully handled international name: Суші 🍣
+]]></system-out>
+  </testcase>
+</testsuite>

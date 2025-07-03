@@ -1,0 +1,3861 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.myapp.payment.PaymentEdgeCaseTest$RefundEdgeCasesTests" time="0.295" tests="4" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/workspace/backend/target/test-classes:/workspace/backend/target/classes:/home/ubuntu/.m2/repository/org/hibernate/orm/hibernate-core/6.4.0.Final/hibernate-core-6.4.0.Final.jar:/home/ubuntu/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.1.0/jakarta.persistence-api-3.1.0.jar:/home/ubuntu/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/jboss/logging/jboss-logging/3.5.0.Final/jboss-logging-3.5.0.Final.jar:/home/ubuntu/.m2/repository/org/hibernate/common/hibernate-commons-annotations/6.0.6.Final/hibernate-commons-annotations-6.0.6.Final.jar:/home/ubuntu/.m2/repository/io/smallrye/jandex/3.1.2/jandex-3.1.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/classmate/1.5.1/classmate-1.5.1.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy/1.14.7/byte-buddy-1.14.7.jar:/home/ubuntu/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.0/jakarta.xml.bind-api-4.0.0.jar:/home/ubuntu/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.0/jakarta.activation-api-2.1.0.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.2/jaxb-runtime-4.0.2.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.2/jaxb-core-4.0.2.jar:/home/ubuntu/.m2/repository/org/eclipse/angus/angus-activation/2.0.0/angus-activation-2.0.0.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/txw2/4.0.2/txw2-4.0.2.jar:/home/ubuntu/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.1/istack-commons-runtime-4.1.1.jar:/home/ubuntu/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/antlr/antlr4-runtime/4.13.0/antlr4-runtime-4.13.0.jar:/home/ubuntu/.m2/repository/org/hibernate/orm/hibernate-community-dialects/6.2.13.Final/hibernate-community-dialects-6.2.13.Final.jar:/home/ubuntu/.m2/repository/org/xerial/sqlite-jdbc/3.44.0.0/sqlite-jdbc-3.44.0.0.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar:/home/ubuntu/.m2/repository/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-classic/1.4.11/logback-classic-1.4.11.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-core/1.4.11/logback-core-1.4.11.jar:/home/ubuntu/.m2/repository/org/mindrot/jbcrypt/0.4/jbcrypt-0.4.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-api/0.12.3/jjwt-api-0.12.3.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-impl/0.12.3/jjwt-impl-0.12.3.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-jackson/0.12.3/jjwt-jackson-0.12.3.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.0/junit-jupiter-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.0/junit-jupiter-api-5.10.0.jar:/home/ubuntu/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-commons/1.10.0/junit-platform-commons-1.10.0.jar:/home/ubuntu/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.0/junit-jupiter-params-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.0/junit-jupiter-engine-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-engine/1.10.0/junit-platform-engine-1.10.0.jar:/home/ubuntu/.m2/repository/org/mockito/mockito-core/5.7.0/mockito-core-5.7.0.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.9/byte-buddy-agent-1.14.9.jar:/home/ubuntu/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/ubuntu/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:/home/ubuntu/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar:/home/ubuntu/.m2/repository/org/testcontainers/junit-jupiter/1.19.3/junit-jupiter-1.19.3.jar:/home/ubuntu/.m2/repository/org/testcontainers/testcontainers/1.19.3/testcontainers-1.19.3.jar:/home/ubuntu/.m2/repository/junit/junit/4.13.2/junit-4.13.2.jar:/home/ubuntu/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/ubuntu/.m2/repository/org/apache/commons/commons-compress/1.24.0/commons-compress-1.24.0.jar:/home/ubuntu/.m2/repository/org/rnorth/duct-tape/duct-tape/1.0.8/duct-tape-1.0.8.jar:/home/ubuntu/.m2/repository/org/jetbrains/annotations/17.0.0/annotations-17.0.0.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-api/3.3.4/docker-java-api-3.3.4.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-transport-zerodep/3.3.4/docker-java-transport-zerodep-3.3.4.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-transport/3.3.4/docker-java-transport-3.3.4.jar:/home/ubuntu/.m2/repository/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar:/home/ubuntu/.m2/repository/com/squareup/okhttp3/mockwebserver/4.11.0/mockwebserver-4.11.0.jar:/home/ubuntu/.m2/repository/com/squareup/okhttp3/okhttp/4.11.0/okhttp-4.11.0.jar:/home/ubuntu/.m2/repository/com/squareup/okio/okio/3.2.0/okio-3.2.0.jar:/home/ubuntu/.m2/repository/com/squareup/okio/okio-jvm/3.2.0/okio-jvm-3.2.0.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib/1.6.20/kotlin-stdlib-1.6.20.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-common/1.6.20/kotlin-stdlib-common-1.6.20.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.6.10/kotlin-stdlib-jdk8-1.6.10.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.6.10/kotlin-stdlib-jdk7-1.6.10.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.15.2/jackson-datatype-jsr310-2.15.2.jar:"/>
+    <property name="java.vm.vendor" value="Ubuntu"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://ubuntu.com/"/>
+    <property name="user.timezone" value="UTC"/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-21-openjdk-amd64/lib"/>
+    <property name="sun.java.command" value="/workspace/backend/target/surefire/surefirebooter-20250703234215266_3.jar /workspace/backend/target/surefire 2025-07-03T23-42-09_523-jvmRun1 surefire-20250703234215266_1tmp surefire_0-20250703234215266_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/workspace/backend/target/test-classes:/workspace/backend/target/classes:/home/ubuntu/.m2/repository/org/hibernate/orm/hibernate-core/6.4.0.Final/hibernate-core-6.4.0.Final.jar:/home/ubuntu/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.1.0/jakarta.persistence-api-3.1.0.jar:/home/ubuntu/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/jboss/logging/jboss-logging/3.5.0.Final/jboss-logging-3.5.0.Final.jar:/home/ubuntu/.m2/repository/org/hibernate/common/hibernate-commons-annotations/6.0.6.Final/hibernate-commons-annotations-6.0.6.Final.jar:/home/ubuntu/.m2/repository/io/smallrye/jandex/3.1.2/jandex-3.1.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/classmate/1.5.1/classmate-1.5.1.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy/1.14.7/byte-buddy-1.14.7.jar:/home/ubuntu/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.0/jakarta.xml.bind-api-4.0.0.jar:/home/ubuntu/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.0/jakarta.activation-api-2.1.0.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.2/jaxb-runtime-4.0.2.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.2/jaxb-core-4.0.2.jar:/home/ubuntu/.m2/repository/org/eclipse/angus/angus-activation/2.0.0/angus-activation-2.0.0.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/txw2/4.0.2/txw2-4.0.2.jar:/home/ubuntu/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.1/istack-commons-runtime-4.1.1.jar:/home/ubuntu/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/antlr/antlr4-runtime/4.13.0/antlr4-runtime-4.13.0.jar:/home/ubuntu/.m2/repository/org/hibernate/orm/hibernate-community-dialects/6.2.13.Final/hibernate-community-dialects-6.2.13.Final.jar:/home/ubuntu/.m2/repository/org/xerial/sqlite-jdbc/3.44.0.0/sqlite-jdbc-3.44.0.0.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar:/home/ubuntu/.m2/repository/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-classic/1.4.11/logback-classic-1.4.11.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-core/1.4.11/logback-core-1.4.11.jar:/home/ubuntu/.m2/repository/org/mindrot/jbcrypt/0.4/jbcrypt-0.4.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-api/0.12.3/jjwt-api-0.12.3.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-impl/0.12.3/jjwt-impl-0.12.3.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-jackson/0.12.3/jjwt-jackson-0.12.3.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.0/junit-jupiter-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.0/junit-jupiter-api-5.10.0.jar:/home/ubuntu/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-commons/1.10.0/junit-platform-commons-1.10.0.jar:/home/ubuntu/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.0/junit-jupiter-params-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.0/junit-jupiter-engine-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-engine/1.10.0/junit-platform-engine-1.10.0.jar:/home/ubuntu/.m2/repository/org/mockito/mockito-core/5.7.0/mockito-core-5.7.0.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.9/byte-buddy-agent-1.14.9.jar:/home/ubuntu/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/ubuntu/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:/home/ubuntu/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar:/home/ubuntu/.m2/repository/org/testcontainers/junit-jupiter/1.19.3/junit-jupiter-1.19.3.jar:/home/ubuntu/.m2/repository/org/testcontainers/testcontainers/1.19.3/testcontainers-1.19.3.jar:/home/ubuntu/.m2/repository/junit/junit/4.13.2/junit-4.13.2.jar:/home/ubuntu/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/ubuntu/.m2/repository/org/apache/commons/commons-compress/1.24.0/commons-compress-1.24.0.jar:/home/ubuntu/.m2/repository/org/rnorth/duct-tape/duct-tape/1.0.8/duct-tape-1.0.8.jar:/home/ubuntu/.m2/repository/org/jetbrains/annotations/17.0.0/annotations-17.0.0.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-api/3.3.4/docker-java-api-3.3.4.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-transport-zerodep/3.3.4/docker-java-transport-zerodep-3.3.4.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-transport/3.3.4/docker-java-transport-3.3.4.jar:/home/ubuntu/.m2/repository/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar:/home/ubuntu/.m2/repository/com/squareup/okhttp3/mockwebserver/4.11.0/mockwebserver-4.11.0.jar:/home/ubuntu/.m2/repository/com/squareup/okhttp3/okhttp/4.11.0/okhttp-4.11.0.jar:/home/ubuntu/.m2/repository/com/squareup/okio/okio/3.2.0/okio-3.2.0.jar:/home/ubuntu/.m2/repository/com/squareup/okio/okio-jvm/3.2.0/okio-jvm-3.2.0.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib/1.6.20/kotlin-stdlib-1.6.20.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-common/1.6.20/kotlin-stdlib-common-1.6.20.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.6.10/kotlin-stdlib-jdk8-1.6.10.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.6.10/kotlin-stdlib-jdk7-1.6.10.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.15.2/jackson-datatype-jsr310-2.15.2.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/ubuntu"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2025-04-15"/>
+    <property name="java.home" value="/usr/lib/jvm/java-21-openjdk-amd64"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/workspace/backend"/>
+    <property name="java.vm.compressedOopsMode" value="32-bit"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="surefire.real.class.path" value="/workspace/backend/target/surefire/surefirebooter-20250703234215266_3.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.7+6-Ubuntu-0ubuntu125.04"/>
+    <property name="user.name" value="ubuntu"/>
+    <property name="stdout.encoding" value="UTF-8"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="6.8.0-1024-aws"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="localRepository" value="/home/ubuntu/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://bugs.launchpad.net/ubuntu/+source/openjdk-21"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="java.version" value="21.0.7"/>
+    <property name="user.dir" value="/workspace/backend"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="UTF-8"/>
+    <property name="java.vendor" value="Ubuntu"/>
+    <property name="java.vm.version" value="21.0.7+6-Ubuntu-0ubuntu125.04"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+    <property name="app.profiles.active" value="test"/>
+  </properties>
+  <testcase name="shouldHandleConcurrentPaymentInsertions" classname="com.myapp.payment.PaymentEdgeCaseTest" time="0.151">
+    <system-out><![CDATA[2025-07-03 23:42:44.105 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database setup completed
+🧹 Cleaning up all transactions...
+2025-07-03 23:42:44.105 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:44.105 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:44.105 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:44.105 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:44.105 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:44.105 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:44.105 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:44.112 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:44.112 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+✅ Database cleaned via TestDatabaseManager
+2025-07-03 23:42:44.163 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:44.163 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.167 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:44.168 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.170 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:44.170 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.172 [main] DEBUG org.hibernate.SQL - 
+    select
+        next_val as id_val 
+    from
+        transactions_SEQ
+Hibernate: 
+    select
+        next_val as id_val 
+    from
+        transactions_SEQ
+2025-07-03 23:42:44.172 [main] DEBUG org.hibernate.SQL - 
+    update
+        transactions_SEQ 
+    set
+        next_val= ? 
+    where
+        next_val=?
+Hibernate: 
+    update
+        transactions_SEQ 
+    set
+        next_val= ? 
+    where
+        next_val=?
+2025-07-03 23:42:44.175 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.177 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:44.177 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.179 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:44.179 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.181 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:44.182 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.184 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.186 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:44.186 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.188 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:44.189 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.191 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:44.191 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.193 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.195 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:44.195 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.197 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:44.197 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.200 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:44.200 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.202 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.204 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:44.204 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.206 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:44.206 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.208 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:44.209 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.211 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.213 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:44.213 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.215 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:44.215 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.217 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:44.218 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.220 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.222 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:44.222 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.224 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:44.224 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.226 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:44.226 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.228 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.230 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:44.230 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.232 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:44.232 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.235 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:44.235 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.237 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.239 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:44.239 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.241 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:44.241 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.243 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:44.244 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.246 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.248 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:44.248 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.250 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:44.250 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.252 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:44.252 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.254 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+]]></system-out>
+  </testcase>
+  <testcase name="immediateRefundAfterPayment_SameSession_ProcessedCorrectly" classname="com.myapp.payment.PaymentEdgeCaseTest$RefundEdgeCasesTests" time="0.131">
+    <system-out><![CDATA[🧹 Cleaning up all transactions...
+2025-07-03 23:42:44.257 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:44.257 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:44.257 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:44.257 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:44.257 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:44.257 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:44.257 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:44.260 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:44.260 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+✅ Database cleaned via TestDatabaseManager
+2025-07-03 23:42:44.310 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:44.311 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.313 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.315 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:44.315 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.317 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:44.318 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.320 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+2025-07-03 23:42:44.320 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:44.335 [main] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.order_id=? 
+    order by
+        t1_0.created_at desc
+Hibernate: 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.order_id=? 
+    order by
+        t1_0.created_at desc
+2025-07-03 23:42:44.336 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.360 [main] DEBUG org.hibernate.SQL - 
+    select
+        coalesce(sum(case 
+            when t1_0.type=? 
+                then t1_0.amount 
+            when t1_0.type=? 
+                then -t1_0.amount 
+            else 0 
+        end), 0.0) 
+    from
+        transactions t1_0 
+    where
+        t1_0.user_id=? 
+        and t1_0.status=? 
+        and t1_0.type in (?, ?)
+Hibernate: 
+    select
+        coalesce(sum(case 
+            when t1_0.type=? 
+                then t1_0.amount 
+            when t1_0.type=? 
+                then -t1_0.amount 
+            else 0 
+        end), 0.0) 
+    from
+        transactions t1_0 
+    where
+        t1_0.user_id=? 
+        and t1_0.status=? 
+        and t1_0.type in (?, ?)
+2025-07-03 23:42:44.362 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.365 [main] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+Hibernate: 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+2025-07-03 23:42:44.366 [main] DEBUG org.hibernate.SQL - 
+    update
+        transactions 
+    set
+        amount=?,
+        created_at=?,
+        description=?,
+        order_id=?,
+        payment_method=?,
+        processed_at=?,
+        reference_id=?,
+        status=?,
+        type=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    update
+        transactions 
+    set
+        amount=?,
+        created_at=?,
+        description=?,
+        order_id=?,
+        payment_method=?,
+        processed_at=?,
+        reference_id=?,
+        status=?,
+        type=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+2025-07-03 23:42:44.375 [main] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+Hibernate: 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+2025-07-03 23:42:44.377 [main] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.order_id=? 
+    order by
+        t1_0.created_at desc
+Hibernate: 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.order_id=? 
+    order by
+        t1_0.created_at desc
+2025-07-03 23:42:44.378 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.381 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.383 [main] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+Hibernate: 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+2025-07-03 23:42:44.384 [main] DEBUG org.hibernate.SQL - 
+    update
+        transactions 
+    set
+        amount=?,
+        created_at=?,
+        description=?,
+        order_id=?,
+        payment_method=?,
+        processed_at=?,
+        reference_id=?,
+        status=?,
+        type=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    update
+        transactions 
+    set
+        amount=?,
+        created_at=?,
+        description=?,
+        order_id=?,
+        payment_method=?,
+        processed_at=?,
+        reference_id=?,
+        status=?,
+        type=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+2025-07-03 23:42:44.387 [main] DEBUG org.hibernate.SQL - 
+    select
+        coalesce(sum(case 
+            when t1_0.type=? 
+                then t1_0.amount 
+            when t1_0.type=? 
+                then -t1_0.amount 
+            else 0 
+        end), 0.0) 
+    from
+        transactions t1_0 
+    where
+        t1_0.user_id=? 
+        and t1_0.status=? 
+        and t1_0.type in (?, ?)
+Hibernate: 
+    select
+        coalesce(sum(case 
+            when t1_0.type=? 
+                then t1_0.amount 
+            when t1_0.type=? 
+                then -t1_0.amount 
+            else 0 
+        end), 0.0) 
+    from
+        transactions t1_0 
+    where
+        t1_0.user_id=? 
+        and t1_0.status=? 
+        and t1_0.type in (?, ?)
+✅ Refund processed successfully
+]]></system-out>
+  </testcase>
+  <testcase name="refundPrecision_FractionalAmounts_MaintainsPrecision" classname="com.myapp.payment.PaymentEdgeCaseTest$RefundEdgeCasesTests" time="0.083">
+    <system-out><![CDATA[🧹 Cleaning up all transactions...
+2025-07-03 23:42:44.389 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:44.389 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:44.389 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:44.389 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:44.389 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:44.389 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:44.389 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:44.392 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:44.392 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+✅ Database cleaned via TestDatabaseManager
+2025-07-03 23:42:44.443 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:44.443 [main] DEBUG org.hibernate.SQL - 
+    select
+        next_val as id_val 
+    from
+        users_SEQ
+Hibernate: 
+    select
+        next_val as id_val 
+    from
+        users_SEQ
+2025-07-03 23:42:44.443 [main] DEBUG org.hibernate.SQL - 
+    update
+        users_SEQ 
+    set
+        next_val= ? 
+    where
+        next_val=?
+Hibernate: 
+    update
+        users_SEQ 
+    set
+        next_val= ? 
+    where
+        next_val=?
+2025-07-03 23:42:44.445 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.448 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.450 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:44.450 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.452 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:44.453 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.455 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+2025-07-03 23:42:44.455 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:44.456 [main] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.order_id=? 
+    order by
+        t1_0.created_at desc
+Hibernate: 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.order_id=? 
+    order by
+        t1_0.created_at desc
+2025-07-03 23:42:44.456 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.459 [main] DEBUG org.hibernate.SQL - 
+    select
+        coalesce(sum(case 
+            when t1_0.type=? 
+                then t1_0.amount 
+            when t1_0.type=? 
+                then -t1_0.amount 
+            else 0 
+        end), 0.0) 
+    from
+        transactions t1_0 
+    where
+        t1_0.user_id=? 
+        and t1_0.status=? 
+        and t1_0.type in (?, ?)
+Hibernate: 
+    select
+        coalesce(sum(case 
+            when t1_0.type=? 
+                then t1_0.amount 
+            when t1_0.type=? 
+                then -t1_0.amount 
+            else 0 
+        end), 0.0) 
+    from
+        transactions t1_0 
+    where
+        t1_0.user_id=? 
+        and t1_0.status=? 
+        and t1_0.type in (?, ?)
+2025-07-03 23:42:44.459 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.461 [main] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+Hibernate: 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+2025-07-03 23:42:44.462 [main] DEBUG org.hibernate.SQL - 
+    update
+        transactions 
+    set
+        amount=?,
+        created_at=?,
+        description=?,
+        order_id=?,
+        payment_method=?,
+        processed_at=?,
+        reference_id=?,
+        status=?,
+        type=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    update
+        transactions 
+    set
+        amount=?,
+        created_at=?,
+        description=?,
+        order_id=?,
+        payment_method=?,
+        processed_at=?,
+        reference_id=?,
+        status=?,
+        type=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+2025-07-03 23:42:44.464 [main] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+Hibernate: 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+2025-07-03 23:42:44.464 [main] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.order_id=? 
+    order by
+        t1_0.created_at desc
+Hibernate: 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.order_id=? 
+    order by
+        t1_0.created_at desc
+2025-07-03 23:42:44.464 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.466 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.468 [main] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+Hibernate: 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+2025-07-03 23:42:44.469 [main] DEBUG org.hibernate.SQL - 
+    update
+        transactions 
+    set
+        amount=?,
+        created_at=?,
+        description=?,
+        order_id=?,
+        payment_method=?,
+        processed_at=?,
+        reference_id=?,
+        status=?,
+        type=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    update
+        transactions 
+    set
+        amount=?,
+        created_at=?,
+        description=?,
+        order_id=?,
+        payment_method=?,
+        processed_at=?,
+        reference_id=?,
+        status=?,
+        type=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+✅ Refund precision maintained correctly
+]]></system-out>
+  </testcase>
+  <testcase name="multipleRefundAttempts_SamePayment_PreventsDuplicates" classname="com.myapp.payment.PaymentEdgeCaseTest$RefundEdgeCasesTests" time="0.081">
+    <system-out><![CDATA[🧹 Cleaning up all transactions...
+2025-07-03 23:42:44.471 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:44.471 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:44.471 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:44.471 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:44.472 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:44.472 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:44.472 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:44.474 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:44.474 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+✅ Database cleaned via TestDatabaseManager
+2025-07-03 23:42:44.525 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.phone=?
+2025-07-03 23:42:44.525 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        users
+        (address, email, full_name, is_active, password_hash, phone, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.528 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.530 [main] DEBUG org.hibernate.SQL - 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.address,
+        r1_0.name,
+        r1_0.owner_id,
+        r1_0.phone,
+        r1_0.status 
+    from
+        restaurants r1_0 
+    where
+        r1_0.id=?
+2025-07-03 23:42:44.530 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        restaurants
+        (address, name, owner_id, phone, status, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.532 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        oi1_0.price,
+        oi1_0.quantity 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:44.533 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        orders
+        (actual_delivery_time, customer_id, delivery_address, estimated_delivery_time, notes, order_date, phone, restaurant_id, status, total_amount, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.535 [main] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.address,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.is_active,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+2025-07-03 23:42:44.535 [main] DEBUG org.hibernate.SQL - 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+Hibernate: 
+    select
+        o1_0.id,
+        o1_0.actual_delivery_time,
+        o1_0.customer_id,
+        o1_0.delivery_address,
+        o1_0.estimated_delivery_time,
+        o1_0.notes,
+        o1_0.order_date,
+        oi1_0.order_id,
+        oi1_0.id,
+        oi1_0.food_item_id,
+        fi1_0.id,
+        fi1_0.available,
+        fi1_0.category,
+        fi1_0.description,
+        fi1_0.image_url,
+        fi1_0.keywords,
+        fi1_0.name,
+        fi1_0.price,
+        fi1_0.quantity,
+        fi1_0.restaurant_id,
+        oi1_0.price,
+        oi1_0.quantity,
+        o1_0.phone,
+        o1_0.restaurant_id,
+        o1_0.status,
+        o1_0.total_amount 
+    from
+        orders o1_0 
+    left join
+        order_items oi1_0 
+            on o1_0.id=oi1_0.order_id 
+    left join
+        food_items fi1_0 
+            on fi1_0.id=oi1_0.food_item_id 
+    where
+        o1_0.id=?
+2025-07-03 23:42:44.536 [main] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.order_id=? 
+    order by
+        t1_0.created_at desc
+Hibernate: 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.order_id=? 
+    order by
+        t1_0.created_at desc
+2025-07-03 23:42:44.536 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.539 [main] DEBUG org.hibernate.SQL - 
+    select
+        coalesce(sum(case 
+            when t1_0.type=? 
+                then t1_0.amount 
+            when t1_0.type=? 
+                then -t1_0.amount 
+            else 0 
+        end), 0.0) 
+    from
+        transactions t1_0 
+    where
+        t1_0.user_id=? 
+        and t1_0.status=? 
+        and t1_0.type in (?, ?)
+Hibernate: 
+    select
+        coalesce(sum(case 
+            when t1_0.type=? 
+                then t1_0.amount 
+            when t1_0.type=? 
+                then -t1_0.amount 
+            else 0 
+        end), 0.0) 
+    from
+        transactions t1_0 
+    where
+        t1_0.user_id=? 
+        and t1_0.status=? 
+        and t1_0.type in (?, ?)
+2025-07-03 23:42:44.539 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.541 [main] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+Hibernate: 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+2025-07-03 23:42:44.542 [main] DEBUG org.hibernate.SQL - 
+    update
+        transactions 
+    set
+        amount=?,
+        created_at=?,
+        description=?,
+        order_id=?,
+        payment_method=?,
+        processed_at=?,
+        reference_id=?,
+        status=?,
+        type=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    update
+        transactions 
+    set
+        amount=?,
+        created_at=?,
+        description=?,
+        order_id=?,
+        payment_method=?,
+        processed_at=?,
+        reference_id=?,
+        status=?,
+        type=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+2025-07-03 23:42:44.544 [main] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+Hibernate: 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+2025-07-03 23:42:44.544 [main] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.order_id=? 
+    order by
+        t1_0.created_at desc
+Hibernate: 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.order_id=? 
+    order by
+        t1_0.created_at desc
+2025-07-03 23:42:44.544 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.547 [main] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        transactions
+        (amount, created_at, description, order_id, payment_method, processed_at, reference_id, status, type, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-03 23:42:44.549 [main] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+Hibernate: 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+2025-07-03 23:42:44.549 [main] DEBUG org.hibernate.SQL - 
+    update
+        transactions 
+    set
+        amount=?,
+        created_at=?,
+        description=?,
+        order_id=?,
+        payment_method=?,
+        processed_at=?,
+        reference_id=?,
+        status=?,
+        type=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+Hibernate: 
+    update
+        transactions 
+    set
+        amount=?,
+        created_at=?,
+        description=?,
+        order_id=?,
+        payment_method=?,
+        processed_at=?,
+        reference_id=?,
+        status=?,
+        type=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+2025-07-03 23:42:44.551 [main] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+Hibernate: 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.id=?
+2025-07-03 23:42:44.552 [main] DEBUG org.hibernate.SQL - 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.order_id=? 
+    order by
+        t1_0.created_at desc
+Hibernate: 
+    select
+        t1_0.id,
+        t1_0.amount,
+        t1_0.created_at,
+        t1_0.description,
+        t1_0.order_id,
+        t1_0.payment_method,
+        t1_0.processed_at,
+        t1_0.reference_id,
+        t1_0.status,
+        t1_0.type,
+        t1_0.updated_at,
+        t1_0.user_id 
+    from
+        transactions t1_0 
+    where
+        t1_0.order_id=? 
+    order by
+        t1_0.created_at desc
+✅ Duplicate refund prevention working correctly
+]]></system-out>
+  </testcase>
+</testsuite>

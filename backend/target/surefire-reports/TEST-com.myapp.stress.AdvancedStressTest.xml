@@ -1,0 +1,2164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.myapp.stress.AdvancedStressTest" time="0.37" tests="5" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/workspace/backend/target/test-classes:/workspace/backend/target/classes:/home/ubuntu/.m2/repository/org/hibernate/orm/hibernate-core/6.4.0.Final/hibernate-core-6.4.0.Final.jar:/home/ubuntu/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.1.0/jakarta.persistence-api-3.1.0.jar:/home/ubuntu/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/jboss/logging/jboss-logging/3.5.0.Final/jboss-logging-3.5.0.Final.jar:/home/ubuntu/.m2/repository/org/hibernate/common/hibernate-commons-annotations/6.0.6.Final/hibernate-commons-annotations-6.0.6.Final.jar:/home/ubuntu/.m2/repository/io/smallrye/jandex/3.1.2/jandex-3.1.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/classmate/1.5.1/classmate-1.5.1.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy/1.14.7/byte-buddy-1.14.7.jar:/home/ubuntu/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.0/jakarta.xml.bind-api-4.0.0.jar:/home/ubuntu/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.0/jakarta.activation-api-2.1.0.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.2/jaxb-runtime-4.0.2.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.2/jaxb-core-4.0.2.jar:/home/ubuntu/.m2/repository/org/eclipse/angus/angus-activation/2.0.0/angus-activation-2.0.0.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/txw2/4.0.2/txw2-4.0.2.jar:/home/ubuntu/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.1/istack-commons-runtime-4.1.1.jar:/home/ubuntu/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/antlr/antlr4-runtime/4.13.0/antlr4-runtime-4.13.0.jar:/home/ubuntu/.m2/repository/org/hibernate/orm/hibernate-community-dialects/6.2.13.Final/hibernate-community-dialects-6.2.13.Final.jar:/home/ubuntu/.m2/repository/org/xerial/sqlite-jdbc/3.44.0.0/sqlite-jdbc-3.44.0.0.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar:/home/ubuntu/.m2/repository/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-classic/1.4.11/logback-classic-1.4.11.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-core/1.4.11/logback-core-1.4.11.jar:/home/ubuntu/.m2/repository/org/mindrot/jbcrypt/0.4/jbcrypt-0.4.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-api/0.12.3/jjwt-api-0.12.3.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-impl/0.12.3/jjwt-impl-0.12.3.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-jackson/0.12.3/jjwt-jackson-0.12.3.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.0/junit-jupiter-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.0/junit-jupiter-api-5.10.0.jar:/home/ubuntu/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-commons/1.10.0/junit-platform-commons-1.10.0.jar:/home/ubuntu/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.0/junit-jupiter-params-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.0/junit-jupiter-engine-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-engine/1.10.0/junit-platform-engine-1.10.0.jar:/home/ubuntu/.m2/repository/org/mockito/mockito-core/5.7.0/mockito-core-5.7.0.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.9/byte-buddy-agent-1.14.9.jar:/home/ubuntu/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/ubuntu/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:/home/ubuntu/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar:/home/ubuntu/.m2/repository/org/testcontainers/junit-jupiter/1.19.3/junit-jupiter-1.19.3.jar:/home/ubuntu/.m2/repository/org/testcontainers/testcontainers/1.19.3/testcontainers-1.19.3.jar:/home/ubuntu/.m2/repository/junit/junit/4.13.2/junit-4.13.2.jar:/home/ubuntu/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/ubuntu/.m2/repository/org/apache/commons/commons-compress/1.24.0/commons-compress-1.24.0.jar:/home/ubuntu/.m2/repository/org/rnorth/duct-tape/duct-tape/1.0.8/duct-tape-1.0.8.jar:/home/ubuntu/.m2/repository/org/jetbrains/annotations/17.0.0/annotations-17.0.0.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-api/3.3.4/docker-java-api-3.3.4.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-transport-zerodep/3.3.4/docker-java-transport-zerodep-3.3.4.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-transport/3.3.4/docker-java-transport-3.3.4.jar:/home/ubuntu/.m2/repository/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar:/home/ubuntu/.m2/repository/com/squareup/okhttp3/mockwebserver/4.11.0/mockwebserver-4.11.0.jar:/home/ubuntu/.m2/repository/com/squareup/okhttp3/okhttp/4.11.0/okhttp-4.11.0.jar:/home/ubuntu/.m2/repository/com/squareup/okio/okio/3.2.0/okio-3.2.0.jar:/home/ubuntu/.m2/repository/com/squareup/okio/okio-jvm/3.2.0/okio-jvm-3.2.0.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib/1.6.20/kotlin-stdlib-1.6.20.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-common/1.6.20/kotlin-stdlib-common-1.6.20.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.6.10/kotlin-stdlib-jdk8-1.6.10.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.6.10/kotlin-stdlib-jdk7-1.6.10.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.15.2/jackson-datatype-jsr310-2.15.2.jar:"/>
+    <property name="java.vm.vendor" value="Ubuntu"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://ubuntu.com/"/>
+    <property name="user.timezone" value="UTC"/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-21-openjdk-amd64/lib"/>
+    <property name="sun.java.command" value="/workspace/backend/target/surefire/surefirebooter-20250703234215266_3.jar /workspace/backend/target/surefire 2025-07-03T23-42-09_523-jvmRun1 surefire-20250703234215266_1tmp surefire_0-20250703234215266_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/workspace/backend/target/test-classes:/workspace/backend/target/classes:/home/ubuntu/.m2/repository/org/hibernate/orm/hibernate-core/6.4.0.Final/hibernate-core-6.4.0.Final.jar:/home/ubuntu/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.1.0/jakarta.persistence-api-3.1.0.jar:/home/ubuntu/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/jboss/logging/jboss-logging/3.5.0.Final/jboss-logging-3.5.0.Final.jar:/home/ubuntu/.m2/repository/org/hibernate/common/hibernate-commons-annotations/6.0.6.Final/hibernate-commons-annotations-6.0.6.Final.jar:/home/ubuntu/.m2/repository/io/smallrye/jandex/3.1.2/jandex-3.1.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/classmate/1.5.1/classmate-1.5.1.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy/1.14.7/byte-buddy-1.14.7.jar:/home/ubuntu/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.0/jakarta.xml.bind-api-4.0.0.jar:/home/ubuntu/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.0/jakarta.activation-api-2.1.0.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.2/jaxb-runtime-4.0.2.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.2/jaxb-core-4.0.2.jar:/home/ubuntu/.m2/repository/org/eclipse/angus/angus-activation/2.0.0/angus-activation-2.0.0.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/txw2/4.0.2/txw2-4.0.2.jar:/home/ubuntu/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.1/istack-commons-runtime-4.1.1.jar:/home/ubuntu/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/antlr/antlr4-runtime/4.13.0/antlr4-runtime-4.13.0.jar:/home/ubuntu/.m2/repository/org/hibernate/orm/hibernate-community-dialects/6.2.13.Final/hibernate-community-dialects-6.2.13.Final.jar:/home/ubuntu/.m2/repository/org/xerial/sqlite-jdbc/3.44.0.0/sqlite-jdbc-3.44.0.0.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.2/jackson-core-2.15.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.2/jackson-databind-2.15.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.2/jackson-annotations-2.15.2.jar:/home/ubuntu/.m2/repository/org/slf4j/slf4j-api/2.0.9/slf4j-api-2.0.9.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-classic/1.4.11/logback-classic-1.4.11.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-core/1.4.11/logback-core-1.4.11.jar:/home/ubuntu/.m2/repository/org/mindrot/jbcrypt/0.4/jbcrypt-0.4.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-api/0.12.3/jjwt-api-0.12.3.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-impl/0.12.3/jjwt-impl-0.12.3.jar:/home/ubuntu/.m2/repository/io/jsonwebtoken/jjwt-jackson/0.12.3/jjwt-jackson-0.12.3.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.0/junit-jupiter-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.0/junit-jupiter-api-5.10.0.jar:/home/ubuntu/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-commons/1.10.0/junit-platform-commons-1.10.0.jar:/home/ubuntu/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.0/junit-jupiter-params-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.0/junit-jupiter-engine-5.10.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-engine/1.10.0/junit-platform-engine-1.10.0.jar:/home/ubuntu/.m2/repository/org/mockito/mockito-core/5.7.0/mockito-core-5.7.0.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.9/byte-buddy-agent-1.14.9.jar:/home/ubuntu/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/ubuntu/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:/home/ubuntu/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar:/home/ubuntu/.m2/repository/org/testcontainers/junit-jupiter/1.19.3/junit-jupiter-1.19.3.jar:/home/ubuntu/.m2/repository/org/testcontainers/testcontainers/1.19.3/testcontainers-1.19.3.jar:/home/ubuntu/.m2/repository/junit/junit/4.13.2/junit-4.13.2.jar:/home/ubuntu/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/ubuntu/.m2/repository/org/apache/commons/commons-compress/1.24.0/commons-compress-1.24.0.jar:/home/ubuntu/.m2/repository/org/rnorth/duct-tape/duct-tape/1.0.8/duct-tape-1.0.8.jar:/home/ubuntu/.m2/repository/org/jetbrains/annotations/17.0.0/annotations-17.0.0.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-api/3.3.4/docker-java-api-3.3.4.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-transport-zerodep/3.3.4/docker-java-transport-zerodep-3.3.4.jar:/home/ubuntu/.m2/repository/com/github/docker-java/docker-java-transport/3.3.4/docker-java-transport-3.3.4.jar:/home/ubuntu/.m2/repository/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar:/home/ubuntu/.m2/repository/com/squareup/okhttp3/mockwebserver/4.11.0/mockwebserver-4.11.0.jar:/home/ubuntu/.m2/repository/com/squareup/okhttp3/okhttp/4.11.0/okhttp-4.11.0.jar:/home/ubuntu/.m2/repository/com/squareup/okio/okio/3.2.0/okio-3.2.0.jar:/home/ubuntu/.m2/repository/com/squareup/okio/okio-jvm/3.2.0/okio-jvm-3.2.0.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib/1.6.20/kotlin-stdlib-1.6.20.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-common/1.6.20/kotlin-stdlib-common-1.6.20.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk8/1.6.10/kotlin-stdlib-jdk8-1.6.10.jar:/home/ubuntu/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-jdk7/1.6.10/kotlin-stdlib-jdk7-1.6.10.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.15.2/jackson-datatype-jsr310-2.15.2.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/ubuntu"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2025-04-15"/>
+    <property name="java.home" value="/usr/lib/jvm/java-21-openjdk-amd64"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/workspace/backend"/>
+    <property name="java.vm.compressedOopsMode" value="32-bit"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="surefire.real.class.path" value="/workspace/backend/target/surefire/surefirebooter-20250703234215266_3.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.7+6-Ubuntu-0ubuntu125.04"/>
+    <property name="user.name" value="ubuntu"/>
+    <property name="stdout.encoding" value="UTF-8"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="6.8.0-1024-aws"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="localRepository" value="/home/ubuntu/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://bugs.launchpad.net/ubuntu/+source/openjdk-21"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="java.version" value="21.0.7"/>
+    <property name="user.dir" value="/workspace/backend"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="UTF-8"/>
+    <property name="java.vendor" value="Ubuntu"/>
+    <property name="java.vm.version" value="21.0.7+6-Ubuntu-0ubuntu125.04"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+    <property name="app.profiles.active" value="test"/>
+  </properties>
+  <testcase name="testSecurityPenetration" classname="com.myapp.stress.AdvancedStressTest" time="0.044">
+    <system-out><![CDATA[2025-07-03 23:42:48.821 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:48.821 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:48.821 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:48.821 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:48.821 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:48.821 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:48.821 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:48.831 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:48.831 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:48.831 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database setup completed
+🔒 Testing Security Penetration...
+✅ Security Penetration Testing Completed
+2025-07-03 23:42:48.858 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:48.858 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:48.859 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:48.859 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:48.859 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:48.859 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:48.859 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:48.861 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:48.861 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+]]></system-out>
+  </testcase>
+  <testcase name="testHighConcurrentLoad" classname="com.myapp.stress.AdvancedStressTest" time="0.117">
+    <system-out><![CDATA[2025-07-03 23:42:48.863 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:48.863 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:48.863 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:48.863 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:48.863 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:48.863 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:48.863 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:48.865 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:48.866 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:48.866 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database setup completed
+🔥 شروع تست فشار بالا با 1000 درخواست همزمان
+📊 تنظیمات تست:
+  - تعداد Thread ها: 50
+  - درخواست هر Thread: 20
+  - کل درخواست‌ها: 1000
+🚀 شروع ارسال درخواست‌های همزمان
+🧵 Thread 0 شروع به کار کرد
+🧵 Thread 1 شروع به کار کرد
+🧵 Thread 2 شروع به کار کرد
+🧵 Thread 3 شروع به کار کرد
+🧵 Thread 4 شروع به کار کرد
+🧵 Thread 5 شروع به کار کرد
+🧵 Thread 6 شروع به کار کرد
+🧵 Thread 7 شروع به کار کرد
+🧵 Thread 8 شروع به کار کرد
+🧵 Thread 9 شروع به کار کرد
+🧵 Thread 10 شروع به کار کرد
+🧵 Thread 11 شروع به کار کرد
+🧵 Thread 12 شروع به کار کرد
+🧵 Thread 13 شروع به کار کرد
+🧵 Thread 14 شروع به کار کرد
+🧵 Thread 15 شروع به کار کرد
+🧵 Thread 16 شروع به کار کرد
+🧵 Thread 17 شروع به کار کرد
+🧵 Thread 18 شروع به کار کرد
+🧵 Thread 19 شروع به کار کرد
+🧵 Thread 20 شروع به کار کرد
+🧵 Thread 21 شروع به کار کرد
+🧵 Thread 22 شروع به کار کرد
+🧵 Thread 23 شروع به کار کرد
+🧵 Thread 24 شروع به کار کرد
+🧵 Thread 25 شروع به کار کرد
+🧵 Thread 26 شروع به کار کرد
+🧵 Thread 27 شروع به کار کرد
+🧵 Thread 28 شروع به کار کرد
+🧵 Thread 29 شروع به کار کرد
+🧵 Thread 30 شروع به کار کرد
+🧵 Thread 31 شروع به کار کرد
+🧵 Thread 32 شروع به کار کرد
+🧵 Thread 33 شروع به کار کرد
+🧵 Thread 34 شروع به کار کرد
+🧵 Thread 35 شروع به کار کرد
+🧵 Thread 36 شروع به کار کرد
+🧵 Thread 37 شروع به کار کرد
+🧵 Thread 38 شروع به کار کرد
+🧵 Thread 39 شروع به کار کرد
+🧵 Thread 40 شروع به کار کرد
+🧵 Thread 41 شروع به کار کرد
+🧵 Thread 42 شروع به کار کرد
+🧵 Thread 43 شروع به کار کرد
+🧵 Thread 44 شروع به کار کرد
+🧵 Thread 45 شروع به کار کرد
+🧵 Thread 46 شروع به کار کرد
+🧵 Thread 47 شروع به کار کرد
+🧵 Thread 48 شروع به کار کرد
+⏳ انتظار برای تکمیل همه Thread ها
+🧵 Thread 49 شروع به کار کرد
+✅ Thread 24 کار خود را تکمیل کرد
+✅ Thread 28 کار خود را تکمیل کرد
+✅ Thread 39 کار خود را تکمیل کرد
+✅ Thread 25 کار خود را تکمیل کرد
+✅ Thread 1 کار خود را تکمیل کرد
+✅ Thread 41 کار خود را تکمیل کرد
+✅ Thread 49 کار خود را تکمیل کرد
+✅ Thread 22 کار خود را تکمیل کرد
+✅ Thread 33 کار خود را تکمیل کرد
+✅ Thread 2 کار خود را تکمیل کرد
+✅ Thread 48 کار خود را تکمیل کرد
+✅ Thread 4 کار خود را تکمیل کرد
+✅ Thread 47 کار خود را تکمیل کرد
+✅ Thread 0 کار خود را تکمیل کرد
+✅ Thread 17 کار خود را تکمیل کرد
+✅ Thread 30 کار خود را تکمیل کرد
+✅ Thread 19 کار خود را تکمیل کرد
+✅ Thread 20 کار خود را تکمیل کرد
+✅ Thread 36 کار خود را تکمیل کرد
+✅ Thread 15 کار خود را تکمیل کرد
+✅ Thread 26 کار خود را تکمیل کرد
+✅ Thread 9 کار خود را تکمیل کرد
+✅ Thread 3 کار خود را تکمیل کرد
+✅ Thread 16 کار خود را تکمیل کرد
+✅ Thread 32 کار خود را تکمیل کرد
+✅ Thread 23 کار خود را تکمیل کرد
+✅ Thread 34 کار خود را تکمیل کرد
+✅ Thread 37 کار خود را تکمیل کرد
+✅ Thread 40 کار خود را تکمیل کرد
+✅ Thread 5 کار خود را تکمیل کرد
+✅ Thread 31 کار خود را تکمیل کرد
+✅ Thread 43 کار خود را تکمیل کرد
+✅ Thread 14 کار خود را تکمیل کرد
+✅ Thread 10 کار خود را تکمیل کرد
+✅ Thread 29 کار خود را تکمیل کرد
+✅ Thread 35 کار خود را تکمیل کرد
+✅ Thread 8 کار خود را تکمیل کرد
+✅ Thread 13 کار خود را تکمیل کرد
+✅ Thread 38 کار خود را تکمیل کرد
+✅ Thread 11 کار خود را تکمیل کرد
+✅ Thread 21 کار خود را تکمیل کرد
+✅ Thread 7 کار خود را تکمیل کرد
+✅ Thread 46 کار خود را تکمیل کرد
+✅ Thread 42 کار خود را تکمیل کرد
+✅ Thread 6 کار خود را تکمیل کرد
+✅ Thread 12 کار خود را تکمیل کرد
+✅ Thread 27 کار خود را تکمیل کرد
+✅ Thread 44 کار خود را تکمیل کرد
+✅ Thread 18 کار خود را تکمیل کرد
+✅ Thread 45 کار خود را تکمیل کرد
+📊 تحلیل نتایج تست فشار بالا:
+   📈 کل درخواست‌ها: 1000
+   ✅ موفق: 0 (0.00%)
+   ❌ ناموفق: 1000
+   ⏱️ میانگین زمان پاسخ: 4.56 میلی‌ثانیه
+🚨 تحلیل خطاها:
+   🐛 Other: Thread 38 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 27 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 16 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 49 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 28 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 16 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 29 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 48 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 39 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 12 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 10 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 12 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 33 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 1 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 2 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 16 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 17 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 24 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 38 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 7 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 23 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 44 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 41 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 17 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 40 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 14 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 5 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 21 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 49 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 6 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 35 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 47 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 11 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 22 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 7 Request 16: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 4 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 26 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 9 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 34 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 25 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 12 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 37 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 0 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 42 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 30 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 40 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 16 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 26 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 13 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 32 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 47 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 18 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 18 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 38 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 22 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 31 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 33 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 15 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 7 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 33 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 36 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 45 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 5 Request 4: Restaurant endpoint failed: nu: 1 بار
+   🐛 Other: Thread 6 Request 10: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 29 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 13 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 5 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 35 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 34 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 0 Request 4: Restaurant endpoint failed: nu: 1 بار
+   🐛 Other: Thread 20 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 39 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 18 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 34 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 19 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 27 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 8 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 27 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 35 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 46 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 48 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 42 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 16 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 40 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 44 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 42 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 38 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 44 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 40 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 40 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 47 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 18 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 6 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 49 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 1 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 46 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 43 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 20 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 23 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 33 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 16 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 22 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 40 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 39 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 49 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 25 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 18 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 20 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 49 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 42 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 35 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 11 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 45 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 34 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 29 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 17 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 44 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 30 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 6 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 1 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 7 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 25 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 21 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 34 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 23 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 2 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 48 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 45 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 13 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 37 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 46 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 45 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 4 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 8 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 32 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 45 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 46 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 32 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 48 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 26 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 25 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 18 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 4 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 2 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 3 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 1 Request 16: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 46 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 13 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 45 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 34 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 19 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 8 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 0 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 11 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 44 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 44 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 24 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 19 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 29 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 6 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 30 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 39 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 0 Request 10: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 1 Request 10: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 26 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 37 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 10 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 27 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 36 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 10 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 16 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 42 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 39 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 4 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 32 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 3 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 5 Request 10: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 3 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 47 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 27 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 33 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 29 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 1 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 47 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 42 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 34 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 49 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 18 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 11 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 16 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 40 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 9 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 36 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 38 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 47 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 43 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 7 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 38 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 49 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 46 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 9 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 1 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 8 Request 16: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 2 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 6 Request 16: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 2 Request 16: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 0 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 10 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 2 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 44 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 36 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 24 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 37 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 7 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 11 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 26 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 17 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 17 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 24 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 14 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 34 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 12 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 12 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 22 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 14 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 46 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 26 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 47 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 26 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 1 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 5 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 49 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 49 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 2 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 6 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 39 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 24 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 23 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 49 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 41 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 26 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 40 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 41 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 22 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 2 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 48 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 40 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 19 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 36 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 49 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 13 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 19 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 30 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 33 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 48 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 2 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 35 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 15 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 45 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 15 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 3 Request 16: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 33 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 26 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 7 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 45 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 19 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 0 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 42 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 34 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 42 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 6 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 12 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 41 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 33 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 39 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 0 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 48 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 28 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 15 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 28 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 30 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 29 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 6 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 39 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 39 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 38 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 44 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 42 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 7 Request 10: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 19 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 37 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 41 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 5 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 4 Request 4: Restaurant endpoint failed: nu: 1 بار
+   🐛 Other: Thread 39 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 7 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 45 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 21 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 29 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 7 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 24 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 5 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 28 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 10 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 47 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 35 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 40 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 43 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 9 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 36 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 42 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 26 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 20 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 28 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 32 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 24 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 47 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 13 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 13 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 39 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 17 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 39 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 28 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 9 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 31 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 5 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 4 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 2 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 15 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 36 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 31 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 19 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 35 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 2 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 44 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 4 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 10 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 32 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 0 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 30 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 48 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 24 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 49 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 10 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 29 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 35 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 32 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 38 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 25 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 1 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 3 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 45 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 25 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 46 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 14 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 39 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 7 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 17 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 5 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 14 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 31 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 49 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 17 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 43 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 47 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 8 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 23 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 45 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 10 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 21 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 29 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 30 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 24 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 45 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 7 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 14 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 45 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 20 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 9 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 29 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 3 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 36 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 29 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 31 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 21 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 34 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 37 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 32 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 28 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 13 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 26 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 40 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 9 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 22 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 16 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 4 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 30 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 22 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 21 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 15 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 3 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 10 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 11 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 42 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 19 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 6 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 3 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 37 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 42 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 22 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 41 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 19 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 33 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 16 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 35 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 15 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 25 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 34 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 35 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 9 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 8 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 6 Request 4: Restaurant endpoint failed: nu: 1 بار
+   🐛 Other: Thread 2 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 35 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 7 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 48 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 2 Request 4: Restaurant endpoint failed: nu: 1 بار
+   🐛 Other: Thread 21 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 41 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 31 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 38 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 49 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 5 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 39 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 44 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 47 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 5 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 14 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 11 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 46 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 20 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 34 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 26 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 11 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 31 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 23 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 40 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 15 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 31 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 14 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 33 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 20 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 41 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 41 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 29 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 8 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 0 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 42 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 32 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 44 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 24 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 43 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 32 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 4 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 7 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 46 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 48 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 18 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 39 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 35 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 28 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 38 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 21 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 43 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 1 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 38 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 34 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 13 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 25 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 11 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 43 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 37 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 30 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 7 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 43 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 23 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 17 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 36 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 33 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 10 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 13 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 7 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 25 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 20 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 31 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 3 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 22 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 35 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 31 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 33 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 6 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 10 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 19 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 49 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 24 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 18 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 44 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 28 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 18 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 1 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 49 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 8 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 12 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 42 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 41 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 29 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 31 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 0 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 23 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 35 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 27 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 44 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 22 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 0 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 34 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 31 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 41 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 40 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 20 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 10 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 6 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 49 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 8 Request 4: Restaurant endpoint failed: nu: 1 بار
+   🐛 Other: Thread 28 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 5 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 30 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 17 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 45 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 44 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 30 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 46 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 3 Request 10: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 38 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 20 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 41 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 17 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 27 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 36 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 5 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 11 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 29 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 14 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 25 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 9 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 8 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 20 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 49 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 44 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 0 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 15 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 32 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 38 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 26 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 12 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 31 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 46 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 24 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 12 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 5 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 41 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 16 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 2 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 43 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 37 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 32 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 3 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 46 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 3 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 10 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 46 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 42 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 36 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 22 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 14 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 23 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 12 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 19 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 27 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 8 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 48 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 46 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 47 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 26 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 33 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 9 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 43 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 38 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 35 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 19 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 26 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 5 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 37 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 24 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 4 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 27 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 4 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 4 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 9 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 4 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 22 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 3 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 27 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 21 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 37 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 48 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 43 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 40 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 14 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 30 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 16 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 9 Request 16: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 28 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 48 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 16 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 11 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 36 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 35 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 27 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 41 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 1 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 38 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 3 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 48 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 40 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 5 Request 16: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 48 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 21 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 45 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 2 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 2 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 14 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 35 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 19 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 36 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 33 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 38 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 37 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 29 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 3 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 24 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 22 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 47 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 17 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 47 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 8 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 15 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 49 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 4 Request 10: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 23 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 13 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 13 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 44 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 8 Request 10: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 9 Request 10: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 17 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 13 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 30 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 40 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 41 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 36 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 1 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 25 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 18 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 43 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 46 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 35 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 19 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 31 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 3 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 23 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 22 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 36 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 40 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 47 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 0 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 12 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 28 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 0 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 28 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 20 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 5 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 0 Request 16: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 30 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 16 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 15 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 0 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 14 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 27 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 25 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 4 Request 16: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 27 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 15 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 45 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 46 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 47 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 23 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 37 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 27 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 12 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 32 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 42 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 34 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 36 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 26 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 44 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 4 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 18 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 39 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 29 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 1 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 26 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 25 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 23 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 10 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 37 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 23 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 16 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 24 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 6 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 33 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 38 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 30 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 41 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 32 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 10 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 17 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 38 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 46 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 23 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 39 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 25 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 8 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 1 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 44 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 16 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 32 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 21 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 13 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 34 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 6 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 43 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 10 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 10 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 16 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 20 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 20 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 17 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 11 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 48 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 43 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 15 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 18 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 30 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 8 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 32 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 8 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 9 Request 4: Restaurant endpoint failed: nu: 1 بار
+   🐛 Other: Thread 2 Request 10: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 6 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 17 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 15 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 8 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 5 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 6 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 17 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 25 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 23 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 17 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 43 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 30 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 35 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 0 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 49 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 16 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 1 Request 4: Restaurant endpoint failed: nu: 1 بار
+   🐛 Other: Thread 11 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 33 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 32 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 21 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 43 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 6 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 19 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 48 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 28 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 23 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 43 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 43 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 18 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 24 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 12 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 44 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 34 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 22 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 3 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 12 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 12 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 31 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 2 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 41 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 11 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 4 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 21 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 15 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 31 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 22 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 45 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 1 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 25 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 48 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 26 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 34 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 20 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 2 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 28 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 9 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 29 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 15 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 16 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 9 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 41 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 42 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 42 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 34 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 36 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 13 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 37 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 25 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 22 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 15 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 14 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 45 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 36 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 43 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 37 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 13 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 32 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 37 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 30 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 12 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 47 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 1 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 27 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 42 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 20 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 4 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 35 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 24 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 36 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 13 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 12 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 7 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 45 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 21 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 40 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 14 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 33 Request 4: Restaurant endpoint failed: n: 1 بار
+   🐛 Other: Thread 9 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 14 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 29 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 0 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 1 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 30 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 2 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 21 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 16 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 47 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 19 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 15 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 41 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 46 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 47 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 11 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 14 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 11 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 27 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 13 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 34 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 6 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 11 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 19 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 27 Request 10: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 46 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 4 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 36 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 10 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 5 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 13 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 33 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 7 Request 4: Restaurant endpoint failed: nu: 1 بار
+   🐛 Other: Thread 39 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 38 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 37 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 31 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 31 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 3 Request 4: Restaurant endpoint failed: nu: 1 بار
+   🐛 Other: Thread 21 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 8 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 32 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 19 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 10 Request 1: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 10 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 0 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 14 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 33 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 33 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 18 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 18 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 19 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 4 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 18 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 39 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 9 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 25 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 21 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 37 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 8 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 27 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 30 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 18 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 42 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 38 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 12 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 20 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 47 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 23 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 8 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 28 Request 6: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 31 Request 0: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 21 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 12 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 15 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 3 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 18 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 17 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 24 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 29 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 27 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 14 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 32 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 0 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 25 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 1 Request 2: Registration failed: null: 1 بار
+   🐛 Other: Thread 43 Request 18: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 13 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 28 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 39 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 6 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 15 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 23 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 44 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 37 Request 8: Registration failed: null: 1 بار
+   🐛 Other: Thread 14 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 28 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 7 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 18 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 26 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 9 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 3 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 28 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 22 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 11 Request 9: Login failed: null: 1 بار
+   🐛 Other: Thread 5 Request 13: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 48 Request 12: Health endpoint failed: null: 1 بار
+   🐛 Other: Thread 40 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 22 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 48 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 24 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 7 Request 3: Login failed: null: 1 بار
+   🐛 Other: Thread 31 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 21 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 20 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 9 Request 7: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 24 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 41 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 20 Request 19: Test endpoint failed: null: 1 بار
+   🐛 Other: Thread 23 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 21 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 12 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 22 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 11 Request 14: Registration failed: null: 1 بار
+   🐛 Other: Thread 17 Request 11: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 40 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 20 Request 16: Restaurant endpoint failed: : 1 بار
+   🐛 Other: Thread 29 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 25 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 26 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 11 Request 15: Login failed: null: 1 بار
+   🐛 Other: Thread 45 Request 17: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 28 Request 5: Order endpoint failed: null: 1 بار
+   🐛 Other: Thread 27 Request 5: Order endpoint failed: null: 1 بار
+🎯 بررسی معیارهای موفقیت:
+✅ تست اجرا شد - نرخ موفقیت: 0.0%
+🎉 تست فشار بالا با موفقیت تکمیل شد
+2025-07-03 23:42:48.976 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:48.976 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:48.976 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:48.976 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:48.976 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:48.976 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:48.976 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:48.979 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:48.979 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+]]></system-out>
+  </testcase>
+  <testcase name="testMemoryLeakage" classname="com.myapp.stress.AdvancedStressTest" time="0.148">
+    <system-out><![CDATA[2025-07-03 23:42:48.980 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:48.980 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:48.980 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:48.980 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:48.980 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:48.980 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:48.980 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:48.982 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:48.982 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:48.982 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database setup completed
+🧠 Testing Memory Leakage...
+Initial Memory Usage: 50 MB
+✅ Memory Leakage Testing Completed
+2025-07-03 23:42:49.124 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:49.124 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:49.124 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:49.124 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:49.124 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:49.124 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:49.124 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:49.127 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:49.127 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+]]></system-out>
+    <system-err><![CDATA[Error in memory test iteration 0: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 1: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 2: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 3: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 4: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 5: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 6: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 7: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 8: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 9: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 10: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 11: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 12: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 13: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 14: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 15: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 16: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 17: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 18: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 19: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 20: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 21: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 22: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 23: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 24: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 25: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 26: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 27: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 28: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 29: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 30: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 31: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 32: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 33: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 34: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 35: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 36: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 37: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 38: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 39: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 40: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 41: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 42: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 43: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 44: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 45: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 46: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 47: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 48: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 49: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 50: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 51: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 52: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 53: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 54: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 55: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 56: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 57: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 58: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 59: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 60: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 61: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 62: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 63: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 64: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 65: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 66: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 67: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 68: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 69: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 70: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 71: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 72: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 73: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 74: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 75: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 76: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 77: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 78: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 79: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 80: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 81: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 82: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 83: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 84: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 85: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 86: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 87: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 88: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 89: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 90: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 91: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 92: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 93: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 94: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 95: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 96: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 97: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 98: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 99: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 100: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 101: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 102: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 103: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 104: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 105: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 106: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 107: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 108: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 109: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 110: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 111: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 112: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 113: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 114: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 115: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 116: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 117: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 118: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 119: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 120: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 121: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 122: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 123: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 124: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 125: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 126: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 127: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 128: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 129: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 130: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 131: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 132: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 133: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 134: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 135: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 136: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 137: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 138: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 139: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 140: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 141: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 142: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 143: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 144: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 145: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 146: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 147: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 148: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 149: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 150: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 151: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 152: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 153: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 154: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 155: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 156: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 157: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 158: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 159: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 160: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 161: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 162: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 163: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 164: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 165: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 166: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 167: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 168: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 169: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 170: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 171: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 172: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 173: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 174: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 175: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 176: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 177: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 178: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 179: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 180: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 181: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 182: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 183: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 184: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 185: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 186: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 187: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 188: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 189: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 190: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 191: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 192: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 193: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 194: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 195: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 196: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 197: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 198: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 199: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 200: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 201: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 202: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 203: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 204: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 205: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 206: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 207: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 208: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 209: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 210: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 211: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 212: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 213: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 214: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 215: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 216: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 217: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 218: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 219: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 220: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 221: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 222: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 223: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 224: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 225: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 226: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 227: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 228: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 229: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 230: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 231: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 232: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 233: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 234: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 235: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 236: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 237: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 238: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 239: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 240: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 241: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 242: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 243: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 244: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 245: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 246: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 247: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 248: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 249: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 250: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 251: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 252: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 253: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 254: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 255: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 256: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 257: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 258: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 259: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 260: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 261: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 262: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 263: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 264: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 265: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 266: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 267: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 268: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 269: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 270: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 271: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 272: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 273: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 274: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 275: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 276: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 277: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 278: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 279: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 280: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 281: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 282: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 283: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 284: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 285: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 286: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 287: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 288: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 289: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 290: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 291: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 292: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 293: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 294: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 295: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 296: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 297: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 298: java.lang.RuntimeException: Health endpoint failed: null
+Error in memory test iteration 299: java.lang.RuntimeException: Health endpoint failed: null
+]]></system-err>
+  </testcase>
+  <testcase name="testDataCorruption" classname="com.myapp.stress.AdvancedStressTest" time="0.028">
+    <system-out><![CDATA[2025-07-03 23:42:49.127 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:49.127 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:49.127 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:49.127 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:49.128 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:49.128 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:49.128 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:49.130 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:49.130 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:49.130 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database setup completed
+💥 Testing Data Corruption Scenarios...
+✅ Data Corruption Testing Completed
+2025-07-03 23:42:49.146 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:49.146 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:49.146 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:49.146 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:49.146 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:49.146 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:49.146 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:49.155 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:49.155 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+]]></system-out>
+  </testcase>
+  <testcase name="testEdgeCasesAndBoundaryValues" classname="com.myapp.stress.AdvancedStressTest" time="0.031">
+    <system-out><![CDATA[2025-07-03 23:42:49.158 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:49.158 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:49.158 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:49.158 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:49.158 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:49.158 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:49.158 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:49.165 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:49.165 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+2025-07-03 23:42:49.165 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database setup completed
+🎯 Testing Edge Cases and Boundary Values...
+🔍 شروع تست داده‌های خالی و null
+📋 تعداد test case ها: 15
+🧪 تست 1/15: ''
+  ✅ Exception مناسب: نامشخص (ConnectException)
+🧪 تست 2/15: '{}'
+  ✅ Exception مناسب: نامشخص (ConnectException)
+🧪 تست 3/15: '{"fullName":""}'
+  ✅ Exception مناسب: نامشخص (ConnectException)
+🧪 تست 4/15: '{"phone":""}'
+  ✅ Exception مناسب: نامشخص (ConnectException)
+🧪 تست 5/15: '{"password":""}'
+  ✅ Exception مناسب: نامشخص (ConnectException)
+🧪 تست 6/15: '{"fullName":null}'
+  ✅ Exception مناسب: نامشخص (ConnectException)
+🧪 تست 7/15: '{"phone":null,"passw...'
+  ✅ Exception مناسب: نامشخص (ConnectException)
+🧪 تست 8/15: '{"fullName":"   "}'
+  ✅ Exception مناسب: نامشخص (ConnectException)
+🧪 تست 9/15: '{"fullName":"\t\n\r"...'
+  ✅ Exception مناسب: نامشخص (ConnectException)
+🧪 تست 10/15: 'null'
+  ✅ Exception مناسب: نامشخص (ConnectException)
+🧪 تست 11/15: '{"fullName":"\u0000"...'
+  ✅ Exception مناسب: نامشخص (ConnectException)
+🧪 تست 12/15: '{"data":undefined}'
+  ✅ Exception مناسب: نامشخص (ConnectException)
+🧪 تست 13/15: '     '
+  ✅ Exception مناسب: نامشخص (ConnectException)
+🧪 تست 14/15: '	
+'
+  ✅ Exception مناسب: نامشخص (ConnectException)
+🧪 تست 15/15: '{"test":""}'
+  ✅ Exception مناسب: نامشخص (ConnectException)
+📊 نتیجه تست داده‌های خالی: 15/15 موفق (100.0%)
+✅ تست داده‌های خالی موفق - سیستم crash نکرد
+🔢 شروع تست اعداد مرزی
+📋 تعداد اعداد تست: 8
+🧪 تست عدد 1/8: 9223372036854775807
+  ✅ Exception قابل قبول: ConnectException
+🧪 تست عدد 2/8: -9223372036854775808
+  ✅ Exception قابل قبول: ConnectException
+🧪 تست عدد 3/8: 0
+  ✅ Exception قابل قبول: ConnectException
+🧪 تست عدد 4/8: -1
+  ✅ Exception قابل قبول: ConnectException
+🧪 تست عدد 5/8: 2147483647
+  ✅ Exception قابل قبول: ConnectException
+🧪 تست عدد 6/8: -2147483648
+  ✅ Exception قابل قبول: ConnectException
+🧪 تست عدد 7/8: 999999999999
+  ✅ Exception قابل قبول: ConnectException
+🧪 تست عدد 8/8: -999999999999
+  ✅ Exception قابل قبول: ConnectException
+✅ تست اعداد مرزی تکمیل شد
+📄 شروع تست فرمت‌های نامعتبر JSON
+📋 تعداد JSON نامعتبر: 11
+🧪 تست JSON 1/11: '{invalid json'
+  ⚠️  Exception غیرمنتظره: ConnectException
+🧪 تست JSON 2/11: '{'single': 'quotes'}'
+  ⚠️  Exception غیرمنتظره: ConnectException
+🧪 تست JSON 3/11: '{"trailing": "comma",}'
+  ⚠️  Exception غیرمنتظره: ConnectException
+🧪 تست JSON 4/11: '{"duplicate":1,"duplicate":2}'
+  ⚠️  Exception غیرمنتظره: ConnectException
+🧪 تست JSON 5/11: 'not json at all'
+  ⚠️  Exception غیرمنتظره: ConnectException
+🧪 تست JSON 6/11: '[1,2,3]'
+  ⚠️  Exception غیرمنتظره: ConnectException
+🧪 تست JSON 7/11: '123'
+  ⚠️  Exception غیرمنتظره: ConnectException
+🧪 تست JSON 8/11: '"string"'
+  ⚠️  Exception غیرمنتظره: ConnectException
+🧪 تست JSON 9/11: '{"nested":{"deeply":{"very":{"...'
+  ⚠️  Exception غیرمنتظره: ConnectException
+🧪 تست JSON 10/11: '{"\u0000":"null byte"}'
+  ⚠️  Exception غیرمنتظره: ConnectException
+🧪 تست JSON 11/11: '{"key":undefined}'
+  ⚠️  Exception غیرمنتظره: ConnectException
+✅ تست فرمت‌های نامعتبر JSON تکمیل شد
+✅ Edge Cases Testing Completed
+2025-07-03 23:42:49.184 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        notifications
+Hibernate: 
+    delete 
+    from
+        notifications
+2025-07-03 23:42:49.184 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        ratings
+Hibernate: 
+    delete 
+    from
+        ratings
+2025-07-03 23:42:49.184 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        order_items
+Hibernate: 
+    delete 
+    from
+        order_items
+2025-07-03 23:42:49.185 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        orders
+Hibernate: 
+    delete 
+    from
+        orders
+2025-07-03 23:42:49.185 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        food_items
+Hibernate: 
+    delete 
+    from
+        food_items
+2025-07-03 23:42:49.185 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        restaurants
+Hibernate: 
+    delete 
+    from
+        restaurants
+2025-07-03 23:42:49.185 [main] DEBUG org.hibernate.SQL - 
+    delete 
+    from
+        users
+Hibernate: 
+    delete 
+    from
+        users
+2025-07-03 23:42:49.187 [main] DEBUG c.myapp.common.TestDatabaseManager - Cleaned all test data from database
+2025-07-03 23:42:49.187 [main] DEBUG c.myapp.common.TestDatabaseManager - Test database cleanup completed
+]]></system-out>
+  </testcase>
+</testsuite>
