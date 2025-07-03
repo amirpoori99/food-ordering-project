@@ -1,22 +1,22 @@
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\restaurant\RestaurantListController.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\common\FrontendConstants.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\common\NotificationService.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\payment\PaymentController.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\common\SessionManager.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\auth\RegisterController.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\MainApp.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\order\internal\ReceiptExporter.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\common\UIPolishController.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\restaurant\RestaurantDetailsController.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\common\HttpClientUtil.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\common\NavigationController.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\notification\NotificationController.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\order\OrderConfirmationController.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\order\internal\TextReceiptExporter.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\menu\MenuManagementController.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\admin\AdminDashboardController.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\order\CartController.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\auth\ProfileController.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\auth\UserProfileController.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\order\OrderHistoryController.java
-C:\Users\USER\Desktop\work space\food-ordering-project\frontend-javafx\src\main\java\com\myapp\ui\auth\LoginController.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/common/UIPolishController.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/MainApp.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/payment/PaymentController.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/order/CartController.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/common/NotificationService.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/auth/ProfileController.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/order/internal/ReceiptExporter.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/common/HttpClientUtil.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/menu/MenuManagementController.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/restaurant/RestaurantDetailsController.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/auth/UserProfileController.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/common/NavigationController.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/order/internal/TextReceiptExporter.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/restaurant/RestaurantListController.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/order/OrderHistoryController.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/order/OrderConfirmationController.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/common/SessionManager.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/admin/AdminDashboardController.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/notification/NotificationController.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/common/FrontendConstants.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/auth/LoginController.java
+/workspace/frontend-javafx/src/main/java/com/myapp/ui/auth/RegisterController.java
