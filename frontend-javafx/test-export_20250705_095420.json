@@ -1,0 +1,9 @@
+[ {
+  "name" : "Restaurant A",
+  "rating" : "4.50",
+  "orders" : "150"
+}, {
+  "name" : "Restaurant B",
+  "rating" : "4.20",
+  "orders" : "120"
+} ]

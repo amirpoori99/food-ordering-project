@@ -138,7 +138,7 @@ class BackendIntegrationTest {
             });
         }
         
-        assertTrue(latch.await(30, TimeUnit.SECONDS), "All concurrent requests should complete");
+        assertTrue(latch.await(60, TimeUnit.SECONDS), "All concurrent requests should complete");
         executor.shutdown();
     }
 

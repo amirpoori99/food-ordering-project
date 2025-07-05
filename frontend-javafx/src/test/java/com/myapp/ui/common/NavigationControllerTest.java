@@ -285,6 +285,9 @@ class NavigationControllerTest extends ApplicationTest {
             String message = "Test error message";
             Exception exception = new RuntimeException("Test exception");
             
+            // Initialize the controller first
+            navigationController.initialize(testStage);
+            
             assertThatCode(() -> navigationController.showError(title, message, exception))
                     .doesNotThrowAnyException();
         }

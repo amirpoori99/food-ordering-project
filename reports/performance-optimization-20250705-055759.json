@@ -1,0 +1,41 @@
+﻿{
+    "environment":  "development",
+    "timestamp":  "2025-07-05 05:57:59",
+    "optimizations":  {
+                          "cache":  {
+                                        "redis.maxMemoryPolicy":  "allkeys-lru",
+                                        "redis.maxMemory":  "512mb",
+                                        "cache.ttl":  3600,
+                                        "cache.maxSize":  10000,
+                                        "cache.evictionPolicy":  "LRU"
+                                    },
+                          "database":  {
+                                           "idleTimeout":  600000,
+                                           "minConnections":  10,
+                                           "maxConnections":  50,
+                                           "maxLifetime":  1800000,
+                                           "connectionTimeout":  30000
+                                       },
+                          "threads":  {
+                                          "queueCapacity":  500,
+                                          "allowCoreThreadTimeout":  true,
+                                          "maxPoolSize":  100,
+                                          "corePoolSize":  20,
+                                          "keepAliveSeconds":  60
+                                      },
+                          "jvm":  {
+                                      "XX:SurvivorRatio":  "8",
+                                      "Xmx":  "2048m",
+                                      "XX:NewRatio":  "3",
+                                      "XX:GCTimeRatio":  "9",
+                                      "XX:MaxGCPauseMillis":  "200",
+                                      "Xms":  "512m"
+                                  }
+                      },
+    "expectedImprovements":  {
+                                 "throughput":  "30-50% increase",
+                                 "memoryUsage":  "20-30% reduction",
+                                 "responseTime":  "40-60% reduction",
+                                 "cpuUsage":  "15-25% reduction"
+                             }
+}

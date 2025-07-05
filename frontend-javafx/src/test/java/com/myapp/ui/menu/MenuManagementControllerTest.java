@@ -138,7 +138,9 @@ class MenuManagementControllerTest extends TestFXBase {
         addCategoryButton = (Button) root.lookup("#addCategoryButton");
         reorderMenuButton = (Button) root.lookup("#reorderMenuButton");
         searchMenuField = (TextField) root.lookup("#searchMenuField");
-        menuViewComboBox = (ComboBox<String>) root.lookup("#menuViewComboBox");
+        @SuppressWarnings("unchecked")
+        ComboBox<String> tempMenuView = (ComboBox<String>) root.lookup("#menuViewComboBox");
+        menuViewComboBox = tempMenuView;
         refreshMenuButton = (Button) root.lookup("#refreshMenuButton");
         
         // Menu Tree components
@@ -157,7 +159,9 @@ class MenuManagementControllerTest extends TestFXBase {
         detailsTitleLabel = (Label) root.lookup("#detailsTitleLabel");
         categoryFormContainer = (VBox) root.lookup("#categoryFormContainer");
         categoryNameField = (TextField) root.lookup("#categoryNameField");
-        categoryIconComboBox = (ComboBox<String>) root.lookup("#categoryIconComboBox");
+        @SuppressWarnings("unchecked")
+        ComboBox<String> tempIconCombo = (ComboBox<String>) root.lookup("#categoryIconComboBox");
+        categoryIconComboBox = tempIconCombo;
         categoryDescriptionArea = (TextArea) root.lookup("#categoryDescriptionArea");
         categoryOrderField = (TextField) root.lookup("#categoryOrderField");
         categoryActiveCheckBox = (CheckBox) root.lookup("#categoryActiveCheckBox");
@@ -187,25 +191,31 @@ class MenuManagementControllerTest extends TestFXBase {
         publishMenuButton = (Button) root.lookup("#publishMenuButton");
 
         // رفع هشدار cast: بررسی نوع در زمان اجرا
+        @SuppressWarnings("unchecked")
         Control node = (Control) root.lookup("#categoryComboBox");
         if (node instanceof ComboBox<?>) {
             try {
-                categoryComboBox = (ComboBox<String>) node;
+                @SuppressWarnings("unchecked")
+                ComboBox<String> tempCategory = (ComboBox<String>) node;
+                categoryComboBox = tempCategory;
             } catch (ClassCastException e) {
                 fail("categoryComboBox is not of expected generic type ComboBox<String>. Actual: " + node.getClass());
             }
         } else {
             fail("categoryComboBox node is not a ComboBox. Actual: " + (node == null ? "null" : node.getClass()));
         }
-        node = (Control) root.lookup("#itemComboBox");
-        if (node instanceof ComboBox<?>) {
+        @SuppressWarnings("unchecked")
+        Control node2 = (Control) root.lookup("#itemComboBox");
+        if (node2 instanceof ComboBox<?>) {
             try {
-                itemComboBox = (ComboBox<String>) node;
+                @SuppressWarnings("unchecked")
+                ComboBox<String> tempItem = (ComboBox<String>) node2;
+                itemComboBox = tempItem;
             } catch (ClassCastException e) {
-                fail("itemComboBox is not of expected generic type ComboBox<String>. Actual: " + node.getClass());
+                fail("itemComboBox is not of expected generic type ComboBox<String>. Actual: " + node2.getClass());
             }
         } else {
-            fail("itemComboBox node is not a ComboBox. Actual: " + (node == null ? "null" : node.getClass()));
+            fail("itemComboBox node is not a ComboBox. Actual: " + (node2 == null ? "null" : node2.getClass()));
         }
     }
     

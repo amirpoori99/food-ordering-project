@@ -38,6 +38,7 @@ com\myapp\ui\payment\PaymentController$4.class
 com\myapp\ui\payment\PaymentController$1.class
 com\myapp\ui\order\OrderConfirmationController$TrackingStatus.class
 com\myapp\ui\common\NotificationService.class
+com\myapp\ui\analytics\service\AnalyticsUIService.class
 com\myapp\ui\order\internal\ReceiptExporter.class
 com\myapp\ui\common\NavigationController.class
 com\myapp\ui\common\SessionManager.class
@@ -49,11 +50,13 @@ com\myapp\ui\menu\MenuManagementController$3.class
 com\myapp\ui\auth\UserProfileController$TransactionItem.class
 com\myapp\ui\order\OrderConfirmationController$6.class
 com\myapp\ui\auth\UserProfileController$FavoriteRestaurant.class
+com\myapp\ui\analytics\util\DataFormatter.class
 com\myapp\ui\common\FrontendConstants$FILES.class
 com\myapp\ui\auth\ProfileController$2.class
 com\myapp\ui\restaurant\RestaurantDetailsController.class
 com\myapp\ui\common\FrontendConstants$API.class
 com\myapp\ui\common\SessionManager$User.class
+com\myapp\ui\analytics\util\DashboardUtil.class
 com\myapp\ui\order\OrderConfirmationController$TrackingStep.class
 com\myapp\ui\payment\PaymentController$3.class
 com\myapp\ui\payment\PaymentController$WalletInfo.class
@@ -68,6 +71,8 @@ com\myapp\ui\restaurant\RestaurantDetailsController$MenuCategory.class
 com\myapp\ui\admin\AdminDashboardController$UserData.class
 com\myapp\ui\common\UIPolishController.class
 com\myapp\ui\common\FrontendConstants$FORMAT.class
+com\myapp\ui\analytics\controller\AnalyticsDashboardController.class
+com\myapp\ui\analytics\service\ChartDataService.class
 com\myapp\ui\common\FrontendConstants$TEST.class
 com\myapp\ui\order\OrderHistoryController$OrderHistory.class
 com\myapp\ui\auth\ProfileController$1.class
@@ -78,9 +83,11 @@ com\myapp\ui\order\OrderConfirmationController$8.class
 com\myapp\ui\order\OrderConfirmationController.class
 com\myapp\ui\auth\UserProfileController$3.class
 com\myapp\ui\restaurant\RestaurantListController$1.class
+com\myapp\ui\analytics\util\ChartUtil.class
 com\myapp\ui\auth\LoginController$1.class
 com\myapp\ui\MainApp.class
 com\myapp\ui\menu\MenuManagementController$MenuItem.class
+com\myapp\ui\analytics\service\DashboardUpdateService.class
 com\myapp\ui\common\NotificationService$NotificationType.class
 com\myapp\ui\order\OrderConfirmationController$5.class
 com\myapp\ui\auth\ProfileController.class
@@ -103,6 +110,7 @@ com\myapp\ui\auth\UserProfileController$10.class
 com\myapp\ui\auth\UserProfileController$2$1.class
 com\myapp\ui\notification\NotificationController$NotificationPriority.class
 com\myapp\ui\common\HttpClientUtil.class
+com\myapp\ui\analytics\service\DashboardUpdateService$1.class
 com\myapp\ui\payment\PaymentController$PaymentData.class
 com\myapp\ui\notification\NotificationController$2.class
 com\myapp\ui\order\CartController$1.class

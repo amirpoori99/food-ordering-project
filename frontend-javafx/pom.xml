@@ -38,7 +38,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>  <!-- کدگذاری گزارش‌ها -->
         
         <!-- نسخه‌های وابستگی‌ها -->
-        <javafx.version>17.0.2</javafx.version>  <!-- نسخه JavaFX -->
+        <javafx.version>21.0.2</javafx.version>  <!-- نسخه JavaFX -->
         <junit.version>5.10.0</junit.version>  <!-- نسخه JUnit -->
         <mockito.version>5.7.0</mockito.version>  <!-- نسخه Mockito -->
         <jacoco.version>0.8.10</jacoco.version>  <!-- نسخه JaCoCo برای پوشش کد -->
@@ -368,12 +368,11 @@
                     <!-- تنظیمات سیستم -->
                     <systemPropertyVariables>
                         <java.awt.headless>true</java.awt.headless>
-                        <file.encoding>UTF-8</file.encoding>
                         <testfx.robot>awt</testfx.robot>
                         <testfx.headless>true</testfx.headless>
                     </systemPropertyVariables>
                     <!-- تنظیمات حافظه برای تست‌ها -->
-                    <argLine>-Xmx1g -XX:+UseG1GC</argLine>
+                    <argLine>-Xmx1g -XX:+UseG1GC -Dfile.encoding=UTF-8</argLine>
                 </configuration>
             </plugin>
             
@@ -439,8 +438,6 @@
                 <configuration>
                     <!-- کدگذاری فایل‌های منابع -->
                     <encoding>${project.build.sourceEncoding}</encoding>
-                    <!-- فیلتر کردن متغیرها -->
-                    <filtering>true</filtering>
                     <!-- تنظیمات غیرفعال کردن فیلترینگ برای فایل‌های خاص -->
                     <nonFilteredFileExtensions>
                         <nonFilteredFileExtension>fxml</nonFilteredFileExtension>
@@ -513,39 +510,36 @@
         <!-- تنظیمات منابع -->
         <!-- ================================================================ -->
         <resources>
-            <!-- منابع اصلی -->
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/*.properties</include>
-                    <include>**/*.xml</include>
-                    <include>**/*.yml</include>
-                    <include>**/*.yaml</include>
-                </includes>
-            </resource>
-            <!-- منابع بدون فیلتر -->
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>**/*.properties</exclude>
-                    <exclude>**/*.xml</exclude>
-                    <exclude>**/*.yml</exclude>
-                    <exclude>**/*.yaml</exclude>
-                </excludes>
-            </resource>
+                    <!-- منابع اصلی -->
+        <resource>
+            <directory>src/main/resources</directory>
+            <includes>
+                <include>**/*.properties</include>
+                <include>**/*.xml</include>
+                <include>**/*.yml</include>
+                <include>**/*.yaml</include>
+            </includes>
+        </resource>
+        <!-- منابع بدون فیلتر -->
+        <resource>
+            <directory>src/main/resources</directory>
+            <excludes>
+                <exclude>**/*.properties</exclude>
+                <exclude>**/*.xml</exclude>
+                <exclude>**/*.yml</exclude>
+                <exclude>**/*.yaml</exclude>
+            </excludes>
+        </resource>
         </resources>
         
         <!-- ================================================================ -->
         <!-- تنظیمات تست‌ها -->
         <!-- ================================================================ -->
         <testResources>
-            <!-- منابع تست -->
-            <testResource>
-                <directory>src/test/resources</directory>
-                <filtering>true</filtering>
-            </testResource>
+                    <!-- منابع تست -->
+        <testResource>
+            <directory>src/test/resources</directory>
+        </testResource>
         </testResources>
     </build>
     

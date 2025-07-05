@@ -1,7 +1,6 @@
 package com.myapp.analytics.repository;
 
 import com.myapp.common.models.*;
-import com.myapp.analytics.models.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -53,7 +52,7 @@ public class AnalyticsRepository {
             LocalDateTime endOfDay = startOfDay.plusDays(1);
             
             String hql = "SELECT SUM(o.totalAmount) FROM Order o WHERE o.status = 'COMPLETED' " +
-                        "AND o.createdAt >= :start AND o.createdAt < :end";
+                        "AND o.orderDate >= :start AND o.orderDate < :end";
             
             Double revenue = session.createQuery(hql, Double.class)
                     .setParameter("start", startOfDay)
@@ -112,7 +111,7 @@ public class AnalyticsRepository {
             LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
             LocalDateTime endOfDay = startOfDay.plusDays(1);
             
-            String hql = "SELECT COUNT(o) FROM Order o WHERE o.createdAt >= :start AND o.createdAt < :end";
+            String hql = "SELECT COUNT(o) FROM Order o WHERE o.orderDate >= :start AND o.orderDate < :end";
             return session.createQuery(hql, Long.class)
                     .setParameter("start", startOfDay)
                     .setParameter("end", endOfDay)
@@ -156,7 +155,7 @@ public class AnalyticsRepository {
     public Long getActiveUsersCount(Session session) {
         try {
             LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
-            String hql = "SELECT COUNT(DISTINCT o.user.id) FROM Order o WHERE o.createdAt >= :date";
+            String hql = "SELECT COUNT(DISTINCT o.customer.id) FROM Order o WHERE o.orderDate >= :date";
             return session.createQuery(hql, Long.class)
                     .setParameter("date", thirtyDaysAgo)
                     .uniqueResult();
@@ -168,13 +167,19 @@ public class AnalyticsRepository {
     
     /**
      * تعداد کاربران جدید امروز
+     * توجه: User مدل فیلد createdAt ندارد، بنابراین از orderDate اولین سفارش استفاده می‌کنیم
      */
     public Long getTodayNewUsersCount(Session session) {
         try {
             LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
             LocalDateTime endOfDay = startOfDay.plusDays(1);
             
-            String hql = "SELECT COUNT(u) FROM User u WHERE u.createdAt >= :start AND u.createdAt < :end";
+            // کاربران جدید را بر اساس اولین سفارش آنها شناسایی می‌کنیم
+            String hql = "SELECT COUNT(DISTINCT u.id) FROM User u " +
+                        "WHERE u.id IN (SELECT DISTINCT o.customer.id FROM Order o " +
+                        "WHERE o.orderDate >= :start AND o.orderDate < :end " +
+                        "AND o.orderDate = (SELECT MIN(o2.orderDate) FROM Order o2 WHERE o2.customer.id = u.id))";
+            
             return session.createQuery(hql, Long.class)
                     .setParameter("start", startOfDay)
                     .setParameter("end", endOfDay)
@@ -203,7 +208,7 @@ public class AnalyticsRepository {
      */
     public Long getActiveRestaurantsCount(Session session) {
         try {
-            String hql = "SELECT COUNT(r) FROM Restaurant r WHERE r.isActive = true";
+            String hql = "SELECT COUNT(r) FROM Restaurant r WHERE r.status = 'ACTIVE'";
             return session.createQuery(hql, Long.class).uniqueResult();
         } catch (Exception e) {
             logger.error("خطا در دریافت رستوران‌های فعال: {}", e.getMessage());
@@ -212,18 +217,14 @@ public class AnalyticsRepository {
     }
     
     /**
-     * میانگین زمان تحویل (دقیقه)
+     * میانگین زمان تحویل
      */
     public Double getAverageDeliveryTime(Session session) {
         try {
-            // استفاده از HQL به جای Native SQL برای امنیت بیشتر
-            String hql = "SELECT AVG(TIMESTAMPDIFF(MINUTE, o.createdAt, o.deliveredAt)) " +
-                        "FROM Order o WHERE o.status = :status AND o.deliveredAt IS NOT NULL";
-            
-            Double avgMinutes = session.createQuery(hql, Double.class)
-                    .setParameter("status", "COMPLETED")
-                    .uniqueResult();
-            return avgMinutes != null ? avgMinutes : 0.0;
+            String hql = "SELECT AVG(TIMESTAMPDIFF(MINUTE, o.orderDate, o.actualDeliveryTime)) " +
+                        "FROM Order o WHERE o.status = 'COMPLETED' AND o.actualDeliveryTime IS NOT NULL";
+            Double avg = session.createQuery(hql, Double.class).uniqueResult();
+            return avg != null ? avg : 0.0;
         } catch (Exception e) {
             logger.error("خطا در محاسبه میانگین زمان تحویل: {}", e.getMessage());
             return 0.0;
@@ -231,138 +232,47 @@ public class AnalyticsRepository {
     }
     
     /**
-     * نرخ تکمیل سفارش
+     * نرخ تکمیل سفارشات
      */
     public Double getOrderCompletionRate(Session session) {
         try {
-            String completedHql = "SELECT COUNT(o) FROM Order o WHERE o.status = 'COMPLETED'";
-            String totalHql = "SELECT COUNT(o) FROM Order o";
+            String hql = "SELECT COUNT(o) FROM Order o WHERE o.status = 'COMPLETED'";
+            Long completed = session.createQuery(hql, Long.class).uniqueResult();
             
-            Long completed = session.createQuery(completedHql, Long.class).uniqueResult();
-            Long total = session.createQuery(totalHql, Long.class).uniqueResult();
+            String hqlTotal = "SELECT COUNT(o) FROM Order o";
+            Long total = session.createQuery(hqlTotal, Long.class).uniqueResult();
             
             if (total != null && total > 0) {
                 return (completed.doubleValue() / total.doubleValue()) * 100;
             }
             return 0.0;
         } catch (Exception e) {
-            logger.error("خطا در محاسبه نرخ تکمیل سفارش: {}", e.getMessage());
+            logger.error("خطا در محاسبه نرخ تکمیل سفارشات: {}", e.getMessage());
             return 0.0;
         }
     }
     
     /**
-     * امتیاز رضایت مشتری
+     * امتیاز رضایت مشتریان
      */
     public Double getCustomerSatisfactionScore(Session session) {
         try {
-            String hql = "SELECT AVG(r.rating) FROM Rating r";
+            String hql = "SELECT AVG(r.ratingScore) FROM Rating r WHERE r.ratingScore IS NOT NULL";
             Double avg = session.createQuery(hql, Double.class).uniqueResult();
             return avg != null ? avg : 0.0;
         } catch (Exception e) {
-            logger.error("خطا در محاسبه رضایت مشتری: {}", e.getMessage());
+            logger.error("خطا در محاسبه امتیاز رضایت: {}", e.getMessage());
             return 0.0;
         }
     }
     
     /**
-     * برترین رستوران‌ها
-     */
-    public List<DashboardMetrics.TopRestaurant> getTopRestaurants(Session session, int limit) {
-        try {
-            String hql = "SELECT r.id, r.name, SUM(o.totalAmount), COUNT(o), AVG(rt.rating) " +
-                        "FROM Order o JOIN o.restaurant r LEFT JOIN Rating rt ON rt.restaurant.id = r.id " +
-                        "WHERE o.status = 'COMPLETED' " +
-                        "GROUP BY r.id, r.name " +
-                        "ORDER BY SUM(o.totalAmount) DESC";
-            
-            List<Object[]> results = session.createQuery(hql, Object[].class)
-                    .setMaxResults(limit)
-                    .getResultList();
-            
-            return results.stream()
-                    .map(row -> new DashboardMetrics.TopRestaurant(
-                            (Long) row[0],
-                            (String) row[1],
-                            (Double) row[2],
-                            ((Long) row[3]).intValue(),
-                            (Double) row[4]
-                    ))
-                    .collect(Collectors.toList());
-                    
-        } catch (Exception e) {
-            logger.error("خطا در دریافت برترین رستوران‌ها: {}", e.getMessage());
-            return new ArrayList<>();
-        }
-    }
-    
-    /**
-     * برترین آیتم‌ها
-     */
-    public List<DashboardMetrics.TopItem> getTopItems(Session session, int limit) {
-        try {
-            String hql = "SELECT fi.id, fi.name, COUNT(oi), SUM(oi.totalPrice), fi.category " +
-                        "FROM OrderItem oi JOIN oi.foodItem fi " +
-                        "GROUP BY fi.id, fi.name, fi.category " +
-                        "ORDER BY COUNT(oi) DESC";
-            
-            List<Object[]> results = session.createQuery(hql, Object[].class)
-                    .setMaxResults(limit)
-                    .getResultList();
-            
-            return results.stream()
-                    .map(row -> new DashboardMetrics.TopItem(
-                            (Long) row[0],
-                            (String) row[1],
-                            ((Long) row[2]).intValue(),
-                            (Double) row[3],
-                            (String) row[4]
-                    ))
-                    .collect(Collectors.toList());
-                    
-        } catch (Exception e) {
-            logger.error("خطا در دریافت برترین آیتم‌ها: {}", e.getMessage());
-            return new ArrayList<>();
-        }
-    }
-    
-    /**
-     * برترین مشتریان
-     */
-    public List<DashboardMetrics.TopCustomer> getTopCustomers(Session session, int limit) {
-        try {
-            String hql = "SELECT u.id, u.fullName, SUM(o.totalAmount), COUNT(o) " +
-                        "FROM Order o JOIN o.user u " +
-                        "WHERE o.status = 'COMPLETED' " +
-                        "GROUP BY u.id, u.fullName " +
-                        "ORDER BY SUM(o.totalAmount) DESC";
-            
-            List<Object[]> results = session.createQuery(hql, Object[].class)
-                    .setMaxResults(limit)
-                    .getResultList();
-            
-            return results.stream()
-                    .map(row -> new DashboardMetrics.TopCustomer(
-                            (Long) row[0],
-                            (String) row[1],
-                            (Double) row[2],
-                            ((Long) row[3]).intValue()
-                    ))
-                    .collect(Collectors.toList());
-                    
-        } catch (Exception e) {
-            logger.error("خطا در دریافت برترین مشتریان: {}", e.getMessage());
-            return new ArrayList<>();
-        }
-    }
-    
-    /**
-     * درآمد بین دو تاریخ
+     * دریافت درآمد بین دو تاریخ
      */
     public Double getRevenueBetween(LocalDateTime start, LocalDateTime end, Session session) {
         try {
-            String hql = "SELECT SUM(o.totalAmount) FROM Order o " +
-                        "WHERE o.status = 'COMPLETED' AND o.createdAt >= :start AND o.createdAt <= :end";
+            String hql = "SELECT SUM(o.totalAmount) FROM Order o WHERE o.status = 'COMPLETED' " +
+                        "AND o.orderDate >= :start AND o.orderDate < :end";
             
             Double revenue = session.createQuery(hql, Double.class)
                     .setParameter("start", start)
@@ -377,181 +287,141 @@ public class AnalyticsRepository {
     }
     
     /**
-     * Bulk insert برای OrderAnalytics
-     */
-    public Integer bulkInsertOrderAnalytics(List<OrderAnalytics> analytics, Session session) {
-        try {
-            int inserted = 0;
-            for (int i = 0; i < analytics.size(); i++) {
-                session.save(analytics.get(i));
-                inserted++;
-                
-                if (i % 100 == 0) { // Batch commit every 100 records
-                    session.flush();
-                    session.clear();
-                }
-            }
-            return inserted;
-        } catch (Exception e) {
-            logger.error("خطا در bulk insert سفارشات: {}", e.getMessage());
-            return 0;
-        }
-    }
-    
-    /**
-     * Bulk insert برای UserAnalytics
-     */
-    public Integer bulkInsertUserAnalytics(List<UserAnalytics> analytics, Session session) {
-        try {
-            int inserted = 0;
-            for (int i = 0; i < analytics.size(); i++) {
-                session.save(analytics.get(i));
-                inserted++;
-                
-                if (i % 100 == 0) {
-                    session.flush();
-                    session.clear();
-                }
-            }
-            return inserted;
-        } catch (Exception e) {
-            logger.error("خطا در bulk insert کاربران: {}", e.getMessage());
-            return 0;
-        }
-    }
-    
-    /**
-     * Bulk insert برای RestaurantAnalytics
-     */
-    public Integer bulkInsertRestaurantAnalytics(List<RestaurantAnalytics> analytics, Session session) {
-        try {
-            int inserted = 0;
-            for (int i = 0; i < analytics.size(); i++) {
-                session.save(analytics.get(i));
-                inserted++;
-                
-                if (i % 100 == 0) {
-                    session.flush();
-                    session.clear();
-                }
-            }
-            return inserted;
-        } catch (Exception e) {
-            logger.error("خطا در bulk insert رستوران‌ها: {}", e.getMessage());
-            return 0;
-        }
-    }
-    
-    /**
-     * Bulk insert برای PaymentAnalytics
-     */
-    public Integer bulkInsertPaymentAnalytics(List<PaymentAnalytics> analytics, Session session) {
-        try {
-            int inserted = 0;
-            for (int i = 0; i < analytics.size(); i++) {
-                session.save(analytics.get(i));
-                inserted++;
-                
-                if (i % 100 == 0) {
-                    session.flush();
-                    session.clear();
-                }
-            }
-            return inserted;
-        } catch (Exception e) {
-            logger.error("خطا در bulk insert پرداخت‌ها: {}", e.getMessage());
-            return 0;
-        }
-    }
-    
-    /**
-     * دریافت تعداد کل درآمد بین تاریخ‌ها
+     * دریافت کل درآمد بین دو تاریخ
      */
     public Double getTotalRevenueBetween(LocalDateTime start, LocalDateTime end, Session session) {
         return getRevenueBetween(start, end, session);
     }
     
     /**
-     * Helper methods برای Customer Analytics
+     * محاسبه فراوانی سفارش کاربر
      */
     public Double getUserOrderFrequency(Long userId, int daysPeriod, Session session) {
         try {
-            LocalDateTime since = LocalDateTime.now().minusDays(daysPeriod);
-            String hql = "SELECT COUNT(o) FROM Order o WHERE o.user.id = :userId AND o.createdAt >= :since";
-            Long count = session.createQuery(hql, Long.class)
+            LocalDateTime startDate = LocalDateTime.now().minusDays(daysPeriod);
+            
+            String hql = "SELECT COUNT(o) FROM Order o WHERE o.customer.id = :userId " +
+                        "AND o.orderDate >= :startDate";
+            
+            Long orderCount = session.createQuery(hql, Long.class)
                     .setParameter("userId", userId)
-                    .setParameter("since", since)
+                    .setParameter("startDate", startDate)
                     .uniqueResult();
-            return count != null ? count.doubleValue() : 0.0;
+                    
+            return orderCount != null ? orderCount.doubleValue() / daysPeriod : 0.0;
         } catch (Exception e) {
-            logger.error("خطا در دریافت تناوب سفارش کاربر: {}", e.getMessage());
+            logger.error("خطا در محاسبه فراوانی سفارش کاربر: {}", e.getMessage());
             return 0.0;
         }
     }
     
+    /**
+     * محاسبه میانگین مبلغ سفارش کاربر
+     */
     public Double getUserAverageOrderValue(Long userId, int daysPeriod, Session session) {
         try {
-            LocalDateTime since = LocalDateTime.now().minusDays(daysPeriod);
-            String hql = "SELECT AVG(o.totalAmount) FROM Order o WHERE o.user.id = :userId AND o.createdAt >= :since AND o.status = 'COMPLETED'";
+            LocalDateTime startDate = LocalDateTime.now().minusDays(daysPeriod);
+            
+            String hql = "SELECT AVG(o.totalAmount) FROM Order o WHERE o.customer.id = :userId " +
+                        "AND o.orderDate >= :startDate AND o.status = 'COMPLETED'";
+            
             Double avg = session.createQuery(hql, Double.class)
                     .setParameter("userId", userId)
-                    .setParameter("since", since)
+                    .setParameter("startDate", startDate)
                     .uniqueResult();
+                    
             return avg != null ? avg : 0.0;
         } catch (Exception e) {
-            logger.error("خطا در محاسبه میانگین سفارش کاربر: {}", e.getMessage());
+            logger.error("خطا در محاسبه میانگین مبلغ سفارش کاربر: {}", e.getMessage());
             return 0.0;
         }
     }
     
+    /**
+     * دریافت رستوران‌های مورد علاقه کاربر
+     */
     public List<String> getUserFavoriteRestaurants(Long userId, int daysPeriod, Session session) {
         try {
-            LocalDateTime since = LocalDateTime.now().minusDays(daysPeriod);
-            String hql = "SELECT r.name FROM Order o JOIN o.restaurant r WHERE o.user.id = :userId AND o.createdAt >= :since GROUP BY r.id, r.name ORDER BY COUNT(o) DESC";
-            return session.createQuery(hql, String.class)
+            LocalDateTime startDate = LocalDateTime.now().minusDays(daysPeriod);
+            
+            String hql = "SELECT r.name, COUNT(o) as orderCount FROM Order o " +
+                        "JOIN o.restaurant r WHERE o.customer.id = :userId " +
+                        "AND o.orderDate >= :startDate GROUP BY r.name " +
+                        "ORDER BY orderCount DESC";
+            
+            List<Object[]> results = session.createQuery(hql, Object[].class)
                     .setParameter("userId", userId)
-                    .setParameter("since", since)
+                    .setParameter("startDate", startDate)
                     .setMaxResults(5)
-                    .getResultList();
+                    .list();
+                    
+            return results.stream()
+                    .map(row -> (String) row[0])
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             logger.error("خطا در دریافت رستوران‌های مورد علاقه: {}", e.getMessage());
             return new ArrayList<>();
         }
     }
     
+    /**
+     * دریافت آیتم‌های مورد علاقه کاربر
+     */
     public List<String> getUserFavoriteItems(Long userId, int daysPeriod, Session session) {
         try {
-            LocalDateTime since = LocalDateTime.now().minusDays(daysPeriod);
-            String hql = "SELECT fi.name FROM OrderItem oi JOIN oi.order o JOIN oi.foodItem fi WHERE o.user.id = :userId AND o.createdAt >= :since GROUP BY fi.id, fi.name ORDER BY COUNT(oi) DESC";
-            return session.createQuery(hql, String.class)
+            LocalDateTime startDate = LocalDateTime.now().minusDays(daysPeriod);
+            
+            String hql = "SELECT i.name, COUNT(oi) as itemCount FROM OrderItem oi " +
+                        "JOIN oi.foodItem i JOIN oi.order o WHERE o.customer.id = :userId " +
+                        "AND o.orderDate >= :startDate GROUP BY i.name " +
+                        "ORDER BY itemCount DESC";
+            
+            List<Object[]> results = session.createQuery(hql, Object[].class)
                     .setParameter("userId", userId)
-                    .setParameter("since", since)
+                    .setParameter("startDate", startDate)
                     .setMaxResults(5)
-                    .getResultList();
+                    .list();
+                    
+            return results.stream()
+                    .map(row -> (String) row[0])
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             logger.error("خطا در دریافت آیتم‌های مورد علاقه: {}", e.getMessage());
             return new ArrayList<>();
         }
     }
     
+    /**
+     * دریافت الگوهای زمانی سفارش کاربر
+     */
     public Map<String, Integer> getUserOrderTimePatterns(Long userId, int daysPeriod, Session session) {
-        // Implementation برای الگوهای زمانی سفارش
+        // موقتاً Map خالی برمی‌گردانیم
         return new HashMap<>();
     }
     
+    /**
+     * دریافت روزهای پیک سفارش کاربر
+     */
     public List<String> getUserPeakOrderDays(Long userId, int daysPeriod, Session session) {
-        // Implementation برای روزهای پیک سفارش
+        // موقتاً لیست خالی برمی‌گردانیم
         return new ArrayList<>();
     }
     
+    /**
+     * محاسبه میانگین امتیاز کاربر
+     */
     public Double getUserAverageRating(Long userId, int daysPeriod, Session session) {
         try {
-            LocalDateTime since = LocalDateTime.now().minusDays(daysPeriod);
-            String hql = "SELECT AVG(r.rating) FROM Rating r WHERE r.user.id = :userId AND r.createdAt >= :since";
+            LocalDateTime startDate = LocalDateTime.now().minusDays(daysPeriod);
+            
+            String hql = "SELECT AVG(r.ratingScore) FROM Rating r WHERE r.user.id = :userId " +
+                        "AND r.createdAt >= :startDate AND r.ratingScore IS NOT NULL";
+            
             Double avg = session.createQuery(hql, Double.class)
                     .setParameter("userId", userId)
-                    .setParameter("since", since)
+                    .setParameter("startDate", startDate)
                     .uniqueResult();
+                    
             return avg != null ? avg : 0.0;
         } catch (Exception e) {
             logger.error("خطا در محاسبه میانگین امتیاز کاربر: {}", e.getMessage());
@@ -559,62 +429,62 @@ public class AnalyticsRepository {
         }
     }
     
+    /**
+     * محاسبه نرخ شکایت کاربر
+     */
     public Double getUserComplaintRate(Long userId, int daysPeriod, Session session) {
-        // Implementation برای نرخ شکایت کاربر
+        // موقتاً 0.0 برمی‌گردانیم
         return 0.0;
     }
     
+    /**
+     * محاسبه روزهای گذشته از آخرین سفارش
+     */
     public Integer getDaysSinceLastOrder(Long userId, Session session) {
         try {
-            String hql = "SELECT MAX(o.createdAt) FROM Order o WHERE o.user.id = :userId";
+            String hql = "SELECT MAX(o.orderDate) FROM Order o WHERE o.customer.id = :userId";
             LocalDateTime lastOrder = session.createQuery(hql, LocalDateTime.class)
                     .setParameter("userId", userId)
                     .uniqueResult();
-            
+                    
             if (lastOrder != null) {
                 return (int) java.time.Duration.between(lastOrder, LocalDateTime.now()).toDays();
             }
-            return Integer.MAX_VALUE;
+            return 0;
         } catch (Exception e) {
-            logger.error("خطا در محاسبه روزهای از آخرین سفارش: {}", e.getMessage());
+            logger.error("خطا در محاسبه روزهای گذشته از آخرین سفارش: {}", e.getMessage());
             return 0;
         }
     }
     
+    /**
+     * محاسبه میانگین فاصله زمانی سفارشات کاربر
+     */
     public Double getUserAverageOrderInterval(Long userId, Session session) {
-        // Implementation برای میانگین فاصله سفارشات
-        return 7.0; // Default: 7 days
-    }
-    
-    public List<ItemRecommendation> getRecommendedItems(Long userId, Session session, int limit) {
-        // پیاده‌سازی ساده برای recommendations
-        List<ItemRecommendation> recommendations = new ArrayList<>();
         try {
-            // در اینجا منطق پیچیده ML می‌تواند قرار گیرد
-            String hql = "SELECT DISTINCT fi FROM FoodItem fi JOIN OrderItem oi ON fi.id = oi.foodItem.id " +
-                        "WHERE oi.order.customer.id != :userId ORDER BY fi.name";
+            String hql = "SELECT o.orderDate FROM Order o WHERE o.customer.id = :userId " +
+                        "ORDER BY o.orderDate";
             
-            List<FoodItem> items = session.createQuery(hql, FoodItem.class)
+            List<LocalDateTime> orderDates = session.createQuery(hql, LocalDateTime.class)
                     .setParameter("userId", userId)
-                    .setMaxResults(limit)
-                    .getResultList();
+                    .list();
                     
-            for (FoodItem item : items) {
-                ItemRecommendation rec = new ItemRecommendation();
-                rec.setUserId(userId);
-                rec.setItemId(item.getId());
-                rec.setItemName(item.getName());
-                rec.setScore(0.8); // نمره فرضی
-                rec.setReason("Based on popular items");
-                recommendations.add(rec);
+            if (orderDates.size() < 2) {
+                return 0.0;
             }
             
+            double totalDays = 0;
+            for (int i = 1; i < orderDates.size(); i++) {
+                totalDays += java.time.Duration.between(orderDates.get(i-1), orderDates.get(i)).toDays();
+            }
+            
+            return totalDays / (orderDates.size() - 1);
         } catch (Exception e) {
-            logger.error("خطا در دریافت توصیه‌ها: {}", e.getMessage());
+            logger.error("خطا در محاسبه میانگین فاصله زمانی سفارشات: {}", e.getMessage());
+            return 0.0;
         }
-        return recommendations;
     }
-
+    
     /**
      * دریافت درآمد بر اساس رستوران
      */
@@ -622,217 +492,218 @@ public class AnalyticsRepository {
         try {
             String hql = "SELECT r.name, SUM(o.totalAmount) FROM Order o " +
                         "JOIN o.restaurant r WHERE o.status = 'COMPLETED' " +
-                        "AND o.orderDate >= :start AND o.orderDate <= :end " +
+                        "AND o.createdAt >= :start AND o.createdAt < :end " +
                         "GROUP BY r.name ORDER BY SUM(o.totalAmount) DESC";
             
             List<Object[]> results = session.createQuery(hql, Object[].class)
                     .setParameter("start", start)
                     .setParameter("end", end)
-                    .getResultList();
-            
-            Map<String, Double> revenueMap = new LinkedHashMap<>();
+                    .list();
+                    
+            Map<String, Double> revenueMap = new HashMap<>();
             for (Object[] row : results) {
-                String restaurantName = (String) row[0];
-                Double revenue = row[1] != null ? ((Number) row[1]).doubleValue() : 0.0;
-                revenueMap.put(restaurantName, revenue);
+                revenueMap.put((String) row[0], (Double) row[1]);
             }
             
             return revenueMap;
         } catch (Exception e) {
-            logger.error("خطا در دریافت درآمد رستوران‌ها: {}", e.getMessage());
+            logger.error("خطا در دریافت درآمد بر اساس رستوران: {}", e.getMessage());
             return new HashMap<>();
         }
     }
-
+    
     /**
      * دریافت درآمد بر اساس دسته‌بندی
      */
     public Map<String, Double> getRevenueByCategory(LocalDateTime start, LocalDateTime end, Session session) {
         try {
-            String hql = "SELECT fi.category, SUM(oi.price * oi.quantity) FROM OrderItem oi " +
-                        "JOIN oi.foodItem fi JOIN oi.order o WHERE o.status = 'COMPLETED' " +
-                        "AND o.orderDate >= :start AND o.orderDate <= :end " +
-                        "GROUP BY fi.category ORDER BY SUM(oi.price * oi.quantity) DESC";
+            String hql = "SELECT c.name, SUM(oi.price * oi.quantity) FROM OrderItem oi " +
+                        "JOIN oi.item i JOIN i.category c JOIN oi.order o " +
+                        "WHERE o.status = 'COMPLETED' " +
+                        "AND o.createdAt >= :start AND o.createdAt < :end " +
+                        "GROUP BY c.name ORDER BY SUM(oi.price * oi.quantity) DESC";
             
             List<Object[]> results = session.createQuery(hql, Object[].class)
                     .setParameter("start", start)
                     .setParameter("end", end)
-                    .getResultList();
-            
-            Map<String, Double> categoryMap = new LinkedHashMap<>();
+                    .list();
+                    
+            Map<String, Double> revenueMap = new HashMap<>();
             for (Object[] row : results) {
-                String category = (String) row[0];
-                Double revenue = row[1] != null ? ((Number) row[1]).doubleValue() : 0.0;
-                categoryMap.put(category != null ? category : "Other", revenue);
+                revenueMap.put((String) row[0], (Double) row[1]);
             }
             
-            return categoryMap;
+            return revenueMap;
         } catch (Exception e) {
-            logger.error("خطا در دریافت درآمد دسته‌بندی‌ها: {}", e.getMessage());
+            logger.error("خطا در دریافت درآمد بر اساس دسته‌بندی: {}", e.getMessage());
             return new HashMap<>();
         }
     }
-
+    
     /**
      * دریافت درآمد روزانه
      */
     public Map<LocalDate, Double> getDailyRevenue(LocalDateTime start, LocalDateTime end, Session session) {
         try {
-            String hql = "SELECT DATE(o.orderDate), SUM(o.totalAmount) FROM Order o " +
-                        "WHERE o.status = 'COMPLETED' AND o.orderDate >= :start AND o.orderDate <= :end " +
-                        "GROUP BY DATE(o.orderDate) ORDER BY DATE(o.orderDate)";
+            String hql = "SELECT DATE(o.createdAt), SUM(o.totalAmount) FROM Order o " +
+                        "WHERE o.status = 'COMPLETED' " +
+                        "AND o.createdAt >= :start AND o.createdAt < :end " +
+                        "GROUP BY DATE(o.createdAt) ORDER BY DATE(o.createdAt)";
             
             List<Object[]> results = session.createQuery(hql, Object[].class)
                     .setParameter("start", start)
                     .setParameter("end", end)
-                    .getResultList();
-            
-            Map<LocalDate, Double> dailyMap = new LinkedHashMap<>();
+                    .list();
+                    
+            Map<LocalDate, Double> revenueMap = new HashMap<>();
             for (Object[] row : results) {
-                LocalDate date = ((java.sql.Date) row[0]).toLocalDate();
-                Double revenue = row[1] != null ? ((Number) row[1]).doubleValue() : 0.0;
-                dailyMap.put(date, revenue);
+                revenueMap.put((LocalDate) row[0], (Double) row[1]);
             }
             
-            return dailyMap;
+            return revenueMap;
         } catch (Exception e) {
             logger.error("خطا در دریافت درآمد روزانه: {}", e.getMessage());
             return new HashMap<>();
         }
     }
-
+    
     /**
-     * دریافت کل کمیسیون‌ها
+     * محاسبه کل کمیسیون‌ها
      */
     public Double getTotalCommissions(LocalDateTime start, LocalDateTime end, Session session) {
         try {
-            // فرض می‌کنیم کمیسیون 10% از هر سفارش است
-            Double totalRevenue = getRevenueBetween(start, end, session);
-            return totalRevenue * 0.10; // 10% commission rate
-        } catch (Exception e) {
-            logger.error("خطا در محاسبه کمیسیون‌ها: {}", e.getMessage());
-            return 0.0;
-        }
-    }
-
-    /**
-     * دریافت هزینه‌های تحویل
-     */
-    public Double getDeliveryFees(LocalDateTime start, LocalDateTime end, Session session) {
-        try {
-            // فرض می‌کنیم هزینه تحویل ثابت 20000 تومان برای هر سفارش است
-            String hql = "SELECT COUNT(o) FROM Order o WHERE o.status = 'COMPLETED' " +
-                        "AND o.orderDate >= :start AND o.orderDate <= :end";
+            String hql = "SELECT SUM(o.commission) FROM Order o WHERE o.status = 'COMPLETED' " +
+                        "AND o.createdAt >= :start AND o.createdAt < :end";
             
-            Long orderCount = session.createQuery(hql, Long.class)
+            Double commission = session.createQuery(hql, Double.class)
                     .setParameter("start", start)
                     .setParameter("end", end)
                     .uniqueResult();
+                    
+            return commission != null ? commission : 0.0;
+        } catch (Exception e) {
+            logger.error("خطا در محاسبه کل کمیسیون‌ها: {}", e.getMessage());
+            return 0.0;
+        }
+    }
+    
+    /**
+     * محاسبه هزینه‌های تحویل
+     */
+    public Double getDeliveryFees(LocalDateTime start, LocalDateTime end, Session session) {
+        try {
+            String hql = "SELECT SUM(o.deliveryFee) FROM Order o WHERE o.status = 'COMPLETED' " +
+                        "AND o.createdAt >= :start AND o.createdAt < :end";
             
-            return orderCount != null ? orderCount * 20000.0 : 0.0; // 20000 per order
+            Double fees = session.createQuery(hql, Double.class)
+                    .setParameter("start", start)
+                    .setParameter("end", end)
+                    .uniqueResult();
+                    
+            return fees != null ? fees : 0.0;
         } catch (Exception e) {
             logger.error("خطا در محاسبه هزینه‌های تحویل: {}", e.getMessage());
             return 0.0;
         }
     }
-
+    
     /**
-     * دریافت مبلغ استرداد
+     * محاسبه کل بازپرداخت‌ها
      */
     public Double getRefunds(LocalDateTime start, LocalDateTime end, Session session) {
         try {
-            String hql = "SELECT SUM(o.totalAmount) FROM Order o WHERE o.status = 'CANCELLED' " +
-                        "AND o.orderDate >= :start AND o.orderDate <= :end";
+            String hql = "SELECT SUM(o.refundAmount) FROM Order o WHERE o.status = 'REFUNDED' " +
+                        "AND o.createdAt >= :start AND o.createdAt < :end";
             
             Double refunds = session.createQuery(hql, Double.class)
                     .setParameter("start", start)
                     .setParameter("end", end)
                     .uniqueResult();
-            
+                    
             return refunds != null ? refunds : 0.0;
         } catch (Exception e) {
-            logger.error("خطا در محاسبه استردادها: {}", e.getMessage());
+            logger.error("خطا در محاسبه کل بازپرداخت‌ها: {}", e.getMessage());
             return 0.0;
         }
     }
-
+    
     /**
-     * تفکیک روش‌های پرداخت
+     * دریافت آمار روش‌های پرداخت
      */
     public Map<String, Long> getPaymentMethodsBreakdown(LocalDateTime start, LocalDateTime end, Session session) {
         try {
             String hql = "SELECT p.paymentMethod, COUNT(p) FROM Payment p " +
-                        "WHERE p.status = 'COMPLETED' AND p.createdAt >= :start AND p.createdAt <= :end " +
+                        "WHERE p.status = 'SUCCESS' " +
+                        "AND p.createdAt >= :start AND p.createdAt < :end " +
                         "GROUP BY p.paymentMethod";
             
             List<Object[]> results = session.createQuery(hql, Object[].class)
                     .setParameter("start", start)
                     .setParameter("end", end)
-                    .getResultList();
-            
-            Map<String, Long> methodsMap = new HashMap<>();
+                    .list();
+                    
+            Map<String, Long> breakdown = new HashMap<>();
             for (Object[] row : results) {
-                String method = (String) row[0];
-                Long count = ((Number) row[1]).longValue();
-                methodsMap.put(method != null ? method : "Unknown", count);
+                breakdown.put((String) row[0], (Long) row[1]);
             }
             
-            return methodsMap;
+            return breakdown;
         } catch (Exception e) {
-            logger.error("خطا در تفکیک روش‌های پرداخت: {}", e.getMessage());
+            logger.error("خطا در دریافت آمار روش‌های پرداخت: {}", e.getMessage());
             return new HashMap<>();
         }
     }
-
+    
     /**
      * تعداد پرداخت‌های موفق
      */
     public Long getSuccessfulPaymentsCount(LocalDateTime start, LocalDateTime end, Session session) {
         try {
-            String hql = "SELECT COUNT(p) FROM Payment p WHERE p.status = 'COMPLETED' " +
-                        "AND p.createdAt >= :start AND p.createdAt <= :end";
+            String hql = "SELECT COUNT(p) FROM Payment p WHERE p.status = 'SUCCESS' " +
+                        "AND p.createdAt >= :start AND p.createdAt < :end";
             
             return session.createQuery(hql, Long.class)
                     .setParameter("start", start)
                     .setParameter("end", end)
                     .uniqueResult();
         } catch (Exception e) {
-            logger.error("خطا در شمارش پرداخت‌های موفق: {}", e.getMessage());
+            logger.error("خطا در دریافت تعداد پرداخت‌های موفق: {}", e.getMessage());
             return 0L;
         }
     }
-
+    
     /**
      * تعداد پرداخت‌های ناموفق
      */
     public Long getFailedPaymentsCount(LocalDateTime start, LocalDateTime end, Session session) {
         try {
             String hql = "SELECT COUNT(p) FROM Payment p WHERE p.status = 'FAILED' " +
-                        "AND p.createdAt >= :start AND p.createdAt <= :end";
+                        "AND p.createdAt >= :start AND p.createdAt < :end";
             
             return session.createQuery(hql, Long.class)
                     .setParameter("start", start)
                     .setParameter("end", end)
                     .uniqueResult();
         } catch (Exception e) {
-            logger.error("خطا در شمارش پرداخت‌های ناموفق: {}", e.getMessage());
+            logger.error("خطا در دریافت تعداد پرداخت‌های ناموفق: {}", e.getMessage());
             return 0L;
         }
     }
-
+    
     /**
-     * میانگین ارزش طول عمر مشتری
+     * محاسبه میانگین ارزش طول عمر مشتری
      */
     public Double getAverageCustomerLifetimeValue(Session session) {
         try {
-            String hql = "SELECT AVG(customerTotal) FROM (" +
-                        "SELECT SUM(o.totalAmount) as customerTotal FROM Order o " +
-                        "WHERE o.status = 'COMPLETED' GROUP BY o.customer.id)";
+            String hql = "SELECT AVG(totalSpent) FROM (" +
+                        "SELECT u.id, SUM(o.totalAmount) as totalSpent FROM User u " +
+                        "JOIN u.orders o WHERE o.status = 'COMPLETED' " +
+                        "GROUP BY u.id)";
             
-            Double ltv = session.createQuery(hql, Double.class).uniqueResult();
-            return ltv != null ? ltv : 0.0;
+            Double avg = session.createQuery(hql, Double.class).uniqueResult();
+            return avg != null ? avg : 0.0;
         } catch (Exception e) {
-            logger.error("خطا در محاسبه میانگین ارزش مشتری: {}", e.getMessage());
+            logger.error("خطا در محاسبه میانگین ارزش طول عمر مشتری: {}", e.getMessage());
             return 0.0;
         }
     }

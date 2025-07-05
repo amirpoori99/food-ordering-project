@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.paint.Color?>
+
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.myapp.ui.analytics.controller.AnalyticsDashboardController"
+      styleClass="analytics-dashboard"
+      prefWidth="1400" prefHeight="900">
+
+    <!-- Header -->
+    <HBox fx:id="headerContainer" styleClass="header" alignment="CENTER_LEFT" spacing="20">
+        <padding>
+            <Insets top="15" right="20" bottom="15" left="20"/>
+        </padding>
+        
+        <Label fx:id="titleLabel" text="داشبورد Analytics" 
+               style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+        
+        <Region HBox.hgrow="ALWAYS"/>
+        
+        <Label fx:id="dateTimeLabel" text="2024/07/05 14:30:00" 
+               style="-fx-font-size: 14px; -fx-text-fill: #666666;"/>
+        
+        <Button fx:id="refreshButton" text="🔄 به‌روزرسانی" 
+                styleClass="btn, btn-primary"
+                onAction="#refreshData"/>
+        
+        <Button fx:id="exportButton" text="📊 صادرات" 
+                styleClass="btn, btn-success"
+                onAction="#exportData"/>
+        
+        <Button fx:id="settingsButton" text="⚙️ تنظیمات" 
+                styleClass="btn, btn-secondary"
+                onAction="#openSettings"/>
+    </HBox>
+
+    <!-- Main Content -->
+    <HBox VBox.vgrow="ALWAYS" spacing="0">
+        
+        <!-- Sidebar -->
+        <VBox fx:id="sidebarContainer" styleClass="sidebar" prefWidth="250" maxWidth="250">
+            <padding>
+                <Insets top="20" right="15" bottom="20" left="15"/>
+            </padding>
+            
+            <Label text="منوی Analytics" 
+                   style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white; -fx-padding: 0 0 20 0;"/>
+            
+            <VBox fx:id="navigationContainer" spacing="10">
+                <Button fx:id="overviewButton" text="📊 نمای کلی" 
+                        styleClass="nav-btn, selected"
+                        onAction="#showOverview"
+                        maxWidth="Infinity"/>
+                
+                <Button fx:id="salesButton" text="💰 فروش" 
+                        styleClass="nav-btn"
+                        onAction="#showSales"
+                        maxWidth="Infinity"/>
+                
+                <Button fx:id="usersButton" text="👥 کاربران" 
+                        styleClass="nav-btn"
+                        onAction="#showUsers"
+                        maxWidth="Infinity"/>
+                
+                <Button fx:id="restaurantsButton" text="🍽️ رستوران‌ها" 
+                        styleClass="nav-btn"
+                        onAction="#showRestaurants"
+                        maxWidth="Infinity"/>
+                
+                <Button fx:id="performanceButton" text="⚡ عملکرد" 
+                        styleClass="nav-btn"
+                        onAction="#showPerformance"
+                        maxWidth="Infinity"/>
+                
+                <Button fx:id="realtimeButton" text="🔄 زنده" 
+                        styleClass="nav-btn"
+                        onAction="#toggleRealTime"
+                        maxWidth="Infinity"/>
+                
+                <Button fx:id="reportsButton" text="📋 گزارش‌ها" 
+                        styleClass="nav-btn"
+                        onAction="#showReports"
+                        maxWidth="Infinity"/>
+            </VBox>
+            
+            <Region VBox.vgrow="ALWAYS"/>
+            
+            <!-- System Status -->
+            <VBox styleClass="status-panel" spacing="10">
+                <Label text="وضعیت سیستم" 
+                       style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Circle radius="5" fill="#28a745"/>
+                    <Label text="سرور متصل" style="-fx-text-fill: white; -fx-font-size: 12px;"/>
+                </HBox>
+                
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Circle radius="5" fill="#28a745"/>
+                    <Label text="پایگاه داده متصل" style="-fx-text-fill: white; -fx-font-size: 12px;"/>
+                </HBox>
+                
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Circle radius="5" fill="#28a745"/>
+                    <Label text="کش فعال" style="-fx-text-fill: white; -fx-font-size: 12px;"/>
+                </HBox>
+            </VBox>
+        </VBox>
+
+        <!-- Content Area -->
+        <VBox fx:id="contentContainer" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" spacing="20">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <!-- Stats Cards -->
+            <HBox fx:id="statsContainer" spacing="15" alignment="CENTER">
+                <VBox fx:id="totalUsersCard" styleClass="stats-card" prefWidth="200" prefHeight="120">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+                    <VBox alignment="CENTER" spacing="5">
+                        <Label text="👥 کل کاربران" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                        <Label text="1,250" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #007bff;"/>
+                    </VBox>
+                </VBox>
+
+                <VBox fx:id="totalRestaurantsCard" styleClass="stats-card" prefWidth="200" prefHeight="120">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+                    <VBox alignment="CENTER" spacing="5">
+                        <Label text="🍽️ کل رستوران‌ها" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                        <Label text="85" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #28a745;"/>
+                    </VBox>
+                </VBox>
+
+                <VBox fx:id="totalOrdersCard" styleClass="stats-card" prefWidth="200" prefHeight="120">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+                    <VBox alignment="CENTER" spacing="5">
+                        <Label text="📦 کل سفارشات" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                        <Label text="5,420" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #ffc107;"/>
+                    </VBox>
+                </VBox>
+
+                <VBox fx:id="totalRevenueCard" styleClass="stats-card" prefWidth="200" prefHeight="120">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+                    <VBox alignment="CENTER" spacing="5">
+                        <Label text="💰 کل درآمد" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                        <Label text="125,000,000 تومان" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #dc3545;"/>
+                    </VBox>
+                </VBox>
+
+                <VBox fx:id="activeUsersCard" styleClass="stats-card" prefWidth="200" prefHeight="120">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+                    <VBox alignment="CENTER" spacing="5">
+                        <Label text="🟢 کاربران فعال" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                        <Label text="320" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #17a2b8;"/>
+                    </VBox>
+                </VBox>
+
+                <VBox fx:id="pendingOrdersCard" styleClass="stats-card" prefWidth="200" prefHeight="120">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+                    <VBox alignment="CENTER" spacing="5">
+                        <Label text="⏳ سفارشات در انتظار" style="-fx-font-size: 14px; -fx-text-fill: #6c757d;"/>
+                        <Label text="45" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #6f42c1;"/>
+                    </VBox>
+                </VBox>
+            </HBox>
+
+            <!-- Charts Section -->
+            <VBox fx:id="chartsContainer" VBox.vgrow="ALWAYS" spacing="20">
+                
+                <!-- First Row of Charts -->
+                <HBox spacing="20" VBox.vgrow="ALWAYS">
+                    
+                    <!-- Sales Trend Chart -->
+                    <VBox styleClass="chart-container" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                        <padding>
+                            <Insets top="15" right="15" bottom="15" left="15"/>
+                        </padding>
+                        <Label text="روند فروش" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 0 0 10 0;"/>
+                        <LineChart fx:id="salesTrendChart" VBox.vgrow="ALWAYS">
+                            <xAxis>
+                                <CategoryAxis label="روز هفته"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis label="تعداد سفارش"/>
+                            </yAxis>
+                        </LineChart>
+                    </VBox>
+
+                    <!-- User Distribution Chart -->
+                    <VBox styleClass="chart-container" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                        <padding>
+                            <Insets top="15" right="15" bottom="15" left="15"/>
+                        </padding>
+                        <Label text="توزیع کاربران" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 0 0 10 0;"/>
+                        <PieChart fx:id="userDistributionChart" VBox.vgrow="ALWAYS"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Second Row of Charts -->
+                <HBox spacing="20" VBox.vgrow="ALWAYS">
+                    
+                    <!-- Restaurant Performance Chart -->
+                    <VBox styleClass="chart-container" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                        <padding>
+                            <Insets top="15" right="15" bottom="15" left="15"/>
+                        </padding>
+                        <Label text="عملکرد رستوران‌ها" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 0 0 10 0;"/>
+                        <BarChart fx:id="restaurantPerformanceChart" VBox.vgrow="ALWAYS">
+                            <xAxis>
+                                <CategoryAxis label="رستوران"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis label="امتیاز"/>
+                            </yAxis>
+                        </BarChart>
+                    </VBox>
+
+                    <!-- Revenue Chart -->
+                    <VBox styleClass="chart-container" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                        <padding>
+                            <Insets top="15" right="15" bottom="15" left="15"/>
+                        </padding>
+                        <Label text="درآمد ماهانه" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 0 0 10 0;"/>
+                        <AreaChart fx:id="revenueChart" VBox.vgrow="ALWAYS">
+                            <xAxis>
+                                <CategoryAxis label="ماه"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis label="درآمد (هزار تومان)"/>
+                            </yAxis>
+                        </AreaChart>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Tables Section -->
+            <VBox fx:id="tablesContainer" spacing="20">
+                
+                <!-- Tables Row -->
+                <HBox spacing="20" VBox.vgrow="ALWAYS">
+                    
+                    <!-- Top Restaurants Table -->
+                    <VBox styleClass="chart-container" HBox.hgrow="ALWAYS" prefHeight="300">
+                        <padding>
+                            <Insets top="15" right="15" bottom="15" left="15"/>
+                        </padding>
+                        <Label text="رستوران‌های برتر" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 0 0 10 0;"/>
+                        <TableView fx:id="topRestaurantsTable" VBox.vgrow="ALWAYS"/>
+                    </VBox>
+
+                    <!-- Recent Orders Table -->
+                    <VBox styleClass="chart-container" HBox.hgrow="ALWAYS" prefHeight="300">
+                        <padding>
+                            <Insets top="15" right="15" bottom="15" left="15"/>
+                        </padding>
+                        <Label text="سفارشات اخیر" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 0 0 10 0;"/>
+                        <TableView fx:id="recentOrdersTable" VBox.vgrow="ALWAYS"/>
+                    </VBox>
+
+                    <!-- User Activity Table -->
+                    <VBox styleClass="chart-container" HBox.hgrow="ALWAYS" prefHeight="300">
+                        <padding>
+                            <Insets top="15" right="15" bottom="15" left="15"/>
+                        </padding>
+                        <Label text="فعالیت کاربران" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 0 0 10 0;"/>
+                        <TableView fx:id="userActivityTable" VBox.vgrow="ALWAYS"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+        </VBox>
+    </HBox>
+
+    <!-- CSS Styles -->
+    <stylesheets>
+        <String fx:value="analytics-dashboard.css"/>
+    </stylesheets>
+
+</VBox> 

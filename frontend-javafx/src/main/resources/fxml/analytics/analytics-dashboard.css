@@ -1,0 +1,546 @@
+/* Analytics Dashboard CSS */
+
+/* Root Styles */
+.analytics-dashboard {
+    -fx-background-color: #f8f9fa;
+    -fx-font-family: "Segoe UI", "System", sans-serif;
+}
+
+/* Header Styles */
+.header {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e9ecef;
+    -fx-border-width: 0 0 1 0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0);
+}
+
+.header .label {
+    -fx-text-fill: #333333;
+}
+
+/* Button Styles */
+.btn {
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-padding: 8 16;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-min-width: 100;
+    -fx-transition: all 0.2s ease;
+}
+
+.btn:hover {
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.btn:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+.btn-primary {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+    -fx-border-color: #007bff;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #0056b3;
+    -fx-border-color: #0056b3;
+}
+
+.btn-success {
+    -fx-background-color: #28a745;
+    -fx-text-fill: white;
+    -fx-border-color: #28a745;
+}
+
+.btn-success:hover {
+    -fx-background-color: #1e7e34;
+    -fx-border-color: #1e7e34;
+}
+
+.btn-secondary {
+    -fx-background-color: #6c757d;
+    -fx-text-fill: white;
+    -fx-border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #545b62;
+    -fx-border-color: #545b62;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    -fx-background-color: #343a40;
+    -fx-pref-width: 250;
+    -fx-min-width: 250;
+    -fx-max-width: 250;
+}
+
+.sidebar .label {
+    -fx-text-fill: white;
+}
+
+/* Navigation Button Styles */
+.nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #adb5bd;
+    -fx-border-color: transparent;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 12 16;
+    -fx-font-size: 14px;
+    -fx-font-weight: normal;
+    -fx-alignment: CENTER_LEFT;
+    -fx-cursor: hand;
+    -fx-transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+    -fx-background-color: rgba(255,255,255,0.1);
+    -fx-text-fill: white;
+}
+
+.nav-btn.selected {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.nav-btn.selected:hover {
+    -fx-background-color: #0056b3;
+}
+
+/* Status Panel Styles */
+.status-panel {
+    -fx-background-color: rgba(255,255,255,0.1);
+    -fx-background-radius: 8;
+    -fx-padding: 15;
+    -fx-border-radius: 8;
+    -fx-border-color: rgba(255,255,255,0.2);
+    -fx-border-width: 1;
+}
+
+/* Stats Card Styles */
+.stats-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);
+    -fx-border-radius: 8;
+    -fx-border-color: transparent;
+    -fx-transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 15, 0, 0, 0);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.stats-card .label {
+    -fx-text-fill: #333333;
+}
+
+/* Chart Container Styles */
+.chart-container {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);
+    -fx-border-radius: 8;
+    -fx-border-color: transparent;
+    -fx-min-height: 300;
+}
+
+.chart-container .label {
+    -fx-text-fill: #333333;
+}
+
+/* Chart Styles */
+.chart {
+    -fx-background-color: transparent;
+    -fx-padding: 10;
+}
+
+.chart-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
+
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.chart-vertical-grid-lines {
+    -fx-stroke: #e9ecef;
+    -fx-stroke-width: 1;
+}
+
+.chart-horizontal-grid-lines {
+    -fx-stroke: #e9ecef;
+    -fx-stroke-width: 1;
+}
+
+.chart-vertical-zero-line {
+    -fx-stroke: #dee2e6;
+    -fx-stroke-width: 1;
+}
+
+.chart-horizontal-zero-line {
+    -fx-stroke: #dee2e6;
+    -fx-stroke-width: 1;
+}
+
+/* Axis Styles */
+.axis {
+    -fx-tick-label-fill: #6c757d;
+    -fx-tick-label-font-size: 12px;
+}
+
+.axis-label {
+    -fx-text-fill: #495057;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.axis-tick-mark {
+    -fx-stroke: #dee2e6;
+    -fx-stroke-width: 1;
+}
+
+/* Line Chart Styles */
+.chart-series-line {
+    -fx-stroke-width: 3;
+    -fx-stroke-line-cap: round;
+    -fx-stroke-line-join: round;
+}
+
+.chart-line-symbol {
+    -fx-background-color: #007bff;
+    -fx-background-radius: 4;
+    -fx-padding: 4;
+}
+
+.chart-line-symbol:hover {
+    -fx-background-color: #0056b3;
+    -fx-scale-x: 1.2;
+    -fx-scale-y: 1.2;
+}
+
+/* Bar Chart Styles */
+.chart-bar {
+    -fx-background-color: #007bff;
+    -fx-background-radius: 2;
+    -fx-border-radius: 2;
+    -fx-border-color: transparent;
+    -fx-transition: all 0.2s ease;
+}
+
+.chart-bar:hover {
+    -fx-background-color: #0056b3;
+    -fx-scale-y: 1.05;
+}
+
+/* Pie Chart Styles */
+.chart-pie-label {
+    -fx-text-fill: #333333;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.chart-pie-label-line {
+    -fx-stroke: #6c757d;
+    -fx-stroke-width: 1;
+}
+
+/* Area Chart Styles */
+.chart-area-symbol {
+    -fx-background-color: #17a2b8;
+    -fx-background-radius: 3;
+    -fx-padding: 3;
+}
+
+.chart-area-line {
+    -fx-stroke: #17a2b8;
+    -fx-stroke-width: 2;
+}
+
+.chart-area-fill {
+    -fx-fill: #17a2b8;
+    -fx-opacity: 0.7;
+}
+
+/* Table Styles */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+}
+
+.table-view .column-header {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #495057;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .table-row-cell:odd {
+    -fx-background-color: #f8f9fa;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: #e3f2fd;
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: #f1f3f4;
+}
+
+.table-view .table-cell {
+    -fx-text-fill: #333333;
+    -fx-font-size: 12px;
+    -fx-padding: 8 12;
+}
+
+/* Scrollbar Styles */
+.scroll-bar {
+    -fx-background-color: #f8f9fa;
+    -fx-pref-width: 12;
+    -fx-pref-height: 12;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #adb5bd;
+    -fx-background-radius: 6;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #6c757d;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-background-color: transparent;
+}
+
+/* Tooltip Styles */
+.tooltip {
+    -fx-background-color: #333333;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 8 12;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+}
+
+/* Alert Styles */
+.dialog-pane {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 1;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 0 0 1 0;
+}
+
+.dialog-pane .content {
+    -fx-padding: 20;
+}
+
+.dialog-pane .button {
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-padding: 8 16;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-min-width: 80;
+}
+
+.dialog-pane .button.default {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+    -fx-border-color: #007bff;
+}
+
+.dialog-pane .button.default:hover {
+    -fx-background-color: #0056b3;
+    -fx-border-color: #0056b3;
+}
+
+.dialog-pane .button.cancel {
+    -fx-background-color: #6c757d;
+    -fx-text-fill: white;
+    -fx-border-color: #6c757d;
+}
+
+.dialog-pane .button.cancel:hover {
+    -fx-background-color: #545b62;
+    -fx-border-color: #545b62;
+}
+
+/* Progress Indicator Styles */
+.progress-indicator {
+    -fx-progress-color: #007bff;
+}
+
+.progress-indicator .spinner {
+    -fx-background-color: transparent;
+}
+
+/* Loading Animation */
+@keyframes fadeIn {
+    from {
+        -fx-opacity: 0;
+    }
+    to {
+        -fx-opacity: 1;
+    }
+}
+
+.fade-in {
+    -fx-animation: fadeIn 0.3s ease-in;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .stats-card {
+        -fx-pref-width: 180;
+        -fx-pref-height: 100;
+    }
+    
+    .chart-container {
+        -fx-min-height: 250;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        -fx-pref-width: 200;
+        -fx-min-width: 200;
+        -fx-max-width: 200;
+    }
+    
+    .stats-card {
+        -fx-pref-width: 150;
+        -fx-pref-height: 80;
+    }
+    
+    .btn {
+        -fx-min-width: 80;
+        -fx-padding: 6 12;
+        -fx-font-size: 12px;
+    }
+}
+
+/* Dark Mode Support */
+.dark-mode {
+    -fx-background-color: #1a1a1a;
+}
+
+.dark-mode .header {
+    -fx-background-color: #2d2d2d;
+    -fx-border-color: #404040;
+}
+
+.dark-mode .sidebar {
+    -fx-background-color: #1a1a1a;
+}
+
+.dark-mode .stats-card,
+.dark-mode .chart-container {
+    -fx-background-color: #2d2d2d;
+    -fx-border-color: #404040;
+}
+
+.dark-mode .chart {
+    -fx-background-color: #2d2d2d;
+}
+
+.dark-mode .chart-title {
+    -fx-text-fill: #ffffff;
+}
+
+.dark-mode .axis {
+    -fx-tick-label-fill: #cccccc;
+}
+
+.dark-mode .axis-label {
+    -fx-text-fill: #cccccc;
+}
+
+.dark-mode .table-view {
+    -fx-background-color: #2d2d2d;
+    -fx-border-color: #404040;
+}
+
+.dark-mode .table-view .column-header {
+    -fx-background-color: #1a1a1a;
+    -fx-border-color: #404040;
+}
+
+.dark-mode .table-view .table-row-cell {
+    -fx-background-color: #2d2d2d;
+}
+
+.dark-mode .table-view .table-row-cell:odd {
+    -fx-background-color: #333333;
+}
+
+.dark-mode .table-view .table-row-cell:selected {
+    -fx-background-color: #404040;
+}
+
+.dark-mode .table-view .table-row-cell:hover {
+    -fx-background-color: #404040;
+}
+
+.dark-mode .table-view .table-cell {
+    -fx-text-fill: #ffffff;
+}
+
+/* Print Styles */
+@media print {
+    .sidebar,
+    .header {
+        -fx-visible: false;
+    }
+    
+    .stats-card,
+    .chart-container {
+        -fx-effect: none;
+        -fx-border-color: #000000;
+        -fx-border-width: 1;
+    }
+    
+    .chart {
+        -fx-background-color: white;
+    }
+} 

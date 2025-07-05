@@ -81,10 +81,13 @@ class RestaurantListControllerTest extends TestFXBase {
             searchButton = (Button) root.lookup("#searchButton");
             refreshButton = (Button) root.lookup("#refreshButton");
             // رفع هشدار cast: بررسی نوع در زمان اجرا
+            @SuppressWarnings("unchecked")
             Control node = (Control) root.lookup("#restaurantListView");
             if (node instanceof ListView<?>) {
                 try {
-                    restaurantListView = (ListView<Restaurant>) node;
+                    @SuppressWarnings("unchecked")
+                    ListView<Restaurant> temp = (ListView<Restaurant>) node;
+                    restaurantListView = temp;
                 } catch (ClassCastException e) {
                     fail("restaurantListView is not of expected generic type ListView<Restaurant>. Actual: " + node.getClass());
                 }
