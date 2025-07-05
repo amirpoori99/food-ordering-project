@@ -1,0 +1,64 @@
+-------------------------------------------------------------------------------
+Test set: com.myapp.review.RatingRepositoryTest$SaveRatingTests
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 4, Skipped: 0, Time elapsed: 0 s <<< FAILURE! -- in com.myapp.review.RatingRepositoryTest$SaveRatingTests
+com.myapp.review.RatingRepositoryTest$SaveRatingTests.shouldUpdateExistingRating -- Time elapsed: 0 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.common.TestDatabaseManager.cleanRatingData(TestDatabaseManager.java:145)
+	at com.myapp.review.RatingRepositoryTest.setUp(RatingRepositoryTest.java:82)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.review.RatingRepositoryTest$SaveRatingTests.shouldHandleRatingWithNullReviewText -- Time elapsed: 0 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.common.TestDatabaseManager.cleanRatingData(TestDatabaseManager.java:145)
+	at com.myapp.review.RatingRepositoryTest.setUp(RatingRepositoryTest.java:82)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.review.RatingRepositoryTest$SaveRatingTests.shouldHandleSaveExceptionGracefully -- Time elapsed: 0 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.common.TestDatabaseManager.cleanRatingData(TestDatabaseManager.java:145)
+	at com.myapp.review.RatingRepositoryTest.setUp(RatingRepositoryTest.java:82)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.review.RatingRepositoryTest$SaveRatingTests.shouldSaveNewRatingSuccessfully -- Time elapsed: 0 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.common.TestDatabaseManager.cleanRatingData(TestDatabaseManager.java:145)
+	at com.myapp.review.RatingRepositoryTest.setUp(RatingRepositoryTest.java:82)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+

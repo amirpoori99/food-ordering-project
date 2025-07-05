@@ -1,0 +1,274 @@
+-------------------------------------------------------------------------------
+Test set: com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests
+-------------------------------------------------------------------------------
+Tests run: 18, Failures: 0, Errors: 18, Skipped: 0, Time elapsed: 0.057 s <<< FAILURE! -- in com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests
+com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersAllEmpty -- Time elapsed: 0.004 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.vendor.VendorRepository.findByFilters(VendorRepository.java:223)
+	at com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersAllEmpty(VendorRepositoryTest.java:503)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersAllThree -- Time elapsed: 0.003 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.vendor.VendorRepository.findByFilters(VendorRepository.java:223)
+	at com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersAllThree(VendorRepositoryTest.java:538)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersLongStrings -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.vendor.VendorRepository.findByFilters(VendorRepository.java:223)
+	at com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersLongStrings(VendorRepositoryTest.java:589)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFilters -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.vendor.VendorRepository.findByFilters(VendorRepository.java:223)
+	at com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFilters(VendorRepositoryTest.java:468)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersUnicode -- Time elapsed: 0 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.vendor.VendorRepository.findByFilters(VendorRepository.java:223)
+	at com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersUnicode(VendorRepositoryTest.java:570)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersSQLInjection -- Time elapsed: 0.003 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.vendor.VendorRepository.findByFilters(VendorRepository.java:223)
+	at com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersSQLInjection(VendorRepositoryTest.java:577)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersSpecialChars -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.vendor.VendorRepository.findByFilters(VendorRepository.java:223)
+	at com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersSpecialChars(VendorRepositoryTest.java:563)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersCategoryAndSearch -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.vendor.VendorRepository.findByFilters(VendorRepository.java:223)
+	at com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersCategoryAndSearch(VendorRepositoryTest.java:531)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersOnlyApproved -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.vendor.VendorRepository.findByFilters(VendorRepository.java:223)
+	at com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersOnlyApproved(VendorRepositoryTest.java:596)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersSearchOnly -- Time elapsed: 0.004 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.vendor.VendorRepository.findByFilters(VendorRepository.java:223)
+	at com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersSearchOnly(VendorRepositoryTest.java:489)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersDistinct -- Time elapsed: 0.003 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.vendor.VendorRepository.findByFilters(VendorRepository.java:223)
+	at com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersDistinct(VendorRepositoryTest.java:545)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersLocationOnly -- Time elapsed: 0.004 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.vendor.VendorRepository.findByFilters(VendorRepository.java:223)
+	at com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersLocationOnly(VendorRepositoryTest.java:475)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersCaseInsensitive -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.vendor.VendorRepository.findByFilters(VendorRepository.java:223)
+	at com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersCaseInsensitive(VendorRepositoryTest.java:554)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersLocationAndCategory -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.vendor.VendorRepository.findByFilters(VendorRepository.java:223)
+	at com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersLocationAndCategory(VendorRepositoryTest.java:517)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersWhitespace -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.vendor.VendorRepository.findByFilters(VendorRepository.java:223)
+	at com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersWhitespace(VendorRepositoryTest.java:510)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersLocationAndSearch -- Time elapsed: 0 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.vendor.VendorRepository.findByFilters(VendorRepository.java:223)
+	at com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersLocationAndSearch(VendorRepositoryTest.java:524)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersCategoryOnly -- Time elapsed: 0.003 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.vendor.VendorRepository.findByFilters(VendorRepository.java:223)
+	at com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersCategoryOnly(VendorRepositoryTest.java:482)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersAllNull -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.vendor.VendorRepository.findByFilters(VendorRepository.java:223)
+	at com.myapp.vendor.VendorRepositoryTest$FindByFiltersTests.testFindByFiltersAllNull(VendorRepositoryTest.java:496)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+

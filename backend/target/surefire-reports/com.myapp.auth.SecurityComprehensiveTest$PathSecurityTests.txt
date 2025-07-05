@@ -1,0 +1,79 @@
+-------------------------------------------------------------------------------
+Test set: com.myapp.auth.SecurityComprehensiveTest$PathSecurityTests
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 0, Errors: 5, Skipped: 0, Time elapsed: 0.009 s <<< FAILURE! -- in com.myapp.auth.SecurityComprehensiveTest$PathSecurityTests
+com.myapp.auth.SecurityComprehensiveTest$PathSecurityTests.invalidUserIdInPath_shouldBeHandledSafely -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.auth.AuthRepository.deleteAll(AuthRepository.java:152)
+	at com.myapp.auth.SecurityComprehensiveTest.setUp(SecurityComprehensiveTest.java:42)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.auth.SecurityComprehensiveTest$PathSecurityTests.roleRequirements_shouldBeEnforcedCorrectly -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.auth.AuthRepository.deleteAll(AuthRepository.java:152)
+	at com.myapp.auth.SecurityComprehensiveTest.setUp(SecurityComprehensiveTest.java:42)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.auth.SecurityComprehensiveTest$PathSecurityTests.publicPaths_shouldNotRequireAuthentication -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.auth.AuthRepository.deleteAll(AuthRepository.java:152)
+	at com.myapp.auth.SecurityComprehensiveTest.setUp(SecurityComprehensiveTest.java:42)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.auth.SecurityComprehensiveTest$PathSecurityTests.protectedPaths_shouldRequireAuthentication -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.auth.AuthRepository.deleteAll(AuthRepository.java:152)
+	at com.myapp.auth.SecurityComprehensiveTest.setUp(SecurityComprehensiveTest.java:42)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+
+com.myapp.auth.SecurityComprehensiveTest$PathSecurityTests.userIdExtractionFromPath_shouldBeSecure -- Time elapsed: 0.001 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.auth.AuthRepository.deleteAll(AuthRepository.java:152)
+	at com.myapp.auth.SecurityComprehensiveTest.setUp(SecurityComprehensiveTest.java:42)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	... 1 more
+

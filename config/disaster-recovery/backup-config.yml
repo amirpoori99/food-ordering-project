@@ -1,0 +1,214 @@
+# Food Ordering System - Backup Configuration
+# Phase 43: Disaster Recovery System
+
+# پیکربندی کلی
+backup_system:
+  enabled: true
+  version: "1.0"
+  environment: "production"
+  
+# تنظیمات پشتیبان‌گیری پایگاه داده
+database_backup:
+  enabled: true
+  type: "sqlite"
+  source_path: "backend/food_ordering.db"
+  retention_days: 30
+  compression: true
+  encryption: true
+  
+  # برنامه‌زمان‌بندی
+  schedule:
+    full_backup: "0 2 * * *"      # روزانه ساعت 2 شب
+    incremental: "0 */6 * * *"    # هر 6 ساعت
+    differential: "0 14 * * *"    # روزانه ساعت 2 ظهر
+    
+  # مقاصد پشتیبان‌گیری
+  destinations:
+    - name: "local"
+      type: "filesystem"
+      path: "backups/database"
+      priority: 1
+      enabled: true
+      
+    - name: "cloud"
+      type: "cloud_storage"
+      provider: "generic"
+      bucket: "food-ordering-backups"
+      priority: 2
+      enabled: false
+      
+    - name: "external"
+      type: "external_drive"
+      path: "E:/Backups/FoodOrdering"
+      priority: 3
+      enabled: false
+
+# پشتیبان‌گیری از فایل‌های تنظیمات
+config_backup:
+  enabled: true
+  paths:
+    - "config/"
+    - "backend/src/main/resources/"
+    - "frontend-javafx/src/main/resources/"
+  
+  schedule: "0 1 * * *"  # روزانه ساعت 1 شب
+  retention_days: 60
+  compression: true
+  
+# پشتیبان‌گیری از کدهای منبع
+source_backup:
+  enabled: true
+  paths:
+    - "backend/src/"
+    - "frontend-javafx/src/"
+    - "scripts/"
+    - "docs/"
+  
+  schedule: "0 3 * * 0"  # هفتگی یکشنبه ساعت 3 شب
+  retention_days: 90
+  compression: true
+  exclude_patterns:
+    - "*.class"
+    - "*.log"
+    - "target/"
+    - "node_modules/"
+    - ".git/"
+
+# پشتیبان‌گیری از لاگ‌ها
+logs_backup:
+  enabled: true
+  paths:
+    - "backend/logs/"
+    - "logs/"
+    - "frontend-javafx/logs/"
+  
+  schedule: "0 0 * * *"  # روزانه نیمه‌شب
+  retention_days: 14
+  compression: true
+  
+# تنظیمات نظارت
+monitoring:
+  enabled: true
+  notifications:
+    email:
+      enabled: false
+      recipients: []
+    
+    webhook:
+      enabled: false
+      url: ""
+      
+    log:
+      enabled: true
+      level: "INFO"
+      file: "logs/backup.log"
+      
+  health_check:
+    enabled: true
+    interval: 300  # 5 دقیقه
+    timeout: 30
+    
+  metrics:
+    enabled: true
+    prometheus_port: 9091
+    
+# تنظیمات امنیتی
+security:
+  encryption:
+    enabled: true
+    algorithm: "AES-256"
+    key_rotation_days: 30
+    
+  access_control:
+    enabled: true
+    users:
+      - username: "backup_admin"
+        role: "admin"
+        permissions: ["read", "write", "delete"]
+        
+      - username: "backup_user"
+        role: "user"
+        permissions: ["read"]
+        
+  audit:
+    enabled: true
+    log_all_operations: true
+    log_file: "logs/backup-audit.log"
+    
+# بازیابی خودکار
+auto_recovery:
+  enabled: false
+  conditions:
+    - condition: "database_corruption"
+      action: "restore_latest_backup"
+      notification: true
+      
+    - condition: "config_file_missing"
+      action: "restore_config_backup"
+      notification: true
+      
+    - condition: "application_crash"
+      action: "restore_application_backup"
+      notification: true
+      
+# تنظیمات عملکرد
+performance:
+  max_parallel_jobs: 3
+  io_priority: "low"
+  cpu_limit: 25  # درصد
+  memory_limit: 512  # مگابایت
+  
+  bandwidth_limit:
+    upload: 0      # بدون محدودیت
+    download: 0    # بدون محدودیت
+    
+# تنظیمات محیط
+environment:
+  temp_directory: "temp/backup"
+  work_directory: "work/backup"
+  lock_file: "var/backup.lock"
+  
+  cleanup:
+    enabled: true
+    temp_files_retention: 1  # روز
+    old_backups_cleanup: true
+    
+# تنظیمات شبکه
+network:
+  timeout: 300
+  retry_count: 3
+  retry_delay: 60
+  
+  proxy:
+    enabled: false
+    host: ""
+    port: 0
+    username: ""
+    password: ""
+    
+# تنظیمات فشرده‌سازی
+compression:
+  algorithm: "gzip"
+  level: 6
+  
+  types:
+    database: "lzma"
+    config: "gzip"
+    logs: "bzip2"
+    source: "gzip"
+    
+# تنظیمات تست
+testing:
+  enabled: true
+  restore_test_frequency: 7  # روز
+  verification_enabled: true
+  
+  test_scenarios:
+    - name: "full_database_restore"
+      frequency: 30  # روز
+      
+    - name: "partial_config_restore"
+      frequency: 7   # روز
+      
+    - name: "emergency_recovery"
+      frequency: 90  # روز 

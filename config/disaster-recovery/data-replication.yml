@@ -1,0 +1,332 @@
+# Food Ordering System - Data Replication Configuration
+# Phase 43: Disaster Recovery System
+
+# تنظیمات کلی تکرار داده
+replication_system:
+  enabled: true
+  version: "1.0"
+  environment: "production"
+  master_node: "primary"
+  
+# تکرار پایگاه داده
+database_replication:
+  enabled: true
+  type: "master_slave"
+  
+  # تنظیمات اصلی
+  master:
+    host: "localhost"
+    port: 5432
+    database: "food_ordering"
+    path: "backend/food_ordering.db"
+    backup_interval: 300  # 5 دقیقه
+    
+  # رپلیکاهای مختلف
+  replicas:
+    - name: "replica_1"
+      type: "local"
+      enabled: true
+      path: "replicas/database/replica_1.db"
+      sync_interval: 60    # 1 دقیقه
+      priority: 1
+      
+    - name: "replica_2" 
+      type: "local"
+      enabled: true
+      path: "replicas/database/replica_2.db"
+      sync_interval: 300   # 5 دقیقه
+      priority: 2
+      
+    - name: "replica_remote"
+      type: "remote"
+      enabled: false
+      host: "backup-server.local"
+      path: "/backup/food_ordering/"
+      sync_interval: 900   # 15 دقیقه
+      priority: 3
+      
+  # تنظیمات همگام‌سازی
+  synchronization:
+    method: "incremental"
+    conflict_resolution: "master_wins"
+    verification: true
+    checksum_validation: true
+    
+    # تنظیمات WAL (Write-Ahead Logging)
+    wal:
+      enabled: true
+      checkpoint_interval: 1000
+      max_wal_size: "100MB"
+      
+  # بازیابی خودکار
+  failover:
+    enabled: true
+    detection_interval: 30    # ثانیه
+    max_retry_attempts: 3
+    auto_promote_replica: true
+    notification_enabled: true
+
+# تکرار فایل‌های تنظیمات
+config_replication:
+  enabled: true
+  
+  sources:
+    - path: "config/"
+      recursive: true
+      
+    - path: "backend/src/main/resources/"
+      recursive: true
+      exclude_patterns: ["*.tmp", "*.log"]
+      
+    - path: "frontend-javafx/src/main/resources/"
+      recursive: true
+      exclude_patterns: ["*.tmp", "*.log"]
+      
+  destinations:
+    - name: "local_replica"
+      type: "local"
+      path: "replicas/config/"
+      enabled: true
+      sync_interval: 600   # 10 دقیقه
+      
+    - name: "external_replica"
+      type: "external"
+      path: "E:/Replicas/FoodOrdering/config/"
+      enabled: false
+      sync_interval: 1800  # 30 دقیقه
+      
+  # تنظیمات همگام‌سازی
+  sync_options:
+    preserve_timestamps: true
+    preserve_permissions: true
+    compare_method: "checksum"
+    compression: true
+    encryption: false
+
+# تکرار لاگ‌ها
+logs_replication:
+  enabled: true
+  real_time: false
+  
+  sources:
+    - path: "backend/logs/"
+      pattern: "*.log"
+      max_age_days: 7
+      
+    - path: "logs/"
+      pattern: "*.log"
+      max_age_days: 30
+      
+    - path: "frontend-javafx/logs/"
+      pattern: "*.log"
+      max_age_days: 7
+      
+  destinations:
+    - name: "local_logs_replica"
+      type: "local"
+      path: "replicas/logs/"
+      enabled: true
+      sync_interval: 1800  # 30 دقیقه
+      
+    - name: "centralized_logging"
+      type: "remote"
+      host: "log-server.local"
+      path: "/logs/food-ordering/"
+      enabled: false
+      sync_interval: 3600  # 1 ساعت
+
+# تکرار فایل‌های اپلیکیشن
+application_replication:
+  enabled: true
+  
+  components:
+    - name: "backend_jar"
+      source: "backend/target/*.jar"
+      destinations:
+        - "replicas/application/backend/"
+      sync_on_build: true
+      
+    - name: "frontend_jar"
+      source: "frontend-javafx/target/*.jar"
+      destinations:
+        - "replicas/application/frontend/"
+      sync_on_build: true
+      
+    - name: "scripts"
+      source: "scripts/"
+      destinations:
+        - "replicas/scripts/"
+      sync_interval: 3600  # 1 ساعت
+      exclude_patterns: ["*.tmp", "*.bak"]
+
+# تنظیمات شبکه
+network_settings:
+  timeout: 30
+  retry_attempts: 3
+  retry_delay: 5
+  
+  bandwidth_limit:
+    upload: 0      # بدون محدودیت
+    download: 0    # بدون محدودیت
+    
+  compression:
+    enabled: true
+    algorithm: "gzip"
+    level: 6
+    
+  encryption:
+    enabled: false
+    algorithm: "AES-256"
+    
+# نظارت و هشدارها
+monitoring:
+  enabled: true
+  
+  health_checks:
+    replica_connectivity: 60     # ثانیه
+    data_consistency: 300        # ثانیه
+    lag_monitoring: 120          # ثانیه
+    
+  alerts:
+    replica_failure:
+      enabled: true
+      threshold: 2    # تعداد تلاش ناموفق
+      
+    high_lag:
+      enabled: true
+      threshold: 600  # ثانیه
+      
+    consistency_error:
+      enabled: true
+      immediate: true
+      
+  metrics:
+    enabled: true
+    collection_interval: 60
+    retention_days: 30
+    
+    prometheus:
+      enabled: true
+      port: 9092
+      
+# امنیت
+security:
+  authentication:
+    enabled: true
+    method: "key_based"
+    key_rotation_days: 30
+    
+  access_control:
+    replica_users:
+      - username: "replication_service"
+        role: "replicator"
+        permissions: ["read", "write"]
+        
+      - username: "monitoring_service"
+        role: "monitor"
+        permissions: ["read"]
+        
+  audit:
+    enabled: true
+    log_all_operations: true
+    log_file: "logs/replication-audit.log"
+    
+# تنظیمات عملکرد
+performance:
+  parallel_streams: 2
+  buffer_size: "64KB"
+  batch_size: 1000
+  
+  resource_limits:
+    cpu_limit: 20        # درصد
+    memory_limit: 256    # مگابایت
+    io_priority: "low"
+    
+# تنظیمات محیط
+environment:
+  work_directory: "work/replication"
+  temp_directory: "temp/replication"
+  lock_files_directory: "var/replication"
+  
+  cleanup:
+    enabled: true
+    temp_files_retention: 1    # روز
+    log_retention: 7           # روز
+    
+# تنظیمات بازیابی
+recovery_settings:
+  automatic_recovery: true
+  recovery_timeout: 300       # ثانیه
+  
+  recovery_strategies:
+    - strategy: "restore_from_latest_replica"
+      priority: 1
+      conditions: ["master_unavailable"]
+      
+    - strategy: "restore_from_backup"
+      priority: 2
+      conditions: ["all_replicas_failed"]
+      
+    - strategy: "manual_intervention"
+      priority: 3
+      conditions: ["data_corruption"]
+      
+# آزمایش و تأیید
+testing:
+  enabled: true
+  
+  consistency_tests:
+    enabled: true
+    frequency: 3600        # ثانیه
+    test_queries:
+      - "SELECT COUNT(*) FROM users"
+      - "SELECT COUNT(*) FROM orders"
+      - "SELECT COUNT(*) FROM restaurants"
+      
+  failover_tests:
+    enabled: false
+    frequency: 86400       # روزانه
+    automated: false
+    
+  data_integrity_tests:
+    enabled: true
+    frequency: 1800        # 30 دقیقه
+    checksum_validation: true
+    
+# رپورت‌ها و لاگ‌گذاری
+reporting:
+  enabled: true
+  
+  daily_reports:
+    enabled: true
+    time: "02:00"
+    include_metrics: true
+    
+  weekly_reports:
+    enabled: true
+    day: "sunday"
+    time: "03:00"
+    detailed_analysis: true
+    
+  real_time_status:
+    enabled: true
+    update_interval: 30    # ثانیه
+    
+# تنظیمات پیشرفته
+advanced_settings:
+  conflict_detection:
+    enabled: true
+    resolution_strategy: "timestamp_based"
+    
+  data_versioning:
+    enabled: false
+    max_versions: 5
+    
+  compression:
+    delta_compression: true
+    block_size: "4KB"
+    
+  caching:
+    enabled: true
+    cache_size: "128MB"
+    ttl: 300               # ثانیه 

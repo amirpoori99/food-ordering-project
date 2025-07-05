@@ -1,0 +1,40 @@
+[2025-07-05 02:51:17] [INFO] Starting environment setup for development...
+[2025-07-05 02:51:17] [INFO] Setup ID: env-setup-development-20250705-025116
+[2025-07-05 02:51:17] [INFO] Loaded configuration for development environment
+[2025-07-05 02:51:17] [INFO] Checking system prerequisites...
+[2025-07-05 02:51:17] [ERROR] Java not found
+[2025-07-05 02:51:17] [SUCCESS] Maven found: Apache Maven 3.9.9 (8e8579a9e76f7d015ee5ec7bfcdc97d260186937)
+[2025-07-05 02:51:17] [SUCCESS] Git found: git version 2.47.1.windows.2
+[2025-07-05 02:51:17] [SUCCESS] System prerequisites check completed
+[2025-07-05 02:51:17] [INFO] Creating directory structure for development environment...
+[2025-07-05 02:51:17] [INFO] Created directory: deployments/development
+[2025-07-05 02:51:17] [INFO] Created directory: deployments/development\logs
+[2025-07-05 02:51:17] [INFO] Created directory: deployments/development\config
+[2025-07-05 02:51:17] [INFO] Created directory: deployments/development\scripts
+[2025-07-05 02:51:17] [INFO] Created directory: deployments/development\data
+[2025-07-05 02:51:17] [INFO] Created directory: deployments/development\backups
+[2025-07-05 02:51:17] [INFO] Created directory: logs\development
+[2025-07-05 02:51:17] [INFO] Created directory: database\development
+[2025-07-05 02:51:17] [SUCCESS] Directory structure created successfully
+[2025-07-05 02:51:17] [INFO] Initializing database for development environment...
+[2025-07-05 02:51:17] [INFO] Creating new database: database\development\food_ordering_development.db
+[2025-07-05 02:51:17] [INFO] Database schema file found, initializing...
+[2025-07-05 02:51:20] [ERROR] Database initialization failed
+[2025-07-05 02:51:20] [ERROR] Database initialization failed: Database initialization failed
+[2025-07-05 02:51:20] [INFO] Configuring application properties for development...
+[2025-07-05 02:51:20] [SUCCESS] Application configuration created: deployments/development\config\application-development.properties
+[2025-07-05 02:51:20] [SUCCESS] JVM arguments file created: deployments/development\config\jvm-args-development.txt
+[2025-07-05 02:51:20] [INFO] Setting up monitoring for development environment...
+[2025-07-05 02:51:21] [SUCCESS] Monitoring configuration created
+[2025-07-05 02:51:21] [INFO] Creating service scripts for development environment...
+[2025-07-05 02:51:21] [SUCCESS] Start script created: start-development.bat
+[2025-07-05 02:51:21] [SUCCESS] Stop script created: stop-development.bat
+[2025-07-05 02:51:21] [SUCCESS] Health check script created: health-check-development.bat
+[2025-07-05 02:51:21] [INFO] Creating environment information file...
+[2025-07-05 02:51:21] [SUCCESS] Environment info created: deployments/development\environment-info.json
+[2025-07-05 02:51:21] [SUCCESS] development environment setup completed successfully!
+[2025-07-05 02:51:21] [SUCCESS] Target Directory: deployments/development
+[2025-07-05 02:51:21] [SUCCESS] Backend Port: 8080
+[2025-07-05 02:51:21] [SUCCESS] Frontend Port: 8081
+[2025-07-05 02:51:21] [INFO] Environment setup completed with exit code: 0
+[2025-07-05 02:51:21] [INFO] Log file: logs\environment-setup-development-20250705-025116.log

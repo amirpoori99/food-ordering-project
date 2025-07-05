@@ -1,0 +1,11 @@
+{
+    "BackupType":  "Incremental",
+    "Status":  "Completed",
+    "Timestamp":  "20250704-202212",
+    "Files":  [
+                  "database.db",
+                  "config",
+                  "logs"
+              ],
+    "Size":  2765926
+}

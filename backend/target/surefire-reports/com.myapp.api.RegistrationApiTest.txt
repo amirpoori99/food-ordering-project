@@ -1,0 +1,30 @@
+-------------------------------------------------------------------------------
+Test set: com.myapp.api.RegistrationApiTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 2.919 s <<< FAILURE! -- in com.myapp.api.RegistrationApiTest
+com.myapp.api.RegistrationApiTest -- Time elapsed: 2.919 s <<< ERROR!
+java.lang.ExceptionInInitializerError
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+	at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+	at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+Caused by: java.lang.IllegalArgumentException: scale has no meaning for floating point numbers
+	at org.hibernate.dialect.Dialect$SizeStrategyImpl.resolveSize(Dialect.java:5046)
+	at org.hibernate.mapping.Column.calculateColumnSize(Column.java:435)
+	at org.hibernate.mapping.BasicValue.resolve(BasicValue.java:356)
+	at org.hibernate.mapping.BasicValue.resolve(BasicValue.java:335)
+	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.lambda$processValueResolvers$4(InFlightMetadataCollectorImpl.java:1800)
+	at java.base/java.util.ArrayList.removeIf(ArrayList.java:1682)
+	at java.base/java.util.ArrayList.removeIf(ArrayList.java:1660)
+	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.processValueResolvers(InFlightMetadataCollectorImpl.java:1799)
+	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.processSecondPasses(InFlightMetadataCollectorImpl.java:1785)
+	at org.hibernate.boot.model.process.spi.MetadataBuildingProcess.complete(MetadataBuildingProcess.java:332)
+	at org.hibernate.boot.model.process.spi.MetadataBuildingProcess.build(MetadataBuildingProcess.java:129)
+	at org.hibernate.boot.internal.MetadataBuilderImpl.build(MetadataBuilderImpl.java:449)
+	at org.hibernate.boot.internal.MetadataBuilderImpl.build(MetadataBuilderImpl.java:101)
+	at org.hibernate.cfg.Configuration.buildSessionFactory(Configuration.java:910)
+	at org.hibernate.cfg.Configuration.buildSessionFactory(Configuration.java:960)
+	at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:68)
+	... 4 more
+

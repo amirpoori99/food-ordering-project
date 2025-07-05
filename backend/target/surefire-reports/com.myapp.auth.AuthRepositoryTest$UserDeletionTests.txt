@@ -1,0 +1,69 @@
+-------------------------------------------------------------------------------
+Test set: com.myapp.auth.AuthRepositoryTest$UserDeletionTests
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 3, Skipped: 0, Time elapsed: 0.019 s <<< FAILURE! -- in com.myapp.auth.AuthRepositoryTest$UserDeletionTests
+com.myapp.auth.AuthRepositoryTest.repositoryInitializationTest -- Time elapsed: 0.014 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.auth.AuthRepository.deleteAll(AuthRepository.java:152)
+	at com.myapp.auth.AuthRepositoryTest.cleanDatabaseSafely(AuthRepositoryTest.java:107)
+	at com.myapp.auth.AuthRepositoryTest.setUp(AuthRepositoryTest.java:85)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+		at com.myapp.auth.AuthRepository.deleteAll(AuthRepository.java:152)
+		at com.myapp.auth.AuthRepositoryTest.cleanDatabaseSafely(AuthRepositoryTest.java:107)
+		at com.myapp.auth.AuthRepositoryTest.tearDown(AuthRepositoryTest.java:94)
+		... 3 more
+	Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+		at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+		at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+		at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+		... 1 more
+Caused by: [CIRCULAR REFERENCE: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]]
+
+com.myapp.auth.AuthRepositoryTest$UserDeletionTests.delete_allowsPhoneReuse_success -- Time elapsed: 0.005 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.auth.AuthRepository.deleteAll(AuthRepository.java:152)
+	at com.myapp.auth.AuthRepositoryTest.cleanDatabaseSafely(AuthRepositoryTest.java:107)
+	at com.myapp.auth.AuthRepositoryTest.setUp(AuthRepositoryTest.java:85)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+		at com.myapp.auth.AuthRepository.deleteAll(AuthRepository.java:152)
+		at com.myapp.auth.AuthRepositoryTest.cleanDatabaseSafely(AuthRepositoryTest.java:107)
+		at com.myapp.auth.AuthRepositoryTest.tearDown(AuthRepositoryTest.java:94)
+		... 4 more
+	Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+		at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+		at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+		at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+		... 1 more
+Caused by: [CIRCULAR REFERENCE: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]]
+
+com.myapp.auth.AuthRepositoryTest$UserDeletionTests.delete_existingUser_success -- Time elapsed: 0.010 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.auth.AuthRepository.deleteAll(AuthRepository.java:152)
+	at com.myapp.auth.AuthRepositoryTest.cleanDatabaseSafely(AuthRepositoryTest.java:107)
+	at com.myapp.auth.AuthRepositoryTest.setUp(AuthRepositoryTest.java:85)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+		at com.myapp.auth.AuthRepository.deleteAll(AuthRepository.java:152)
+		at com.myapp.auth.AuthRepositoryTest.cleanDatabaseSafely(AuthRepositoryTest.java:107)
+		at com.myapp.auth.AuthRepositoryTest.tearDown(AuthRepositoryTest.java:94)
+		... 4 more
+	Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+		at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+		at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+		at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+		... 1 more
+Caused by: [CIRCULAR REFERENCE: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]]
+

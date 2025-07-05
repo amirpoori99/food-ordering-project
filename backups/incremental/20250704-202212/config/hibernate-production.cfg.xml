@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <!-- Production Database Configuration for PostgreSQL -->
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/food_ordering_prod</property>
+        <property name="hibernate.connection.username">postgres</property>
+        <property name="hibernate.connection.password">FoodOrdering2024!Prod</property>
+        
+        <!-- Connection Pool Settings (HikariCP) -->
+        <property name="hibernate.connection.provider_class">org.hibernate.hikaricp.internal.HikariCPConnectionProvider</property>
+        <property name="hibernate.hikari.maximumPoolSize">50</property>
+        <property name="hibernate.hikari.minimumIdle">10</property>
+        <property name="hibernate.hikari.connectionTimeout">30000</property>
+        <property name="hibernate.hikari.idleTimeout">600000</property>
+        <property name="hibernate.hikari.maxLifetime">1800000</property>
+        <property name="hibernate.hikari.leakDetectionThreshold">60000</property>
+        
+        <!-- PostgreSQL Dialect -->
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+        
+        <!-- Performance Settings -->
+        <property name="hibernate.jdbc.batch_size">25</property>
+        <property name="hibernate.order_inserts">true</property>
+        <property name="hibernate.order_updates">true</property>
+        <property name="hibernate.jdbc.batch_versioned_data">true</property>
+        
+        <!-- Cache Settings -->
+        <property name="hibernate.cache.use_second_level_cache">true</property>
+        <property name="hibernate.cache.use_query_cache">true</property>
+        <property name="hibernate.cache.region.factory_class">org.hibernate.cache.jcache.JCacheRegionFactory</property>
+        
+        <!-- Schema Management -->
+        <property name="hibernate.hbm2ddl.auto">validate</property>
+        <property name="hibernate.show_sql">false</property>
+        <property name="hibernate.format_sql">false</property>
+        
+        <!-- Transaction Settings -->
+        <property name="hibernate.transaction.coordinator_class">jdbc</property>
+        <property name="hibernate.current_session_context_class">thread</property>
+        
+        <!-- Entity Mappings -->
+        <mapping class="com.myapp.common.models.User"/>
+        <mapping class="com.myapp.common.models.Restaurant"/>
+        <mapping class="com.myapp.common.models.FoodItem"/>
+        <mapping class="com.myapp.common.models.Order"/>
+        <mapping class="com.myapp.common.models.OrderItem"/>
+        <mapping class="com.myapp.common.models.Transaction"/>
+        <mapping class="com.myapp.common.models.Coupon"/>
+        <mapping class="com.myapp.common.models.CouponUsage"/>
+        <mapping class="com.myapp.common.models.Favorites"/>
+        <mapping class="com.myapp.common.models.Rating"/>
+        <mapping class="com.myapp.common.models.Notification"/>
+    </session-factory>
+</hibernate-configuration> 

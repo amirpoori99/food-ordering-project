@@ -56,7 +56,7 @@ echo ✅ Backend project found
 echo.
 echo 🚀 Starting Backend Server...  REM راه‌اندازی سرور بک‌اند برای تست‌های یکپارچگی
 cd ..\backend  REM ورود به پوشه بک‌اند
-start "Backend Server" cmd /c "mvn spring-boot:run"  REM اجرای سرور بک‌اند در پنجره جدید
+start "Backend Server" cmd /c "mvn exec:java"  REM اجرای سرور بک‌اند در پنجره جدید
 cd ..\frontend-javafx  REM بازگشت به پوشه فرانت‌اند
 
 echo ⏳ Waiting for backend to start (30 seconds)...  REM صبر برای راه‌اندازی کامل سرور

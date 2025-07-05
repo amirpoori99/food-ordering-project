@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "https://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <!-- PostgreSQL Database Connection Configuration (Production Ready) -->
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/food_ordering_prod</property>
+        <property name="hibernate.connection.username">${DB_USERNAME}</property>
+        <property name="hibernate.connection.password">${DB_PASSWORD}</property>
+        
+        <!-- PostgreSQL Dialect -->
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+        
+        <!-- Production Performance Settings -->
+        <property name="hibernate.show_sql">false</property>
+        <property name="hibernate.format_sql">false</property>
+        <property name="hibernate.hbm2ddl.auto">validate</property>
+        <property name="hibernate.use_sql_comments">false</property>
+        
+        <!-- HikariCP Connection Pool Settings (Production) -->
+        <property name="hibernate.connection.provider_class">com.zaxxer.hikari.hibernate.HikariConnectionProvider</property>
+        <property name="hibernate.hikari.connectionTimeout">30000</property>
+        <property name="hibernate.hikari.idleTimeout">600000</property>
+        <property name="hibernate.hikari.maxLifetime">1800000</property>
+        <property name="hibernate.hikari.maximumPoolSize">100</property>
+        <property name="hibernate.hikari.minimumIdle">20</property>
+        <property name="hibernate.hikari.poolName">FoodOrderingPool</property>
+        <property name="hibernate.hikari.leakDetectionThreshold">60000</property>
+        
+        <!-- Advanced Batch Processing -->
+        <property name="hibernate.jdbc.batch_size">50</property>
+        <property name="hibernate.jdbc.fetch_size">100</property>
+        <property name="hibernate.order_inserts">true</property>
+        <property name="hibernate.order_updates">true</property>
+        <property name="hibernate.batch_versioned_data">true</property>
+        <property name="hibernate.jdbc.batch_versioned_data">true</property>
+        
+        <!-- Second-Level Cache Configuration (Redis) -->
+        <property name="hibernate.cache.use_second_level_cache">true</property>
+        <property name="hibernate.cache.use_query_cache">true</property>
+        <property name="hibernate.cache.region.factory_class">org.hibernate.cache.jcache.JCacheRegionFactory</property>
+        <property name="hibernate.cache.provider_configuration_file_resource_path">ehcache.xml</property>
+        
+        <!-- Query Optimization -->
+        <property name="hibernate.query.plan_cache_max_size">2048</property>
+        <property name="hibernate.query.plan_parameter_metadata_max_size">128</property>
+        
+        <!-- Session Context -->
+        <property name="hibernate.current_session_context_class">thread</property>
+        
+        <!-- Transaction Settings -->
+        <property name="hibernate.transaction.coordinator_class">jdbc</property>
+        <property name="hibernate.connection.autocommit">false</property>
+        
+        <!-- Statistics and Monitoring -->
+        <property name="hibernate.generate_statistics">true</property>
+        <property name="hibernate.session.events.log.LOG_QUERIES_SLOWER_THAN_MS">50</property>
+        
+        <!-- JPA Optimizations -->
+        <property name="hibernate.jpa.compliance.query">true</property>
+        <property name="hibernate.jpa.compliance.transaction">true</property>
+        
+        <!-- Entity mappings -->
+        <mapping class="com.myapp.common.models.User"/>
+        <mapping class="com.myapp.common.models.Restaurant"/>
+        <mapping class="com.myapp.common.models.FoodItem"/>
+        <mapping class="com.myapp.common.models.Order"/>
+        <mapping class="com.myapp.common.models.OrderItem"/>
+        <mapping class="com.myapp.common.models.Transaction"/>
+        <mapping class="com.myapp.common.models.Rating"/>
+        <mapping class="com.myapp.common.models.Coupon"/>
+        <mapping class="com.myapp.common.models.CouponUsage"/>
+        <mapping class="com.myapp.common.models.Favorite"/>
+        <mapping class="com.myapp.common.models.Notification"/>
+        
+        <!-- Analytics & Business Intelligence entities -->
+        <mapping class="com.myapp.analytics.models.OrderAnalytics"/>
+        <mapping class="com.myapp.analytics.models.UserAnalytics"/>
+        <mapping class="com.myapp.analytics.models.RestaurantAnalytics"/>
+        <mapping class="com.myapp.analytics.models.PaymentAnalytics"/>
+        <mapping class="com.myapp.analytics.models.ETLResult"/>
+        <mapping class="com.myapp.analytics.models.DashboardMetrics"/>
+    </session-factory>
+</hibernate-configuration> 

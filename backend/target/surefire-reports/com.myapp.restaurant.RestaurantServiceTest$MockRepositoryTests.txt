@@ -1,0 +1,64 @@
+-------------------------------------------------------------------------------
+Test set: com.myapp.restaurant.RestaurantServiceTest$MockRepositoryTests
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 3, Skipped: 0, Time elapsed: 0.016 s <<< FAILURE! -- in com.myapp.restaurant.RestaurantServiceTest$MockRepositoryTests
+com.myapp.restaurant.RestaurantServiceTest$MockRepositoryTests.shouldCallRepositoryMethodsWithCorrectParameters -- Time elapsed: 0.008 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.restaurant.RestaurantRepository.deleteAll(RestaurantRepository.java:98)
+	at com.myapp.restaurant.RestaurantServiceTest.setUp(RestaurantServiceTest.java:132)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+		at com.myapp.restaurant.RestaurantRepository.deleteAll(RestaurantRepository.java:98)
+		at com.myapp.restaurant.RestaurantServiceTest.tearDown(RestaurantServiceTest.java:146)
+		... 4 more
+	Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+		at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+		at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+		at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+		... 1 more
+Caused by: [CIRCULAR REFERENCE: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]]
+
+com.myapp.restaurant.RestaurantServiceTest$MockRepositoryTests.shouldHandleEmptyOptionalFromRepository -- Time elapsed: 0.005 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.restaurant.RestaurantRepository.deleteAll(RestaurantRepository.java:98)
+	at com.myapp.restaurant.RestaurantServiceTest.setUp(RestaurantServiceTest.java:132)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+		at com.myapp.restaurant.RestaurantRepository.deleteAll(RestaurantRepository.java:98)
+		at com.myapp.restaurant.RestaurantServiceTest.tearDown(RestaurantServiceTest.java:146)
+		... 4 more
+	Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+		at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+		at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+		at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+		... 1 more
+Caused by: [CIRCULAR REFERENCE: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]]
+
+com.myapp.restaurant.RestaurantServiceTest$MockRepositoryTests.shouldHandleRepositoryExceptionsGracefully -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.restaurant.RestaurantRepository.deleteAll(RestaurantRepository.java:98)
+	at com.myapp.restaurant.RestaurantServiceTest.setUp(RestaurantServiceTest.java:132)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+		at com.myapp.restaurant.RestaurantRepository.deleteAll(RestaurantRepository.java:98)
+		at com.myapp.restaurant.RestaurantServiceTest.tearDown(RestaurantServiceTest.java:146)
+		... 4 more
+	Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+		at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+		at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+		at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+		... 1 more
+Caused by: [CIRCULAR REFERENCE: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]]
+

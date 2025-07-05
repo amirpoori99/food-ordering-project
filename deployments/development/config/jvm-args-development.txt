@@ -1,0 +1,3 @@
+﻿-Xms512m
+-Xmx1024m
+-Dspring.profiles.active=dev

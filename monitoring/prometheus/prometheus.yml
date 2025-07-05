@@ -1,0 +1,219 @@
+﻿# Prometheus Configuration for Food Ordering System - Phase 42
+# Advanced monitoring configuration with comprehensive metrics collection
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'food-ordering-prod'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Load alerting rules
+rule_files:
+  - "alerting-rules.yml"
+  - "recording-rules.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Main Application Instance
+  - job_name: 'food-ordering-app'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    params:
+      format: ['prometheus']
+
+  # Backend Services Monitoring
+  - job_name: 'backend-services'
+    static_configs:
+      - targets: 
+          - 'localhost:8081'  # Auth Service
+          - 'localhost:8082'  # Order Service  
+          - 'localhost:8083'  # Payment Service
+          - 'localhost:8084'  # Restaurant Service
+          - 'localhost:8085'  # User Service
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 15s
+    labels:
+      service_type: 'backend'
+
+  # Database Monitoring
+  - job_name: 'postgresql'
+    static_configs:
+      - targets: ['localhost:9187']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    labels:
+      component: 'database'
+
+  # Redis Monitoring
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['localhost:9121']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    labels:
+      component: 'cache'
+
+  # Node Exporter (System Metrics)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['localhost:9100']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    labels:
+      component: 'system'
+
+  # Application Server Metrics
+  - job_name: 'jvm-metrics'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 10s
+    labels:
+      component: 'jvm'
+
+  # Nginx Load Balancer
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['localhost:9113']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    labels:
+      component: 'loadbalancer'
+
+  # Business Metrics
+  - job_name: 'business-metrics'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/api/metrics/business'
+    scrape_interval: 30s
+    labels:
+      type: 'business'
+
+  # Order Processing Metrics
+  - job_name: 'order-metrics'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/api/metrics/orders'
+    scrape_interval: 20s
+    labels:
+      type: 'orders'
+
+  # Payment Processing Metrics
+  - job_name: 'payment-metrics'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/api/metrics/payments'
+    scrape_interval: 20s
+    labels:
+      type: 'payments'
+
+  # User Activity Metrics
+  - job_name: 'user-metrics'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/api/metrics/users'
+    scrape_interval: 60s
+    labels:
+      type: 'users'
+
+  # Restaurant Performance Metrics
+  - job_name: 'restaurant-metrics'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/api/metrics/restaurants'
+    scrape_interval: 30s
+    labels:
+      type: 'restaurants'
+
+  # External API Dependencies
+  - job_name: 'external-apis'
+    static_configs:
+      - targets: 
+          - 'payment-gateway:443'
+          - 'sms-service:443'
+          - 'email-service:443'
+    metrics_path: '/health'
+    scrape_interval: 60s
+    scheme: https
+    labels:
+      component: 'external'
+
+  # Security Events
+  - job_name: 'security-metrics'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/api/metrics/security'
+    scrape_interval: 30s
+    labels:
+      type: 'security'
+
+  # Authentication Metrics
+  - job_name: 'auth-metrics'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/api/metrics/auth'
+    scrape_interval: 15s
+    labels:
+      type: 'authentication'
+
+  # Application Performance
+  - job_name: 'performance-metrics'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/api/metrics/performance'
+    scrape_interval: 10s
+    labels:
+      type: 'performance'
+
+  # Cache Performance
+  - job_name: 'cache-metrics'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/api/metrics/cache'
+    scrape_interval: 20s
+    labels:
+      type: 'cache'
+
+  # Database Performance
+  - job_name: 'database-performance'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: '/api/metrics/database'
+    scrape_interval: 30s
+    labels:
+      type: 'database-performance'
+
+# Remote write configuration (for long-term storage)
+remote_write:
+  - url: "http://localhost:8086/api/v1/prom/write?db=prometheus"
+    write_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'go_.*'
+        action: drop
+
+# Remote read configuration
+remote_read:
+  - url: "http://localhost:8086/api/v1/prom/read?db=prometheus"
+
+# Storage configuration
+storage:
+  tsdb:
+    retention.time: 30d
+    retention.size: 10GB
+    path: /prometheus/data
+
+# Additional configuration
+external_labels:
+  monitor: 'food-ordering-monitor'
+  datacenter: 'main'

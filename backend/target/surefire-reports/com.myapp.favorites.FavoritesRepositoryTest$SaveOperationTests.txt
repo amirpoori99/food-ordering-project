@@ -1,0 +1,104 @@
+-------------------------------------------------------------------------------
+Test set: com.myapp.favorites.FavoritesRepositoryTest$SaveOperationTests
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 0, Errors: 5, Skipped: 0, Time elapsed: 0.020 s <<< FAILURE! -- in com.myapp.favorites.FavoritesRepositoryTest$SaveOperationTests
+com.myapp.favorites.FavoritesRepositoryTest$SaveOperationTests.shouldUpdateExistingFavorite -- Time elapsed: 0.003 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.favorites.FavoritesRepository.clear(FavoritesRepository.java:495)
+	at com.myapp.favorites.FavoritesRepositoryTest.setUp(FavoritesRepositoryTest.java:53)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+		at com.myapp.favorites.FavoritesRepository.clear(FavoritesRepository.java:495)
+		at com.myapp.favorites.FavoritesRepositoryTest.tearDown(FavoritesRepositoryTest.java:76)
+		... 4 more
+	Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+		at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+		at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+		at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+		... 1 more
+Caused by: [CIRCULAR REFERENCE: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]]
+
+com.myapp.favorites.FavoritesRepositoryTest$SaveOperationTests.shouldSaveFavoriteWithLegacyMethod -- Time elapsed: 0.003 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.favorites.FavoritesRepository.clear(FavoritesRepository.java:495)
+	at com.myapp.favorites.FavoritesRepositoryTest.setUp(FavoritesRepositoryTest.java:53)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+		at com.myapp.favorites.FavoritesRepository.clear(FavoritesRepository.java:495)
+		at com.myapp.favorites.FavoritesRepositoryTest.tearDown(FavoritesRepositoryTest.java:76)
+		... 4 more
+	Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+		at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+		at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+		at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+		... 1 more
+Caused by: [CIRCULAR REFERENCE: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]]
+
+com.myapp.favorites.FavoritesRepositoryTest$SaveOperationTests.shouldHandleInvalidIdsInLegacySave -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.favorites.FavoritesRepository.clear(FavoritesRepository.java:495)
+	at com.myapp.favorites.FavoritesRepositoryTest.setUp(FavoritesRepositoryTest.java:53)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+		at com.myapp.favorites.FavoritesRepository.clear(FavoritesRepository.java:495)
+		at com.myapp.favorites.FavoritesRepositoryTest.tearDown(FavoritesRepositoryTest.java:76)
+		... 4 more
+	Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+		at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+		at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+		at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+		... 1 more
+Caused by: [CIRCULAR REFERENCE: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]]
+
+com.myapp.favorites.FavoritesRepositoryTest$SaveOperationTests.shouldSaveNewFavoriteSuccessfully -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.favorites.FavoritesRepository.clear(FavoritesRepository.java:495)
+	at com.myapp.favorites.FavoritesRepositoryTest.setUp(FavoritesRepositoryTest.java:53)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+		at com.myapp.favorites.FavoritesRepository.clear(FavoritesRepository.java:495)
+		at com.myapp.favorites.FavoritesRepositoryTest.tearDown(FavoritesRepositoryTest.java:76)
+		... 4 more
+	Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+		at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+		at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+		at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+		... 1 more
+Caused by: [CIRCULAR REFERENCE: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]]
+
+com.myapp.favorites.FavoritesRepositoryTest$SaveOperationTests.shouldHandleNullFavoriteGracefully -- Time elapsed: 0.004 s <<< ERROR!
+java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+	at com.myapp.favorites.FavoritesRepository.clear(FavoritesRepository.java:495)
+	at com.myapp.favorites.FavoritesRepositoryTest.setUp(FavoritesRepositoryTest.java:53)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.lang.NoClassDefFoundError: Could not initialize class com.myapp.common.utils.DatabaseUtil
+		at com.myapp.favorites.FavoritesRepository.clear(FavoritesRepository.java:495)
+		at com.myapp.favorites.FavoritesRepositoryTest.tearDown(FavoritesRepositoryTest.java:76)
+		... 4 more
+	Caused by: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]
+		at com.myapp.common.utils.DatabaseUtil.buildSessionFactory(DatabaseUtil.java:81)
+		at com.myapp.common.utils.DatabaseUtil.<clinit>(DatabaseUtil.java:20)
+		at com.myapp.api.RegistrationApiTest.setUpClass(RegistrationApiTest.java:91)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+		... 1 more
+Caused by: [CIRCULAR REFERENCE: java.lang.ExceptionInInitializerError: Exception java.lang.ExceptionInInitializerError [in thread "main"]]
+

@@ -1,0 +1,21 @@
+﻿# JVM Performance Arguments
+-Xms2g
+-Xmx4g
+-XX:+UseG1GC
+-XX:MaxGCPauseMillis=200
+-XX:G1HeapRegionSize=16m
+-XX:+UseStringDeduplication
+-XX:+OptimizeStringConcat
+-XX:+UseCompressedOops
+-XX:+UseCompressedClassPointers
+-XX:+TieredCompilation
+-XX:TieredStopAtLevel=4
+-XX:+UseFastAccessorMethods
+-XX:+AggressiveOpts
+-XX:+UseBiasedLocking
+-XX:BiasedLockingStartupDelay=0
+-XX:+UseThreadPriorities
+-XX:ThreadPriorityPolicy=42
+-XX:+DisableExplicitGC
+-XX:+HeapDumpOnOutOfMemoryError
+-XX:HeapDumpPath=logs/heap-dump.hprof

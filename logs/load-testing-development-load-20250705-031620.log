@@ -1,0 +1,12 @@
+[2025-07-05 03:16:21] [INFO] Starting load test process...
+[2025-07-05 03:16:21] [INFO] Test Type: load
+[2025-07-05 03:16:21] [INFO] Description: Normal load testing
+[2025-07-05 03:16:21] [INFO] Users: 5
+[2025-07-05 03:16:21] [INFO] Duration: 1 minutes
+[2025-07-05 03:16:21] [INFO] Ramp-up: 30 seconds
+[2025-07-05 03:16:21] [INFO] Base URL: http://localhost:8080
+[2025-07-05 03:16:26] [WARNING] Application health check failed. Starting basic connectivity test...
+[2025-07-05 03:16:31] [ERROR] Application is not reachable at http://localhost:8080
+[2025-07-05 03:16:31] [ERROR] Please ensure the application is running before load testing
+[2025-07-05 03:16:31] [SUCCESS] Load testing completed successfully
+[2025-07-05 03:16:31] [INFO] Log file: logs\load-testing-development-load-20250705-031620.log

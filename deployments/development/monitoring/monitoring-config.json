@@ -1,0 +1,11 @@
+﻿{
+    "environment":  "development",
+    "alerts":  {
+                   "endpoints":  [
+                                     "http://localhost:8080/actuator/health"
+                                 ],
+                   "enabled":  true
+               },
+    "metricsPort":  9090,
+    "loggingLevel":  "DEBUG"
+}

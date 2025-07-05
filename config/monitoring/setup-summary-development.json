@@ -1,0 +1,18 @@
+﻿{
+    "Environment":  "development",
+    "Prometheus":  {
+                       "Port":  9090,
+                       "URL":  "http://localhost:9090",
+                       "Config":  "config\\monitoring\\prometheus-config.yml"
+                   },
+    "Grafana":  {
+                    "Port":  3000,
+                    "URL":  "http://localhost:3000",
+                    "Username":  "admin",
+                    "Password":  "foodordering123"
+                },
+    "NodeExporter":  {
+                         "URL":  "http://localhost:9100",
+                         "Port":  9100
+                     }
+}

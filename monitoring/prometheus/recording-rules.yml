@@ -1,0 +1,278 @@
+﻿# ========================================================================
+# Prometheus Recording Rules for Food Ordering System - Phase 42
+# Performance optimization through pre-calculated metrics
+# ========================================================================
+
+groups:
+  # ==============================================
+  # Performance Recording Rules
+  # ==============================================
+
+  - name: performance-recording-rules
+    interval: 30s
+    rules:
+      # HTTP Request Rate (5m average)
+      - record: food_ordering:http_request_rate_5m
+        expr: rate(http_requests_total[5m])
+        labels:
+          service: food-ordering
+
+      # HTTP Request Success Rate
+      - record: food_ordering:http_success_rate_5m
+        expr: rate(http_requests_total{status=~"2.."}[5m]) / rate(http_requests_total[5m])
+        labels:
+          service: food-ordering
+
+      # HTTP Request Error Rate
+      - record: food_ordering:http_error_rate_5m
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m])
+        labels:
+          service: food-ordering
+
+      # Response Time Percentiles
+      - record: food_ordering:http_response_time_p95_5m
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
+        labels:
+          service: food-ordering
+
+      - record: food_ordering:http_response_time_p90_5m
+        expr: histogram_quantile(0.90, rate(http_request_duration_seconds_bucket[5m]))
+        labels:
+          service: food-ordering
+
+      - record: food_ordering:http_response_time_p50_5m
+        expr: histogram_quantile(0.50, rate(http_request_duration_seconds_bucket[5m]))
+        labels:
+          service: food-ordering
+
+  # ==============================================
+  # Business Metrics Recording Rules
+  # ==============================================
+
+  - name: business-recording-rules
+    interval: 60s
+    rules:
+      # Order Processing Rate
+      - record: food_ordering:order_processing_rate_1h
+        expr: rate(orders_created_total[1h])
+        labels:
+          service: food-ordering
+
+      - record: food_ordering:order_completion_rate_1h
+        expr: rate(orders_completed_total[1h])
+        labels:
+          service: food-ordering
+
+      - record: food_ordering:order_cancellation_rate_1h
+        expr: rate(orders_cancelled_total[1h])
+        labels:
+          service: food-ordering
+
+      # Order Success Rate
+      - record: food_ordering:order_success_rate_1h
+        expr: rate(orders_completed_total[1h]) / rate(orders_created_total[1h])
+        labels:
+          service: food-ordering
+
+      # Payment Success Rate
+      - record: food_ordering:payment_success_rate_5m
+        expr: rate(payment_successful_total[5m]) / rate(payment_attempts_total[5m])
+        labels:
+          service: food-ordering
+
+      # Payment Failure Rate
+      - record: food_ordering:payment_failure_rate_5m
+        expr: rate(payment_failures_total[5m]) / rate(payment_attempts_total[5m])
+        labels:
+          service: food-ordering
+
+      # Revenue Rate
+      - record: food_ordering:revenue_rate_1h
+        expr: rate(revenue_total[1h])
+        labels:
+          service: food-ordering
+
+      # Average Order Value
+      - record: food_ordering:average_order_value_1h
+        expr: rate(revenue_total[1h]) / rate(orders_completed_total[1h])
+        labels:
+          service: food-ordering
+
+  # ==============================================
+  # System Resource Recording Rules
+  # ==============================================
+
+  - name: system-recording-rules
+    interval: 30s
+    rules:
+      # CPU Usage
+      - record: food_ordering:cpu_usage_percent
+        expr: 100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+        labels:
+          service: food-ordering
+
+      # Memory Usage
+      - record: food_ordering:memory_usage_percent
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100
+        labels:
+          service: food-ordering
+
+      # Disk Usage
+      - record: food_ordering:disk_usage_percent
+        expr: (1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100
+        labels:
+          service: food-ordering
+
+      # Network I/O
+      - record: food_ordering:network_receive_bytes_rate
+        expr: rate(node_network_receive_bytes_total[5m])
+        labels:
+          service: food-ordering
+
+      - record: food_ordering:network_transmit_bytes_rate
+        expr: rate(node_network_transmit_bytes_total[5m])
+        labels:
+          service: food-ordering
+
+  # ==============================================
+  # Database Recording Rules
+  # ==============================================
+
+  - name: database-recording-rules
+    interval: 30s
+    rules:
+      # Database Connection Pool Usage
+      - record: food_ordering:db_connection_pool_usage_percent
+        expr: (hikaricp_connections_active / hikaricp_connections_max) * 100
+        labels:
+          service: food-ordering
+
+      # Database Query Rate
+      - record: food_ordering:db_query_rate_5m
+        expr: rate(database_queries_total[5m])
+        labels:
+          service: food-ordering
+
+      # Database Error Rate
+      - record: food_ordering:db_error_rate_5m
+        expr: rate(database_errors_total[5m]) / rate(database_queries_total[5m])
+        labels:
+          service: food-ordering
+
+      # Database Response Time
+      - record: food_ordering:db_response_time_p95_5m
+        expr: histogram_quantile(0.95, rate(database_query_duration_seconds_bucket[5m]))
+        labels:
+          service: food-ordering
+
+  # ==============================================
+  # Cache Recording Rules
+  # ==============================================
+
+  - name: cache-recording-rules
+    interval: 30s
+    rules:
+      # Cache Hit Rate
+      - record: food_ordering:cache_hit_rate_5m
+        expr: rate(cache_hits_total[5m]) / rate(cache_requests_total[5m])
+        labels:
+          service: food-ordering
+
+      # Cache Miss Rate
+      - record: food_ordering:cache_miss_rate_5m
+        expr: rate(cache_misses_total[5m]) / rate(cache_requests_total[5m])
+        labels:
+          service: food-ordering
+
+      # Cache Memory Usage
+      - record: food_ordering:cache_memory_usage_percent
+        expr: (redis_memory_used_bytes / redis_memory_max_bytes) * 100
+        labels:
+          service: food-ordering
+
+  # ==============================================
+  # JVM Recording Rules
+  # ==============================================
+
+  - name: jvm-recording-rules
+    interval: 30s
+    rules:
+      # JVM Memory Usage
+      - record: food_ordering:jvm_memory_usage_percent
+        expr: (jvm_memory_used_bytes / jvm_memory_max_bytes) * 100
+        labels:
+          service: food-ordering
+
+      # JVM GC Rate
+      - record: food_ordering:jvm_gc_rate_5m
+        expr: rate(jvm_gc_collection_seconds_count[5m])
+        labels:
+          service: food-ordering
+
+      # JVM GC Time
+      - record: food_ordering:jvm_gc_time_rate_5m
+        expr: rate(jvm_gc_collection_seconds_sum[5m])
+        labels:
+          service: food-ordering
+
+      # JVM Thread Count
+      - record: food_ordering:jvm_thread_count
+        expr: jvm_threads_current
+        labels:
+          service: food-ordering
+
+  # ==============================================
+  # Security Recording Rules
+  # ==============================================
+
+  - name: security-recording-rules
+    interval: 60s
+    rules:
+      # Authentication Failure Rate
+      - record: food_ordering:auth_failure_rate_5m
+        expr: rate(authentication_failures_total[5m])
+        labels:
+          service: food-ordering
+
+      # Suspicious Activity Rate
+      - record: food_ordering:suspicious_activity_rate_5m
+        expr: rate(security_suspicious_events_total[5m])
+        labels:
+          service: food-ordering
+
+      # Failed Login Rate
+      - record: food_ordering:failed_login_rate_5m
+        expr: rate(user_login_failures_total[5m])
+        labels:
+          service: food-ordering
+
+      # Unauthorized Access Rate
+      - record: food_ordering:unauthorized_access_rate_5m
+        expr: rate(http_requests_total{status="401"}[5m])
+        labels:
+          service: food-ordering
+
+  # ==============================================
+  # External Dependencies Recording Rules
+  # ==============================================
+
+  - name: external-dependencies-recording-rules
+    interval: 60s
+    rules:
+      # External API Response Time
+      - record: food_ordering:external_api_response_time_p95_5m
+        expr: histogram_quantile(0.95, rate(external_api_duration_seconds_bucket[5m]))
+        labels:
+          service: food-ordering
+
+      # External API Success Rate
+      - record: food_ordering:external_api_success_rate_5m
+        expr: rate(external_api_requests_total{status=~"2.."}[5m]) / rate(external_api_requests_total[5m])
+        labels:
+          service: food-ordering
+
+      # External API Error Rate
+      - record: food_ordering:external_api_error_rate_5m
+        expr: rate(external_api_errors_total[5m]) / rate(external_api_requests_total[5m])
+        labels:
+          service: food-ordering

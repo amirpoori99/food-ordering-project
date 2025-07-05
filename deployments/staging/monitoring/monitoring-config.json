@@ -1,0 +1,11 @@
+﻿{
+    "environment":  "staging",
+    "alerts":  {
+                   "endpoints":  [
+                                     "http://localhost:8082/actuator/health"
+                                 ],
+                   "enabled":  true
+               },
+    "metricsPort":  9091,
+    "loggingLevel":  "INFO"
+}

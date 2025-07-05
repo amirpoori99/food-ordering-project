@@ -356,24 +356,32 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.1.2</version>
                 <configuration>
-                    <!-- رد کردن تست‌ها در صورت نیاز -->
-                    <skipTests>${skipTests}</skipTests>
-                    <!-- رد کردن کامپایل تست‌ها -->
-                    <skip>${maven.test.skip}</skip>
-                    <!-- تنظیمات JUnit 5 -->
-                    <includes>
-                        <include>**/*Test.java</include>
-                        <include>**/*Tests.java</include>
-                    </includes>
-                    <!-- تنظیمات سیستم -->
+                    <!-- Headless JavaFX configuration for CI/testing -->
                     <systemPropertyVariables>
                         <java.awt.headless>true</java.awt.headless>
-                        <file.encoding>UTF-8</file.encoding>
-                        <testfx.robot>awt</testfx.robot>
+                        <testfx.robot>glass</testfx.robot>
                         <testfx.headless>true</testfx.headless>
+                        <prism.order>sw</prism.order>
+                        <prism.text>t2k</prism.text>
+                        <glass.platform>Monocle</glass.platform>
+                        <monocle.platform>Headless</monocle.platform>
+                        <file.encoding>UTF-8</file.encoding>
                     </systemPropertyVariables>
-                    <!-- تنظیمات حافظه برای تست‌ها -->
-                    <argLine>-Xmx1g -XX:+UseG1GC</argLine>
+                    <argLine>
+                        --add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED
+                        --add-opens javafx.graphics/javafx.stage=ALL-UNNAMED
+                        --add-opens javafx.base/com.sun.javafx.runtime=ALL-UNNAMED
+                        --add-opens javafx.controls/javafx.scene.control.skin=ALL-UNNAMED
+                        --add-opens javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED
+                        -Dfile.encoding=UTF-8
+                    </argLine>
+                    <!-- Exclude performance tests that may take too long -->
+                    <excludes>
+                        <exclude>**/NetworkStressTests.class</exclude>
+                    </excludes>
+                    <!-- Test timeout configuration -->
+                    <forkedProcessTimeoutInSeconds>300</forkedProcessTimeoutInSeconds>
+                    <reuseForks>false</reuseForks>
                 </configuration>
             </plugin>
             

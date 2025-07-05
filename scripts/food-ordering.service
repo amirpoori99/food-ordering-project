@@ -41,7 +41,7 @@ ExecReload=/bin/kill -HUP $MAINPID                        # دستور بارگ�
 
 # تنظیمات محیطی
 Environment=JAVA_HOME=/usr/lib/jvm/java-17-openjdk        # مسیر Java
-Environment=SPRING_PROFILES_ACTIVE=production             # پروفایل فعال Spring
+# Environment variables for production
 Environment=DB_PATH=/opt/food-ordering-system/backend/food_ordering.db  # مسیر پایگاه داده
 
 # تنظیمات امنیتی

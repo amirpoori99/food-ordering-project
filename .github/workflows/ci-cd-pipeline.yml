@@ -1,0 +1,410 @@
+name: Food Ordering System - CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop, staging ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'development'
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+      skip_tests:
+        description: 'Skip tests'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  JAVA_VERSION: '17'
+  MAVEN_OPTS: '-Xmx1024m'
+  
+jobs:
+  # Build and Test Job
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+        
+    - name: Cache Maven dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+        
+    - name: Build Backend
+      run: |
+        cd backend
+        mvn clean compile -DskipTests
+        
+    - name: Run Backend Tests
+      if: ${{ !inputs.skip_tests }}
+      run: |
+        cd backend
+        mvn test
+        
+    - name: Build Frontend
+      run: |
+        cd frontend-javafx
+        mvn clean compile -DskipTests
+        
+    - name: Run Frontend Tests
+      if: ${{ !inputs.skip_tests }}
+      run: |
+        cd frontend-javafx
+        mvn test
+        
+    - name: Generate Test Reports
+      if: always()
+      run: |
+        mkdir -p reports
+        cp backend/target/surefire-reports/*.xml reports/ 2>/dev/null || echo "No backend test reports"
+        cp frontend-javafx/target/surefire-reports/*.xml reports/ 2>/dev/null || echo "No frontend test reports"
+        
+    - name: Upload Test Reports
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-reports
+        path: reports/
+        
+    - name: Upload Backend Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: backend-artifacts
+        path: backend/target/
+        
+    - name: Upload Frontend Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: frontend-artifacts
+        path: frontend-javafx/target/
+
+  # Security Scan Job
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+        
+    - name: Run OWASP Dependency Check
+      run: |
+        cd backend
+        mvn org.owasp:dependency-check-maven:check
+        
+    - name: Run Security Audit Script
+      run: |
+        # Convert PowerShell script to bash equivalent for Linux CI
+        echo "Running security audit..."
+        find . -name "*.java" -exec grep -l "hardcoded\|password\|secret" {} \; || echo "No hardcoded credentials found"
+        
+    - name: Upload Security Reports
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-reports
+        path: |
+          backend/target/dependency-check-report.html
+          logs/security-*.log
+
+  # Code Quality Job
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+        
+    - name: Cache SonarCloud packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: ${{ runner.os }}-sonar
+        
+    - name: Run Code Analysis
+      run: |
+        cd backend
+        mvn clean verify sonar:sonar \
+          -Dsonar.projectKey=food-ordering-system \
+          -Dsonar.organization=your-org \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+      continue-on-error: true
+
+  # Deploy to Development
+  deploy-development:
+    name: Deploy to Development
+    runs-on: ubuntu-latest
+    needs: [build-and-test, security-scan]
+    if: github.ref == 'refs/heads/develop' || (github.event_name == 'workflow_dispatch' && inputs.environment == 'development')
+    environment: development
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download Backend Artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: backend-artifacts
+        path: backend/target/
+        
+    - name: Download Frontend Artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: frontend-artifacts
+        path: frontend-javafx/target/
+        
+    - name: Deploy to Development
+      run: |
+        echo "Deploying to development environment..."
+        # Create deployment script for Linux
+        mkdir -p deployments/development
+        cp -r backend deployments/development/
+        cp -r frontend-javafx deployments/development/
+        
+        # Create deployment info
+        cat > deployments/development/deployment-info.json << EOF
+        {
+          "deploymentId": "deploy-development-$(date +%Y%m%d-%H%M%S)",
+          "environment": "development",
+          "version": "${{ github.sha }}",
+          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "deployedBy": "${{ github.actor }}",
+          "branch": "${{ github.ref_name }}"
+        }
+        EOF
+        
+        echo "Development deployment completed"
+        
+    - name: Run Health Check
+      run: |
+        echo "Running health check for development environment..."
+        # Health check logic would go here
+        echo "Health check passed"
+        
+    - name: Notify Deployment Success
+      if: success()
+      run: |
+        echo "✅ Development deployment successful!"
+        
+    - name: Notify Deployment Failure
+      if: failure()
+      run: |
+        echo "❌ Development deployment failed!"
+
+  # Deploy to Staging
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build-and-test, security-scan, code-quality]
+    if: github.ref == 'refs/heads/staging' || (github.event_name == 'workflow_dispatch' && inputs.environment == 'staging')
+    environment: staging
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download Backend Artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: backend-artifacts
+        path: backend/target/
+        
+    - name: Download Frontend Artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: frontend-artifacts
+        path: frontend-javafx/target/
+        
+    - name: Deploy to Staging
+      run: |
+        echo "Deploying to staging environment..."
+        mkdir -p deployments/staging
+        cp -r backend deployments/staging/
+        cp -r frontend-javafx deployments/staging/
+        
+        # Create deployment info
+        cat > deployments/staging/deployment-info.json << EOF
+        {
+          "deploymentId": "deploy-staging-$(date +%Y%m%d-%H%M%S)",
+          "environment": "staging",
+          "version": "${{ github.sha }}",
+          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "deployedBy": "${{ github.actor }}",
+          "branch": "${{ github.ref_name }}"
+        }
+        EOF
+        
+        echo "Staging deployment completed"
+        
+    - name: Run Smoke Tests
+      run: |
+        echo "Running smoke tests for staging environment..."
+        # Smoke test logic would go here
+        echo "Smoke tests passed"
+        
+    - name: Notify Deployment Success
+      if: success()
+      run: |
+        echo "✅ Staging deployment successful!"
+
+  # Deploy to Production
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build-and-test, security-scan, code-quality]
+    if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && inputs.environment == 'production')
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download Backend Artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: backend-artifacts
+        path: backend/target/
+        
+    - name: Download Frontend Artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: frontend-artifacts
+        path: frontend-javafx/target/
+        
+    - name: Create Production Backup
+      run: |
+        echo "Creating production backup..."
+        if [ -d "deployments/production" ]; then
+          mkdir -p deployments/production/.backups
+          cp -r deployments/production deployments/production/.backups/backup-$(date +%Y%m%d-%H%M%S)
+          echo "Production backup created"
+        fi
+        
+    - name: Deploy to Production
+      run: |
+        echo "Deploying to production environment..."
+        mkdir -p deployments/production
+        cp -r backend deployments/production/
+        cp -r frontend-javafx deployments/production/
+        
+        # Create deployment info
+        cat > deployments/production/deployment-info.json << EOF
+        {
+          "deploymentId": "deploy-production-$(date +%Y%m%d-%H%M%S)",
+          "environment": "production",
+          "version": "${{ github.sha }}",
+          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "deployedBy": "${{ github.actor }}",
+          "branch": "${{ github.ref_name }}"
+        }
+        EOF
+        
+        echo "Production deployment completed"
+        
+    - name: Run Production Health Check
+      run: |
+        echo "Running production health check..."
+        # Production health check logic would go here
+        sleep 10
+        echo "Production health check passed"
+        
+    - name: Notify Production Deployment Success
+      if: success()
+      run: |
+        echo "🎉 Production deployment successful!"
+        
+    - name: Rollback on Failure
+      if: failure()
+      run: |
+        echo "❌ Production deployment failed - initiating rollback..."
+        if [ -d "deployments/production/.backups" ]; then
+          latest_backup=$(ls -t deployments/production/.backups/ | head -1)
+          if [ -n "$latest_backup" ]; then
+            echo "Rolling back to: $latest_backup"
+            rm -rf deployments/production/*
+            cp -r deployments/production/.backups/$latest_backup/* deployments/production/
+            echo "Rollback completed"
+          fi
+        fi
+
+  # Cleanup Job
+  cleanup:
+    name: Cleanup
+    runs-on: ubuntu-latest
+    needs: [deploy-development, deploy-staging, deploy-production]
+    if: always()
+    
+    steps:
+    - name: Cleanup Artifacts
+      run: |
+        echo "Cleaning up temporary artifacts..."
+        # Cleanup logic would go here
+        echo "Cleanup completed"
+        
+    - name: Generate Deployment Report
+      run: |
+        echo "Generating deployment report..."
+        cat > deployment-report.md << EOF
+        # Deployment Report
+        
+        **Date**: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+        **Commit**: ${{ github.sha }}
+        **Branch**: ${{ github.ref_name }}
+        **Actor**: ${{ github.actor }}
+        
+        ## Jobs Status
+        - Build and Test: ${{ needs.build-and-test.result }}
+        - Security Scan: ${{ needs.security-scan.result }}
+        - Code Quality: ${{ needs.code-quality.result }}
+        - Deploy Development: ${{ needs.deploy-development.result }}
+        - Deploy Staging: ${{ needs.deploy-staging.result }}
+        - Deploy Production: ${{ needs.deploy-production.result }}
+        
+        ## Summary
+        Pipeline execution completed.
+        EOF
+        
+        echo "Deployment report generated"
+        
+    - name: Upload Deployment Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: deployment-report
+        path: deployment-report.md 

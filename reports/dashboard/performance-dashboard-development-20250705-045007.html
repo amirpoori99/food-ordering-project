@@ -1,0 +1,329 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Food Ordering System - Performance Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .dashboard { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            background: white; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header { 
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); 
+            color: white; 
+            padding: 30px; 
+            text-align: center; 
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header .subtitle { font-size: 1.2em; opacity: 0.9; }
+        .header .timestamp { font-size: 0.9em; opacity: 0.7; margin-top: 10px; }
+        
+        .content { padding: 30px; }
+        .section { margin-bottom: 40px; }
+        .section-title { 
+            font-size: 1.8em; 
+            color: #2c3e50; 
+            margin-bottom: 20px; 
+            border-bottom: 3px solid #3498db; 
+            padding-bottom: 10px; 
+        }
+        
+        .metrics-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px; 
+            margin-bottom: 30px; 
+        }
+        .metric-card { 
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+            border-radius: 10px; 
+            padding: 25px; 
+            border-left: 5px solid #3498db; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .metric-card:hover { transform: translateY(-5px); }
+        .metric-title { 
+            font-size: 1.1em; 
+            color: #495057; 
+            margin-bottom: 15px; 
+            font-weight: 600; 
+        }
+        .metric-value { 
+            font-size: 2.2em; 
+            font-weight: bold; 
+            margin-bottom: 5px; 
+        }
+        .metric-unit { 
+            font-size: 0.9em; 
+            color: #6c757d; 
+            margin-left: 5px; 
+        }
+        .metric-status { 
+            font-size: 0.9em; 
+            font-weight: 600; 
+            margin-top: 8px; 
+        }
+        
+        .good { color: #27ae60; }
+        .warning { color: #f39c12; }
+        .critical { color: #e74c3c; }
+        
+        .progress-bar { 
+            width: 100%; 
+            height: 10px; 
+            background-color: #ecf0f1; 
+            border-radius: 5px; 
+            overflow: hidden; 
+            margin-top: 10px; 
+        }
+        .progress-fill { 
+            height: 100%; 
+            border-radius: 5px; 
+            transition: width 0.3s ease; 
+        }
+        
+        .alerts-section { 
+            background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%); 
+            border-radius: 10px; 
+            padding: 25px; 
+            margin-bottom: 30px; 
+            border-left: 5px solid #e53e3e; 
+        }
+        .alert-item { 
+            background: white; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            border-left: 4px solid #e53e3e; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .alert-level { 
+            font-weight: bold; 
+            margin-right: 10px; 
+        }
+        .alert-type { 
+            background: #f1f3f4; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            font-size: 0.8em; 
+            margin-right: 10px; 
+        }
+        
+        .charts-section { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); 
+            gap: 30px; 
+        }
+        .chart-container { 
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+            border-radius: 10px; 
+            padding: 25px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .chart-title { 
+            font-size: 1.3em; 
+            color: #2c3e50; 
+            margin-bottom: 20px; 
+            text-align: center; 
+        }
+        
+        .summary-stats { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 15px; 
+            margin-top: 30px; 
+        }
+        .summary-card { 
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            text-align: center; 
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        .summary-number { 
+            font-size: 2em; 
+            font-weight: bold; 
+            margin-bottom: 5px; 
+        }
+        .summary-label { 
+            font-size: 0.9em; 
+            opacity: 0.9; 
+        }
+        
+        .refresh-info { 
+            text-align: center; 
+            padding: 20px; 
+            background: #f8f9fa; 
+            color: #6c757d; 
+            border-radius: 0 0 15px 15px; 
+        }
+        
+        @media (max-width: 768px) {
+            .metrics-grid, .charts-section, .summary-stats { 
+                grid-template-columns: 1fr; 
+            }
+            .header h1 { font-size: 2em; }
+            .content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>ðŸš€ Food Ordering System</h1>
+            <div class="subtitle">Performance Dashboard - development Environment</div>
+            <div class="timestamp">Last Updated: 2025-07-05 04:50:07</div>
+        </div>
+        
+        <div class="content">            <div class="section">
+                <div class="section-title">ðŸš¨ Active Alerts (3)</div>
+                <div class="alerts-section">                    <div class="alert-item">
+                        <span class="alert-level" style="color: #d69e2e;">MEDIUM</span>
+                        <span class="alert-type">BUSINESS</span>
+                        Low order completion rate: 31.69%
+                    </div>                </div>
+            </div>            <div class="section">
+                <div class="section-title">ðŸ’» System Performance</div>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-title">CPU Usage</div>
+                        <div class="metric-value good">41<span class="metric-unit">%</span></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 41%; background-color: #27ae60;"></div>
+                        </div>
+                        <div class="metric-status good">8 cores @ 3.2 GHz</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-title">Memory Usage</div>
+                        <div class="metric-value good">43.75<span class="metric-unit">%</span></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 43.75%; background-color: #27ae60;"></div>
+                        </div>
+                        <div class="metric-status good">7GB / 16GB</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-title">Disk Usage</div>
+                        <div class="metric-value good">36.6<span class="metric-unit">%</span></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 36.6%; background-color: #27ae60;"></div>
+                        </div>
+                        <div class="metric-status good">183GB / 500GB</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-title">Network Activity</div>
+                        <div class="metric-value good">119<span class="metric-unit">connections</span></div>
+                        <div class="metric-status good">In: 4.47MB | Out: 3.8MB</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">â˜• Application Performance</div>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-title">JVM Heap Usage</div>
+                        <div class="metric-value good">23.73<span class="metric-unit">%</span></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 23.73%; background-color: #27ae60;"></div>
+                        </div>
+                        <div class="metric-status good">243MB / 1024MB</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-title">Database Connections</div>
+                        <div class="metric-value good">16<span class="metric-unit">%</span></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 16%; background-color: #27ae60;"></div>
+                        </div>
+                        <div class="metric-status good">8 / 50 active</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-title">Redis Cache</div>
+                        <div class="metric-value good">94<span class="metric-unit">%</span></div>
+                        <div class="metric-status good">Hit Ratio | 196 ops/sec</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-title">Web Server</div>
+                        <div class="metric-value good">169<span class="metric-unit">ms</span></div>
+                        <div class="metric-status good">Avg Response Time | 123 req/sec</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">ðŸ“Š Business Metrics</div>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-title">Orders Today</div>
+                        <div class="metric-value good">344</div>
+                        <div class="metric-status warning">Completion Rate: 31.69%</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-title">Active Users</div>
+                        <div class="metric-value good">94</div>
+                        <div class="metric-status good">Sessions | 18 new registrations</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-title">Revenue Today</div>
+                        <div class="metric-value good">7609<span class="metric-unit">USD</span></div>
+                        <div class="metric-status good">Avg Order: 41 USD</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-title">Restaurant Performance</div>
+                        <div class="metric-value good">4.47975327166717<span class="metric-unit">/5</span></div>
+                        <div class="metric-status good">Avg Rating | 18min prep time</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">ðŸ“ˆ Summary Statistics</div>
+                <div class="summary-stats">
+                    <div class="summary-card">
+                        <div class="summary-number">EXCELLENT</div>
+                        <div class="summary-label">System Health</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-number">FAST</div>
+                        <div class="summary-label">Response Speed</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-number">31.69</div>
+                        <div class="summary-label">Order Success %</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-number">3</div>
+                        <div class="summary-label">Active Alerts</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="refresh-info">
+            Dashboard refreshes every 30 seconds | Generated at 2025-07-05 04:50:07
+        </div>
+    </div>
+</body>
+</html>

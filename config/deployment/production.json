@@ -1,0 +1,55 @@
+{
+  "environment": "production",
+  "backend": {
+    "skipTests": true,
+    "port": 8080,
+    "jvmArgs": [
+      "-Xms2048m",
+      "-Xmx4096m",
+      "-Dspring.profiles.active=production",
+      "-XX:+UseG1GC",
+      "-XX:+UseStringDeduplication"
+    ]
+  },
+  "frontend": {
+    "port": 8080,
+    "jvmArgs": [
+      "-Xms1024m",
+      "-Xmx2048m"
+    ]
+  },
+  "database": {
+    "url": "jdbc:sqlite:food_ordering_production.db",
+    "driver": "org.sqlite.JDBC",
+    "backup": true,
+    "encryption": true
+  },
+  "services": {
+    "backend": {
+      "enabled": true,
+      "port": 8080,
+      "healthCheckUrl": "http://localhost:8080/health",
+      "startupTimeout": 120
+    },
+    "frontend": {
+      "enabled": true,
+      "port": 8080,
+      "startupTimeout": 60
+    }
+  },
+  "deployment": {
+    "targetDirectory": "deployments/production",
+    "backupCount": 10,
+    "rollbackEnabled": true
+  },
+  "monitoring": {
+    "enabled": true,
+    "metricsPort": 9090,
+    "loggingLevel": "WARN"
+  },
+  "security": {
+    "enableSsl": true,
+    "sslPort": 8443,
+    "keystorePath": "config/security/keystore.jks"
+  }
+} 
