@@ -1,0 +1,346 @@
+# Real-time Alerting Configuration for Food Ordering System
+# Phase 46 Enhancement - Enterprise Alerting System
+
+# Global Configuration
+global:
+  # SMTP Configuration
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'alerts@foodordering.com'
+  smtp_auth_username: 'alerts@foodordering.com'
+  smtp_auth_password: 'your-app-password'
+  smtp_require_tls: true
+  
+  # Slack Configuration
+  slack_api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+  
+  # Microsoft Teams Configuration
+  teams_webhook_url: 'https://outlook.office.com/webhook/YOUR/TEAMS/WEBHOOK'
+  
+  # Default notification settings
+  resolve_timeout: 5m
+  
+# Alert Groups
+route:
+  group_by: ['alertname', 'environment', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: 'default'
+  
+  routes:
+    # Critical alerts - immediate notification
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      group_wait: 5s
+      repeat_interval: 15m
+      
+    # High priority alerts
+    - match:
+        severity: high
+      receiver: 'high-priority-alerts'
+      group_wait: 10s
+      repeat_interval: 30m
+      
+    # Medium priority alerts
+    - match:
+        severity: medium
+      receiver: 'medium-priority-alerts'
+      group_wait: 30s
+      repeat_interval: 1h
+      
+    # Low priority alerts
+    - match:
+        severity: low
+      receiver: 'low-priority-alerts'
+      group_wait: 1m
+      repeat_interval: 4h
+      
+    # Business alerts
+    - match:
+        category: business
+      receiver: 'business-alerts'
+      group_wait: 30s
+      repeat_interval: 2h
+      
+    # Security alerts
+    - match:
+        category: security
+      receiver: 'security-alerts'
+      group_wait: 0s
+      repeat_interval: 10m
+      
+    # Performance alerts
+    - match:
+        category: performance
+      receiver: 'performance-alerts'
+      group_wait: 15s
+      repeat_interval: 30m
+
+# Notification Receivers
+receivers:
+  # Default receiver
+  - name: 'default'
+    email_configs:
+      - to: 'devops@foodordering.com'
+        subject: '[Food Ordering] Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Environment: {{ .Labels.environment }}
+          Service: {{ .Labels.service }}
+          Severity: {{ .Labels.severity }}
+          Time: {{ .StartsAt }}
+          {{ end }}
+          
+  # Critical alerts - multiple channels
+  - name: 'critical-alerts'
+    email_configs:
+      - to: 'devops@foodordering.com,management@foodordering.com'
+        subject: '🚨 CRITICAL ALERT: {{ .GroupLabels.alertname }}'
+        body: |
+          ⚠️ CRITICAL ALERT DETECTED ⚠️
+          
+          {{ range .Alerts }}
+          🔴 Alert: {{ .Annotations.summary }}
+          📝 Description: {{ .Annotations.description }}
+          🌐 Environment: {{ .Labels.environment }}
+          🔧 Service: {{ .Labels.service }}
+          ⚡ Severity: {{ .Labels.severity }}
+          ⏰ Time: {{ .StartsAt }}
+          🔗 Dashboard: {{ .Annotations.dashboard_url }}
+          {{ end }}
+          
+          Please investigate immediately!
+          
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#alerts-critical'
+        title: '🚨 Critical Alert: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Environment:* {{ .Labels.environment }}
+          *Service:* {{ .Labels.service }}
+          *Severity:* {{ .Labels.severity }}
+          *Time:* {{ .StartsAt }}
+          {{ end }}
+        actions:
+          - type: button
+            text: 'View Dashboard'
+            url: '{{ .Annotations.dashboard_url }}'
+          - type: button
+            text: 'Acknowledge'
+            url: '{{ .Annotations.acknowledge_url }}'
+            
+  # High priority alerts
+  - name: 'high-priority-alerts'
+    email_configs:
+      - to: 'devops@foodordering.com'
+        subject: '🔶 HIGH PRIORITY: {{ .GroupLabels.alertname }}'
+        body: |
+          🔶 HIGH PRIORITY ALERT
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Environment: {{ .Labels.environment }}
+          Service: {{ .Labels.service }}
+          Time: {{ .StartsAt }}
+          {{ end }}
+          
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#alerts-high'
+        title: '🔶 High Priority: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Environment:* {{ .Labels.environment }}
+          *Service:* {{ .Labels.service }}
+          {{ end }}
+          
+  # Medium priority alerts
+  - name: 'medium-priority-alerts'
+    email_configs:
+      - to: 'devops@foodordering.com'
+        subject: '🔵 MEDIUM: {{ .GroupLabels.alertname }}'
+        body: |
+          🔵 MEDIUM PRIORITY ALERT
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Environment: {{ .Labels.environment }}
+          Service: {{ .Labels.service }}
+          {{ end }}
+          
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#alerts-medium'
+        title: '🔵 Medium Priority: {{ .GroupLabels.alertname }}'
+        
+  # Low priority alerts
+  - name: 'low-priority-alerts'
+    email_configs:
+      - to: 'devops@foodordering.com'
+        subject: '🟢 LOW: {{ .GroupLabels.alertname }}'
+        body: |
+          🟢 LOW PRIORITY ALERT
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Environment: {{ .Labels.environment }}
+          {{ end }}
+          
+  # Business alerts
+  - name: 'business-alerts'
+    email_configs:
+      - to: 'business@foodordering.com,management@foodordering.com'
+        subject: '📊 BUSINESS ALERT: {{ .GroupLabels.alertname }}'
+        body: |
+          📊 BUSINESS METRICS ALERT
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Environment: {{ .Labels.environment }}
+          Business Impact: {{ .Annotations.business_impact }}
+          {{ end }}
+          
+    teams_configs:
+      - webhook_url: 'https://outlook.office.com/webhook/YOUR/TEAMS/WEBHOOK'
+        title: '📊 Business Alert: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          **Alert:** {{ .Annotations.summary }}
+          **Description:** {{ .Annotations.description }}
+          **Environment:** {{ .Labels.environment }}
+          **Business Impact:** {{ .Annotations.business_impact }}
+          {{ end }}
+          
+  # Security alerts
+  - name: 'security-alerts'
+    email_configs:
+      - to: 'security@foodordering.com,devops@foodordering.com'
+        subject: '🔒 SECURITY ALERT: {{ .GroupLabels.alertname }}'
+        body: |
+          🔒 SECURITY ALERT DETECTED
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Environment: {{ .Labels.environment }}
+          Security Level: {{ .Labels.security_level }}
+          Source IP: {{ .Labels.source_ip }}
+          User: {{ .Labels.user }}
+          {{ end }}
+          
+          Immediate investigation required!
+          
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#security-alerts'
+        title: '🔒 Security Alert: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Security Level:* {{ .Labels.security_level }}
+          *Source IP:* {{ .Labels.source_ip }}
+          *User:* {{ .Labels.user }}
+          {{ end }}
+          
+  # Performance alerts
+  - name: 'performance-alerts'
+    email_configs:
+      - to: 'devops@foodordering.com'
+        subject: '⚡ PERFORMANCE: {{ .GroupLabels.alertname }}'
+        body: |
+          ⚡ PERFORMANCE ALERT
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Environment: {{ .Labels.environment }}
+          Service: {{ .Labels.service }}
+          Current Value: {{ .Labels.current_value }}
+          Threshold: {{ .Labels.threshold }}
+          {{ end }}
+          
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+        channel: '#performance-alerts'
+        title: '⚡ Performance Alert: {{ .GroupLabels.alertname }}'
+
+# Inhibit Rules
+inhibit_rules:
+  # Inhibit warning alerts if critical alert is firing
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'environment', 'service']
+    
+  # Inhibit medium alerts if high alert is firing
+  - source_match:
+      severity: 'high'
+    target_match:
+      severity: 'medium'
+    equal: ['alertname', 'environment', 'service']
+    
+  # Inhibit low alerts if medium alert is firing
+  - source_match:
+      severity: 'medium'
+    target_match:
+      severity: 'low'
+    equal: ['alertname', 'environment', 'service']
+
+# Templates for custom formatting
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# Food Ordering System Specific Configuration
+food_ordering:
+  # Business hours for alert suppression
+  business_hours:
+    start: "09:00"
+    end: "22:00"
+    timezone: "Asia/Tehran"
+    
+  # Alert escalation
+  escalation:
+    level_1: "devops@foodordering.com"
+    level_2: "management@foodordering.com"
+    level_3: "ceo@foodordering.com"
+    
+  # Service mappings
+  services:
+    - name: "auth-service"
+      owner: "backend-team"
+      contact: "backend@foodordering.com"
+    - name: "order-service"
+      owner: "business-team"
+      contact: "business@foodordering.com"
+    - name: "payment-service"
+      owner: "finance-team"
+      contact: "finance@foodordering.com"
+    - name: "notification-service"
+      owner: "devops-team"
+      contact: "devops@foodordering.com"
+      
+  # Alert categories
+  categories:
+    - name: "system"
+      description: "System-level alerts"
+      severity_levels: ["critical", "high", "medium", "low"]
+    - name: "business"
+      description: "Business metrics alerts"
+      severity_levels: ["high", "medium", "low"]
+    - name: "security"
+      description: "Security-related alerts"
+      severity_levels: ["critical", "high", "medium"]
+    - name: "performance"
+      description: "Performance-related alerts"
+      severity_levels: ["high", "medium", "low"] 

@@ -1,0 +1,47 @@
+{
+  "environment": "staging",
+  "backend": {
+    "skipTests": false,
+    "port": 8082,
+    "jvmArgs": [
+      "-Xms1024m",
+      "-Xmx2048m",
+      "-Dspring.profiles.active=staging"
+    ]
+  },
+  "frontend": {
+    "port": 8083,
+    "jvmArgs": [
+      "-Xms512m",
+      "-Xmx1024m"
+    ]
+  },
+  "database": {
+    "url": "jdbc:sqlite:food_ordering_staging.db",
+    "driver": "org.sqlite.JDBC",
+    "backup": true
+  },
+  "services": {
+    "backend": {
+      "enabled": true,
+      "port": 8082,
+      "healthCheckUrl": "http://localhost:8082/health",
+      "startupTimeout": 90
+    },
+    "frontend": {
+      "enabled": true,
+      "port": 8083,
+      "startupTimeout": 45
+    }
+  },
+  "deployment": {
+    "targetDirectory": "deployments/staging",
+    "backupCount": 5,
+    "rollbackEnabled": true
+  },
+  "monitoring": {
+    "enabled": true,
+    "metricsPort": 9091,
+    "loggingLevel": "INFO"
+  }
+} 
