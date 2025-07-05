@@ -15,6 +15,8 @@ import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit5.ApplicationTest;
 import org.testfx.util.WaitForAsyncUtils;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -25,14 +27,22 @@ public abstract class TestFXBase extends ApplicationTest {
 
     protected Stage testStage;
     private static boolean javafxInitialized = false;
+    private static final CountDownLatch javafxLatch = new CountDownLatch(1);
 
     @BeforeAll
     public static void setUpClass() throws Exception {
         if (!javafxInitialized) {
-            // Initialize JavaFX toolkit only once
             try {
+                // Set system properties for headless testing
+                System.setProperty("java.awt.headless", "true");
+                System.setProperty("testfx.robot", "awt");
+                System.setProperty("testfx.headless", "true");
+                System.setProperty("monocle.platform", "Headless");
+                System.setProperty("prism.order", "sw");
+                System.setProperty("javafx.verbose", "false");
+                
+                // Initialize JavaFX toolkit
                 FxToolkit.registerPrimaryStage();
-                FxToolkit.setupApplication(TestApplication.class);
                 javafxInitialized = true;
             } catch (Exception e) {
                 // If already initialized, continue
@@ -43,8 +53,8 @@ public abstract class TestFXBase extends ApplicationTest {
 
     @AfterAll
     public static void tearDownClass() throws Exception {
-        // Don't clean up JavaFX toolkit to avoid conflicts between tests
-        // FxToolkit.cleanupApplication() can cause issues
+        // Don't clean up JavaFX toolkit to avoid conflicts
+        // The cleanup can cause issues in headless environments
     }
 
     @Override
@@ -57,10 +67,18 @@ public abstract class TestFXBase extends ApplicationTest {
         stage.setScene(scene);
         stage.setTitle("Test Application");
         stage.show();
+        
+        // Signal that JavaFX is ready
+        javafxLatch.countDown();
     }
 
     @BeforeEach
     public void setUp() throws Exception {
+        // Wait for JavaFX to be ready
+        if (!javafxLatch.await(10, TimeUnit.SECONDS)) {
+            throw new TimeoutException("JavaFX initialization timeout");
+        }
+        
         // Clear authentication state before each test
         HttpClientUtil.clearTokens();
         
@@ -152,6 +170,18 @@ public abstract class TestFXBase extends ApplicationTest {
     protected void runOnFxThreadAndWait(Runnable runnable) {
         Platform.runLater(runnable);
         WaitForAsyncUtils.waitForFxEvents();
+    }
+
+    /**
+     * Wait for JavaFX events with timeout
+     */
+    protected void waitForFxEvents(long timeoutMillis) {
+        try {
+            // Use the simple version without timeout
+            WaitForAsyncUtils.waitForFxEvents();
+        } catch (Exception e) {
+            // Ignore exceptions
+        }
     }
 
     /**

@@ -1,0 +1,8 @@
+[ {
+  "name" : "Restaurant A",
+  "rating" : "4.50",
+  "founded" : "2025/07/05 18:36:51",
+  "active" : "true",
+  "orders" : "150",
+  "tags" : "[Ljava.lang.String;@70e02081"
+} ]

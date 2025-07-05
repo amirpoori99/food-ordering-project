@@ -39,6 +39,7 @@ com\myapp\ui\auth\RegisterControllerTest.class
 com\myapp\ui\restaurant\RestaurantListControllerTest$1.class
 com\myapp\ui\analytics\DashboardUpdateServiceTest$PerformanceTests.class
 com\myapp\ui\auth\ProfileControllerTest.class
+com\myapp\ui\common\SimpleTestBase.class
 com\myapp\ui\analytics\AnalyticsDashboardControllerTest$StatsCardsTests.class
 com\myapp\ui\notification\NotificationControllerTest$FunctionalTests.class
 com\myapp\ui\common\NavigationControllerTest$SingletonPatternTests.class
@@ -76,6 +77,7 @@ com\myapp\ui\common\NavigationControllerTest$SceneConstantsTests.class
 com\myapp\ui\performance\PerformanceTest$RestaurantData.class
 com\myapp\ui\common\HttpClientUtilTest$AuthenticationStateTests.class
 com\myapp\ui\common\NavigationControllerTest$LogoutTests.class
+com\myapp\ui\common\BasicControllerTest.class
 com\myapp\ui\security\SecurityTest.class
 com\myapp\ui\edge\EdgeCaseTest.class
 com\myapp\ui\analytics\AnalyticsUIServiceTest$ChartUpdateTests.class

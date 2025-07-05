@@ -21,6 +21,7 @@ import javafx.scene.shape.Circle;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.util.Duration;
+import javafx.application.Platform;
 
 import java.net.URL;
 import java.util.ResourceBundle;
