@@ -11,6 +11,10 @@ public class DeliveryAnalyticsDTO {
     private double customerSatisfaction;
     private Map<String, Double> deliveryZones;
     private List<Map<String, Object>> topCouriers;
+    
+    // فیلدهای جدید مورد نیاز
+    private List<Map<String, Object>> deliveryByArea;
+    private List<Map<String, Object>> courierPerformance;
 
     public DeliveryAnalyticsDTO() {}
 
@@ -34,4 +38,11 @@ public class DeliveryAnalyticsDTO {
 
     public List<Map<String, Object>> getTopCouriers() { return topCouriers; }
     public void setTopCouriers(List<Map<String, Object>> topCouriers) { this.topCouriers = topCouriers; }
+    
+    // متدهای جدید مورد نیاز
+    public List<Map<String, Object>> getDeliveryByArea() { return deliveryByArea; }
+    public void setDeliveryByArea(List<Map<String, Object>> deliveryByArea) { this.deliveryByArea = deliveryByArea; }
+    
+    public List<Map<String, Object>> getCourierPerformance() { return courierPerformance; }
+    public void setCourierPerformance(List<Map<String, Object>> courierPerformance) { this.courierPerformance = courierPerformance; }
 } 

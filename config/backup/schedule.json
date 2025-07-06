@@ -1,0 +1,17 @@
+{
+    "LogBackup":  {
+                      "Retention":  "24 hours",
+                      "Enabled":  true,
+                      "Schedule":  "Every hour"
+                  },
+    "FullBackup":  {
+                       "Retention":  "30 days",
+                       "Enabled":  true,
+                       "Schedule":  "Daily at 2:00 AM"
+                   },
+    "IncrementalBackup":  {
+                              "Retention":  "7 days",
+                              "Enabled":  true,
+                              "Schedule":  "Every 4 hours"
+                          }
+}

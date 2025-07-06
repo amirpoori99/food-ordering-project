@@ -63,7 +63,10 @@ public class TransactionController implements HttpHandler {
         // Parse query parameters
         Map<String, String> params = parseQueryString(query);
 
-        if (path.equals("/api/transactions/wallet/history")) {
+        if (path.equals("/api/transactions")) {
+            // GET /api/transactions - Get all transactions
+            getAllTransactions(exchange);
+        } else if (path.equals("/api/transactions/wallet/history")) {
             handleGetWalletHistory(exchange, params);
         } else if (path.equals("/api/transactions/wallet/charges")) {
             handleGetWalletCharges(exchange, params);
@@ -78,6 +81,24 @@ public class TransactionController implements HttpHandler {
         }
     }
 
+    /**
+     * GET /api/transactions - دریافت تمام تراکنش‌ها
+     * 
+     * این endpoint تمام تراکنش‌های موجود را برمی‌گرداند
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void getAllTransactions(HttpExchange exchange) throws IOException {
+        try {
+            List<Transaction> transactions = paymentRepository.getAllPayments();
+            String jsonResponse = JsonUtil.toJson(transactions);
+            sendSuccessResponse(exchange, jsonResponse);
+        } catch (Exception e) {
+            sendErrorResponse(exchange, 500, "Error retrieving transactions: " + e.getMessage());
+        }
+    }
+    
     /**
      * GET /api/transactions/wallet/history?userId={userId}&startDate={date}&endDate={date}
      * دریافت تاریخچه تراکنش‌های کیف پول برای کاربر

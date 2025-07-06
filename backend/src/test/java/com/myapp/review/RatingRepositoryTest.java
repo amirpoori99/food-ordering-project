@@ -7,6 +7,7 @@ import com.myapp.common.models.RestaurantStatus;
 import com.myapp.common.models.User;
 import com.myapp.common.TestDatabaseManager;
 import com.myapp.common.utils.DatabaseUtil;
+import com.myapp.common.utils.TestDataHelper;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.junit.jupiter.api.BeforeEach;
@@ -78,24 +79,38 @@ public class RatingRepositoryTest {
      */
     @BeforeEach
     void setUp() {
-        // پاک‌سازی پایگاه داده برای جداسازی تست‌ها
+        // پاک‌سازی کامل داده‌های مرتبط
         TestDatabaseManager.cleanRatingData();
-        
+        TestDatabaseManager.clearUsers();
+        TestDatabaseManager.clearRestaurants();
         ratingRepository = new RatingRepository();
-        
-        // ایجاد داده‌های تست
+        // ایجاد داده‌های تست با مقادیر یکتا
         testUser = new User();
-        testUser.setId(1L);
+        testUser.setId(null); // اجازه دهید دیتابیس ID را تولید کند
         testUser.setFullName("Test User");
-        testUser.setPhone("1234567890");
-        testUser.setEmail("test@example.com");
-        
+        testUser.setPhone("09" + System.nanoTime() % 1000000000);
+        testUser.setEmail("test" + System.nanoTime() + "@example.com");
+        testUser.setPasswordHash("testPassword123"); // اضافه کردن passwordHash
+        testUser.setIsActive(true); // اضافه کردن isActive
+        // ذخیره کاربر تستی
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+            session.persist(testUser);
+            tx.commit();
+        }
+        // ایجاد رستوران تستی با ownerId یکتا
         testRestaurant = new Restaurant();
-        testRestaurant.setId(2L);
+        testRestaurant.setId(null);
         testRestaurant.setName("Test Restaurant");
         testRestaurant.setStatus(RestaurantStatus.APPROVED);
-        testRestaurant.setOwnerId(3L);
-        
+        testRestaurant.setOwnerId(System.nanoTime() % 10000);
+        // ذخیره رستوران تستی
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            Transaction tx = session.beginTransaction();
+            session.persist(testRestaurant);
+            tx.commit();
+        }
+        // ایجاد rating تستی
         testRating = new Rating(testUser, testRestaurant, 4, "Great food and service!");
         testRating.setCreatedAt(LocalDateTime.now());
     }

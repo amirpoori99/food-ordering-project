@@ -1,21 +1,33 @@
 package com.myapp.notification;
 
 import com.myapp.common.TestDatabaseManager;
-import com.myapp.common.models.Notification;
+import com.myapp.common.models.*;
 import com.myapp.common.models.Notification.NotificationType;
 import com.myapp.common.models.Notification.NotificationPriority;
-import com.myapp.common.models.OrderStatus;
-import com.myapp.common.models.User;
 import com.myapp.common.utils.DatabaseUtil;
+import com.myapp.common.utils.TestDataHelper;
+import com.myapp.notification.NotificationService;
+import com.myapp.notification.NotificationRepository;
 import com.myapp.auth.AuthRepository;
-
-import org.junit.jupiter.api.*;
+import com.myapp.auth.AuthService;
+import com.myapp.auth.dto.RegisterRequest;
+import com.myapp.restaurant.RestaurantRepository;
+import com.myapp.restaurant.RestaurantService;
+import com.myapp.order.OrderService;
+import com.myapp.order.OrderRepository;
+import com.myapp.item.ItemRepository;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
+import org.junit.jupiter.api.*;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,24 +39,28 @@ class NotificationAdvancedTest {
     private static NotificationRepository notificationRepository;
     private static AuthRepository authRepository;
     private static User testUser1, testUser2, inactiveUser;
+    private static org.hibernate.SessionFactory sessionFactory;
 
     @BeforeAll
     static void setUpClass() {
-        testDatabaseManager = new TestDatabaseManager();
-        testDatabaseManager.setupTestDatabase();
+        // اطمینان از اینکه sessionFactory آماده است
+        TestDatabaseManager.ensureSessionFactoryReady();
+        sessionFactory = DatabaseUtil.getSessionFactory();
         
+        // Initialize repositories and services
         notificationRepository = new NotificationRepository();
         authRepository = new AuthRepository();
         notificationService = new NotificationService(notificationRepository, authRepository);
         
+        // ایجاد کاربران تستی
         createTestUsers();
     }
 
     @AfterAll
     static void tearDownClass() {
-        if (testDatabaseManager != null) {
-            testDatabaseManager.cleanup();
-        }
+        // Don't call cleanup here as it closes the sessionFactory
+        // Let the test framework handle cleanup at the end
+        System.out.println("✅ NotificationAdvancedTest completed");
     }
 
     @BeforeEach
@@ -53,7 +69,7 @@ class NotificationAdvancedTest {
     }
 
     private static void createTestUsers() {
-        Transaction transaction = null;
+        org.hibernate.Transaction transaction = null;
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             
@@ -106,7 +122,7 @@ class NotificationAdvancedTest {
     }
 
     @Test
-    @Order(1)
+    @org.junit.jupiter.api.Order(1)
     @DisplayName("Should validate all notification types and priorities comprehensively")
     void shouldValidateAllNotificationTypesAndPrioritiesComprehensively() {
         // Test all notification types
@@ -149,7 +165,7 @@ class NotificationAdvancedTest {
     }
 
     @Test
-    @Order(2)
+    @org.junit.jupiter.api.Order(2)
     @DisplayName("Should handle comprehensive validation scenarios")
     void shouldHandleComprehensiveValidationScenarios() {
         // Test boundary values - exactly at limits
@@ -210,7 +226,7 @@ class NotificationAdvancedTest {
     }
 
     @Test
-    @Order(3)
+    @org.junit.jupiter.api.Order(3)
     @DisplayName("Should test all factory methods comprehensively")
     void shouldTestAllFactoryMethodsComprehensively() {
         Long orderId = 100L;
@@ -344,7 +360,7 @@ class NotificationAdvancedTest {
     }
 
     @Test
-    @Order(4)
+    @org.junit.jupiter.api.Order(4)
     @DisplayName("Should handle performance under significant load")
     void shouldHandlePerformanceUnderSignificantLoad() {
         try {

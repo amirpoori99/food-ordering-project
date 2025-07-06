@@ -103,10 +103,10 @@ public class JWTUtil {
         try {
             // پردازش و اعتبارسنجی token
             Jwts.parser()
-                .setSigningKey(getSigningKey())     // بررسی امضا
+                .verifyWith(getSigningKey())        // بررسی امضا
                 .requireIssuer(ISSUER)              // بررسی صادرکننده
                 .build()
-                .parseClaimsJws(token);             // پردازش claims
+                .parseSignedClaims(token);          // پردازش claims
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false; // token نامعتبر

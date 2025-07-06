@@ -1,0 +1,8 @@
+{
+    "Bucket":  "food-ordering-backups",
+    "Region":  "us-west-2",
+    "Provider":  "AWS S3",
+    "Schedule":  "Daily",
+    "Encryption":  "AES-256",
+    "Compression":  true
+}

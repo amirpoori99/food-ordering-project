@@ -281,4 +281,15 @@ public class OrderRepository {
             tx.commit();
         }
     }
+
+    /**
+     * دریافت تمام سفارشات
+     * 
+     * @return لیست تمام سفارشات
+     */
+    public List<Order> getAllOrders() {
+        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM Order", Order.class).list();
+        }
+    }
 }

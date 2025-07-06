@@ -189,11 +189,12 @@ public class PaymentController implements HttpHandler {
      * @throws IOException خطا در I/O
      */
     private void handleGetRequest(HttpExchange exchange, String path) throws IOException {
-        if (path.startsWith("/api/payments/transaction/")) {
-            // دریافت تراکنش بر اساس ID
+        if (path.equals("/api/payments")) {
+            // دریافت همه پرداخت‌ها
+            getAllPayments(exchange);
+        } else if (path.startsWith("/api/payments/transaction/")) {
             getTransaction(exchange, path);
         } else if (path.startsWith("/api/payments/user/") && path.endsWith("/history")) {
-            // تاریخچه تراکنش‌های کاربر
             getUserTransactionHistory(exchange, path);
         } else if (path.startsWith("/api/payments/user/") && path.endsWith("/wallet-transactions")) {
             // تراکنش‌های کیف پول کاربر
@@ -443,6 +444,15 @@ public class PaymentController implements HttpHandler {
         } catch (Exception e) {
             sendResponse(exchange, 500, "{\"error\":\"" + e.getMessage() + "\"}");
         }
+    }
+    
+    /**
+     * دریافت همه پرداخت‌ها
+     */
+    private void getAllPayments(HttpExchange exchange) throws IOException {
+        List<Transaction> payments = paymentService.getAllPayments();
+        String response = serializeTransactionList(payments);
+        sendResponse(exchange, 200, response);
     }
     
     // ==================== PUT ENDPOINTS ====================

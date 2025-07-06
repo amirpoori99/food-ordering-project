@@ -50,7 +50,7 @@ echo "✅ Backend project found"
 echo ""
 echo "🚀 Starting Backend Server..."  # راه‌اندازی سرور بک‌اند برای تست‌های یکپارچگی
 cd ../backend  # ورود به پوشه بک‌اند
-mvn spring-boot:run &   # اجرای سرور بک‌اند در پس‌زمینه
+mvn exec:java &   # اجرای سرور بک‌اند در پس‌زمینه
 BACKEND_PID=$!          # ذخیره شناسه فرآیند سرور
 cd ../frontend-javafx   # بازگشت به پوشه فرانت‌اند
 

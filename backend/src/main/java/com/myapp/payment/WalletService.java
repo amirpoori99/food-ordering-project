@@ -710,6 +710,15 @@ public class WalletService {
     /**
      * Wallet statistics inner class
      */
+    /**
+     * دریافت تمام کیف پول‌ها
+     * 
+     * @return لیست تمام تراکنش‌های کیف پول
+     */
+    public List<Transaction> getAllWallets() {
+        return paymentRepository.getAllPayments();
+    }
+    
     public static class WalletStatistics {
         private final Double currentBalance;
         private final Double totalCharged;

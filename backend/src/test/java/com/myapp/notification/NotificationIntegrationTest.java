@@ -7,12 +7,20 @@ import com.myapp.common.models.Notification.NotificationPriority;
 import com.myapp.common.models.OrderStatus;
 import com.myapp.common.models.User;
 import com.myapp.common.utils.DatabaseUtil;
+import com.myapp.common.utils.TestDataHelper;
 import com.myapp.auth.AuthRepository;
+import com.myapp.notification.NotificationRepository;
+import com.myapp.notification.NotificationService;
 import com.myapp.auth.AuthService;
-
-import org.junit.jupiter.api.*;
+import com.myapp.auth.dto.RegisterRequest;
+import com.myapp.restaurant.RestaurantRepository;
+import com.myapp.restaurant.RestaurantService;
+import com.myapp.order.OrderService;
+import com.myapp.order.OrderRepository;
+import com.myapp.item.ItemRepository;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
+import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -67,24 +75,32 @@ class NotificationIntegrationTest {
     /** کاربران تستی برای تست‌های integration */
     private static User testUser1, testUser2, testUser3;
 
+    /** SessionFactory برای تست‌های پایگاه داده */
+    private static SessionFactory sessionFactory;
+    
+    /** کاربران تستی */
+    private static User inactiveUser;
+
     @BeforeAll
     static void setUpClass() {
-        testDatabaseManager = new TestDatabaseManager();
-        testDatabaseManager.setupTestDatabase();
+        // اطمینان از اینکه sessionFactory آماده است
+        TestDatabaseManager.ensureSessionFactoryReady();
+        sessionFactory = DatabaseUtil.getSessionFactory();
         
+        // Initialize repositories and services
         notificationRepository = new NotificationRepository();
         authRepository = new AuthRepository();
         notificationService = new NotificationService(notificationRepository, authRepository);
         
-        // Create test users
+        // ایجاد کاربران تستی
         createTestUsers();
     }
 
     @AfterAll
     static void tearDownClass() {
-        if (testDatabaseManager != null) {
-            testDatabaseManager.cleanup();
-        }
+        // Don't call cleanup here as it closes the sessionFactory
+        // Let the test framework handle cleanup at the end
+        System.out.println("✅ NotificationIntegrationTest completed");
     }
 
     @BeforeEach
@@ -106,7 +122,7 @@ class NotificationIntegrationTest {
     }
 
     private static void createTestUsers() {
-        Transaction transaction = null;
+        org.hibernate.Transaction transaction = null;
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             
@@ -163,7 +179,7 @@ class NotificationIntegrationTest {
     class CompleteNotificationWorkflowTest {
 
         @Test
-        @Order(1)
+        @org.junit.jupiter.api.Order(1)
         @DisplayName("Should handle complete order notification workflow")
         void shouldHandleCompleteOrderNotificationWorkflow() {
             Long orderId = 100L;
@@ -217,7 +233,7 @@ class NotificationIntegrationTest {
         }
 
         @Test
-        @Order(2)
+        @org.junit.jupiter.api.Order(2)
         @DisplayName("Should handle notification state transitions correctly")
         void shouldHandleNotificationStateTransitionsCorrectly() {
             try {
@@ -286,7 +302,7 @@ class NotificationIntegrationTest {
         }
 
         @Test
-        @Order(3)
+        @org.junit.jupiter.api.Order(3)
         @DisplayName("Should handle bulk operations correctly")
         void shouldHandleBulkOperationsCorrectly() {
             // Create multiple notifications for user
@@ -486,7 +502,7 @@ class NotificationIntegrationTest {
 
             // Manually set old creation dates (older than 90 days to trigger cleanup)
             try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
-                Transaction transaction = session.beginTransaction();
+                org.hibernate.Transaction transaction = session.beginTransaction();
                 session.createQuery("UPDATE Notification SET createdAt = :oldDate WHERE id IN (:ids)")
                     .setParameter("oldDate", LocalDateTime.now().minusDays(95))
                     .setParameterList("ids", List.of(oldNotification1.getId(), oldNotification2.getId()))
@@ -627,6 +643,7 @@ class NotificationIntegrationTest {
                 int failedOperations = 0;
 
                 // Mark notifications as read/unread concurrently with error handling
+                @SuppressWarnings("unchecked")
                 CompletableFuture<Boolean>[] futures = new CompletableFuture[notifications.size()];
                 for (int i = 0; i < notifications.size(); i++) {
                     final Long notificationId = notifications.get(i).getId();

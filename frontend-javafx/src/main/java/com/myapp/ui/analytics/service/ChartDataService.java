@@ -483,7 +483,8 @@ public class ChartDataService {
                         errorRateSeries.getData().add(new XYChart.Data<>(time, metrics.get("errorRate")));
                     }
                     
-                    chart.getData().addAll(responseTimeSeries, errorRateSeries);
+                    chart.getData().add(responseTimeSeries);
+                    chart.getData().add(errorRateSeries);
                     chartUtil.applyChartStyle(chart, "performance-metrics");
                 });
             }, executorService);

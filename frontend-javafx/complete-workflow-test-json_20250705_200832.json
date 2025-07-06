@@ -1,0 +1,11 @@
+[ {
+  "revenue" : "2,500,000.00",
+  "name" : "Restaurant A",
+  "rating" : "4.50",
+  "orders" : "150"
+}, {
+  "revenue" : "1,800,000.00",
+  "name" : "Restaurant B",
+  "rating" : "4.20",
+  "orders" : "120"
+} ]

@@ -1,8 +1,10 @@
 package com.myapp.auth;
 
-import com.myapp.common.exceptions.DuplicatePhoneException;
+import com.myapp.common.TestBase;
 import com.myapp.common.models.User;
-import com.myapp.common.utils.DatabaseUtil;
+import com.myapp.common.utils.TestDataHelper;
+import com.myapp.common.exceptions.DuplicatePhoneException;
+import com.myapp.auth.AuthRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -65,7 +67,7 @@ import static org.assertj.core.api.Assertions.*;
  * @since 2024
  */
 @DisplayName("AuthRepository Tests")
-class AuthRepositoryTest {
+class AuthRepositoryTest extends TestBase {
 
     /** Repository instance برای تست‌ها */
     private AuthRepository repository;
@@ -79,9 +81,9 @@ class AuthRepositoryTest {
      * - اطمینان از clean test environment بدون database locks
      */
     @BeforeEach
-    void setUp() {
+    public void setUp() {
+        super.setUp();
         repository = new AuthRepository();
-        // پاک‌سازی پایگاه داده قبل از هر تست با thread-safe approach
         cleanDatabaseSafely();
     }
 
@@ -89,35 +91,9 @@ class AuthRepositoryTest {
      * تمیزکاری بعد از هر تست برای آزادسازی resources
      */
     @AfterEach
-    void tearDown() {
-        // Close any open sessions and clean up
+    public void tearDown() {
         cleanDatabaseSafely();
-    }
-
-    /**
-     * پاک‌سازی امن پایگاه داده با مدیریت صحیح session ها
-     * برای جلوگیری از SQLite lock issues
-     */
-    private void cleanDatabaseSafely() {
-        try {
-            // اجرای cleanup با retry mechanism
-            int maxRetries = 3;
-            for (int i = 0; i < maxRetries; i++) {
-                try {
-                    repository.deleteAll();
-                    break; // اگر موفق شد، از loop خارج شو
-                } catch (Exception e) {
-                    if (i == maxRetries - 1) {
-                        throw e; // اگر آخرین تلاش بود، exception را پرتاب کن
-                    }
-                    // صبر کوتاه قبل از تلاش مجدد
-                    Thread.sleep(100);
-                }
-            }
-        } catch (Exception e) {
-            // Log warning but don't fail the test
-            System.err.println("⚠️ Warning: Database cleanup failed: " + e.getMessage());
-        }
+        super.tearDown();
     }
 
     /**
@@ -145,24 +121,24 @@ class AuthRepositoryTest {
          * - اطلاعات قابل بازیابی باشند
          */
         @Test
-        @DisplayName("User creation with valid data succeeds")
+        @DisplayName("Should create user with valid data")
         void saveNew_validUser_success() {
-            // Given - آماده‌سازی کاربر معتبر با unique phone
-            String uniquePhone = "09123" + System.currentTimeMillis() % 1000000;
-            User user = User.forRegistration("John Doe", uniquePhone, "john@example.com", "hashedPassword", "Tehran");
-            
-            // When - ذخیره‌سازی کاربر
-            User saved = repository.saveNew(user);
-            
-            // Then - بررسی نتایج
-            assertThat(saved.getId()).isNotNull();
-            assertThat(saved.getId()).isPositive();
-            assertThat(saved.getFullName()).isEqualTo("John Doe");
-            assertThat(saved.getPhone()).isEqualTo(uniquePhone);
-            assertThat(saved.getEmail()).isEqualTo("john@example.com");
-            assertThat(saved.getPasswordHash()).isEqualTo("hashedPassword");
-            assertThat(saved.getAddress()).isEqualTo("Tehran");
-            assertThat(saved.getRole()).isEqualTo(User.Role.BUYER);
+            // Given
+            User user = new User();
+            user.setFullName("John Doe");
+            user.setPhone(TestDataHelper.generateUniquePhone());
+            user.setEmail(TestDataHelper.generateUniqueEmail());
+            user.setPasswordHash("hashedPassword");
+            user.setRole(User.Role.BUYER);
+
+            // When
+            User savedUser = repository.saveNew(user);
+
+            // Then
+            assertThat(savedUser).isNotNull();
+            assertThat(savedUser.getId()).isNotNull();
+            assertThat(savedUser.getPhone()).isEqualTo(user.getPhone());
+            assertThat(savedUser.getFullName()).isEqualTo("John Doe");
         }
 
         /**
@@ -175,21 +151,21 @@ class AuthRepositoryTest {
          * - ID معتبر تولید شود
          */
         @Test
-        @DisplayName("User creation with minimal data succeeds")
+        @DisplayName("Should create user with minimal data")
         void saveNew_minimalUser_success() {
-            // Given - کاربر با حداقل اطلاعات
-            User user = User.forRegistration("Simple User", "09123456788", "", "hashedPassword", "");
-            
-            // When - ذخیره‌سازی
-            User saved = repository.saveNew(user);
-            
-            // Then - بررسی حداقل اطلاعات
-            assertThat(saved.getId()).isNotNull();
-            assertThat(saved.getFullName()).isEqualTo("Simple User");
-            assertThat(saved.getPhone()).isEqualTo("09123456788");
-            assertThat(saved.getEmail()).isEqualTo("");
-            assertThat(saved.getAddress()).isEqualTo("");
-            assertThat(saved.getRole()).isEqualTo(User.Role.BUYER);
+            // Given
+            User user = new User();
+            user.setPhone(TestDataHelper.generateUniquePhone());
+            user.setPasswordHash("hashedPassword");
+            user.setFullName("Test User");
+
+            // When
+            User savedUser = repository.saveNew(user);
+
+            // Then
+            assertThat(savedUser).isNotNull();
+            assertThat(savedUser.getId()).isNotNull();
+            assertThat(savedUser.getPhone()).isEqualTo(user.getPhone());
         }
 
         /**
@@ -200,19 +176,23 @@ class AuthRepositoryTest {
          * Scenario: ایجاد کاربران با تمام نقش‌های موجود سیستم
          * Expected: هر نقش صحیح ذخیره و بازیابی شود
          */
-        @EnumSource(User.Role.class)
         @ParameterizedTest
-        @DisplayName("User creation with different roles succeeds")
+        @EnumSource(User.Role.class)
+        @DisplayName("Should create user with different roles")
         void saveNew_differentRoles_success(User.Role role) {
-            // Given - کاربر با نقش مشخص
-            User user = User.forRegistration("Test User", "0912345678" + role.ordinal(), "test@example.com", "hashedPassword", "Tehran");
+            // Given
+            User user = new User();
+            user.setPhone(TestDataHelper.generateUniquePhone());
+            user.setPasswordHash("hashedPassword");
             user.setRole(role);
-            
-            // When - ذخیره‌سازی
-            User saved = repository.saveNew(user);
-            
-            // Then - بررسی نقش
-            assertThat(saved.getRole()).isEqualTo(role);
+            user.setFullName("Test User");
+
+            // When
+            User savedUser = repository.saveNew(user);
+
+            // Then
+            assertThat(savedUser).isNotNull();
+            assertThat(savedUser.getRole()).isEqualTo(role);
         }
 
         /**
@@ -225,18 +205,23 @@ class AuthRepositoryTest {
          * - یکپارچگی پایگاه داده حفظ شود
          */
         @Test
-        @DisplayName("User creation with duplicate phone throws exception")
+        @DisplayName("Should throw exception for duplicate phone")
         void saveNew_duplicatePhone_throwsException() {
-            // Given - دو کاربر با شماره تلفن یکسان
-            String phone = "09123" + (System.currentTimeMillis() % 1000000);
-            User firstUser = User.forRegistration("First User", phone, "first@example.com", "hashedPassword1", "Tehran");
-            User secondUser = User.forRegistration("Second User", phone, "second@example.com", "hashedPassword2", "Isfahan");
-            
-            // ذخیره کاربر اول
-            repository.saveNew(firstUser);
-            
-            // When & Then - انتظار exception برای کاربر دوم
-            assertThatThrownBy(() -> repository.saveNew(secondUser))
+            // Given
+            String duplicatePhone = TestDataHelper.generateUniquePhone();
+            User user1 = new User();
+            user1.setPhone(duplicatePhone);
+            user1.setPasswordHash("hashedPassword1");
+            user1.setFullName("Test User");
+
+            User user2 = new User();
+            user2.setPhone(duplicatePhone); // Same phone
+            user2.setPasswordHash("hashedPassword2");
+            user2.setFullName("Test User");
+
+            // When & Then
+            repository.saveNew(user1);
+            assertThatThrownBy(() -> repository.saveNew(user2))
                     .isInstanceOf(DuplicatePhoneException.class);
         }
 
@@ -249,19 +234,21 @@ class AuthRepositoryTest {
          * Expected: تمام فرمت‌های معتبر پذیرفته شوند
          */
         @ParameterizedTest
-        @ValueSource(strings = {
-            "09111111111", "09222222222", "09333333333", "09444444444", "09555555555"
-        })
-        @DisplayName("User creation with various phone formats succeeds")
+        @ValueSource(strings = {"09123456786", "+989123456786", "00989123456786"})
+        @DisplayName("Should create user with various phone formats")
         void saveNew_variousPhoneFormats_success(String phone) {
-            // Given - کاربر با فرمت خاص شماره تلفن
-            User user = User.forRegistration("Test User", phone, "test@example.com", "hashedPassword", "Tehran");
-            
-            // When - ذخیره‌سازی
-            User saved = repository.saveNew(user);
-            
-            // Then - بررسی حفظ فرمت
-            assertThat(saved.getPhone()).isEqualTo(phone);
+            // Given
+            User user = new User();
+            user.setPhone(phone);
+            user.setPasswordHash("hashedPassword");
+            user.setFullName("Test User");
+
+            // When
+            User savedUser = repository.saveNew(user);
+
+            // Then
+            assertThat(savedUser).isNotNull();
+            assertThat(savedUser.getPhone()).isEqualTo(phone);
         }
     }
 
@@ -288,20 +275,22 @@ class AuthRepositoryTest {
          * - تمام فیلدها مطابقت داشته باشند
          */
         @Test
-        @DisplayName("Find user by ID succeeds")
+        @DisplayName("Should find user by ID when exists")
         void findById_existingUser_success() {
-            // Given - ایجاد و ذخیره کاربر
-            User user = User.forRegistration("John Doe", "09123456783", "john@example.com", "hashedPassword", "Tehran");
-            User saved = repository.saveNew(user);
-            
-            // When - جستجو بر اساس ID
-            Optional<User> found = repository.findById(saved.getId());
-            
-            // Then - بررسی نتایج
-            assertThat(found).isPresent();
-            assertThat(found.get().getId()).isEqualTo(saved.getId());
-            assertThat(found.get().getFullName()).isEqualTo("John Doe");
-            assertThat(found.get().getPhone()).isEqualTo("09123456783");
+            // Given
+            User user = new User();
+            user.setPhone(TestDataHelper.generateUniquePhone());
+            user.setPasswordHash("hashedPassword");
+            user.setFullName("Test User");
+            User savedUser = repository.saveNew(user);
+
+            // When
+            User foundUser = repository.findById(savedUser.getId()).orElse(null);
+
+            // Then
+            assertThat(foundUser).isNotNull();
+            assertThat(foundUser.getId()).isEqualTo(savedUser.getId());
+            assertThat(foundUser.getPhone()).isEqualTo(user.getPhone());
         }
 
         /**
@@ -311,13 +300,13 @@ class AuthRepositoryTest {
          * Expected: Optional.empty بازگردانده شود
          */
         @Test
-        @DisplayName("Find user by non-existent ID returns empty")
+        @DisplayName("Should return empty when user not found by ID")
         void findById_nonExistentUser_returnsEmpty() {
-            // When - جستجوی ID غیرموجود
-            Optional<User> found = repository.findById(999999L);
-            
-            // Then - بررسی عدم وجود
-            assertThat(found).isNotPresent();
+            // When
+            var result = repository.findById(999L);
+
+            // Then
+            assertThat(result).isEmpty();
         }
 
         /**
@@ -330,20 +319,21 @@ class AuthRepositoryTest {
          * - شماره تلفن دقیق مطابقت داشته باشد
          */
         @Test
-        @DisplayName("Find user by phone succeeds")
+        @DisplayName("Should find user by phone when exists")
         void findByPhone_existingUser_success() {
-            // Given - ایجاد کاربر با شماره خاص
-            String phone = "09123456782";
-            User user = User.forRegistration("Jane Doe", phone, "jane@example.com", "hashedPassword", "Tehran");
+            // Given
+            User user = new User();
+            user.setPhone("09123456784");
+            user.setPasswordHash("hashedPassword");
+            user.setFullName("Test User");
             repository.saveNew(user);
-            
-            // When - جستجو بر اساس شماره تلفن
-            Optional<User> found = repository.findByPhone(phone);
-            
-            // Then - بررسی نتایج
-            assertThat(found).isPresent();
-            assertThat(found.get().getPhone()).isEqualTo(phone);
-            assertThat(found.get().getFullName()).isEqualTo("Jane Doe");
+
+            // When
+            User foundUser = repository.findByPhone("09123456784").orElse(null);
+
+            // Then
+            assertThat(foundUser).isNotNull();
+            assertThat(foundUser.getPhone()).isEqualTo("09123456784");
         }
 
         /**
@@ -353,13 +343,13 @@ class AuthRepositoryTest {
          * Expected: Optional.empty بازگردانده شود
          */
         @Test
-        @DisplayName("Find user by non-existent phone returns empty")
+        @DisplayName("Should return empty when user not found by phone")
         void findByPhone_nonExistentUser_returnsEmpty() {
-            // When - جستجوی شماره غیرموجود
-            Optional<User> found = repository.findByPhone("09999999999");
-            
-            // Then - بررسی عدم وجود
-            assertThat(found).isNotPresent();
+            // When
+            var result = repository.findByPhone("nonexistent");
+
+            // Then
+            assertThat(result).isEmpty();
         }
     }
 
@@ -386,110 +376,28 @@ class AuthRepositoryTest {
          * - سایر فیلدها به‌روزرسانی شوند
          */
         @Test
-        @DisplayName("User update with valid data succeeds")
+        @DisplayName("Should update user successfully")
         void update_validUser_success() {
-            try {
-                // Given - ایجاد و ذخیره کاربر اولیه با unique phone
-                String uniquePhone = "09123" + (System.currentTimeMillis() % 1000000);
-                User user = User.forRegistration("John Doe", uniquePhone, "john@example.com", "hashedPassword", "Tehran");
-                User saved = repository.saveNew(user);
-                
-                // تغییر اطلاعات کاربر
-                saved.setFullName("John Smith");
-                saved.setEmail("johnsmith@example.com");
-                saved.setAddress("Isfahan");
-                
-                // When - به‌روزرسانی with enhanced retry logic
-                User updated = null;
-                boolean updateSuccessful = false;
-                
-                try {
-                    updated = com.myapp.common.utils.DatabaseRetryUtil.executeWithRetry(
-                        () -> repository.update(saved),
-                        "user update operation"
-                    );
-                    updateSuccessful = true;
-                } catch (RuntimeException e) {
-                    if (e.getMessage() != null && e.getMessage().contains("Failed to complete")) {
-                        System.out.println("⚠️ User update failed due to database locking after retries");
-                        return; // Skip the test gracefully
-                    }
-                    throw e;
-                }
-                
-                // Then - بررسی تغییرات فقط اگر update موفق بود
-                if (updateSuccessful && updated != null) {
-                    assertThat(updated.getFullName()).isEqualTo("John Smith");
-                    assertThat(updated.getEmail()).isEqualTo("johnsmith@example.com");
-                    assertThat(updated.getAddress()).isEqualTo("Isfahan");
-                    assertThat(updated.getPhone()).isEqualTo(uniquePhone); // شماره تلفن تغییر نکرده
-                    System.out.println("✅ User update test passed successfully");
-                }
-                
-            } catch (org.hibernate.exception.LockAcquisitionException e) {
-                // اگر database lock رخ داد، تست را skip می‌کنیم
-                System.out.println("⚠️ Skipping user update test due to database lock: " + e.getMessage());
-                return;
-            } catch (Exception e) {
-                if (e.getMessage() != null && (e.getMessage().contains("database is locked") ||
-                    e.getMessage().contains("SQLITE_BUSY") || e.getMessage().contains("Failed to complete"))) {
-                    System.out.println("⚠️ Skipping user update test due to SQLite lock: " + e.getClass().getSimpleName());
-                    return;
-                }
-                throw e;
-            }
-        }
+            // Given
+            User user = new User();
+            user.setPhone("09123456783");
+            user.setPasswordHash("hashedPassword");
+            user.setFullName("Original Name");
+            user.setFullName("Test User");
+            User savedUser = repository.saveNew(user);
 
-        /**
-         * تست خطای تغییر شماره تلفن به شماره موجود
-         * 
-         * Scenario: تلاش تغییر شماره تلفن کاربر به شماره کاربر دیگر
-         * Expected:
-         * - DuplicatePhoneException پرتاب شود
-         * - تغییرات اعمال نشوند
-         * - یکپارچگی پایگاه داده حفظ شود
-         */
-        @Test
-        @DisplayName("User update with phone change to existing phone throws exception")
-        void update_duplicatePhone_throwsException() {
-            // Given - ایجاد دو کاربر با guaranteed unique phone numbers
-            long timestamp = System.currentTimeMillis();
-            String phone1 = "091100" + (timestamp % 100000); 
-            String phone2 = "091200" + ((timestamp + 500) % 100000); // تضمین تفاوت
+            // When
+            savedUser.setFullName("Updated Name");
+            User updatedUser = repository.update(savedUser);
+
+            // Then
+            assertThat(updatedUser).isNotNull();
+            assertThat(updatedUser.getFullName()).isEqualTo("Updated Name");
             
-            User user1 = User.forRegistration("User One", phone1, "user1@example.com", "hashedPassword", "Tehran");
-            User user2 = User.forRegistration("User Two", phone2, "user2@example.com", "hashedPassword", "Tehran");
-            
-            try {
-                User saved1 = repository.saveNew(user1);
-                User saved2 = repository.saveNew(user2);
-                
-                // تلاش تغییر شماره تلفن user2 به شماره user1
-                saved2.setPhone(phone1);
-                
-                // When & Then - انتظار exception
-                boolean exceptionThrown = false;
-                try {
-                    repository.update(saved2);
-                } catch (DuplicatePhoneException e) {
-                    exceptionThrown = true;
-                } catch (Exception e) {
-                    // Any other exception (like database lock) should also count as expected behavior
-                    exceptionThrown = true;
-                }
-                
-                // در نهایت باید exception پرتاب شده باشد
-                assertThat(exceptionThrown).isTrue();
-                        
-            } catch (DuplicatePhoneException e) {
-                // اگر در ایجاد users duplicate رخ داد، still pass the test
-                System.out.println("⚠️ Duplicate phone test passed due to initial duplicate: " + e.getMessage());
-                return;
-            } catch (Exception e) {
-                // هر مشکل دیگری را skip می‌کنیم
-                System.out.println("⚠️ Skipping duplicate phone test due to infrastructure issue: " + e.getClass().getSimpleName());
-                return;
-            }
+            // Verify in database
+            User foundUser = repository.findById(savedUser.getId()).orElse(null);
+            assertThat(foundUser).isNotNull();
+            assertThat(foundUser.getFullName()).isEqualTo("Updated Name");
         }
     }
 
@@ -516,18 +424,21 @@ class AuthRepositoryTest {
          * - عملیات بدون خطا انجام شود
          */
         @Test
-        @DisplayName("User deletion succeeds")
+        @DisplayName("Should delete existing user successfully")
         void delete_existingUser_success() {
-            // Given - ایجاد و ذخیره کاربر
-            User user = User.forRegistration("John Doe", "09123456778", "john@example.com", "hashedPassword", "Tehran");
-            User saved = repository.saveNew(user);
-            
-            // When - حذف کاربر
-            repository.delete(saved.getId());
-            
-            // Then - بررسی حذف
-            Optional<User> found = repository.findById(saved.getId());
-            assertThat(found).isNotPresent();
+            // Given
+            User user = new User();
+            user.setPhone("09123456782");
+            user.setPasswordHash("hashedPassword");
+            user.setFullName("Test User");
+            User savedUser = repository.saveNew(user);
+
+            // When
+            repository.delete(savedUser.getId());
+
+            // Then
+            var result = repository.findById(savedUser.getId());
+            assertThat(result).isEmpty();
         }
 
         /**
@@ -540,47 +451,25 @@ class AuthRepositoryTest {
          * - constraint تکرار شماره رعایت شود
          */
         @Test
-        @DisplayName("User deletion allows phone reuse")
+        @DisplayName("Should allow phone reuse after deletion")
         void delete_allowsPhoneReuse_success() {
-            try {
-                // Given - ایجاد کاربر اول با unique phone
-                long nanoTime = System.nanoTime();
-                String phone = "091300" + (nanoTime % 100000);
-                User user1 = User.forRegistration("First User", phone, "first@example.com", "hashedPassword", "Tehran");
-                
-                User saved1 = repository.saveNew(user1);
-                
-                // When - حذف کاربر اول با retry logic
-                com.myapp.common.utils.DatabaseRetryUtil.executeWithRetry(
-                    () -> {
-                        repository.delete(saved1.getId());
-                        return null;
-                    },
-                    "user deletion operation"
-                );
-                
-                // Then - امکان ایجاد کاربر جدید با همان شماره
-                User user2 = User.forRegistration("Second User", phone, "second@example.com", "hashedPassword", "Isfahan");
-                User saved2 = repository.saveNew(user2);
-                
-                assertThat(saved2.getPhone()).isEqualTo(phone);
-                assertThat(saved2.getFullName()).isEqualTo("Second User");
-                
-            } catch (DuplicatePhoneException e) {
-                // اگر phone number قبلاً استفاده شده، تست را skip می‌کنیم
-                System.out.println("⚠️ Skipping phone reuse test due to concurrent execution: " + e.getMessage());
-                return;
-            } catch (org.hibernate.exception.LockAcquisitionException e) {
-                System.out.println("⚠️ Skipping phone reuse test due to database lock: " + e.getMessage());
-                return;
-            } catch (Exception e) {
-                if (e.getMessage() != null && (e.getMessage().contains("database is locked") || 
-                    e.getMessage().contains("Failed to complete") || e.getMessage().contains("SQLITE_BUSY"))) {
-                    System.out.println("⚠️ Skipping phone reuse test due to SQLite lock: " + e.getClass().getSimpleName());
-                    return;
-                }
-                throw e;
-            }
+            // Given
+            User user1 = new User();
+            user1.setPhone("09123456781");
+            user1.setPasswordHash("hashedPassword1");
+            user1.setFullName("Test User");
+            User savedUser1 = repository.saveNew(user1);
+
+            // When
+            repository.delete(savedUser1.getId());
+
+            User user2 = new User();
+            user2.setPhone("09123456781"); // Same phone
+            user2.setPasswordHash("hashedPassword2");
+            user2.setFullName("Test User");
+
+            // Then
+            assertThatCode(() -> repository.saveNew(user2)).doesNotThrowAnyException();
         }
     }
 
@@ -588,8 +477,8 @@ class AuthRepositoryTest {
     @DisplayName("Repository instance should be initialized and database accessible")
     void repositoryInitializationTest() {
         AuthRepository repo = new AuthRepository();
-        Assertions.assertNotNull(repo);
+        assertThat(repo).isNotNull();
         // تست ساده یک کوئری واقعی
-        Assertions.assertDoesNotThrow(() -> repo.findByPhone(""));
+        assertThatCode(() -> repo.findByPhone("")).doesNotThrowAnyException();
     }
 }

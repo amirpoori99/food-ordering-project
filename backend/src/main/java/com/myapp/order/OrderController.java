@@ -173,6 +173,9 @@ public class OrderController implements HttpHandler {
             // GET /api/orders/customer/{customerId}/statistics - Get customer statistics
             Long customerId = extractIdFromPath(path, "/api/orders/customer/", "/statistics");
             getCustomerStatistics(exchange, customerId);
+        } else if (path.equals("/api/orders")) {
+            // GET /api/orders - Get all orders
+            getAllOrders(exchange);
         } else {
             sendErrorResponse(exchange, 404, "Endpoint not found");
         }
@@ -237,6 +240,17 @@ public class OrderController implements HttpHandler {
     private void getCustomerStatistics(HttpExchange exchange, Long customerId) throws IOException {
         OrderService.OrderStatistics stats = orderService.getCustomerOrderStatistics(customerId);
         sendJsonResponse(exchange, 200, stats);
+    }
+    
+    /**
+     * دریافت تمام سفارشات
+     * 
+     * @param exchange HttpExchange object
+     * @throws IOException در صورت خطا در ارسال پاسخ
+     */
+    private void getAllOrders(HttpExchange exchange) throws IOException {
+        List<Order> orders = orderService.getAllOrders();
+        sendJsonResponse(exchange, 200, orders);
     }
     
     // ==================== POST ENDPOINTS ====================

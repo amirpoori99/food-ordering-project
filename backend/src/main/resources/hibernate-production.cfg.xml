@@ -8,8 +8,8 @@
         <!-- PostgreSQL Database Connection Configuration (Production Ready) -->
         <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
         <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/food_ordering_prod</property>
-        <property name="hibernate.connection.username">${DB_USERNAME}</property>
-        <property name="hibernate.connection.password">${DB_PASSWORD}</property>
+        <property name="hibernate.connection.username">food-ordering-project</property>
+        <property name="hibernate.connection.password">food-ordering-project</property>
         
         <!-- PostgreSQL Dialect -->
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 #!/usr/bin/env pwsh
+=======
+﻿#!/usr/bin/env pwsh
+>>>>>>> a7ce529ea7a2d6da6cfcfe93caba86effa8aa5ea
 
 # Food Ordering System - Load Testing & Stress Testing
 # Phase 46: Performance Optimization & Load Testing
@@ -33,9 +37,15 @@ $TimeStamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $TestResults = @{
     StartTime = Get-Date
     EndTime = $null
+<<<<<<< HEAD
         TotalRequests = 0
         SuccessfulRequests = 0
         FailedRequests = 0
+=======
+    TotalRequests = 0
+    SuccessfulRequests = 0
+    FailedRequests = 0
+>>>>>>> a7ce529ea7a2d6da6cfcfe93caba86effa8aa5ea
     AverageResponseTime = 0
     MaxResponseTime = 0
     MinResponseTime = 999999

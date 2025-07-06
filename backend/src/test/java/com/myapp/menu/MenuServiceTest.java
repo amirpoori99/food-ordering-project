@@ -1,19 +1,33 @@
 package com.myapp.menu;
 
+import com.myapp.common.TestDatabaseManager;
 import com.myapp.common.exceptions.NotFoundException;
 import com.myapp.common.models.FoodItem;
 import com.myapp.common.models.Restaurant;
 import com.myapp.common.models.RestaurantStatus;
 import com.myapp.common.utils.DatabaseUtil;
+import com.myapp.common.utils.TestDataHelper;
 import com.myapp.item.ItemRepository;
 import com.myapp.restaurant.RestaurantRepository;
+import com.myapp.menu.MenuRepository;
+import com.myapp.menu.MenuService;
+import com.myapp.auth.AuthRepository;
+import com.myapp.auth.AuthService;
+import com.myapp.auth.dto.RegisterRequest;
+import com.myapp.restaurant.RestaurantService;
+import com.myapp.order.OrderService;
+import com.myapp.order.OrderRepository;
+import com.myapp.notification.NotificationService;
+import com.myapp.notification.NotificationRepository;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -115,6 +129,8 @@ class MenuServiceTest {
      */
     @BeforeAll
     static void setUpClass() {
+        // اطمینان از اینکه sessionFactory آماده است
+        TestDatabaseManager.ensureSessionFactoryReady();
         sessionFactory = DatabaseUtil.getSessionFactory();
     }
     

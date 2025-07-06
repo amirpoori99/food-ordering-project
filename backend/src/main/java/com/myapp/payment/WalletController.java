@@ -64,7 +64,10 @@ public class WalletController implements HttpHandler {
     // ==================== GET ENDPOINTS ====================
     
     private void handleGetRequest(HttpExchange exchange, String path) throws IOException {
-        if (path.startsWith("/api/wallet/") && path.endsWith("/balance")) {
+        if (path.equals("/api/wallet")) {
+            // GET /api/wallet - Get all wallet information
+            getAllWallets(exchange);
+        } else if (path.startsWith("/api/wallet/") && path.endsWith("/balance")) {
             getWalletBalance(exchange, path);
         } else if (path.startsWith("/api/wallet/") && path.endsWith("/transactions")) {
             getWalletTransactionHistory(exchange, path);
@@ -78,6 +81,24 @@ public class WalletController implements HttpHandler {
             checkSufficientBalance(exchange, path);
         } else {
             sendResponse(exchange, 404, "{\"error\":\"Endpoint not found\"}");
+        }
+    }
+    
+    /**
+     * GET /api/wallet - دریافت اطلاعات تمام کیف پول‌ها
+     * 
+     * این endpoint اطلاعات کلی کیف پول‌ها را برمی‌گرداند
+     * 
+     * @param exchange شیء HttpExchange
+     * @throws IOException در صورت خطا در ورودی/خروجی
+     */
+    private void getAllWallets(HttpExchange exchange) throws IOException {
+        try {
+            List<Transaction> wallets = walletService.getAllWallets();
+            String response = serializeTransactionList(wallets);
+            sendResponse(exchange, 200, response);
+        } catch (Exception e) {
+            sendResponse(exchange, 500, "{\"error\":\"" + e.getMessage() + "\"}");
         }
     }
     

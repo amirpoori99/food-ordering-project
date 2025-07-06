@@ -8,6 +8,10 @@ public class ROIAnalyticsDTO {
     private double roiPercentage;
     private Map<String, Double> roiByCategory;
     private Map<String, Double> roiByPeriod;
+    private Map<String, Double> roiMetrics;
+    private double investmentROI;
+    private double marketingROI;
+    private double technologyROI;
 
     public ROIAnalyticsDTO() {}
 
@@ -25,4 +29,16 @@ public class ROIAnalyticsDTO {
 
     public Map<String, Double> getRoiByPeriod() { return roiByPeriod; }
     public void setRoiByPeriod(Map<String, Double> roiByPeriod) { this.roiByPeriod = roiByPeriod; }
+
+    public Map<String, Double> getRoiMetrics() { return roiMetrics; }
+    public void setRoiMetrics(Map<String, Double> roiMetrics) { this.roiMetrics = roiMetrics; }
+    
+    public double getInvestmentROI() { return investmentROI; }
+    public void setInvestmentROI(double investmentROI) { this.investmentROI = investmentROI; }
+    
+    public double getMarketingROI() { return marketingROI; }
+    public void setMarketingROI(double marketingROI) { this.marketingROI = marketingROI; }
+    
+    public double getTechnologyROI() { return technologyROI; }
+    public void setTechnologyROI(double technologyROI) { this.technologyROI = technologyROI; }
 } 

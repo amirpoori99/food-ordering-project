@@ -1,5 +1,6 @@
 package com.myapp.analytics.dto;
 
+import java.util.List;
 import java.util.Map;
 
 public class PerformanceAnalyticsDTO {
@@ -11,6 +12,11 @@ public class PerformanceAnalyticsDTO {
     private Map<String, Object> cachePerformance;
     private Map<String, Object> trafficAnalysis;
     private Map<String, Object> peakHours;
+    
+    // فیلدهای جدید مورد نیاز
+    private List<Map<String, Object>> systemPerformance;
+    private double responseTime;
+    private double uptime;
 
     public PerformanceAnalyticsDTO() {}
 
@@ -37,4 +43,14 @@ public class PerformanceAnalyticsDTO {
 
     public Map<String, Object> getPeakHours() { return peakHours; }
     public void setPeakHours(Map<String, Object> peakHours) { this.peakHours = peakHours; }
+    
+    // متدهای جدید مورد نیاز
+    public List<Map<String, Object>> getSystemPerformance() { return systemPerformance; }
+    public void setSystemPerformance(List<Map<String, Object>> systemPerformance) { this.systemPerformance = systemPerformance; }
+    
+    public double getResponseTime() { return responseTime; }
+    public void setResponseTime(double responseTime) { this.responseTime = responseTime; }
+    
+    public double getUptime() { return uptime; }
+    public void setUptime(double uptime) { this.uptime = uptime; }
 } 

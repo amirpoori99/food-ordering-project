@@ -1,5 +1,6 @@
 package com.myapp.analytics.dto;
 
+import java.util.List;
 import java.util.Map;
 
 public class RealTimeAnalyticsDTO {
@@ -8,6 +9,9 @@ public class RealTimeAnalyticsDTO {
     private double currentRevenue;
     private Map<String, Object> systemStatus;
     private Map<String, Object> activeSessions;
+    private Map<String, Object> performanceMetrics;
+    private int activeUsers;
+    private List<Map<String, Object>> performanceMetricsList;
 
     public RealTimeAnalyticsDTO() {}
 
@@ -25,4 +29,13 @@ public class RealTimeAnalyticsDTO {
 
     public Map<String, Object> getActiveSessions() { return activeSessions; }
     public void setActiveSessions(Map<String, Object> activeSessions) { this.activeSessions = activeSessions; }
+
+    public Map<String, Object> getPerformanceMetrics() { return performanceMetrics; }
+    public void setPerformanceMetrics(Map<String, Object> performanceMetrics) { this.performanceMetrics = performanceMetrics; }
+    
+    public int getActiveUsers() { return activeUsers; }
+    public void setActiveUsers(int activeUsers) { this.activeUsers = activeUsers; }
+    
+    public List<Map<String, Object>> getPerformanceMetricsList() { return performanceMetricsList; }
+    public void setPerformanceMetricsList(List<Map<String, Object>> performanceMetrics) { this.performanceMetricsList = performanceMetrics; }
 } 

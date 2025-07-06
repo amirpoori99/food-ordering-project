@@ -99,13 +99,18 @@ public class PaymentService {
             throw new IllegalArgumentException("Payment method cannot be empty");
         }
         
-        // 2. اعتبارسنجی وجود کاربر
+        // 2. اعتبارسنجی روش پرداخت
+        if (!isValidPaymentMethod(paymentMethod)) {
+            throw new IllegalArgumentException("Unsupported payment method: " + paymentMethod);
+        }
+        
+        // 3. اعتبارسنجی وجود کاربر
         Optional<User> userOpt = authRepository.findById(userId);
         if (userOpt.isEmpty()) {
             throw new NotFoundException("User", userId);
         }
         
-        // 3. اعتبارسنجی وجود سفارش و تعلق آن به کاربر
+        // 4. اعتبارسنجی وجود سفارش و تعلق آن به کاربر
         Optional<Order> orderOpt = orderRepository.findById(orderId);
         if (orderOpt.isEmpty()) {
             throw new NotFoundException("Order", orderId);
@@ -116,12 +121,12 @@ public class PaymentService {
             throw new IllegalArgumentException("Order does not belong to the specified user");
         }
         
-        // 4. بررسی وضعیت سفارش برای قابلیت پرداخت
+        // 5. بررسی وضعیت سفارش برای قابلیت پرداخت
         if (order.getStatus() != com.myapp.common.models.OrderStatus.PENDING) {
             throw new IllegalArgumentException("Order is not in a payable state");
         }
         
-        // 5. بررسی عدم وجود پرداخت قبلی موفق
+        // 6. بررسی عدم وجود پرداخت قبلی موفق
         List<Transaction> existingPayments = paymentRepository.findByOrderId(orderId);
         Optional<Transaction> completedPayment = existingPayments.stream()
             .filter(t -> t.getStatus() == TransactionStatus.COMPLETED && t.getType() == TransactionType.PAYMENT)
@@ -131,11 +136,11 @@ public class PaymentService {
             throw new IllegalArgumentException("Payment already completed for this order");
         }
         
-        // 6. ایجاد تراکنش پرداخت اولیه
+        // 7. ایجاد تراکنش پرداخت اولیه
         Transaction payment = Transaction.forPayment(userId, orderId, order.getTotalAmount(), paymentMethod);
         payment = paymentRepository.save(payment);
         
-        // 7. پردازش پرداخت بر اساس روش انتخابی
+        // 8. پردازش پرداخت بر اساس روش انتخابی
         try {
             switch (paymentMethod.toUpperCase()) {
                 case "WALLET":
@@ -148,6 +153,7 @@ public class PaymentService {
                     processCashOnDeliveryPayment(payment);
                     break;
                 default:
+                    // This should never happen due to validation above
                     throw new IllegalArgumentException("Unsupported payment method: " + paymentMethod);
             }
         } catch (Exception e) {
@@ -738,5 +744,12 @@ public class PaymentService {
         }
         
         return paymentRepository.update(transaction);
+    }
+    
+    /**
+     * دریافت همه پرداخت‌ها
+     */
+    public List<Transaction> getAllPayments() {
+        return paymentRepository.getAllPayments();
     }
 } 

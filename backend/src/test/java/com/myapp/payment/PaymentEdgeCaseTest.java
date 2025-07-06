@@ -65,10 +65,8 @@ class PaymentEdgeCaseTest {
 
     @BeforeAll
     static void setUpClass() {
-        dbManager = new TestDatabaseManager();
-        dbManager.setupTestDatabase();
-        
-        // استفاده از DatabaseUtil به جای ایجاد SessionFactory جداگانه
+        // اطمینان از اینکه sessionFactory آماده است
+        TestDatabaseManager.ensureSessionFactoryReady();
         sessionFactory = DatabaseUtil.getSessionFactory();
     }
 
@@ -82,6 +80,10 @@ class PaymentEdgeCaseTest {
         authService = new AuthService(authRepository);
         paymentService = new PaymentService(paymentRepository, authRepository, orderRepository);
         
+        // Don't call cleanup() as it closes the sessionFactory
+        // Instead, just clear test data
+        TestDatabaseManager.clearAllTestData();
+        
         // پاک‌سازی ساده داده‌های قبلی
         try {
             cleanupAllTransactions();
@@ -94,10 +96,18 @@ class PaymentEdgeCaseTest {
 
     @AfterAll
     static void tearDownClass() {
-        // SessionFactory را close نمی‌کنیم چون متعلق به DatabaseUtil است
-        if (dbManager != null) {
-        dbManager.cleanup();
-        }
+        // Don't call cleanup here as it closes the sessionFactory
+        // Let the test framework handle cleanup at the end
+        System.out.println("✅ PaymentEdgeCaseTest completed");
+    }
+
+    @AfterEach
+    void tearDown() {
+        // Only clear data, don't close the sessionFactory
+        TestDatabaseManager.clearUsers();
+        TestDatabaseManager.clearRestaurants();
+        TestDatabaseManager.cleanRatingData();
+        TestDatabaseManager.clearNotifications();
     }
 
     // ==================== MONETARY PRECISION TESTS ====================
@@ -263,6 +273,7 @@ class PaymentEdgeCaseTest {
             
             // When - پردازش همزمان پرداخت‌ها
             ExecutorService executor = Executors.newFixedThreadPool(numberOfOrders);
+            @SuppressWarnings("unchecked")
             CompletableFuture<Transaction>[] futures = new CompletableFuture[numberOfOrders];
             AtomicInteger successCount = new AtomicInteger(0);
             AtomicInteger failureCount = new AtomicInteger(0);
@@ -361,6 +372,7 @@ class PaymentEdgeCaseTest {
             
             // When - پردازش همزمان پرداخت‌های کارت
             ExecutorService executor = Executors.newFixedThreadPool(numberOfUsers);
+            @SuppressWarnings("unchecked")
             CompletableFuture<Transaction>[] futures = new CompletableFuture[numberOfUsers];
             AtomicInteger processedCount = new AtomicInteger(0);
             

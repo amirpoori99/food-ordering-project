@@ -18,6 +18,10 @@ import java.util.List;
 public class DatabasePopulator {
     
     public static void main(String[] args) {
+        // تنظیم محیط برای اجرای production
+        System.setProperty("app.environment", "development");
+        System.setProperty("test.environment", "false");
+        
         DatabasePopulator populator = new DatabasePopulator();
         populator.populateDatabase();
     }

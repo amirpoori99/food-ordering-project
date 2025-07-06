@@ -1,5 +1,6 @@
 package com.myapp.analytics.dto;
 
+import java.util.List;
 import java.util.Map;
 
 public class ComparativeAnalyticsDTO {
@@ -7,6 +8,10 @@ public class ComparativeAnalyticsDTO {
     private Map<String, Double> period2Data;
     private Map<String, Double> differences;
     private Map<String, Double> percentageChanges;
+    private Map<String, Double> periodComparison;
+    private Map<String, Double> benchmarkAnalysis;
+    private List<Map<String, Object>> periodComparisonList;
+    private List<Map<String, Object>> benchmarkAnalysisList;
 
     public ComparativeAnalyticsDTO() {}
 
@@ -21,4 +26,16 @@ public class ComparativeAnalyticsDTO {
 
     public Map<String, Double> getPercentageChanges() { return percentageChanges; }
     public void setPercentageChanges(Map<String, Double> percentageChanges) { this.percentageChanges = percentageChanges; }
+
+    public Map<String, Double> getPeriodComparison() { return periodComparison; }
+    public void setPeriodComparison(Map<String, Double> periodComparison) { this.periodComparison = periodComparison; }
+
+    public Map<String, Double> getBenchmarkAnalysis() { return benchmarkAnalysis; }
+    public void setBenchmarkAnalysis(Map<String, Double> benchmarkAnalysis) { this.benchmarkAnalysis = benchmarkAnalysis; }
+    
+    public List<Map<String, Object>> getPeriodComparisonList() { return periodComparisonList; }
+    public void setPeriodComparison(List<Map<String, Object>> periodComparison) { this.periodComparisonList = periodComparison; }
+    
+    public List<Map<String, Object>> getBenchmarkAnalysisList() { return benchmarkAnalysisList; }
+    public void setBenchmarkAnalysis(List<Map<String, Object>> benchmarkAnalysis) { this.benchmarkAnalysisList = benchmarkAnalysis; }
 } 

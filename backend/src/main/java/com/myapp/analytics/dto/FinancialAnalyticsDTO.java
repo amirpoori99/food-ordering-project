@@ -1,5 +1,6 @@
 package com.myapp.analytics.dto;
 
+import java.util.List;
 import java.util.Map;
 
 public class FinancialAnalyticsDTO {
@@ -10,6 +11,11 @@ public class FinancialAnalyticsDTO {
     private Map<String, Double> revenueByCategory;
     private Map<String, Double> costByCategory;
     private Map<String, Double> financialTrends;
+    
+    // فیلدهای جدید مورد نیاز
+    private double revenueGrowth;
+    private List<Map<String, Object>> costAnalysis;
+    private List<Map<String, Object>> paymentMethods;
 
     public FinancialAnalyticsDTO() {}
 
@@ -33,4 +39,14 @@ public class FinancialAnalyticsDTO {
 
     public Map<String, Double> getFinancialTrends() { return financialTrends; }
     public void setFinancialTrends(Map<String, Double> financialTrends) { this.financialTrends = financialTrends; }
+    
+    // متدهای جدید مورد نیاز
+    public double getRevenueGrowth() { return revenueGrowth; }
+    public void setRevenueGrowth(double revenueGrowth) { this.revenueGrowth = revenueGrowth; }
+    
+    public List<Map<String, Object>> getCostAnalysis() { return costAnalysis; }
+    public void setCostAnalysis(List<Map<String, Object>> costAnalysis) { this.costAnalysis = costAnalysis; }
+    
+    public List<Map<String, Object>> getPaymentMethods() { return paymentMethods; }
+    public void setPaymentMethods(List<Map<String, Object>> paymentMethods) { this.paymentMethods = paymentMethods; }
 } 

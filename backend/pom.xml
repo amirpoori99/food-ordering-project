@@ -38,7 +38,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>  <!-- کدگذاری گزارش‌ها -->
         
         <!-- نسخه‌های وابستگی‌ها -->
-        <hibernate.version>6.4.0.Final</hibernate.version>  <!-- نسخه Hibernate -->
+        <hibernate.version>6.2.13.Final</hibernate.version>  <!-- نسخه Hibernate -->
         <junit.version>5.10.0</junit.version>  <!-- نسخه JUnit -->
         <mockito.version>5.7.0</mockito.version>  <!-- نسخه Mockito -->
         <jacoco.version>0.8.10</jacoco.version>  <!-- نسخه JaCoCo برای پوشش کد -->
@@ -66,11 +66,6 @@
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-community-dialects</artifactId>
             <version>6.2.13.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.xerial</groupId>
-            <artifactId>sqlite-jdbc</artifactId>
-            <version>${sqlite.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -172,6 +167,50 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>2.15.2</version>
         </dependency>
+
+        <!-- Production Database Dependencies -->
+        <!-- SQLite Driver for Testing and Development -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>${sqlite.version}</version>
+        </dependency>
+        
+        <!-- PostgreSQL Driver -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.1</version>
+        </dependency>
+        
+        <!-- HikariCP Connection Pool -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>5.0.1</version>
+        </dependency>
+        
+        <!-- C3P0 Connection Pool for Tests -->
+        <dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.5.5</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- Redis Client for Caching -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>5.1.0</version>
+        </dependency>
+        
+        <!-- Async HTTP Client for external APIs -->
+        <dependency>
+            <groupId>org.asynchttpclient</groupId>
+            <artifactId>async-http-client</artifactId>
+            <version>2.12.3</version>
+        </dependency>
     </dependencies>
     
     <!-- ================================================================ -->
@@ -196,7 +235,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <!-- mainClass removed to allow command-line override -->
+                    <mainClass>com.myapp.ServerApp</mainClass>
                 </configuration>
             </plugin>
             
@@ -236,6 +275,9 @@
                         <include>**/*Test.java</include>
                         <include>**/*Tests.java</include>
                     </includes>
+                    <!-- جلوگیری از اجرای موازی تست‌ها برای رفع قفل شدن فایل SQLite -->
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
                     <!-- تنظیمات سیستم -->
                     <systemPropertyVariables>
                         <java.awt.headless>true</java.awt.headless>

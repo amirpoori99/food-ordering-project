@@ -1,5 +1,6 @@
 package com.myapp.analytics.dto;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,6 +28,11 @@ public class UserAnalyticsDTO {
     private Map<String, Double> loyaltySegments;
     private double churnRate;
     private double lifetimeValue;
+    
+    // فیلدهای جدید مورد نیاز
+    private double userRetention;
+    private List<Map<String, Object>> userSegments;
+    private List<Map<String, Object>> userBehavior;
     
     // Constructors
     public UserAnalyticsDTO() {}
@@ -70,4 +76,14 @@ public class UserAnalyticsDTO {
     
     public double getLifetimeValue() { return lifetimeValue; }
     public void setLifetimeValue(double lifetimeValue) { this.lifetimeValue = lifetimeValue; }
+    
+    // متدهای جدید مورد نیاز
+    public double getUserRetention() { return userRetention; }
+    public void setUserRetention(double userRetention) { this.userRetention = userRetention; }
+    
+    public List<Map<String, Object>> getUserSegments() { return userSegments; }
+    public void setUserSegments(List<Map<String, Object>> userSegments) { this.userSegments = userSegments; }
+    
+    public List<Map<String, Object>> getUserBehavior() { return userBehavior; }
+    public void setUserBehavior(List<Map<String, Object>> userBehavior) { this.userBehavior = userBehavior; }
 } 

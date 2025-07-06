@@ -1,5 +1,6 @@
 package com.myapp.analytics.dto;
 
+import java.util.List;
 import java.util.Map;
 
 public class SeasonalAnalyticsDTO {
@@ -8,6 +9,8 @@ public class SeasonalAnalyticsDTO {
     private Map<String, Double> autumnData;
     private Map<String, Double> winterData;
     private Map<String, Double> seasonalPatterns;
+    private List<Map<String, Object>> holidayImpact;
+    private List<Map<String, Object>> weatherImpact;
 
     public SeasonalAnalyticsDTO() {}
 
@@ -25,4 +28,10 @@ public class SeasonalAnalyticsDTO {
 
     public Map<String, Double> getSeasonalPatterns() { return seasonalPatterns; }
     public void setSeasonalPatterns(Map<String, Double> seasonalPatterns) { this.seasonalPatterns = seasonalPatterns; }
+    
+    public List<Map<String, Object>> getHolidayImpact() { return holidayImpact; }
+    public void setHolidayImpact(List<Map<String, Object>> holidayImpact) { this.holidayImpact = holidayImpact; }
+    
+    public List<Map<String, Object>> getWeatherImpact() { return weatherImpact; }
+    public void setWeatherImpact(List<Map<String, Object>> weatherImpact) { this.weatherImpact = weatherImpact; }
 } 

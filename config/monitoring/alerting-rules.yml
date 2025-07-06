@@ -1,0 +1,311 @@
+﻿# ========================================================================
+# Prometheus Alerting Rules for Food Ordering System - Phase 42
+# Advanced alerting configuration for comprehensive monitoring
+# ========================================================================
+
+groups:
+  # ==============================================
+  # System Infrastructure Alerts
+  # ==============================================
+
+  - name: system-alerts
+    rules:
+      # High CPU Usage
+      - alert: HighCpuUsage
+        expr: 100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 2m
+        labels:
+          severity: warning
+          category: system
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 80% for more than 2 minutes"
+
+      # High Memory Usage
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          category: system
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 85% for more than 5 minutes"
+
+      # Disk Space Low
+      - alert: DiskSpaceLow
+        expr: (1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100 > 90
+        for: 5m
+        labels:
+          severity: critical
+          category: system
+        annotations:
+          summary: "Low disk space detected"
+          description: "Disk space usage is above 90% for more than 5 minutes"
+
+      # Instance Down
+      - alert: InstanceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: system
+        annotations:
+          summary: "Instance is down"
+          description: "Instance {{ $labels.instance }} is down for more than 1 minute"
+
+  # ==============================================
+  # Application Performance Alerts
+  # ==============================================
+
+  - name: application-alerts
+    rules:
+      # High Response Time
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is above 2 seconds"
+
+      # High Error Rate
+      - alert: HighErrorRate
+        expr: (rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m])) * 100 > 5
+        for: 5m
+        labels:
+          severity: critical
+          category: application
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is above 5% for more than 5 minutes"
+
+      # Low Success Rate
+      - alert: LowSuccessRate
+        expr: (rate(http_requests_total{status=~"2.."}[5m]) / rate(http_requests_total[5m])) * 100 < 90
+        for: 10m
+        labels:
+          severity: warning
+          category: application
+        annotations:
+          summary: "Low success rate detected"
+          description: "Success rate is below 90% for more than 10 minutes"
+
+      # JVM Memory Usage High
+      - alert: JVMMemoryUsageHigh
+        expr: (jvm_memory_used_bytes / jvm_memory_max_bytes) * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+          category: jvm
+        annotations:
+          summary: "JVM memory usage is high"
+          description: "JVM memory usage is above 85% for more than 10 minutes"
+
+      # JVM GC Time High
+      - alert: JVMGCTimeHigh
+        expr: rate(jvm_gc_collection_seconds_sum[5m]) > 0.1
+        for: 10m
+        labels:
+          severity: warning
+          category: jvm
+        annotations:
+          summary: "JVM GC time is high"
+          description: "JVM GC time is above 10% for more than 10 minutes"
+
+  # ==============================================
+  # Database Performance Alerts
+  # ==============================================
+
+  - name: database-alerts
+    rules:
+      # Database Connection Pool High
+      - alert: DatabaseConnectionPoolHigh
+        expr: (hikaricp_connections_active / hikaricp_connections_max) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "Database connection pool usage is high"
+          description: "Connection pool usage is above 85% for more than 5 minutes"
+
+      # Database Response Time High
+      - alert: DatabaseResponseTimeHigh
+        expr: histogram_quantile(0.95, rate(database_query_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "Database response time is high"
+          description: "95th percentile database response time is above 1 second"
+
+      # Database Error Rate High
+      - alert: DatabaseErrorRateHigh
+        expr: (rate(database_errors_total[5m]) / rate(database_queries_total[5m])) * 100 > 2
+        for: 5m
+        labels:
+          severity: critical
+          category: database
+        annotations:
+          summary: "Database error rate is high"
+          description: "Database error rate is above 2% for more than 5 minutes"
+
+  # ==============================================
+  # Business Logic Alerts
+  # ==============================================
+
+  - name: business-alerts
+    rules:
+      # Order Processing Time High
+      - alert: OrderProcessingTimeHigh
+        expr: histogram_quantile(0.95, rate(order_processing_duration_seconds_bucket[5m])) > 300
+        for: 5m
+        labels:
+          severity: warning
+          category: business
+        annotations:
+          summary: "Order processing time is high"
+          description: "95th percentile order processing time is above 5 minutes"
+
+      # Payment Failure Rate High
+      - alert: PaymentFailureRateHigh
+        expr: (rate(payment_failures_total[5m]) / rate(payment_attempts_total[5m])) * 100 > 5
+        for: 5m
+        labels:
+          severity: critical
+          category: business
+        annotations:
+          summary: "Payment failure rate is high"
+          description: "Payment failure rate is above 5% for more than 5 minutes"
+
+      # Order Cancellation Rate High
+      - alert: OrderCancellationRateHigh
+        expr: (rate(orders_cancelled_total[5m]) / rate(orders_created_total[5m])) * 100 > 10
+        for: 10m
+        labels:
+          severity: warning
+          category: business
+        annotations:
+          summary: "Order cancellation rate is high"
+          description: "Order cancellation rate is above 10% for more than 10 minutes"
+
+      # Restaurant Offline
+      - alert: RestaurantOffline
+        expr: restaurant_online_status == 0
+        for: 5m
+        labels:
+          severity: warning
+          category: business
+        annotations:
+          summary: "Restaurant is offline"
+          description: "Restaurant {{ $labels.restaurant_id }} is offline for more than 5 minutes"
+
+  # ==============================================
+  # Security Alerts
+  # ==============================================
+
+  - name: security-alerts
+    rules:
+      # Failed Login Attempts High
+      - alert: FailedLoginAttemptsHigh
+        expr: rate(authentication_failures_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "High number of failed login attempts"
+          description: "More than 10 failed login attempts per minute detected"
+
+      # Suspicious Activity Detected
+      - alert: SuspiciousActivityDetected
+        expr: rate(security_suspicious_events_total[5m]) > 5
+        for: 1m
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "Suspicious activity detected"
+          description: "More than 5 suspicious security events per minute detected"
+
+      # Unauthorized Access Attempts
+      - alert: UnauthorizedAccessAttempts
+        expr: rate(http_requests_total{status="401"}[5m]) > 20
+        for: 3m
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "High number of unauthorized access attempts"
+          description: "More than 20 unauthorized access attempts per minute detected"
+
+  # ==============================================
+  # Cache Performance Alerts
+  # ==============================================
+
+  - name: cache-alerts
+    rules:
+      # Cache Hit Rate Low
+      - alert: CacheHitRateLow
+        expr: (rate(cache_hits_total[5m]) / rate(cache_requests_total[5m])) * 100 < 80
+        for: 10m
+        labels:
+          severity: warning
+          category: cache
+        annotations:
+          summary: "Cache hit rate is low"
+          description: "Cache hit rate is below 80% for more than 10 minutes"
+
+      # Cache Memory Usage High
+      - alert: CacheMemoryUsageHigh
+        expr: (redis_memory_used_bytes / redis_memory_max_bytes) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          category: cache
+        annotations:
+          summary: "Cache memory usage is high"
+          description: "Redis memory usage is above 85% for more than 5 minutes"
+
+  # ==============================================
+  # External Dependencies Alerts
+  # ==============================================
+
+  - name: external-dependencies-alerts
+    rules:
+      # External API Down
+      - alert: ExternalAPIDown
+        expr: up{job="external-apis"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          category: external
+        annotations:
+          summary: "External API is down"
+          description: "External API {{ $labels.instance }} is down for more than 2 minutes"
+
+      # External API Response Time High
+      - alert: ExternalAPIResponseTimeHigh
+        expr: histogram_quantile(0.95, rate(external_api_duration_seconds_bucket[5m])) > 5
+        for: 5m
+        labels:
+          severity: warning
+          category: external
+        annotations:
+          summary: "External API response time is high"
+          description: "95th percentile external API response time is above 5 seconds"
+
+      # External API Error Rate High
+      - alert: ExternalAPIErrorRateHigh
+        expr: (rate(external_api_errors_total[5m]) / rate(external_api_requests_total[5m])) * 100 > 10
+        for: 5m
+        labels:
+          severity: critical
+          category: external
+        annotations:
+          summary: "External API error rate is high"
+          description: "External API error rate is above 10% for more than 5 minutes"

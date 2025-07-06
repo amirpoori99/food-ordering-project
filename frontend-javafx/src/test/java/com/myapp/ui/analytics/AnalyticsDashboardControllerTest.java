@@ -245,7 +245,7 @@ class AnalyticsDashboardControllerTest {
             // When & Then
             CountDownLatch latch = new CountDownLatch(1);
             Platform.runLater(() -> {
-                assertNotNull(table);
+            assertNotNull(table);
                 latch.countDown();
             });
 
@@ -414,10 +414,10 @@ class AnalyticsDashboardControllerTest {
         void shouldHandleMultipleUIUpdatesEfficiently() throws Exception {
             // When
             CountDownLatch latch = new CountDownLatch(1);
-            Platform.runLater(() -> {
+                Platform.runLater(() -> {
                 // Test that the controller can handle multiple UI updates
-                latch.countDown();
-            });
+                    latch.countDown();
+                });
 
             // Then
             assertTrue(latch.await(10, TimeUnit.SECONDS));

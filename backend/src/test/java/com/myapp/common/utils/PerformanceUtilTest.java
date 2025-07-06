@@ -784,6 +784,7 @@ class PerformanceUtilTest {
         @DisplayName("✅ Complete Performance Optimization Workflow")
         void completePerformanceWorkflow_AllFeatures_WorkTogether() {
             // 1. اندازه‌گیری performance عملیات cache شده
+            @SuppressWarnings("unchecked")
             PerformanceUtil.PerformanceResult<List<String>> result = PerformanceUtil.measurePerformance(
                 "cached_data_processing",
                 () -> {

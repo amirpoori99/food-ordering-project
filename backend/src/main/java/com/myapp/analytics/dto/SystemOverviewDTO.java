@@ -36,6 +36,15 @@ public class SystemOverviewDTO {
     // آمار اضافی
     private Map<String, Object> additionalMetrics;
     
+    // فیلدهای جدید مورد نیاز
+    private int activeUsers;
+    private int newUsers;
+    private int completedOrders;
+    private int pendingOrders;
+    private int activeRestaurants;
+    private double averageDeliveryTime;
+    private double deliverySuccessRate;
+    
     // Constructors
     public SystemOverviewDTO() {}
     
@@ -174,5 +183,62 @@ public class SystemOverviewDTO {
     
     public void setAdditionalMetrics(Map<String, Object> additionalMetrics) {
         this.additionalMetrics = additionalMetrics;
+    }
+    
+    // متدهای جدید مورد نیاز
+    public int getActiveUsers() {
+        return activeUsers;
+    }
+    
+    public void setActiveUsers(int activeUsers) {
+        this.activeUsers = activeUsers;
+    }
+    
+    public int getNewUsers() {
+        return newUsers;
+    }
+    
+    public void setNewUsers(int newUsers) {
+        this.newUsers = newUsers;
+    }
+    
+    public int getCompletedOrders() {
+        return completedOrders;
+    }
+    
+    public void setCompletedOrders(int completedOrders) {
+        this.completedOrders = completedOrders;
+    }
+    
+    public int getPendingOrders() {
+        return pendingOrders;
+    }
+    
+    public void setPendingOrders(int pendingOrders) {
+        this.pendingOrders = pendingOrders;
+    }
+    
+    public int getActiveRestaurants() {
+        return activeRestaurants;
+    }
+    
+    public void setActiveRestaurants(int activeRestaurants) {
+        this.activeRestaurants = activeRestaurants;
+    }
+    
+    public double getAverageDeliveryTime() {
+        return averageDeliveryTime;
+    }
+    
+    public void setAverageDeliveryTime(double averageDeliveryTime) {
+        this.averageDeliveryTime = averageDeliveryTime;
+    }
+    
+    public double getDeliverySuccessRate() {
+        return deliverySuccessRate;
+    }
+    
+    public void setDeliverySuccessRate(double deliverySuccessRate) {
+        this.deliverySuccessRate = deliverySuccessRate;
     }
 } 

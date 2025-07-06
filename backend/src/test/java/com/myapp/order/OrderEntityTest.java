@@ -255,40 +255,40 @@ class OrderEntityTest {
             
             // Set order to specific status for testing
             switch (status) {
-                case PENDING -> {
+                case PENDING:
                     // Already in PENDING state
                     assertThat(order.canBeCancelled()).isTrue();
-                }
-                case CONFIRMED -> {
+                    break;
+                case CONFIRMED:
                     order.confirm();
                     assertThat(order.canBeCancelled()).isTrue();
-                }
-                case PREPARING -> {
+                    break;
+                case PREPARING:
                     order.confirm();
                     order.setStatus(OrderStatus.PREPARING);
                     assertThat(order.canBeCancelled()).isTrue();
-                }
-                case READY -> {
+                    break;
+                case READY:
                     order.confirm();
                     order.setStatus(OrderStatus.READY);
                     assertThat(order.canBeCancelled()).isFalse();
-                }
-                case OUT_FOR_DELIVERY -> {
+                    break;
+                case OUT_FOR_DELIVERY:
                     order.confirm();
                     order.setStatus(OrderStatus.OUT_FOR_DELIVERY);
                     assertThat(order.canBeCancelled()).isFalse();
-                }
-                case DELIVERED -> {
+                    break;
+                case DELIVERED:
                     order.confirm();
                     order.setStatus(OrderStatus.OUT_FOR_DELIVERY);
                     order.markAsDelivered();
                     assertThat(order.canBeCancelled()).isFalse();
-                }
-                case CANCELLED -> {
+                    break;
+                case CANCELLED:
                     order.confirm();
                     order.cancel();
                     assertThat(order.canBeCancelled()).isFalse();
-                }
+                    break;
             }
         }
     }

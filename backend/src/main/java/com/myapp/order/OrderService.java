@@ -591,4 +591,13 @@ public class OrderService {
             return completedOrders > 0 ? totalSpent / completedOrders : 0.0; 
         }
     }
+    
+    /**
+     * دریافت تمام سفارشات
+     * 
+     * @return لیست تمام سفارشات
+     */
+    public List<Order> getAllOrders() {
+        return orderRepository.getAllOrders();
+    }
 }

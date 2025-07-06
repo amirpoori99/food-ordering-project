@@ -1,0 +1,136 @@
+﻿{
+  "dashboard": {
+    "id": null,
+    "title": "Food Ordering System - Business Metrics Dashboard",
+    "tags": ["food-ordering", "business", "phase-42"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Orders Per Hour",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(orders_created_total[1h])",
+            "refId": "A",
+            "legendFormat": "Orders Created"
+          },
+          {
+            "expr": "rate(orders_completed_total[1h])",
+            "refId": "B",
+            "legendFormat": "Orders Completed"
+          },
+          {
+            "expr": "rate(orders_cancelled_total[1h])",
+            "refId": "C",
+            "legendFormat": "Orders Cancelled"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Orders/hour",
+            "max": null,
+            "min": 0,
+            "show": true
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": 2,
+        "title": "Revenue Per Hour",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(revenue_total[1h])",
+            "refId": "A",
+            "legendFormat": "Revenue"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Revenue/hour",
+            "max": null,
+            "min": 0,
+            "show": true
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        }
+      },
+      {
+        "id": 3,
+        "title": "Restaurant Performance",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "avg(restaurant_rating) by (restaurant_id)",
+            "refId": "A",
+            "legendFormat": "Rating - {{ restaurant_id }}"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Rating",
+            "max": 5,
+            "min": 0,
+            "show": true
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        }
+      },
+      {
+        "id": 4,
+        "title": "User Activity",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(user_logins_total[1h])",
+            "refId": "A",
+            "legendFormat": "User Logins"
+          },
+          {
+            "expr": "rate(user_registrations_total[1h])",
+            "refId": "B",
+            "legendFormat": "User Registrations"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Users/hour",
+            "max": null,
+            "min": 0,
+            "show": true
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 8
+        }
+      }
+    ],
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "refresh": "30s",
+    "schemaVersion": 30,
+    "version": 0
+  }
+}

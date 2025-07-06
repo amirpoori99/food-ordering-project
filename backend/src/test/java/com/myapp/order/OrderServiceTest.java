@@ -1,5 +1,6 @@
 package com.myapp.order;
 
+import com.myapp.common.TestDatabaseManager;
 import com.myapp.common.exceptions.NotFoundException;
 import com.myapp.common.models.*;
 import com.myapp.common.utils.DatabaseUtil;
@@ -16,6 +17,20 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 // Explicit import to resolve ambiguity
 import com.myapp.common.models.Order;
+import com.myapp.common.models.OrderItem;
+import com.myapp.common.models.OrderStatus;
+import com.myapp.common.models.Restaurant;
+import com.myapp.common.models.RestaurantStatus;
+import com.myapp.common.exceptions.NotFoundException;
+import com.myapp.order.OrderRepository;
+import com.myapp.order.OrderService;
+import com.myapp.restaurant.RestaurantRepository;
+import com.myapp.auth.AuthRepository;
+import com.myapp.auth.AuthService;
+import com.myapp.auth.dto.RegisterRequest;
+import com.myapp.restaurant.RestaurantService;
+import com.myapp.notification.NotificationService;
+import com.myapp.notification.NotificationRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -78,6 +93,8 @@ class OrderServiceTest {
      */
     @BeforeAll
     static void setUpClass() {
+        // اطمینان از اینکه sessionFactory آماده است
+        TestDatabaseManager.ensureSessionFactoryReady();
         sessionFactory = DatabaseUtil.getSessionFactory();
     }
     

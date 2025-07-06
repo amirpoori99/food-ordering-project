@@ -2,7 +2,21 @@ package com.myapp.item;
 
 import com.myapp.common.TestDatabaseManager;
 import com.myapp.common.models.*;
+import com.myapp.common.utils.DatabaseUtil;
+import com.myapp.common.utils.TestDataHelper;
+import com.myapp.item.ItemService;
+import com.myapp.item.ItemRepository;
+import com.myapp.auth.AuthRepository;
+import com.myapp.auth.AuthService;
+import com.myapp.auth.dto.RegisterRequest;
 import com.myapp.restaurant.RestaurantRepository;
+import com.myapp.restaurant.RestaurantService;
+import com.myapp.order.OrderService;
+import com.myapp.order.OrderRepository;
+import com.myapp.notification.NotificationService;
+import com.myapp.notification.NotificationRepository;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -50,12 +64,22 @@ class ItemServiceEdgeCaseTest {
     /** رستوران سراسری برای استفاده در همه تست‌ها */
     private static Restaurant globalTestRestaurant;
 
+    /** SessionFactory برای تست‌های پایگاه داده */
+    private static SessionFactory sessionFactory;
+    
+    /** Session جاری برای هر تست */
+    private Session session;
+
     /**
      * راه‌اندازی اولیه کلاس تست - اجرا یک بار در ابتدای تمام تست‌ها
      * دیتابیس تست را راه‌اندازی کرده و رستوران سراسری ایجاد می‌کند
      */
     @BeforeAll
     static void setUpClass() {
+        // اطمینان از اینکه sessionFactory آماده است
+        TestDatabaseManager.ensureSessionFactoryReady();
+        sessionFactory = DatabaseUtil.getSessionFactory();
+        
         // راه‌اندازی دیتابیس تست
         dbManager = new TestDatabaseManager();
         dbManager.setupTestDatabase();
@@ -78,8 +102,9 @@ class ItemServiceEdgeCaseTest {
      */
     @BeforeEach
     void setUp() {
-        // پاک‌سازی دیتابیس برای تست‌های مستقل
-        dbManager.cleanup();
+        // Don't call cleanup() as it closes the sessionFactory
+        // Instead, just clear test data
+        TestDatabaseManager.clearAllTestData();
         
         // ایجاد instances جدید برای هر تست
         itemRepository = new ItemRepository();
@@ -100,8 +125,18 @@ class ItemServiceEdgeCaseTest {
      */
     @AfterAll
     static void tearDownClass() {
-        // پاک‌سازی نهایی دیتابیس
-        dbManager.cleanup();
+        // Don't call cleanup here as it closes the sessionFactory
+        // Let the test framework handle cleanup at the end
+        System.out.println("✅ ItemServiceEdgeCaseTest completed");
+    }
+
+    @AfterEach
+    void tearDown() {
+        // Only clear data, don't close the sessionFactory
+        TestDatabaseManager.clearUsers();
+        TestDatabaseManager.clearRestaurants();
+        TestDatabaseManager.cleanRatingData();
+        TestDatabaseManager.clearNotifications();
     }
 
     // ==================== تست‌های مقادیر حدی و مرزی ====================

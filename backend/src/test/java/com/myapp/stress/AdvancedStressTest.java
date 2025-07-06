@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.AfterAll;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -38,13 +39,26 @@ public class AdvancedStressTest {
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();
         dbManager = new TestDatabaseManager();
-        dbManager.cleanup();
+        // Don't call cleanup() as it closes the sessionFactory
+        // Instead, just clear test data
+        TestDatabaseManager.clearAllTestData();
         dbManager.setupTestDatabase();
     }
 
     @AfterEach
     void tearDown() {
-        dbManager.cleanup();
+        // Only clear data, don't close the sessionFactory
+        TestDatabaseManager.clearUsers();
+        TestDatabaseManager.clearRestaurants();
+        TestDatabaseManager.cleanRatingData();
+        TestDatabaseManager.clearNotifications();
+    }
+
+    @AfterAll
+    static void tearDownClass() {
+        // Don't call cleanup here as it closes the sessionFactory
+        // Let the test framework handle cleanup at the end
+        System.out.println("✅ AdvancedStressTest completed");
     }
 
     /**

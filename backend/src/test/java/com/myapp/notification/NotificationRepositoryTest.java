@@ -1,15 +1,26 @@
 package com.myapp.notification;
 
 import com.myapp.common.TestDatabaseManager;
-import com.myapp.common.models.Notification;
+import com.myapp.common.models.*;
 import com.myapp.common.models.Notification.NotificationType;
 import com.myapp.common.models.Notification.NotificationPriority;
-import com.myapp.common.models.User;
 import com.myapp.common.utils.DatabaseUtil;
-
-import org.junit.jupiter.api.*;
+import com.myapp.common.utils.TestDataHelper;
+import com.myapp.notification.NotificationService;
+import com.myapp.notification.NotificationRepository;
+import com.myapp.auth.AuthRepository;
+import com.myapp.auth.AuthService;
+import com.myapp.auth.dto.RegisterRequest;
+import com.myapp.restaurant.RestaurantRepository;
+import com.myapp.restaurant.RestaurantService;
+import com.myapp.order.OrderService;
+import com.myapp.order.OrderRepository;
+import com.myapp.item.ItemRepository;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.junit.jupiter.api.*;
+
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -43,75 +54,69 @@ import static org.junit.jupiter.api.Assertions.*;
  * @version 1.0
  * @since 2024
  */
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DisplayName("Notification Repository Comprehensive Tests")
 class NotificationRepositoryTest {
 
+    /** SessionFactory برای تست‌های پایگاه داده */
+    private static SessionFactory sessionFactory;
+    
     /** Repository تحت تست */
     private static NotificationRepository notificationRepository;
     
-    /** مدیر دیتابیس تست */
-    private static TestDatabaseManager testDatabaseManager;
-    
-    /** کاربران تستی برای استفاده در تست‌ها */
-    private static User testUser1, testUser2;
+    /** کاربران تستی */
+    private static User testUser1, testUser2, inactiveUser;
 
     @BeforeAll
     static void setUpClass() {
-        testDatabaseManager = new TestDatabaseManager();
-        testDatabaseManager.setupTestDatabase();
+        // اطمینان از اینکه sessionFactory آماده است
+        TestDatabaseManager.ensureSessionFactoryReady();
+        sessionFactory = DatabaseUtil.getSessionFactory();
+        
+        // Initialize repository
         notificationRepository = new NotificationRepository();
         
-        // Create test users
+        // ایجاد کاربران تستی
         createTestUsers();
     }
 
     @AfterAll
     static void tearDownClass() {
-        if (testDatabaseManager != null) {
-            testDatabaseManager.cleanup();
-        }
+        // Don't call cleanup here as it closes the sessionFactory
+        // Let the test framework handle cleanup at the end
+        System.out.println("✅ NotificationRepositoryTest completed");
     }
 
     @BeforeEach
     void setUp() {
-        testDatabaseManager.clearNotifications();
+        TestDatabaseManager.clearNotifications();
     }
 
     private static void createTestUsers() {
-        // Clear any existing users first to avoid conflicts
-        // testDatabaseManager.clearUsers(); // Method might not exist
-        
+        // پاک‌سازی کاربران تستی قبلی برای جلوگیری از تکرار
+        TestDatabaseManager.clearUsers();
         Transaction transaction = null;
         try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            
-            // Create testUser1 with unique phone
+            // Create testUser1 with unique phone and email
             testUser1 = new User();
             testUser1.setFullName("Test User 1");
-            testUser1.setEmail("testuser1@example.com");
-            testUser1.setPhone("1234567890" + System.nanoTime() % 10000);
+            testUser1.setEmail(TestDataHelper.generateUniqueEmail());
+            testUser1.setPhone(TestDataHelper.generateUniquePhone());
             testUser1.setPasswordHash("password123");
             testUser1.setIsActive(true);
             session.persist(testUser1);
-            
-            // Create testUser2 with unique phone  
+            // Create testUser2 with unique phone and email
             testUser2 = new User();
             testUser2.setFullName("Test User 2");
-            testUser2.setEmail("testuser2@example.com");
-            testUser2.setPhone("0987654321" + System.nanoTime() % 10000);
+            testUser2.setEmail(TestDataHelper.generateUniqueEmail());
+            testUser2.setPhone(TestDataHelper.generateUniquePhone());
             testUser2.setPasswordHash("password456");
             testUser2.setIsActive(true);
             session.persist(testUser2);
-            
-            // Flush to ensure IDs are generated
             session.flush();
-            
             transaction.commit();
-            
-            // Log user IDs for debugging
             System.out.println("✅ Created testUser1 with ID: " + testUser1.getId());
             System.out.println("✅ Created testUser2 with ID: " + testUser2.getId());
-            
         } catch (Exception e) {
             System.err.println("❌ Error creating test users: " + e.getMessage());
             if (transaction != null) {
@@ -126,7 +131,7 @@ class NotificationRepositoryTest {
     class BasicCrudOperationsTest {
 
         @Test
-        @Order(1)
+        @org.junit.jupiter.api.Order(1)
         @DisplayName("Should save notification successfully")
         void shouldSaveNotificationSuccessfully() {
             // Given
@@ -150,7 +155,7 @@ class NotificationRepositoryTest {
         }
 
         @Test
-        @Order(2)
+        @org.junit.jupiter.api.Order(2)
         @DisplayName("Should find notification by ID successfully")
         void shouldFindNotificationByIdSuccessfully() {
             // Given
@@ -172,7 +177,7 @@ class NotificationRepositoryTest {
         }
 
         @Test
-        @Order(3)
+        @org.junit.jupiter.api.Order(3)
         @DisplayName("Should update notification successfully")
         void shouldUpdateNotificationSuccessfully() {
             // Given
@@ -195,7 +200,7 @@ class NotificationRepositoryTest {
         }
 
         @Test
-        @Order(4)
+        @org.junit.jupiter.api.Order(4)
         @DisplayName("Should delete notification successfully")
         void shouldDeleteNotificationSuccessfully() {
             // Given

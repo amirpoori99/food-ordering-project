@@ -1,0 +1,10 @@
+﻿{
+    "AvgResponseTime":  202,
+    "TotalRequests":  561,
+    "SuccessRate":  93,
+    "P95ResponseTime":  323,
+    "MaxResponseTime":  1015,
+    "Throughput":  153,
+    "SuccessfulRequests":  521,
+    "FailedRequests":  40
+}

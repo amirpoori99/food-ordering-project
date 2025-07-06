@@ -568,4 +568,14 @@ public class PaymentRepository {
             return totalTransactions > 0 ? (double) completedTransactions / totalTransactions * 100 : 0.0; 
         }
     }
+
+    /**
+     * دریافت همه پرداخت‌ها
+     */
+    public List<Transaction> getAllPayments() {
+        try (Session session = sessionFactory.openSession()) {
+            Query<Transaction> query = session.createQuery("FROM Transaction t ORDER BY t.createdAt DESC", Transaction.class);
+            return query.getResultList();
+        }
+    }
 } 

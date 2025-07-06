@@ -1,0 +1,67 @@
+﻿{
+    "directories":  {
+                        "logs":  "logs\\staging",
+                        "database":  "database\\staging",
+                        "target":  "deployments/staging"
+                    },
+    "setupBy":  "USER",
+    "environment":  "staging",
+    "configuration":  {
+                          "environment":  "staging",
+                          "backend":  {
+                                          "skipTests":  false,
+                                          "port":  8082,
+                                          "jvmArgs":  [
+                                                          "-Xms1024m",
+                                                          "-Xmx2048m",
+                                                          "-Dspring.profiles.active=staging"
+                                                      ]
+                                      },
+                          "frontend":  {
+                                           "port":  8083,
+                                           "jvmArgs":  [
+                                                           "-Xms512m",
+                                                           "-Xmx1024m"
+                                                       ]
+                                       },
+                          "database":  {
+                                           "url":  "jdbc:sqlite:food_ordering_staging.db",
+                                           "driver":  "org.sqlite.JDBC",
+                                           "backup":  true
+                                       },
+                          "services":  {
+                                           "backend":  {
+                                                           "enabled":  true,
+                                                           "port":  8082,
+                                                           "healthCheckUrl":  "http://localhost:8082/health",
+                                                           "startupTimeout":  90
+                                                       },
+                                           "frontend":  {
+                                                            "enabled":  true,
+                                                            "port":  8083,
+                                                            "startupTimeout":  45
+                                                        }
+                                       },
+                          "deployment":  {
+                                             "targetDirectory":  "deployments/staging",
+                                             "backupCount":  5,
+                                             "rollbackEnabled":  true
+                                         },
+                          "monitoring":  {
+                                             "enabled":  true,
+                                             "metricsPort":  9091,
+                                             "loggingLevel":  "INFO"
+                                         }
+                      },
+    "scripts":  {
+                    "stop":  "scripts\\stop-staging.bat",
+                    "healthCheck":  "scripts\\health-check-staging.bat",
+                    "start":  "scripts\\start-staging.bat"
+                },
+    "services":  {
+                     "backendPort":  8082,
+                     "monitoringPort":  9091,
+                     "frontendPort":  8083
+                 },
+    "setupDate":  "2025-07-05 02:51:34"
+}

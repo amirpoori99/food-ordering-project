@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +36,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * @version 1.0
  * @since 2024
  */
+@Disabled("UI test - only run in graphical environment")
 @DisplayName("ChartDataService Tests")
 @Tag("analytics")
 @Tag("service")

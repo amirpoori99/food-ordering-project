@@ -4,21 +4,32 @@
         "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
-        <!-- Database connection properties -->
+        <!-- SQLite Database Connection Configuration (for Testing) -->
         <property name="hibernate.connection.driver_class">org.sqlite.JDBC</property>
         <property name="hibernate.connection.url">jdbc:sqlite:food_ordering.db</property>
         <property name="hibernate.connection.username"></property>
         <property name="hibernate.connection.password"></property>
         
-        <!-- Hibernate properties -->
+        <!-- SQLite Dialect -->
         <property name="hibernate.dialect">org.hibernate.community.dialect.SQLiteDialect</property>
-        <property name="hibernate.show_sql">true</property>
+        
+        <!-- Performance Settings -->
+        <property name="hibernate.show_sql">false</property>
         <property name="hibernate.format_sql">true</property>
-        <property name="hibernate.hbm2ddl.auto">validate</property>
-        <property name="hibernate.connection.pool_size">10</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
+        
+        <!-- Connection Pool Settings -->
+        <property name="hibernate.connection.pool_size">20</property>
         <property name="hibernate.current_session_context_class">thread</property>
-        <property name="hibernate.jdbc.batch_size">20</property>
+        
+        <!-- Batch Settings -->
+        <property name="hibernate.jdbc.batch_size">25</property>
         <property name="hibernate.jdbc.fetch_size">20</property>
+        <property name="hibernate.order_inserts">true</property>
+        <property name="hibernate.order_updates">true</property>
+        <property name="hibernate.batch_versioned_data">true</property>
+        
+        <!-- Cache Settings -->
         <property name="hibernate.cache.use_second_level_cache">false</property>
         <property name="hibernate.cache.use_query_cache">false</property>
         
@@ -32,8 +43,15 @@
         <mapping class="com.myapp.common.models.Rating"/>
         <mapping class="com.myapp.common.models.Coupon"/>
         <mapping class="com.myapp.common.models.CouponUsage"/>
-        <mapping class="com.myapp.common.models.Notification"/>
         <mapping class="com.myapp.common.models.Favorite"/>
-        <mapping class="com.myapp.common.models.Delivery"/>
+        <mapping class="com.myapp.common.models.Notification"/>
+        
+        <!-- Analytics & Business Intelligence entities -->
+        <mapping class="com.myapp.analytics.models.OrderAnalytics"/>
+        <mapping class="com.myapp.analytics.models.UserAnalytics"/>
+        <mapping class="com.myapp.analytics.models.RestaurantAnalytics"/>
+        <mapping class="com.myapp.analytics.models.PaymentAnalytics"/>
+        <mapping class="com.myapp.analytics.models.ETLResult"/>
+        <mapping class="com.myapp.analytics.models.DashboardMetrics"/>
     </session-factory>
 </hibernate-configuration> 

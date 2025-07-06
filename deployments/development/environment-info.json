@@ -1,0 +1,67 @@
+﻿{
+    "directories":  {
+                        "logs":  "logs\\development",
+                        "database":  "database\\development",
+                        "target":  "deployments/development"
+                    },
+    "setupBy":  "USER",
+    "environment":  "development",
+    "configuration":  {
+                          "environment":  "development",
+                          "backend":  {
+                                          "skipTests":  false,
+                                          "port":  8080,
+                                          "jvmArgs":  [
+                                                          "-Xms512m",
+                                                          "-Xmx1024m",
+                                                          "-Dspring.profiles.active=dev"
+                                                      ]
+                                      },
+                          "frontend":  {
+                                           "port":  8081,
+                                           "jvmArgs":  [
+                                                           "-Xms256m",
+                                                           "-Xmx512m"
+                                                       ]
+                                       },
+                          "database":  {
+                                           "url":  "jdbc:sqlite:food_ordering_dev.db",
+                                           "driver":  "org.sqlite.JDBC",
+                                           "backup":  true
+                                       },
+                          "services":  {
+                                           "backend":  {
+                                                           "enabled":  true,
+                                                           "port":  8080,
+                                                           "healthCheckUrl":  "http://localhost:8080/health",
+                                                           "startupTimeout":  60
+                                                       },
+                                           "frontend":  {
+                                                            "enabled":  true,
+                                                            "port":  8081,
+                                                            "startupTimeout":  30
+                                                        }
+                                       },
+                          "deployment":  {
+                                             "targetDirectory":  "deployments/development",
+                                             "backupCount":  3,
+                                             "rollbackEnabled":  true
+                                         },
+                          "monitoring":  {
+                                             "enabled":  true,
+                                             "metricsPort":  9090,
+                                             "loggingLevel":  "DEBUG"
+                                         }
+                      },
+    "scripts":  {
+                    "stop":  "scripts\\stop-development.bat",
+                    "healthCheck":  "scripts\\health-check-development.bat",
+                    "start":  "scripts\\start-development.bat"
+                },
+    "services":  {
+                     "backendPort":  8080,
+                     "monitoringPort":  9090,
+                     "frontendPort":  8081
+                 },
+    "setupDate":  "2025-07-05 02:51:21"
+}

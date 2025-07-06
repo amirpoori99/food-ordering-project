@@ -371,11 +371,6 @@
     <!-- لاگ‌های اضافی TestFX کاهش یافته‌اند -->
     
     <!-- کاهش لاگ‌های verbose کتابخانه‌های شخص ثالث -->
-    <!-- logger برای Spring -->
-    <logger name="org.springframework" level="WARN"/>
-    <!-- نام logger: Spring -->
-    <!-- سطح لاگ: WARN (فقط هشدارها) -->
-    <!-- لاگ‌های اضافی Spring کاهش یافته‌اند -->
     
     <!-- logger برای Netty -->
     <logger name="io.netty" level="WARN"/>

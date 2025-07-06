@@ -174,6 +174,9 @@ public class DeliveryController implements HttpHandler {
         } else if (path.equals("/api/deliveries/pending")) {
             // GET /api/deliveries/pending - تحویل‌های در انتظار اختصاص پیک
             getPendingDeliveries(exchange);
+        } else if (path.equals("/api/deliveries") || path.equals("/api/deliveries/")) {
+            // GET /api/deliveries - تمام تحویل‌ها
+            getAllDeliveries(exchange);
         } else {
             sendErrorResponse(exchange, 404, "Endpoint not found");
         }
@@ -246,6 +249,16 @@ public class DeliveryController implements HttpHandler {
      */
     private void getActiveDeliveries(HttpExchange exchange) throws IOException {
         List<Delivery> deliveries = deliveryService.getActiveDeliveries();
+        sendJsonResponse(exchange, 200, deliveries);
+    }
+    
+    /**
+     * دریافت تمام تحویل‌ها
+     * 
+     * @param exchange HTTP exchange
+     */
+    private void getAllDeliveries(HttpExchange exchange) throws IOException {
+        List<Delivery> deliveries = deliveryService.getAllDeliveries();
         sendJsonResponse(exchange, 200, deliveries);
     }
     

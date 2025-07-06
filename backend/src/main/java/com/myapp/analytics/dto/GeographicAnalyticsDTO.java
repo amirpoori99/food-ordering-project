@@ -10,6 +10,12 @@ public class GeographicAnalyticsDTO {
     private Map<String, Double> regionGrowth;
     private List<String> topCities;
     private Map<String, Double> cityPerformance;
+    private Map<String, Double> regionalSales;
+    private Map<String, Double> userDistribution;
+    private Map<String, Double> restaurantDistribution;
+    private List<Map<String, Object>> salesByRegion;
+    private List<Map<String, Object>> userDistributionList;
+    private List<Map<String, Object>> restaurantDistributionList;
 
     public GeographicAnalyticsDTO() {}
 
@@ -30,4 +36,22 @@ public class GeographicAnalyticsDTO {
 
     public Map<String, Double> getCityPerformance() { return cityPerformance; }
     public void setCityPerformance(Map<String, Double> cityPerformance) { this.cityPerformance = cityPerformance; }
+
+    public Map<String, Double> getRegionalSales() { return regionalSales; }
+    public void setRegionalSales(Map<String, Double> regionalSales) { this.regionalSales = regionalSales; }
+
+    public Map<String, Double> getUserDistribution() { return userDistribution; }
+    public void setUserDistribution(Map<String, Double> userDistribution) { this.userDistribution = userDistribution; }
+
+    public Map<String, Double> getRestaurantDistribution() { return restaurantDistribution; }
+    public void setRestaurantDistribution(Map<String, Double> restaurantDistribution) { this.restaurantDistribution = restaurantDistribution; }
+    
+    public List<Map<String, Object>> getSalesByRegion() { return salesByRegion; }
+    public void setSalesByRegion(List<Map<String, Object>> salesByRegion) { this.salesByRegion = salesByRegion; }
+    
+    public List<Map<String, Object>> getUserDistributionList() { return userDistributionList; }
+    public void setUserDistributionList(List<Map<String, Object>> userDistribution) { this.userDistributionList = userDistribution; }
+    
+    public List<Map<String, Object>> getRestaurantDistributionList() { return restaurantDistributionList; }
+    public void setRestaurantDistributionList(List<Map<String, Object>> restaurantDistribution) { this.restaurantDistributionList = restaurantDistribution; }
 } 

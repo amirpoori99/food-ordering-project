@@ -12,6 +12,7 @@ public class PopularItemDTO {
     private double totalRevenue;
     private double averageRating;
     private double popularityScore;
+    private int totalQuantity;
     
     // Constructors
     public PopularItemDTO() {}
@@ -47,6 +48,9 @@ public class PopularItemDTO {
     
     public double getPopularityScore() { return popularityScore; }
     public void setPopularityScore(double popularityScore) { this.popularityScore = popularityScore; }
+    
+    public int getTotalQuantity() { return totalQuantity; }
+    public void setTotalQuantity(int totalQuantity) { this.totalQuantity = totalQuantity; }
     
     /**
      * محاسبه امتیاز محبوبیت

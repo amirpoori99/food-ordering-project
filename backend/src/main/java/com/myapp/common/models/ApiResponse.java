@@ -3,11 +3,11 @@ package com.myapp.common.models;
 /**
  * کلاس استاندارد برای پاسخ‌های API
  */
-public class ApiResponse {
+public class ApiResponse<T> {
     
     private boolean success;
     private String message;
-    private Object data;
+    private T data;
     private long timestamp;
     
     public ApiResponse() {
@@ -20,9 +20,26 @@ public class ApiResponse {
         this.message = message;
     }
     
-    public ApiResponse(boolean success, String message, Object data) {
+    public ApiResponse(boolean success, String message, T data) {
         this(success, message);
         this.data = data;
+    }
+    
+    // Static utility methods
+    public static <T> ApiResponse<T> success(T data, String message) {
+        return new ApiResponse<>(true, message, data);
+    }
+    
+    public static <T> ApiResponse<T> success(T data) {
+        return new ApiResponse<>(true, "عملیات با موفقیت انجام شد", data);
+    }
+    
+    public static <T> ApiResponse<T> error(String message) {
+        return new ApiResponse<>(false, message, null);
+    }
+    
+    public static <T> ApiResponse<T> error(String message, T data) {
+        return new ApiResponse<>(false, message, data);
     }
     
     // Getters and Setters
@@ -42,11 +59,11 @@ public class ApiResponse {
         this.message = message;
     }
     
-    public Object getData() {
+    public T getData() {
         return data;
     }
     
-    public void setData(Object data) {
+    public void setData(T data) {
         this.data = data;
     }
     

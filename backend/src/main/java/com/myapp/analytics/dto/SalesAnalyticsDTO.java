@@ -31,6 +31,11 @@ public class SalesAnalyticsDTO {
     // آمار اضافی
     private Map<String, Object> additionalMetrics;
     
+    // فیلدهای جدید مورد نیاز
+    private List<Map<String, Object>> salesByCategory;
+    private List<Map<String, Object>> salesByRestaurant;
+    private List<Map<String, Object>> salesByTime;
+    
     // Constructors
     public SalesAnalyticsDTO() {}
     
@@ -137,5 +142,30 @@ public class SalesAnalyticsDTO {
     
     public void setAdditionalMetrics(Map<String, Object> additionalMetrics) {
         this.additionalMetrics = additionalMetrics;
+    }
+    
+    // متدهای جدید مورد نیاز
+    public List<Map<String, Object>> getSalesByCategory() {
+        return salesByCategory;
+    }
+    
+    public void setSalesByCategory(List<Map<String, Object>> salesByCategory) {
+        this.salesByCategory = salesByCategory;
+    }
+    
+    public List<Map<String, Object>> getSalesByRestaurant() {
+        return salesByRestaurant;
+    }
+    
+    public void setSalesByRestaurant(List<Map<String, Object>> salesByRestaurant) {
+        this.salesByRestaurant = salesByRestaurant;
+    }
+    
+    public List<Map<String, Object>> getSalesByTime() {
+        return salesByTime;
+    }
+    
+    public void setSalesByTime(List<Map<String, Object>> salesByTime) {
+        this.salesByTime = salesByTime;
     }
 } 

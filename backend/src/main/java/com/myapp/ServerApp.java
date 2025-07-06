@@ -37,6 +37,9 @@ import com.myapp.favorites.FavoritesController; // کنترلر علاقه‌م�
 import com.myapp.notification.NotificationRepository; // ریپازیتوری اعلان
 import com.myapp.notification.NotificationService;    // سرویس اعلان
 import com.myapp.notification.NotificationController; // کنترلر اعلان
+// --- ایمپورت‌های مربوط به Analytics و Business Intelligence ---
+import com.myapp.analytics.AnalyticsService;         // سرویس تحلیل داده‌ها
+import com.myapp.analytics.AnalyticsController;      // کنترلر Analytics
 // --- ابزارهای کمکی و مدل‌ها ---
 import com.myapp.common.utils.DatabaseUtil; // ابزار اتصال به دیتابیس
 import com.myapp.common.utils.PasswordUtil; // ابزار رمزنگاری
@@ -75,6 +78,7 @@ public class ServerApp {
     private static VendorController vendorController;          // کنترلر سیستم فروشندگان
     private static FavoritesController favoritesController;    // کنترلر علاقه‌مندی‌ها
     private static NotificationController notificationController; // کنترلر اعلان‌ها
+    private static AnalyticsController analyticsController;     // کنترلر Analytics و BI
     
     /**
      * متد اصلی main که نقطه شروع برنامه است
@@ -110,6 +114,9 @@ public class ServerApp {
         // مرحله 5: راه‌اندازی سرویس کیف پول برای کنترلر تراکنش‌ها
         WalletService walletService = new WalletService(paymentRepo, authRepo);
         
+        // مرحله 5.5: راه‌اندازی سرویس Analytics و Business Intelligence
+        AnalyticsService analyticsService = new AnalyticsService(DatabaseUtil.getSessionFactory());
+        
         // مرحله 6: راه‌اندازی سایر کنترلرها
         restaurantController = new RestaurantController();               // کنترلر رستوران‌ها
         orderController = new OrderController();                        // کنترلر سفارشات
@@ -119,9 +126,10 @@ public class ServerApp {
         deliveryController = new DeliveryController();                  // کنترلر تحویل‌ها
         itemController = new ItemController();                          // کنترلر آیتم‌ها
         menuController = new MenuController();                          // کنترلر منو
-        vendorController = new VendorController();                      // کنترلر فروشندگان
+        vendorController = new VendorController();                      // کنترلر سیستم فروشندگان
         favoritesController = new FavoritesController(favoritesService); // کنترلر علاقه‌مندی‌ها
         notificationController = new NotificationController(notificationService); // کنترلر اعلان‌ها
+        analyticsController = new AnalyticsController(); // کنترلر Analytics و BI
         
         // مرحله 7: تست اتصال به پایگاه داده
         System.out.println("Testing Hibernate connection...");
@@ -150,19 +158,20 @@ public class ServerApp {
         server.createContext("/health", new HealthHandler());              // بررسی سلامت سرور
         
         // مرحله 10: اضافه کردن endpoint های کنترلرها (Business Logic)
-        server.createContext("/api/admin/", adminController);              // endpoint های پنل مدیریت
+        server.createContext("/api/admin", adminController);              // endpoint های پنل مدیریت
         server.createContext("/api/restaurants", restaurantController);   // endpoint های رستوران‌ها
-        server.createContext("/api/orders/", orderController);             // endpoint های سفارشات
-        server.createContext("/api/payments/", paymentController);         // endpoint های پرداخت
-        server.createContext("/api/wallet/", walletController);            // endpoint های کیف پول
-        server.createContext("/api/transactions/", transactionController); // endpoint های تراکنش‌ها
-        server.createContext("/api/deliveries/", deliveryController);      // endpoint های تحویل
-        server.createContext("/api/items", itemController);               // endpoint های آیتم‌ها
-        server.createContext("/api/menu/", menuController);                // endpoint های منو
-        server.createContext("/api/vendors/", vendorController);           // endpoint های فروشندگان
-        server.createContext("/api/favorites/", favoritesController);      // endpoint های علاقه‌مندی‌ها
-        server.createContext("/api/notifications/", notificationController); // endpoint های اعلان‌ها
-        server.createContext("/api/notification/", notificationController);  // endpoint جایگزین اعلان‌ها
+        server.createContext("/api/orders", orderController);              // endpoint های سفارشات
+        server.createContext("/api/payments", paymentController);          // endpoint های پرداخت
+        server.createContext("/api/wallet", walletController);             // endpoint های کیف پول
+        server.createContext("/api/transactions", transactionController);  // endpoint های تراکنش‌ها
+        server.createContext("/api/deliveries", deliveryController);       // endpoint های تحویل
+        server.createContext("/api/items", itemController);                // endpoint های آیتم‌ها
+        server.createContext("/api/menu", menuController);                 // endpoint های منو
+        server.createContext("/api/vendors", vendorController);            // endpoint های فروشندگان
+        server.createContext("/api/favorites", favoritesController);       // endpoint های علاقه‌مندی‌ها
+        server.createContext("/api/notifications", notificationController); // endpoint های اعلان‌ها
+        server.createContext("/api/notification", notificationController);  // endpoint جایگزین اعلان‌ها
+        server.createContext("/api/analytics", analyticsController);        // endpoint های Analytics و BI
         
         // مرحله 11: تنظیم Thread Pool برای پردازش همزمان درخواست‌ها
         server.setExecutor(Executors.newFixedThreadPool(10)); // حداکثر 10 thread همزمان
@@ -247,6 +256,17 @@ public class ServerApp {
         System.out.println("   POST /api/notifications/ - Create notification");
         System.out.println("   PUT  /api/notification/{id}/read - Mark as read");
         System.out.println("   DELETE /api/notification/{id} - Delete notification");
+        
+        // نمایش endpoint های Analytics و Business Intelligence (10+ endpoint)
+        System.out.println("   📊 Analytics & Business Intelligence (10+ endpoints):");
+        System.out.println("   GET  /api/analytics/dashboard - Real-time dashboard");
+        System.out.println("   GET  /api/analytics/revenue-report - Revenue analysis");
+        System.out.println("   GET  /api/analytics/customer-analytics - Customer behavior");
+        System.out.println("   GET  /api/analytics/restaurant-performance - Restaurant metrics");
+        System.out.println("   POST /api/analytics/etl/run - Run ETL process");
+        System.out.println("   GET  /api/analytics/predictions - AI predictions");
+        System.out.println("   GET  /api/analytics/recommendations/{userId} - Personalized recommendations");
+        System.out.println("   GET  /api/analytics/export/excel - Export to Excel");
         
         // مرحله 13: تنظیم Graceful Shutdown برای خاموش کردن صحیح سرور
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

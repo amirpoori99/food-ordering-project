@@ -2,255 +2,166 @@ package com.myapp.common;
 
 import com.myapp.common.utils.DatabaseUtil;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * کلاس ابزاری برای مدیریت عملیات پایگاه داده تست
- * 
- * این کلاس مسئولیت‌های زیر را دارد:
- * 
- * Database Setup:
- * - راه‌اندازی پایگاه داده تست
- * - پیکربندی خودکار Hibernate
- * 
- * Data Cleaning:
- * - پاک‌سازی داده‌های تست بعد از هر تست
- * - حذف انتخابی جداول خاص (Notification, Rating)
- * - پاک‌سازی کامل تمام داده‌ها
- * 
- * Transaction Management:
- * - مدیریت تراکنش‌ها با rollback در صورت خطا
- * - Exception handling و logging مناسب
- * 
- * Utility Operations:
- * - شمارش رکوردها برای assertion ها
- * - تست‌های integrity و foreign key constraints
- * 
- * Design Pattern: Utility Class
- * - Static methods برای عملیات مشترک
- * - Instance methods برای lifecycle management
+ * Test Database Manager for managing test database operations
+ * This class provides utilities for test-specific database operations
  * 
  * @author Food Ordering System Team
  * @version 1.0
- * @since 2024
  */
 public class TestDatabaseManager {
     
-    /** Logger برای ثبت رویدادهای مدیریت پایگاه داده تست */
-    private static final Logger logger = LoggerFactory.getLogger(TestDatabaseManager.class);
+    private static SessionFactory sessionFactory;
     
     /**
-     * راه‌اندازی پایگاه داده تست
-     * 
-     * Scenario: آماده‌سازی پایگاه داده برای اجرای تست‌ها
-     * Operations:
-     * - پیکربندی خودکار Hibernate
-     * - ایجاد جداول بر اساس entity mappings
-     * - تنظیم connection pool
-     * 
-     * Note: 
-     * پایگاه داده به صورت خودکار از طریق hibernate configuration راه‌اندازی می‌شود
-     * این متد بیشتر برای logging و monitoring استفاده می‌شود
+     * Initialize test database
      */
-    public void setupTestDatabase() {
-        // پایگاه داده به صورت خودکار از طریق hibernate configuration راه‌اندازی می‌شود
-        logger.debug("Test database setup completed");
-    }
-    
-    /**
-     * متد پاک‌سازی برای cleanup تست
-     * 
-     * Scenario: پاک‌سازی بعد از اتمام lifecycle تست
-     * Operations:
-     * - پاک‌سازی تمام داده‌های تست
-     * - آزادسازی منابع
-     * - ثبت completion log
-     * 
-     * Usage: معمولاً در @AfterAll یا test teardown استفاده می‌شود
-     */
-    public void cleanup() {
-        cleanAllTestData();
-        logger.debug("Test database cleanup completed");
-    }
-    
-    /**
-     * پاک‌سازی تمام داده‌های notification از پایگاه داده
-     * 
-     * Scenario: پاک‌سازی انتخابی فقط اعلان‌ها
-     * 
-     * Transaction Flow:
-     * 1. شروع تراکنش
-     * 2. حذف تمام notification ها
-     * 3. commit تراکنش
-     * 4. در صورت خطا: rollback
-     * 
-     * Error Handling:
-     * - Rollback خودکار در صورت exception
-     * - Logging جزئیات خطا
-     * - Exception swallowing برای stability تست‌ها
-     */
-    public void clearNotifications() {
-        Transaction transaction = null;
-        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-            
-            // حذف تمام اعلان‌ها
-            session.createQuery("DELETE FROM Notification").executeUpdate();
-            
-            transaction.commit();
-            logger.debug("Cleaned all notification data from test database");
-            
+    public static void initialize() {
+        try {
+            sessionFactory = DatabaseUtil.getSessionFactory();
+            System.out.println("✅ Test database initialized successfully");
         } catch (Exception e) {
-            // Rollback تراکنش در صورت خطا
-            if (transaction != null) {
-                try {
-                    transaction.rollback();
-                } catch (Exception rollbackEx) {
-                    logger.error("Error during rollback: {}", rollbackEx.getMessage(), rollbackEx);
-                }
-            }
-            logger.error("Error cleaning notification data: {}", e.getMessage(), e);
+            System.err.println("❌ Failed to initialize test database: " + e.getMessage());
+            throw new RuntimeException("Test database initialization failed", e);
         }
     }
     
     /**
-     * پاک‌سازی فقط داده‌های notification بدون حذف کاربران
-     * 
-     * Scenario: پاک‌سازی انتخابی notifications برای تست‌های که نیاز به حفظ کاربران دارند
-     * 
-     * این متد فقط notification ها را حذف می‌کند و کاربران را دست‌نخورده نگه می‌دارد
-     * مناسب برای تست‌هایی که کاربران ثابت نیاز دارند
+     * Get test session factory
      */
-    public void clearNotificationData() {
+    public static SessionFactory getSessionFactory() {
+        if (sessionFactory == null) {
+            initialize();
+        }
+        return sessionFactory;
+    }
+    
+    /**
+     * Get a new test session
+     */
+    public static Session getSession() {
+        return getSessionFactory().openSession();
+    }
+    
+    /**
+     * Clear all test data without closing the sessionFactory
+     * This is safer for test isolation
+     */
+    public static void clearAllTestData() {
+        try {
+            clearUsers();
+            clearRestaurants();
+            cleanRatingData();
+            clearNotifications();
+            System.out.println("[TestDatabaseManager] All test data cleared");
+        } catch (Exception e) {
+            System.err.println("[TestDatabaseManager] Error clearing test data: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Ensure sessionFactory is properly initialized and not closed
+     * This method should be called before any test operations
+     */
+    public static void ensureSessionFactoryReady() {
+        try {
+            if (sessionFactory == null || sessionFactory.isClosed()) {
+                System.out.println("[TestDatabaseManager] Reinitializing sessionFactory...");
+                initialize();
+            }
+        } catch (Exception e) {
+            System.err.println("[TestDatabaseManager] Error ensuring sessionFactory ready: " + e.getMessage());
+            throw new RuntimeException("Failed to ensure sessionFactory is ready", e);
+        }
+    }
+    
+    /**
+     * Clean up test database - only call this at the very end of all tests
+     */
+    public static void cleanup() {
+        try {
+            clearAllTestData();
+            // Only close sessionFactory if it's not null and not already closed
+            if (sessionFactory != null && !sessionFactory.isClosed()) {
+                sessionFactory.close();
+                System.out.println("[TestDatabaseManager] SessionFactory closed successfully");
+            }
+        } catch (Exception e) {
+            System.err.println("[TestDatabaseManager] Error during cleanup: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Execute a database operation in a transaction
+     */
+    public static <T> T executeInTransaction(DatabaseOperation<T> operation) {
+        Session session = getSession();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+            T result = operation.execute(session);
+            transaction.commit();
+            return result;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw new RuntimeException("Database operation failed", e);
+        } finally {
+            session.close();
+        }
+    }
+    
+    /**
+     * Functional interface for database operations
+     */
+    @FunctionalInterface
+    public static interface DatabaseOperation<T> {
+        T execute(Session session);
+    }
+
+    public static void setupTestDatabase() {
+        System.out.println("[TestDatabaseManager] setupTestDatabase called");
+    }
+
+    public static void clearUsers() {
+        executeInTransaction(session -> {
+            session.createQuery("DELETE FROM User").executeUpdate();
+            return null;
+        });
+        System.out.println("[TestDatabaseManager] clearUsers: All users deleted");
+    }
+
+    public static void clearRestaurants() {
+        executeInTransaction(session -> {
+            session.createQuery("DELETE FROM Restaurant").executeUpdate();
+            return null;
+        });
+        System.out.println("[TestDatabaseManager] clearRestaurants: All restaurants deleted");
+    }
+
+    public static void clearNotifications() {
+        executeInTransaction(session -> {
+            session.createQuery("DELETE FROM Notification").executeUpdate();
+            return null;
+        });
+        System.out.println("[TestDatabaseManager] clearNotifications: All notifications deleted");
+    }
+
+    public static void clearNotificationData() {
         clearNotifications();
     }
-    
-    /**
-     * پاک‌سازی تمام داده‌های rating از پایگاه داده
-     * 
-     * Scenario: پاک‌سازی انتخابی فقط رتبه‌بندی‌ها
-     * 
-     * Static Method: 
-     * برای استفاده راحت‌تر در تست‌های مختلف بدون نیاز به instance
-     * 
-     * Transaction Management:
-     * - مدیریت کامل تراکنش با try-with-resources
-     * - Exception handling مقاوم
-     * - Detailed logging برای debugging
-     */
+
     public static void cleanRatingData() {
-        Transaction transaction = null;
-        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-            
-            // حذف تمام رتبه‌بندی‌ها
+        executeInTransaction(session -> {
             session.createQuery("DELETE FROM Rating").executeUpdate();
-            
-            transaction.commit();
-            logger.debug("Cleaned all rating data from test database");
-            
-        } catch (Exception e) {
-            // Rollback تراکنش در صورت خطا
-            if (transaction != null) {
-                try {
-                    transaction.rollback();
-                } catch (Exception rollbackEx) {
-                    logger.error("Error during rollback: {}", rollbackEx.getMessage(), rollbackEx);
-                }
-            }
-            logger.error("Error cleaning rating data: {}", e.getMessage(), e);
-        }
-    }
-    
-    /**
-     * پاک‌سازی تمام داده‌های تست از پایگاه داده
-     * 
-     * Scenario: پاک‌سازی کامل برای reset کردن پایگاه داده
-     * 
-     * Foreign Key Constraint Handling:
-     * ترتیب حذف طوری انتخاب شده که foreign key constraints نقض نشوند:
-     * 1. Notification (مستقل)
-     * 2. Rating (مستقل) 
-     * 3. OrderItem (وابسته به Order و FoodItem)
-     * 4. Order (وابسته به User و Restaurant)
-     * 5. FoodItem (وابسته به Restaurant)
-     * 6. Restaurant (وابسته به User)
-     * 7. User (بنیادی‌ترین entity)
-     * 
-     * Performance Consideration:
-     * - استفاده از bulk delete برای سرعت بالا
-     * - یک تراکنش برای همه عملیات
-     */
-    public static void cleanAllTestData() {
-        Transaction transaction = null;
-        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-            
-            // حذف به ترتیب برای رعایت foreign key constraints
-            session.createQuery("DELETE FROM Notification").executeUpdate();
-            session.createQuery("DELETE FROM Rating").executeUpdate();
-            session.createQuery("DELETE FROM OrderItem").executeUpdate();
-            session.createQuery("DELETE FROM Order").executeUpdate();
-            session.createQuery("DELETE FROM FoodItem").executeUpdate();
-            session.createQuery("DELETE FROM Restaurant").executeUpdate();
-            session.createQuery("DELETE FROM User").executeUpdate();
-            
-            transaction.commit();
-            logger.debug("Cleaned all test data from database");
-            
-        } catch (Exception e) {
-            // Rollback تراکنش در صورت خطا
-            if (transaction != null) {
-                try {
-                    transaction.rollback();
-                } catch (Exception rollbackEx) {
-                    logger.error("Error during rollback: {}", rollbackEx.getMessage(), rollbackEx);
-                }
-            }
-            logger.error("Error cleaning test data: {}", e.getMessage(), e);
-        }
-    }
-    
-    /**
-     * پاک‌سازی تمام داده‌های تست (alias برای cleanAllTestData)
-     * 
-     * این متد wrapper برای cleanAllTestData است تا با نام‌گذاری تست‌ها سازگار باشد
-     */
-    public void clearAllData() {
-        cleanAllTestData();
-    }
-    
-    /**
-     * دریافت تعداد rating ها در پایگاه داده
-     * 
-     * Scenario: بررسی تعداد رکوردها برای assertion در تست‌ها
-     * 
-     * Usage Examples:
-     * - تأیید اینکه rating ها حذف شده‌اند
-     * - بررسی تعداد rating های ایجاد شده
-     * - Validation قبل و بعد از عملیات
-     * 
-     * Return Value:
-     * - تعداد واقعی rating ها در database
-     * - 0 در صورت خطا یا عدم وجود رکورد
-     * 
-     * Error Handling:
-     * - Exception safety با return 0
-     * - Logging خطاها برای debugging
-     * 
-     * @return تعداد rating ها در پایگاه داده
-     */
-    public static long getRatingCount() {
-        try (Session session = DatabaseUtil.getSessionFactory().openSession()) {
-            // استفاده از HQL برای شمارش
-            Long count = session.createQuery("SELECT COUNT(r) FROM Rating r", Long.class)
-                              .uniqueResult();
-            return count != null ? count : 0L;
-        } catch (Exception e) {
-            logger.error("Error getting rating count: {}", e.getMessage(), e);
-            return 0L; // مقدار پیش‌فرض در صورت خطا
-        }
+            return null;
+        });
+        System.out.println("[TestDatabaseManager] cleanRatingData: All ratings deleted");
     }
 } 
