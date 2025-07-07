@@ -1,6 +1,7 @@
 package com.myapp.analytics;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.myapp.common.models.ApiResponse;
 import com.myapp.common.utils.JsonUtil;
 import com.myapp.analytics.AnalyticsService;
@@ -26,11 +27,14 @@ import java.util.Map;
 public class AnalyticsController implements HttpHandler {
 
     private final AnalyticsService analyticsService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
     private static final Logger logger = LoggerFactory.getLogger(AnalyticsController.class);
 
     public AnalyticsController() {
         this.analyticsService = new AnalyticsService();
+        this.objectMapper = new ObjectMapper();
+        // اضافه کردن پشتیبانی از Java 8 Date/Time
+        this.objectMapper.registerModule(new JavaTimeModule());
     }
 
     /**
