@@ -409,8 +409,20 @@ public class ServerApp {
                     String requestBody = new String(exchange.getRequestBody().readAllBytes());
                     System.out.println("📥 Registration request received");
                     
+                    // اعتبارسنجی JSON قبل از پردازش
+                    if (requestBody == null || requestBody.trim().isEmpty()) {
+                        sendResponse(exchange, 400, "{\"error\":\"Request body is empty\"}");
+                        return;
+                    }
+                    
                     // تبدیل JSON به JsonNode برای پردازش
-                    JsonNode json = objectMapper.readTree(requestBody);
+                    JsonNode json;
+                    try {
+                        json = objectMapper.readTree(requestBody);
+                    } catch (Exception e) {
+                        sendResponse(exchange, 400, "{\"error\":\"Invalid JSON format\",\"details\":\"" + e.getMessage().replace("\"", "'") + "\"}");
+                        return;
+                    }
                     
                     // اعتبارسنجی فیلدهای ضروری
                     if (!json.has("fullName") || !json.has("phone") || !json.has("password")) {

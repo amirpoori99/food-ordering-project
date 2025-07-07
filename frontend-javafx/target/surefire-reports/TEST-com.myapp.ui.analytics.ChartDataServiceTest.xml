@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.myapp.ui.analytics.ChartDataServiceTest" time="0.0" tests="7" errors="0" skipped="7" failures="0">
+  <properties/>
+  <testcase name="" classname="com.myapp.ui.analytics.ChartDataServiceTest$IntegrationTests" time="0.0">
+    <skipped message="UI test - only run in graphical environment"/>
+  </testcase>
+  <testcase name="" classname="com.myapp.ui.analytics.ChartDataServiceTest$ErrorHandlingTests" time="0.0">
+    <skipped message="UI test - only run in graphical environment"/>
+  </testcase>
+  <testcase name="" classname="com.myapp.ui.analytics.ChartDataServiceTest$PerformanceTests" time="0.0">
+    <skipped message="UI test - only run in graphical environment"/>
+  </testcase>
+  <testcase name="" classname="com.myapp.ui.analytics.ChartDataServiceTest$CacheManagementTests" time="0.0">
+    <skipped message="UI test - only run in graphical environment"/>
+  </testcase>
+  <testcase name="" classname="com.myapp.ui.analytics.ChartDataServiceTest$RealDataTests" time="0.0">
+    <skipped message="UI test - only run in graphical environment"/>
+  </testcase>
+  <testcase name="" classname="com.myapp.ui.analytics.ChartDataServiceTest$AdditionalChartDataTests" time="0.0">
+    <skipped message="UI test - only run in graphical environment"/>
+  </testcase>
+  <testcase name="" classname="com.myapp.ui.analytics.ChartDataServiceTest$ChartDataLoadingTests" time="0.0">
+    <skipped message="UI test - only run in graphical environment"/>
+  </testcase>
+</testsuite>

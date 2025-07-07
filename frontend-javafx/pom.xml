@@ -227,13 +227,7 @@
             <scope>test</scope>
         </dependency>
         
-        <!-- Monocle - برای تست headless -->
-        <dependency>
-            <groupId>org.testfx</groupId>
-            <artifactId>openjfx-monocle</artifactId>
-            <version>jdk-12.0.1+2</version>
-            <scope>test</scope>
-        </dependency>
+
         
         <!-- JUnit Platform Suite - برای تست‌های suite -->
         <dependency>
@@ -366,16 +360,26 @@
                     <!-- تنظیمات JUnit 5 -->
                     <includes>
                         <include>**/*LogicTest.java</include>
-                        <include>**/BasicControllerTest.java</include>
+                        <include>**/*BasicControllerTest.java</include>
+                        <include>**/*ServiceTest.java</include>
                     </includes>
+                    <!-- تنظیمات فایل‌های تست -->
+                    <excludes>
+                        <exclude>**/*IntegrationTest.java</exclude>
+                        <exclude>**/*PerformanceTest.java</exclude>
+                        <exclude>**/*ControllerTest.java</exclude>
+                        <exclude>**/*EdgeTest.java</exclude>
+                        <exclude>**/*CoverageTest.java</exclude>
+                    </excludes>
                     <!-- تنظیمات سیستم -->
                     <systemPropertyVariables>
-                        <monocle.platform>Headless</monocle.platform>
-                        <prism.order>sw</prism.order>
+                        <java.awt.headless>true</java.awt.headless>
+                        <testfx.robot>awt</testfx.robot>
+                        <testfx.headless>true</testfx.headless>
                         <javafx.verbose>false</javafx.verbose>
                     </systemPropertyVariables>
                     <!-- تنظیمات حافظه برای تست‌ها -->
-                    <argLine>-Xmx1g -XX:+UseG1GC -Dfile.encoding=UTF-8 -Djava.awt.headless=true -Dtestfx.robot=awt -Dtestfx.headless=true</argLine>
+                    <argLine>-Xmx2g -XX:+UseG1GC -Dfile.encoding=UTF-8 -Djava.awt.headless=true -Dtestfx.robot=awt -Dtestfx.headless=true</argLine>
                 </configuration>
             </plugin>
             

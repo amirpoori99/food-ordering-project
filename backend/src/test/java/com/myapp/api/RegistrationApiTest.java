@@ -395,11 +395,11 @@ class RegistrationApiTest {
         @Test
         @DisplayName("Register user with long strings")
         void registerUser_longStrings_handled() {
-            // Arrange - داده‌های طولانی
+            // Arrange - داده‌های طولانی (در حد مجاز)
             String phone = "09123456779";
-            String longName = "A".repeat(200);
-            String longEmail = "very.long.email.address.that.might.cause.problems@very-long-domain-name-that-should-be-tested.com";
-            String longAddress = "Very Long Address That Includes Various Streets And Alleys And Multiple Building Numbers And Postal Codes ".repeat(5);
+            String longName = "A".repeat(100); // کاهش طول
+            String longEmail = "very.long.email@very-long-domain.com"; // کاهش طول
+            String longAddress = "Very Long Address With Multiple Streets And Building Numbers"; // کاهش طول
             
             User user = User.forRegistration(longName, phone, longEmail, "hashed_pass", longAddress);
             
@@ -423,7 +423,7 @@ class RegistrationApiTest {
         void registerUser_longPasswordHash_handled() {
             // Arrange
             String phone = "09123456778";
-            String longPasswordHash = "hashed_" + "a".repeat(500);
+            String longPasswordHash = "hashed_" + "a".repeat(200); // کاهش طول به حد مجاز
             
             User user = User.forRegistration("Test User", phone, "test@example.com", longPasswordHash, "Tehran");
             

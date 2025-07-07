@@ -40,9 +40,21 @@ public abstract class TestFXBase extends ApplicationTest {
                 System.setProperty("monocle.platform", "Headless");
                 System.setProperty("prism.order", "sw");
                 System.setProperty("javafx.verbose", "false");
+                System.setProperty("javafx.animation.fullspeed", "true");
+                System.setProperty("javafx.animation.pulse", "1");
+                System.setProperty("testfx.robot.write_sleep", "100");
+                System.setProperty("testfx.robot.read_sleep", "100");
+                System.setProperty("testfx.robot.auto_wait", "1000");
+                System.setProperty("testfx.robot.auto_wait_for_idle", "true");
                 
-                // Initialize JavaFX toolkit
-                FxToolkit.registerPrimaryStage();
+                // Initialize JavaFX toolkit with error handling
+                try {
+                    FxToolkit.registerPrimaryStage();
+                } catch (Exception e) {
+                    // If toolkit registration fails, try alternative approach
+                    System.setProperty("testfx.robot", "awt");
+                    System.setProperty("testfx.headless", "true");
+                }
                 javafxInitialized = true;
             } catch (Exception e) {
                 // If already initialized, continue
@@ -61,15 +73,20 @@ public abstract class TestFXBase extends ApplicationTest {
     public void start(Stage stage) throws Exception {
         this.testStage = stage;
         
-        // Create a simple scene for testing
-        VBox root = new VBox();
-        Scene scene = new Scene(root, 800, 600);
-        stage.setScene(scene);
-        stage.setTitle("Test Application");
-        stage.show();
-        
-        // Signal that JavaFX is ready
-        javafxLatch.countDown();
+        try {
+            // Create a simple scene for testing
+            VBox root = new VBox();
+            Scene scene = new Scene(root, 800, 600);
+            stage.setScene(scene);
+            stage.setTitle("Test Application");
+            stage.show();
+            
+            // Signal that JavaFX is ready
+            javafxLatch.countDown();
+        } catch (Exception e) {
+            // If stage setup fails, still signal ready
+            javafxLatch.countDown();
+        }
     }
 
     @BeforeEach

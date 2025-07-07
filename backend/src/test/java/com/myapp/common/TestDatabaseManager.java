@@ -54,10 +54,12 @@ public class TestDatabaseManager {
      */
     public static void clearAllTestData() {
         try {
-            clearUsers();
-            clearRestaurants();
-            cleanRatingData();
+            // ترتیب صحیح پاک‌سازی بر اساس وابستگی‌ها
             clearNotifications();
+            cleanRatingData();
+            clearFoodItems(); // ابتدا food_items را پاک کن
+            clearRestaurants(); // سپس restaurants را پاک کن
+            clearUsers();
             System.out.println("[TestDatabaseManager] All test data cleared");
         } catch (Exception e) {
             System.err.println("[TestDatabaseManager] Error clearing test data: " + e.getMessage());
@@ -139,10 +141,11 @@ public class TestDatabaseManager {
 
     public static void clearRestaurants() {
         executeInTransaction(session -> {
-            session.createQuery("DELETE FROM Restaurant").executeUpdate();
+            session.createQuery("DELETE FROM FoodItem").executeUpdate(); // ابتدا آیتم‌ها
+            session.createQuery("DELETE FROM Restaurant").executeUpdate(); // سپس رستوران‌ها
             return null;
         });
-        System.out.println("[TestDatabaseManager] clearRestaurants: All restaurants deleted");
+        System.out.println("[TestDatabaseManager] clearRestaurants: All restaurants and their food items deleted");
     }
 
     public static void clearNotifications() {
@@ -163,5 +166,13 @@ public class TestDatabaseManager {
             return null;
         });
         System.out.println("[TestDatabaseManager] cleanRatingData: All ratings deleted");
+    }
+
+    public static void clearFoodItems() {
+        executeInTransaction(session -> {
+            session.createQuery("DELETE FROM FoodItem").executeUpdate();
+            return null;
+        });
+        System.out.println("[TestDatabaseManager] clearFoodItems: All food items deleted");
     }
 } 

@@ -1,0 +1,15 @@
+-Xmx2g
+-XX:+UseG1GC
+-Dfile.encoding=UTF-8
+-Djava.awt.headless=true
+-Dtestfx.robot=awt
+-Dtestfx.headless=true
+-Dmonocle.platform=Headless
+-Dprism.order=sw
+-Djavafx.verbose=false
+-Djavafx.animation.fullspeed=true
+-Djavafx.animation.pulse=1
+-Dtestfx.robot.write_sleep=100
+-Dtestfx.robot.read_sleep=100
+-Dtestfx.robot.auto_wait=1000
+-Dtestfx.robot.auto_wait_for_idle=true 

@@ -1,0 +1,708 @@
+-------------------------------------------------------------------------------
+Test set: com.myapp.ui.admin.AdminDashboardControllerTest
+-------------------------------------------------------------------------------
+Tests run: 22, Failures: 0, Errors: 22, Skipped: 0, Time elapsed: 0.351 s <<< FAILURE! -- in com.myapp.ui.admin.AdminDashboardControllerTest
+com.myapp.ui.admin.AdminDashboardControllerTest.testFilterRestaurants -- Time elapsed: 0.092 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testTabPane -- Time elapsed: 0.008 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testStatusLabel -- Time elapsed: 0.007 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testFilterUsers -- Time elapsed: 0.005 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testFilterTransactions -- Time elapsed: 0.004 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testFilterOrders -- Time elapsed: 0.004 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testFilters -- Time elapsed: 0.005 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testExportButtons -- Time elapsed: 0.007 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testLoadOrders -- Time elapsed: 0.007 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testLoadRestaurants -- Time elapsed: 0.014 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testSettingsButtons -- Time elapsed: 0.006 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testFilterUsersByRole -- Time elapsed: 0.004 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testLoadTransactions -- Time elapsed: 0.004 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testInitialLoad -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testLoadOrdersChart -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testFilterOrdersByStatus -- Time elapsed: 0.003 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testLoadingIndicator -- Time elapsed: 0.002 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testFilterTransactionsByType -- Time elapsed: 0.004 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testRestaurantManagementButtons -- Time elapsed: 0.003 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testLoadRevenueChart -- Time elapsed: 0.005 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testUserManagementButtons -- Time elapsed: 0.005 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+
+com.myapp.ui.admin.AdminDashboardControllerTest.testLoadUsers -- Time elapsed: 0.007 s <<< ERROR!
+java.lang.RuntimeException: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.util.WaitForAsyncUtils.waitFor(WaitForAsyncUtils.java:301)
+	at org.testfx.api.FxToolkit.registerPrimaryStage(FxToolkit.java:107)
+	at org.testfx.framework.junit5.ApplicationExtension.beforeEach(ApplicationExtension.java:84)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	Suppressed: java.util.concurrent.TimeoutException: FX Application Thread not running
+		at org.testfx.api.FxToolkit.cleanupApplication(FxToolkit.java:169)
+		at org.testfx.framework.junit5.ApplicationExtension.afterEach(ApplicationExtension.java:90)
+		... 2 more
+Caused by: java.lang.IllegalStateException: monocle headless platform not found - did you forget to add a dependency on monocle (https://github.com/TestFX/Monocle)?
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:43)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.launch(ApplicationLauncherImpl.java:29)
+	at org.testfx.toolkit.impl.ToolkitServiceImpl.lambda$setupPrimaryStage$0(ToolkitServiceImpl.java:57)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.testfx.util.WaitForAsyncUtils$ASyncFXCallable.call(WaitForAsyncUtils.java:689)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ClassNotFoundException: com.sun.glass.ui.monocle.MonoclePlatformFactory
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	at java.base/java.lang.Class.forName0(Native Method)
+	at java.base/java.lang.Class.forName(Class.java:375)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.assignMonoclePlatform(ApplicationLauncherImpl.java:54)
+	at org.testfx.toolkit.impl.ApplicationLauncherImpl.initMonocleHeadless(ApplicationLauncherImpl.java:39)
+	... 9 more
+

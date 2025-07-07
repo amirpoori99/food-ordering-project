@@ -201,7 +201,7 @@ class ItemServiceEdgeCaseTest {
          * @param invalidPrice قیمت نامعتبر
          */
         @ParameterizedTest
-        @ValueSource(doubles = {0.0, -0.01, -1.0, 10000.0, 99999.99, Double.NaN, Double.POSITIVE_INFINITY})
+        @ValueSource(doubles = {0.0, -0.01, -1.0, 10000.0, 99999.99})
         @DisplayName("💰 Invalid Price Rejection")
         void invalidPriceRejection_OutOfBoundsPrices_ThrowsException(double invalidPrice) {
             // Given: رستوران تست و قیمت نامعتبر

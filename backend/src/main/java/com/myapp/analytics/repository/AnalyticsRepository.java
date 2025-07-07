@@ -406,8 +406,8 @@ public class AnalyticsRepository {
         InnovationAnalyticsDTO innovationData = new InnovationAnalyticsDTO();
         
         try (Connection conn = DatabaseUtil.getConnection()) {
-            innovationData.setInnovationMetrics(convertListToMap(getInnovationMetrics(conn, period)));
-            innovationData.setTechnologyAdoption(convertListToMap(getTechnologyAdoption(conn, period)));
+            innovationData.setInnovationMetrics(getInnovationMetrics(conn, period));
+            innovationData.setTechnologyAdoption(getTechnologyAdoption(conn, period));
             innovationData.setProductInnovation(convertListToMap(getProductInnovation(conn, period)));
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "خطا در دریافت آمار نوآوری", e);
