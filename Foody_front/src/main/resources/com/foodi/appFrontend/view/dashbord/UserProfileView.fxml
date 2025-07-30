@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="550.0"
+            style="-fx-background-color: white;"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.foodi.appFrontend.tabs.dashbord.UserProfileController">
+
+    <!-- ScrollPane wrapping the entire content -->
+    <ScrollPane fitToWidth="true"
+                hbarPolicy="NEVER"
+                vbarPolicy="AS_NEEDED"
+                style="-fx-background-color: white; -fx-background: white;"
+                AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0"
+                AnchorPane.topAnchor="0.0"
+                AnchorPane.bottomAnchor="0.0">
+
+        <content>
+            <VBox alignment="TOP_CENTER"
+                  spacing="25.0"
+                  style="-fx-padding: 30;">
+
+                <!-- Profile Header -->
+                <VBox alignment="CENTER" spacing="20.0">
+                    <!-- Profile Picture Section -->
+                    <StackPane alignment="CENTER" prefHeight="120.0" prefWidth="120.0">
+                        <children>
+                            <!-- Profile Image Container -->
+                            <HBox alignment="CENTER"
+                                  style="-fx-background-color: #667eea;
+                                         -fx-background-radius: 60;
+                                         -fx-pref-width: 120;
+                                         -fx-pref-height: 120;
+                                         -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 8, 0, 0, 4);">
+                                <ImageView fx:id="profileImageView"
+                                           fitHeight="110.0"
+                                           fitWidth="110.0"
+                                           pickOnBounds="true"
+                                           preserveRatio="true"
+                                           style="-fx-background-radius: 55;" />
+                            </HBox>
+
+                            <!-- Change Picture Button -->
+                            <MFXButton onAction="#handleChangePicture"
+                                       style="-fx-background-color: #3b82f6;
+                                             -fx-text-fill: white;
+                                             -fx-font-size: 12px;
+                                             -fx-font-weight: bold;
+                                             -fx-background-radius: 15;
+                                             -fx-cursor: hand;
+                                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 2);"
+                                       text="📷 Change"
+                                       StackPane.alignment="BOTTOM_RIGHT">
+                                <padding>
+                                    <Insets bottom="6.0" left="10.0" right="10.0" top="6.0" />
+                                </padding>
+                            </MFXButton>
+                        </children>
+                    </StackPane>
+
+                    <!-- Profile Title -->
+                    <HBox alignment="CENTER"
+                          style="-fx-background-color: #667eea;
+                                 -fx-background-radius: 10;
+                                 -fx-padding: 12 20;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 6, 0, 0, 3);">
+                        <Label text="👤 My Profile Information"
+                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Profile Form Section -->
+                <VBox spacing="20.0"
+                      style="-fx-background-color: #f8fafc;
+                             -fx-padding: 30;
+                             -fx-background-radius: 15;
+                             -fx-border-color: #e2e8f0;
+                             -fx-border-width: 1;
+                             -fx-border-radius: 15;
+                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0, 0, 3);">
+
+                    <GridPane hgap="20.0" vgap="18.0">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="120.0" prefWidth="140.0" />
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="250.0" prefWidth="350.0" />
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints minHeight="40.0" prefHeight="45.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="40.0" prefHeight="45.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="40.0" prefHeight="45.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="40.0" prefHeight="45.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="40.0" prefHeight="45.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="40.0" prefHeight="45.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="40.0" prefHeight="45.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="40.0" prefHeight="45.0" vgrow="SOMETIMES" />
+                        </rowConstraints>
+
+                        <children>
+                            <!-- Full Name -->
+                            <Label text="👤 Full Name:"
+                                   style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #374151;" />
+                            <MFXTextField fx:id="fullNameField"
+                                          promptText="Enter your full name"
+                                          style="-fx-background-color: white;
+                                                 -fx-background-radius: 8;
+                                                 -fx-padding: 12;
+                                                 -fx-font-size: 14px;
+                                                 -fx-border-color: #d1d5db;
+                                                 -fx-border-width: 1;
+                                                 -fx-border-radius: 8;"
+                                          GridPane.columnIndex="1" />
+
+                            <!-- Phone -->
+                            <Label text="📱 Phone:"
+                                   style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #374151;"
+                                   GridPane.rowIndex="1" />
+                            <MFXTextField fx:id="phoneField"
+                                          promptText="Enter your phone number"
+                                          style="-fx-background-color: white;
+                                                 -fx-background-radius: 8;
+                                                 -fx-padding: 12;
+                                                 -fx-font-size: 14px;
+                                                 -fx-border-color: #d1d5db;
+                                                 -fx-border-width: 1;
+                                                 -fx-border-radius: 8;"
+                                          GridPane.columnIndex="1"
+                                          GridPane.rowIndex="1" />
+
+                            <!-- Email -->
+                            <Label text="📧 Email:"
+                                   style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #374151;"
+                                   GridPane.rowIndex="2" />
+                            <MFXTextField fx:id="emailField"
+                                          promptText="Enter your email address"
+                                          style="-fx-background-color: white;
+                                                 -fx-background-radius: 8;
+                                                 -fx-padding: 12;
+                                                 -fx-font-size: 14px;
+                                                 -fx-border-color: #d1d5db;
+                                                 -fx-border-width: 1;
+                                                 -fx-border-radius: 8;"
+                                          GridPane.columnIndex="1"
+                                          GridPane.rowIndex="2" />
+
+                            <!-- Address -->
+                            <Label text="🏠 Address:"
+                                   style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #374151;"
+                                   GridPane.rowIndex="3" />
+                            <MFXTextField fx:id="addressField"
+                                          promptText="Enter your address"
+                                          style="-fx-background-color: white;
+                                                 -fx-background-radius: 8;
+                                                 -fx-padding: 12;
+                                                 -fx-font-size: 14px;
+                                                 -fx-border-color: #d1d5db;
+                                                 -fx-border-width: 1;
+                                                 -fx-border-radius: 8;"
+                                          GridPane.columnIndex="1"
+                                          GridPane.rowIndex="3" />
+
+                            <!-- Role -->
+                            <Label text="👔 Role:"
+                                   style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #374151;"
+                                   GridPane.rowIndex="4" />
+                            <MFXTextField fx:id="roleField"
+                                          editable="false"
+                                          promptText="Your role"
+                                          style="-fx-background-color: #f3f4f6;
+                                                 -fx-background-radius: 8;
+                                                 -fx-padding: 12;
+                                                 -fx-font-size: 14px;
+                                                 -fx-border-color: #d1d5db;
+                                                 -fx-border-width: 1;
+                                                 -fx-border-radius: 8;
+                                                 -fx-text-fill: #6b7280;"
+                                          GridPane.columnIndex="1"
+                                          GridPane.rowIndex="4" />
+
+                            <!-- Wallet Balance -->
+                            <Label text="💰 Wallet Balance:"
+                                   style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #374151;"
+                                   GridPane.rowIndex="5" />
+                            <MFXTextField fx:id="walletBalanceField"
+                                          editable="false"
+                                          promptText="Your wallet balance"
+                                          style="-fx-background-color: #ecfdf5;
+                                                 -fx-background-radius: 8;
+                                                 -fx-padding: 12;
+                                                 -fx-font-size: 14px;
+                                                 -fx-font-weight: bold;
+                                                 -fx-border-color: #10b981;
+                                                 -fx-border-width: 1;
+                                                 -fx-border-radius: 8;
+                                                 -fx-text-fill: #059669;"
+                                          GridPane.columnIndex="1"
+                                          GridPane.rowIndex="5" />
+
+                            <!-- Bank Name -->
+                            <Label fx:id="bankNameLabel"
+                                   text="🏦 Bank Name:"
+                                   style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #374151;"
+                                   GridPane.rowIndex="6" />
+                            <MFXTextField fx:id="bankNameField"
+                                          editable="false"
+                                          promptText="Bank name"
+                                          style="-fx-background-color: #f3f4f6;
+                                                 -fx-background-radius: 8;
+                                                 -fx-padding: 12;
+                                                 -fx-font-size: 14px;
+                                                 -fx-border-color: #d1d5db;
+                                                 -fx-border-width: 1;
+                                                 -fx-border-radius: 8;
+                                                 -fx-text-fill: #6b7280;"
+                                          GridPane.columnIndex="1"
+                                          GridPane.rowIndex="6" />
+
+                            <!-- Account Number -->
+                            <Label fx:id="accountNumberLabel"
+                                   text="💳 Account Number:"
+                                   style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #374151;"
+                                   GridPane.rowIndex="7" />
+                            <MFXTextField fx:id="accountNumberField"
+                                          editable="false"
+                                          promptText="Account number"
+                                          style="-fx-background-color: #f3f4f6;
+                                                 -fx-background-radius: 8;
+                                                 -fx-padding: 12;
+                                                 -fx-font-size: 14px;
+                                                 -fx-border-color: #d1d5db;
+                                                 -fx-border-width: 1;
+                                                 -fx-border-radius: 8;
+                                                 -fx-text-fill: #6b7280;"
+                                          GridPane.columnIndex="1"
+                                          GridPane.rowIndex="7" />
+                        </children>
+                    </GridPane>
+
+                    <!-- Error Message -->
+                    <Label fx:id="profileErrorMessageLabel"
+                           style="-fx-text-fill: #ef4444;
+                                  -fx-font-weight: bold;
+                                  -fx-font-size: 14px;
+                                  -fx-background-color: #fef2f2;
+                                  -fx-background-radius: 6;
+                                  -fx-padding: 10;"
+                           text=""
+                           wrapText="true" />
+
+                    <!-- Action Buttons -->
+                    <HBox alignment="CENTER" spacing="15.0">
+                        <children>
+                            <MFXButton fx:id="editProfileButton"
+                                       onAction="#handleEditProfile"
+                                       text="✏️ Edit Profile"
+                                       style="-fx-background-color: #3b82f6;
+                                             -fx-text-fill: white;
+                                             -fx-font-weight: bold;
+                                             -fx-font-size: 14px;
+                                             -fx-background-radius: 8;
+                                             -fx-padding: 12 24;
+                                             -fx-cursor: hand;
+                                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 2);" />
+
+                            <MFXButton fx:id="saveButton"
+                                       onAction="#handleSaveChanges"
+                                       text="💾 Save Changes"
+                                       style="-fx-background-color: #10b981;
+                                             -fx-text-fill: white;
+                                             -fx-font-weight: bold;
+                                             -fx-font-size: 14px;
+                                             -fx-background-radius: 8;
+                                             -fx-padding: 12 24;
+                                             -fx-cursor: hand;
+                                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 2);" />
+
+                            <MFXButton fx:id="cancelButton"
+                                       onAction="#handleCancelEdit"
+                                       text="❌ Cancel"
+                                       style="-fx-background-color: #ef4444;
+                                             -fx-text-fill: white;
+                                             -fx-font-weight: bold;
+                                             -fx-font-size: 14px;
+                                             -fx-background-radius: 8;
+                                             -fx-padding: 12 24;
+                                             -fx-cursor: hand;
+                                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 2);" />
+                        </children>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </content>
+    </ScrollPane>
+</AnchorPane>

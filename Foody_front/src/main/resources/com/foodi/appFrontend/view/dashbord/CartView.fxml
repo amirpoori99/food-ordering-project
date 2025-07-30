@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.foodi.appFrontend.tabs.dashbord.CartController"
+      spacing="15" alignment="TOP_CENTER" style="-fx-background-color: #f8fafc; -fx-padding: 20;">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <Label text="Your Shopping Cart" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+
+    <!-- Delivery Address Section -->
+    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 4, 0, 0, 2);">
+        <Label text="Delivery Address" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Address:" style="-fx-font-weight: 600; -fx-text-fill: #374151;"/>
+            <TextField fx:id="deliveryAddressField" promptText="Enter delivery address" prefWidth="400" 
+                      style="-fx-background-color: #f8fafc; -fx-background-radius: 6; -fx-padding: 8 12; -fx-border-color: #e2e8f0; -fx-border-width: 1; -fx-border-radius: 6;"/>
+        </HBox>
+    </VBox>
+
+    <!-- Coupon Section -->
+    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 4, 0, 0, 2);">
+        <Label text="Apply Coupon" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Coupon Code:" style="-fx-font-weight: 600; -fx-text-fill: #374151;"/>
+            <TextField fx:id="couponCodeField" promptText="Enter coupon code" prefWidth="200"
+                      style="-fx-background-color: #f8fafc; -fx-background-radius: 6; -fx-padding: 8 12; -fx-border-color: #e2e8f0; -fx-border-width: 1; -fx-border-radius: 6;"/>
+            <MFXButton text="Apply Coupon" onAction="#handleApplyCoupon" 
+                      style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 8 16; -fx-font-weight: 600; -fx-cursor: hand;"/>
+        </HBox>
+        <Label fx:id="couponStatusLabel" text="" style="-fx-text-fill: #10b981; -fx-font-weight: 600;"/>
+    </VBox>
+
+    <TableView fx:id="cartItemsTable" VBox.vgrow="ALWAYS" prefHeight="300" prefWidth="600" 
+               style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 4, 0, 0, 2);">
+        <columns>
+            <TableColumn fx:id="cartItemNameColumn" text="Item" prefWidth="200"/>
+            <TableColumn fx:id="cartItemQuantityColumn" text="Quantity" prefWidth="100"/>
+            <TableColumn fx:id="cartItemPriceColumn" text="Price" prefWidth="100"/>
+            <TableColumn fx:id="cartItemSubtotalColumn" text="Subtotal" prefWidth="100"/>
+            <TableColumn fx:id="cartItemActionsColumn" text="Actions" prefWidth="100"/>
+        </columns>
+    </TableView>
+
+    <!-- Price Breakdown -->
+    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 4, 0, 0, 2);">
+        <Label text="Price Breakdown" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Label text="Subtotal:" style="-fx-font-size: 14px; -fx-font-weight: 600; -fx-text-fill: #374151;"/>
+            <Label fx:id="subtotalLabel" text="0.00" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #374151;"/>
+        </HBox>
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Label text="Coupon Discount:" style="-fx-font-size: 14px; -fx-text-fill: #10b981; -fx-font-weight: 600;"/>
+            <Label fx:id="couponDiscountLabel" text="0.00" style="-fx-font-size: 14px; -fx-text-fill: #10b981; -fx-font-weight: bold;"/>
+        </HBox>
+        <HBox spacing="10" alignment="CENTER_RIGHT" 
+              style="-fx-background-color: #667eea; -fx-background-radius: 6; -fx-padding: 10 15;">
+            <Label text="Total Price:" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            <Label fx:id="totalPriceLabel" text="0.00" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+        </HBox>
+    </VBox>
+
+    <Label fx:id="cartErrorMessageLabel" textFill="#ef4444" wrapText="true" style="-fx-font-weight: 600;"/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <MFXButton text="Clear Cart" onAction="#handleClearCart" 
+                  style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 10 20; -fx-font-weight: 600; -fx-cursor: hand;"/>
+        <MFXButton text="Place Order" onAction="#handlePlaceOrder" 
+                  style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 10 20; -fx-font-weight: 600; -fx-cursor: hand;"/>
+        <MFXButton text="Close" onAction="#handleClose" 
+                  style="-fx-background-color: #6b7280; -fx-text-fill: white; -fx-background-radius: 6; -fx-padding: 10 20; -fx-font-weight: 600; -fx-cursor: hand;"/>
+    </HBox>
+
+</VBox>

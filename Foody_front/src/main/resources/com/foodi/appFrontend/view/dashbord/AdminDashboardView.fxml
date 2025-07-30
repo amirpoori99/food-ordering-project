@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Region?>
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.foodi.appFrontend.tabs.dashbord.AdminDashboard"
+            style="-fx-background-color: #f8fafc;">
+
+    <top>
+        <!-- Header Section -->
+        <VBox style="-fx-background-color: white; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);">
+            <!-- Top Bar with Title and Logout -->
+            <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-padding: 20 30 15 30; -fx-background-color: white;">
+                <Label text="Fooody Admin Dashboard"
+                       style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: linear-gradient(to right, #667eea, #764ba2);"/>
+
+                <!-- Spacer -->
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <!-- Error Message -->
+                <Label fx:id="errorMessageLabel"
+                       style="-fx-text-fill: #ef4444; -fx-font-size: 13px;"
+                       wrapText="true" />
+
+                <!-- Logout Button -->
+                <MFXButton text="Logout"
+                           onAction="#logout"
+                           style="-fx-background-color: #ef4444;
+                                 -fx-text-fill: white;
+                                 -fx-background-radius: 8;
+                                 -fx-padding: 10 20;
+                                 -fx-font-size: 14px;
+                                 -fx-font-weight: bold;
+                                 -fx-cursor: hand;"/>
+            </HBox>
+
+            <!-- Browser-style Tab Navigation -->
+            <HBox spacing="0" style="-fx-padding: 0 30 0 30; -fx-background-color: #f1f5f9;">
+                <MFXButton fx:id="usersTab"
+                           text="👥 Users Management"
+                           onAction="#switchToUsersTab"
+                           style="-fx-background-color: white;
+                                 -fx-text-fill: #374151;
+                                 -fx-padding: 12 24;
+                                 -fx-font-size: 14px;
+                                 -fx-font-weight: 600;
+                                 -fx-border-color: #e2e8f0;
+                                 -fx-border-width: 1 1 0 1;
+                                 -fx-background-radius: 8 8 0 0;
+                                 -fx-border-radius: 8 8 0 0;
+                                 -fx-cursor: hand;"/>
+
+                <MFXButton fx:id="ordersTab"
+                           text="📦 Orders Management"
+                           onAction="#switchToOrdersTab"
+                           style="-fx-background-color: #f1f5f9;
+                                 -fx-text-fill: #6b7280;
+                                 -fx-padding: 12 24;
+                                 -fx-font-size: 14px;
+                                 -fx-font-weight: 500;
+                                 -fx-border-color: #e2e8f0;
+                                 -fx-border-width: 0 0 1 0;
+                                 -fx-cursor: hand;"/>
+
+                <MFXButton fx:id="transactionsTab"
+                           text="💳 Transactions"
+                           onAction="#switchToTransactionsTab"
+                           style="-fx-background-color: #f1f5f9;
+                                 -fx-text-fill: #6b7280;
+                                 -fx-padding: 12 24;
+                                 -fx-font-size: 14px;
+                                 -fx-font-weight: 500;
+                                 -fx-border-color: #e2e8f0;
+                                 -fx-border-width: 0 0 1 0;
+                                 -fx-cursor: hand;"/>
+
+                <MFXButton fx:id="couponsTab"
+                           text="🎫 Coupons"
+                           onAction="#switchToCouponsTab"
+                           style="-fx-background-color: #f1f5f9;
+                                 -fx-text-fill: #6b7280;
+                                 -fx-padding: 12 24;
+                                 -fx-font-size: 14px;
+                                 -fx-font-weight: 500;
+                                 -fx-border-color: #e2e8f0;
+                                 -fx-border-width: 0 0 1 0;
+                                 -fx-cursor: hand;"/>
+
+                <!-- Spacer to fill remaining space -->
+                <Region HBox.hgrow="ALWAYS" style="-fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0;"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <TabPane fx:id="mainTabPane"
+                 BorderPane.alignment="CENTER"
+                 tabClosingPolicy="UNAVAILABLE"
+                 style="-fx-tab-header-area-tabs-breadth: 0; -fx-padding: 0;">
+            <tabs>
+                <Tab text="Users Management">
+                    <content>
+                        <VBox spacing="25"
+                              alignment="TOP_LEFT"
+                              style="-fx-background-color: white; -fx-padding: 40;">
+
+                            <Label text="System Users"
+                                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+
+                            <!-- Controls Section -->
+                            <HBox spacing="15"
+                                  alignment="CENTER_LEFT"
+                                  style="-fx-background-color: #f8fafc; -fx-padding: 20; -fx-background-radius: 12;">
+                                <Label text="Filter by Role:"
+                                       style="-fx-font-size: 14px; -fx-text-fill: #374151; -fx-font-weight: 600;"/>
+                                <ComboBox fx:id="filterRoleComboBox"
+                                          promptText="All Roles"
+                                          style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 8 12;"/>
+
+                                <MFXButton text="🔄 Refresh Users"
+                                           onAction="#viewUsers"
+                                           style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10 16; -fx-font-size: 13px; -fx-cursor: hand;"/>
+                                <MFXButton text="✅ Approve Selected"
+                                           onAction="#approveSelectedUsers"
+                                           style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10 16; -fx-font-size: 13px; -fx-cursor: hand;"/>
+                                <MFXButton text="❌ Reject Selected"
+                                           onAction="#rejectSelectedUsers"
+                                           style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10 16; -fx-font-size: 13px; -fx-cursor: hand;"/>
+                            </HBox>
+
+                            <!-- Table Section -->
+                            <TableView fx:id="usersTable"
+                                       VBox.vgrow="ALWAYS"
+                                       prefHeight="450"
+                                       style="-fx-background-color: white;
+                                             -fx-border-color: #e2e8f0;
+                                             -fx-border-radius: 12;
+                                             -fx-background-radius: 12;
+                                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 4, 0, 0, 2);">
+                                <columns>
+                                    <TableColumn fx:id="userIdColumn" text="ID" prefWidth="60"/>
+                                    <TableColumn fx:id="userNameColumn" text="Full Name" prefWidth="150"/>
+                                    <TableColumn fx:id="userPhoneColumn" text="Phone" prefWidth="120"/>
+                                    <TableColumn fx:id="userEmailColumn" text="Email" prefWidth="180"/>
+                                    <TableColumn fx:id="userRoleColumn" text="Role" prefWidth="100"/>
+                                    <TableColumn fx:id="userAddressColumn" text="Address" prefWidth="200"/>
+                                    <TableColumn fx:id="userStatusColumn" text="Status" prefWidth="100"/>
+                                    <TableColumn fx:id="userWalletBalanceColumn" text="Wallet Balance" prefWidth="130"/>
+                                </columns>
+                                <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+                            </TableView>
+                        </VBox>
+                    </content>
+                </Tab>
+
+                <Tab text="Orders Management">
+                    <content>
+                        <VBox spacing="25"
+                              alignment="TOP_LEFT"
+                              style="-fx-background-color: white; -fx-padding: 40;">
+
+                            <Label text="System Orders"
+                                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+
+                            <!-- Controls Section -->
+                            <HBox spacing="15"
+                                  alignment="CENTER_LEFT"
+                                  style="-fx-background-color: #f8fafc; -fx-padding: 20; -fx-background-radius: 12;">
+                                <ComboBox fx:id="orderTimePeriodFilter"
+                                          promptText="Time Period"
+                                          style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 8 12;"/>
+                                <ComboBox fx:id="orderStatusFilter"
+                                          promptText="Filter by Status"
+                                          style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 8 12;"/>
+                                <MFXButton text="🔄 Refresh Orders"
+                                           onAction="#viewOrders"
+                                           style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10 16; -fx-font-size: 13px; -fx-cursor: hand;"/>
+                            </HBox>
+
+                            <!-- Table Section -->
+                            <TableView fx:id="ordersTable"
+                                       VBox.vgrow="ALWAYS"
+                                       prefHeight="450"
+                                       style="-fx-background-color: white;
+                                             -fx-border-color: #e2e8f0;
+                                             -fx-border-radius: 12;
+                                             -fx-background-radius: 12;
+                                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 4, 0, 0, 2);">
+                                <columns>
+                                    <TableColumn fx:id="orderIdColumn" text="ID" prefWidth="60"/>
+                                    <TableColumn fx:id="orderCustomerIdColumn" text="Customer ID" prefWidth="110"/>
+                                    <TableColumn fx:id="orderVendorIdColumn" text="Vendor ID" prefWidth="110"/>
+                                    <TableColumn fx:id="orderCourierIdColumn" text="Courier ID" prefWidth="110"/>
+                                    <TableColumn fx:id="orderStatusColumn" text="Status" prefWidth="120"/>
+                                    <TableColumn fx:id="orderPriceColumn" text="Price" prefWidth="90"/>
+                                    <TableColumn fx:id="orderAddressColumn" text="Delivery Address" prefWidth="200"/>
+                                    <TableColumn fx:id="orderCreatedAtColumn" text="Created At" prefWidth="150"/>
+                                </columns>
+                                <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+                            </TableView>
+                        </VBox>
+                    </content>
+                </Tab>
+
+                <Tab text="Transactions Management">
+                    <content>
+                        <VBox spacing="25"
+                              alignment="TOP_LEFT"
+                              style="-fx-background-color: white; -fx-padding: 40;">
+
+                            <Label text="System Transactions"
+                                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+
+                            <!-- Controls Section -->
+                            <HBox spacing="15"
+                                  alignment="CENTER_LEFT"
+                                  style="-fx-background-color: #f8fafc; -fx-padding: 20; -fx-background-radius: 12;">
+                                <TextField fx:id="transactionSearchField"
+                                           promptText="🔍 Search transactions..."
+                                           style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 8 12; -fx-pref-width: 200;"/>
+                                <ComboBox fx:id="transactionUserFilter"
+                                          promptText="Filter by User"
+                                          style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 8 12;"/>
+                                <ComboBox fx:id="transactionMethodFilter"
+                                          promptText="Filter by Method"
+                                          style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 8 12;"/>
+                                <ComboBox fx:id="transactionStatusFilter"
+                                          promptText="Filter by Status"
+                                          style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 8 12;"/>
+                                <MFXButton text="🔄 Refresh Transactions"
+                                           onAction="#viewTransactions"
+                                           style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10 16; -fx-font-size: 13px; -fx-cursor: hand;"/>
+                            </HBox>
+
+                            <!-- Table Section -->
+                            <TableView fx:id="transactionsTable"
+                                       VBox.vgrow="ALWAYS"
+                                       prefHeight="450"
+                                       style="-fx-background-color: white;
+                                             -fx-border-color: #e2e8f0;
+                                             -fx-border-radius: 12;
+                                             -fx-background-radius: 12;
+                                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 4, 0, 0, 2);">
+                                <columns>
+                                    <TableColumn fx:id="transactionIdColumn" text="ID" prefWidth="60"/>
+                                    <TableColumn fx:id="transactionOrderIdColumn" text="Order ID" prefWidth="100"/>
+                                    <TableColumn fx:id="transactionUserIdColumn" text="User ID" prefWidth="100"/>
+                                    <TableColumn fx:id="transactionMethodColumn" text="Method" prefWidth="120"/>
+                                    <TableColumn fx:id="transactionStatusColumn" text="Status" prefWidth="120"/>
+                                </columns>
+                                <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+                            </TableView>
+                        </VBox>
+                    </content>
+                </Tab>
+
+                <Tab text="Coupons Management">
+                    <content>
+                        <VBox spacing="25"
+                              alignment="TOP_LEFT"
+                              style="-fx-background-color: white; -fx-padding: 40;">
+
+                            <Label text="System Coupons"
+                                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"/>
+
+                            <!-- Controls Section -->
+                            <HBox spacing="15"
+                                  alignment="CENTER_LEFT"
+                                  style="-fx-background-color: #f8fafc; -fx-padding: 20; -fx-background-radius: 12;">
+                                <MFXButton text="➕ Add New Coupon"
+                                           onAction="#addCoupon"
+                                           style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10 16; -fx-font-size: 13px; -fx-cursor: hand;"/>
+                                <MFXButton text="🔄 Refresh Coupons"
+                                           onAction="#viewCoupons"
+                                           style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10 16; -fx-font-size: 13px; -fx-cursor: hand;"/>
+                                <MFXButton text="✏️ Edit Selected"
+                                           onAction="#editCoupon"
+                                           style="-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10 16; -fx-font-size: 13px; -fx-cursor: hand;"/>
+                                <MFXButton text="🗑️ Delete Selected"
+                                           onAction="#deleteCoupon"
+                                           style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10 16; -fx-font-size: 13px; -fx-cursor: hand;"/>
+                            </HBox>
+
+                            <!-- Table Section -->
+                            <TableView fx:id="couponsTable"
+                                       VBox.vgrow="ALWAYS"
+                                       prefHeight="450"
+                                       style="-fx-background-color: white;
+                                             -fx-border-color: #e2e8f0;
+                                             -fx-border-radius: 12;
+                                             -fx-background-radius: 12;
+                                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 4, 0, 0, 2);">
+                                <columns>
+                                    <TableColumn fx:id="couponIdColumn" text="ID" prefWidth="60"/>
+                                    <TableColumn fx:id="couponCodeColumn" text="Code" prefWidth="110"/>
+                                    <TableColumn fx:id="couponTypeColumn" text="Type" prefWidth="90"/>
+                                    <TableColumn fx:id="couponValueColumn" text="Value" prefWidth="90"/>
+                                    <TableColumn fx:id="couponMinPriceColumn" text="Min Price" prefWidth="110"/>
+                                    <TableColumn fx:id="couponUserCountColumn" text="User Count" prefWidth="110"/>
+                                    <TableColumn fx:id="couponStartDateColumn" text="Start Date" prefWidth="130"/>
+                                    <TableColumn fx:id="couponEndDateColumn" text="End Date" prefWidth="130"/>
+                                </columns>
+                                <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+                            </TableView>
+                        </VBox>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+</BorderPane>

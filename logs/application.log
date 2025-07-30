@@ -1,0 +1,31 @@
+2025-07-30 13:44:08.114 [main] INFO  Main - Main: Triggering JpaUtil static initializer...
+2025-07-30 13:44:08.357 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: MyPU]
+2025-07-30 13:44:08.453 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.4.4.Final
+2025-07-30 13:44:08.520 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-07-30 13:44:10.878 [main] WARN  o.hibernate.orm.connections.pooling - HHH10001002: Using built-in connection pool (not intended for production use)
+2025-07-30 13:44:10.885 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Loaded JDBC driver class: org.postgresql.Driver
+2025-07-30 13:44:10.886 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001012: Connecting with JDBC URL [jdbc:postgresql://localhost:5432/testdb]
+2025-07-30 13:44:10.886 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001001: Connection properties: {password=****, user=postgres}
+2025-07-30 13:44:10.886 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001003: Autocommit mode: false
+2025-07-30 13:44:10.891 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001115: Connection pool size: 20 (min=1)
+2025-07-30 13:44:14.052 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-07-30 13:44:14.086 [main] INFO  o.hibernate.orm.connections.access - HHH10001501: Connection obtained from JdbcConnectionAccess [org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess@7cecab19] for (non-JTA) DDL execution was not in auto-commit mode; the Connection 'local transaction' will be committed and the Connection will be set into auto-commit mode.
+2025-07-30 13:44:14.501 [main] INFO  Main - Main: JpaUtil static initializer completed successfully.
+2025-07-30 13:44:14.659 [main] INFO  Main - Server is now listening on port: 8080
+2025-07-30 13:44:14.659 [main] INFO  Main - Authentication Service:     http://localhost:8080/auth/*
+2025-07-30 13:44:14.659 [main] INFO  Main - Restaurant Management:      http://localhost:8080/restaurants/*
+2025-07-30 13:44:14.660 [main] INFO  Main - Vendor Search & Browse:     http://localhost:8080/vendors/*
+2025-07-30 13:44:14.660 [main] INFO  Main - Menu & Item Management:    http://localhost:8080/items/*
+2025-07-30 13:44:14.660 [main] INFO  Main - Order Processing:           http://localhost:8080/orders/*
+2025-07-30 13:44:14.660 [main] INFO  Main - Favorites Management:      http://localhost:8080/favorites/*
+2025-07-30 13:44:14.660 [main] INFO  Main - Rating & Review System:     http://localhost:8080/ratings/*
+2025-07-30 13:44:14.660 [main] INFO  Main - Delivery Tracking:          http://localhost:8080/deliveries/*
+2025-07-30 13:44:14.660 [main] INFO  Main - Wallet & Balance:           http://localhost:8080/wallet/*
+2025-07-30 13:44:14.660 [main] INFO  Main - Payment Processing:         http://localhost:8080/payment/*
+2025-07-30 13:44:14.660 [main] INFO  Main - Transaction History:        http://localhost:8080/transactions/*
+2025-07-30 13:44:14.660 [main] INFO  Main - Coupon Management:          http://localhost:8080/coupons/*
+2025-07-30 13:44:14.660 [main] INFO  Main - Admin Panel:               http://localhost:8080/admin/*
+2025-07-30 13:44:14.660 [main] INFO  Main - All services are now available and ready to handle requests!
+2025-07-30 13:44:46.896 [Thread-1] INFO  Main - Main: Shutdown hook triggered. Closing resources...
+2025-07-30 13:44:46.898 [Thread-1] INFO  o.hibernate.orm.connections.pooling - HHH10001008: Cleaning up connection pool [jdbc:postgresql://localhost:5432/testdb]
+2025-07-30 13:44:46.899 [Thread-1] INFO  Main - Main: Resources closed. Exiting.
